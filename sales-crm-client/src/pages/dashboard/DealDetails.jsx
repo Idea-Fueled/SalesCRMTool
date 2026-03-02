@@ -1,0 +1,358 @@
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { getDealById } from "../../../API/services/dealService";
+import {
+    Briefcase, Building2, User, DollarSign,
+    Calendar, Clock, Target, Info,
+    TrendingUp, ArrowLeft, Tag, Share2, Loader2,
+    Star, RotateCw, Maximize2, Lock, ThumbsUp, Shield,
+    MoreHorizontal, Download, ChevronRight,
+    MapPin, Mail, Phone, FileText, Paperclip, List, History, MessageSquare
+} from "lucide-react";
+import toast from "react-hot-toast";
+
+const pipelineStages = [
+    { id: "Lead", label: "Lead" },
+    { id: "Qualified", label: "Qualified" },
+    { id: "Proposal", label: "Proposal" },
+    { id: "Negotiation", label: "Negotiation" },
+    { id: "Closed Won", label: "Closed Won" },
+    { id: "Closed Lost", label: "Closed Lost" }
+];
+
+const formatDate = (date, includeTime = false) => {
+    if (!date) return "Not Set";
+    const options = {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+    };
+    if (includeTime) {
+        options.hour = '2-digit';
+        options.minute = '2-digit';
+    }
+    return new Date(date).toLocaleString("en-IN", options);
+};
+
+export default function DealDetails() {
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const [deal, setDeal] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchDeal = async () => {
+            try {
+                const res = await getDealById(id);
+                setDeal(res.data.data);
+            } catch (error) {
+                console.error(error);
+                toast.error("Failed to fetch deal details");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchDeal();
+    }, [id]);
+
+    const getInitials = (name) => {
+        if (!name) return "D";
+        const parts = name.trim().split(/\s+/);
+        if (parts.length >= 2) {
+            return (parts[0][0] + parts[1][0]).toUpperCase();
+        }
+        return parts[0].slice(0, 2).toUpperCase();
+    };
+
+    if (loading) {
+        return (
+            <div className="flex h-[80vh] items-center justify-center">
+                <Loader2 className="w-10 h-10 animate-spin text-red-500" />
+            </div>
+        );
+    }
+
+    if (!deal) {
+        return (
+            <div className="p-8 text-center text-gray-500">
+                <p className="text-lg font-semibold">Deal not found</p>
+                <button
+                    onClick={() => navigate(-1)}
+                    className="mt-4 text-red-500 hover:text-red-600 font-medium flex items-center justify-center gap-2 mx-auto"
+                >
+                    <ArrowLeft size={18} /> Go Back
+                </button>
+            </div>
+        );
+    }
+
+    const basePath = window.location.pathname.startsWith('/rep') ? '/rep' :
+        window.location.pathname.startsWith('/manager') ? '/manager' : '/dashboard';
+
+    return (
+        <div className="min-h-screen bg-gray-50/50 p-6 space-y-6">
+            {/* Symmetric Navigation Header */}
+            <div className="flex items-center mb-1.5 text-[10px] font-black uppercase tracking-[0.12em] text-gray-400">
+                <Link to={basePath} className="hover:text-red-600 transition-colors">Dashboard</Link>
+                <ChevronRight size={10} className="mx-1.5 text-gray-200" />
+                <Link to={`${basePath}/deals`} className="hover:text-red-600 transition-colors">Deals</Link>
+                <ChevronRight size={10} className="mx-1.5 text-gray-200" />
+                <span className="text-gray-900">View Details</span>
+            </div>
+
+            {/* Hero Section */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex items-center justify-between">
+                <div className="flex items-center gap-6">
+                    <div className="w-20 h-20 rounded-full bg-orange-100 border-4 border-white shadow-md flex items-center justify-center text-orange-500 text-2xl font-black ring-1 ring-orange-100 uppercase">
+                        {getInitials(deal.name)}
+                    </div>
+                    <div>
+                        <div className="flex items-center gap-2 mb-1">
+                            <h1 className="text-2xl font-black text-gray-900 leading-none">{deal.name}</h1>
+                            <Star size={18} className="text-yellow-400 fill-yellow-400" />
+                        </div>
+                        <div className="space-y-1.5">
+                            <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
+                                <Building2 size={14} className="text-gray-300" />
+                                <button
+                                    onClick={() => deal.companyId?._id && navigate(`${basePath}/companies/${deal.companyId._id}`)}
+                                    className="hover:text-red-600 underline decoration-gray-200 underline-offset-4"
+                                >
+                                    {deal.companyId?.name || deal.companyName || "No Company"}
+                                </button>
+                            </div>
+                            <div className="flex items-center gap-4 text-xs">
+                                <div className="flex items-center gap-1.5 text-gray-400">
+                                    <MapPin size={12} className="text-gray-300" />
+                                    <span>{deal.companyId?.address || "Location not specified"}</span>
+                                </div>
+                                <div className="flex items-center gap-1.5 text-red-500 font-bold">
+                                    <User size={12} className="text-red-400" />
+                                    {deal.contactId?._id ? (
+                                        <button
+                                            onClick={() => navigate(`${basePath}/contacts/${deal.contactId._id}`)}
+                                            className="hover:underline"
+                                        >
+                                            {deal.contactId.firstName} {deal.contactId.lastName}
+                                        </button>
+                                    ) : (
+                                        <span>{deal.contactName || "No Contact"}</span>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="flex items-center gap-3">
+                    <div className="text-right">
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Current Forecast</p>
+                        <p className="text-2xl font-black text-gray-900">{deal.currency} {deal.value?.toLocaleString()}</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Main Content Split Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                {/* Left Column - Information */}
+                <div className="lg:col-span-4 space-y-6">
+                    {/* Deals Information */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div className="px-6 py-4 border-b border-gray-50">
+                            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Commercial Parameters</h3>
+                        </div>
+                        <div className="p-6 space-y-5">
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                                    <DollarSign size={10} className="text-green-500" /> Deal Value
+                                </label>
+                                <p className="text-sm font-bold text-gray-900">{deal.currency} {deal.value?.toLocaleString() || "0"}</p>
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                                    <TrendingUp size={10} className="text-blue-500" /> Win Probability
+                                </label>
+                                <div className="flex items-center gap-3">
+                                    <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                        <div
+                                            className="h-full bg-blue-500 rounded-full transition-all duration-1000"
+                                            style={{ width: `${deal.probability || 0}%` }}
+                                        />
+                                    </div>
+                                    <span className="text-xs font-black text-gray-900">{deal.probability || 0}%</span>
+                                </div>
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                                    <Calendar size={10} className="text-red-400" /> Expected Close
+                                </label>
+                                <p className="text-sm font-bold text-gray-900">{formatDate(deal.expectedCloseDate)}</p>
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                                    <Target size={10} className="text-purple-500" /> Lead Source
+                                </label>
+                                <p className="text-sm font-bold text-gray-900 capitalize">{deal.source || "Direct Identification"}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Strategic Owner */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div className="px-6 py-4 border-b border-gray-50">
+                            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Executive Ownership</h3>
+                        </div>
+                        <div className="p-4">
+                            <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-sm ring-1 ring-red-100">
+                                    {deal.ownerId?.firstName?.[0]}{deal.ownerId?.lastName?.[0]}
+                                </div>
+                                <div>
+                                    <p className="text-sm font-black text-gray-900 leading-none">{deal.ownerId?.firstName} {deal.ownerId?.lastName || ""}</p>
+                                    <p className="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-tighter">Strategic Account Manager</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Stage History */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
+                            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Pipeline Transition Log</h3>
+                            <RotateCw size={12} className="text-gray-300" />
+                        </div>
+                        <div className="p-6 space-y-6">
+                            {(!deal.stageHistory || deal.stageHistory.length === 0) ? (
+                                <p className="text-xs text-gray-400 italic text-center py-4">No historical transitions recorded.</p>
+                            ) : (
+                                deal.stageHistory.map((history, idx) => (
+                                    <div key={idx} className="relative pl-6 pb-6 last:pb-0 border-l border-gray-100 last:border-0">
+                                        <div className="absolute left-[-5px] top-0 w-2 h-2 rounded-full bg-red-400 border-2 border-white ring-1 ring-red-100" />
+                                        <div className="space-y-1">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[11px] font-black text-gray-900 uppercase">{history.stage}</span>
+                                                <span className="text-[9px] font-bold text-gray-400">{formatDate(history.changedAt)}</span>
+                                            </div>
+                                            <p className="text-[10px] text-gray-500 font-medium">
+                                                By {history.changedBy?.firstName ? `${history.changedBy.firstName} ${history.changedBy.lastName || ""}` : (typeof history.changedBy === 'string' ? "System" : "Unknown")}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right Column - Pipeline & Interactions */}
+                <div className="lg:col-span-8 space-y-8">
+                    {/* Pipeline Status */}
+                    <div className="space-y-4">
+                        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Symmetric Pipeline Status</h3>
+                        <div className="flex flex-wrap items-center">
+                            {pipelineStages.map((stage, index) => {
+                                const currentStageIndex = pipelineStages.findIndex(s => s.id === deal.stage);
+                                const isPast = index < currentStageIndex;
+                                const isCurrent = deal.stage === stage.id;
+
+                                return (
+                                    <div key={stage.id} className="flex-1 min-w-[120px] relative group h-12 mb-2 mr-2">
+                                        <div className={`
+                                            h-full w-full flex items-center justify-center text-[10px] font-black px-4
+                                            transition-all duration-300 cursor-default uppercase tracking-widest
+                                            ${isCurrent
+                                                ? (index === 0 ? "bg-blue-600 text-white" :
+                                                    index === 1 ? "bg-amber-400 text-white" :
+                                                        index === 2 ? "bg-orange-600 text-white" :
+                                                            index === 3 ? "bg-pink-600 text-white" :
+                                                                index === 4 ? "bg-green-600 text-white" :
+                                                                    index === 5 ? "bg-red-600 text-white" :
+                                                                        "bg-gray-200 text-gray-500")
+                                                : isPast ? "bg-gray-800 text-white opacity-40" : "bg-gray-100 text-gray-400"}
+                                            ${index === 0 ? "rounded-l-xl" : ""}
+                                            ${index === pipelineStages.length - 1 ? "rounded-r-xl" : ""}
+                                            relative z-10
+                                        `}
+                                            style={{
+                                                clipPath: index === 0
+                                                    ? "polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%)"
+                                                    : index === pipelineStages.length - 1
+                                                        ? "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 10% 50%)"
+                                                        : "polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%, 10% 50%)"
+                                            }}>
+                                            {stage.label}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-h-[450px]">
+                        <div className="px-6 h-14 border-b border-gray-50 flex items-center justify-between">
+                            <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider">Remarks</h3>
+                            <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-50 px-2.5 py-1 rounded-full border border-gray-100">
+                                <MessageSquare size={12} /> Communication History
+                            </div>
+                        </div>
+
+                        <div className="p-8 space-y-8">
+                            {/* Narratives/Notes */}
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                                    <FileText size={10} /> Interaction Notes
+                                </div>
+                                <div className="p-8 bg-gray-50/50 rounded-2xl border border-gray-100 text-[14px] text-gray-600 leading-relaxed italic whitespace-pre-wrap shadow-inner font-medium">
+                                    {deal.notes || "No interaction notes recorded for this deal node yet."}
+                                </div>
+                            </div>
+
+                            {/* Internal Metadata */}
+                            <div className="pt-8 border-t border-gray-50">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-4">
+                                        <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Administrative Metadata</h4>
+                                        <div className="space-y-3">
+                                            <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50/50 border border-gray-100">
+                                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Unified ID</span>
+                                                <span className="text-[10px] font-mono font-bold text-gray-600">{deal._id}</span>
+                                            </div>
+                                            <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50/50 border border-gray-100">
+                                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Schema Sync</span>
+                                                <span className="text-[10px] font-bold text-green-600 uppercase">Synchronized</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-4">
+                                        <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Relationship Links</h4>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="p-3 rounded-lg bg-gray-50/50 border border-gray-100 flex flex-col items-center justify-center text-center">
+                                                <Paperclip size={14} className="text-gray-300 mb-1" />
+                                                <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">0 Digital Assets</span>
+                                            </div>
+                                            <div className="p-3 rounded-lg bg-gray-50/50 border border-gray-100 flex flex-col items-center justify-center text-center">
+                                                <Mail size={14} className="text-gray-300 mb-1" />
+                                                <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">1 Message Logged</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Sticky Meta Footer */}
+            <div className="flex items-center justify-between pt-6 border-t border-gray-100 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                <div className="flex items-center gap-6">
+                    <span className="flex items-center gap-1.5"><Calendar size={12} className="text-gray-300" /> Origin: {formatDate(deal.createdAt)}</span>
+                    <span className="flex items-center gap-1.5"><Clock size={12} className="text-gray-300" /> Latest Sync: {formatDate(deal.updatedAt)}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                    <span>Active Deal Stream</span>
+                </div>
+            </div>
+        </div>
+    );
+}
