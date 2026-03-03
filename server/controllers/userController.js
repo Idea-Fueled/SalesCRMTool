@@ -49,8 +49,9 @@ export const registerUser = async (req, res, next) => {
 
         let user;
         let message = ""; // Declare message here so it's accessible in the background send
-        if (isInvitation) {
-            // Invitation Flow: No password yet
+
+        if (isInvitation && !password) {
+            // Invitation Flow: No password provided by the creator
             const invitationToken = crypto.randomBytes(32).toString("hex");
             const invitationExpiry = Date.now() + 3600000; // 1 hour
 
@@ -88,10 +89,9 @@ export const registerUser = async (req, res, next) => {
                     <p style="font-size: 12px; color: #94a3b8; text-align: center;">&copy; ${new Date().getFullYear()} mbdConsulting. All rights reserved.</p>
                 </div>
             `;
-            // sendEmail(email, "Account Setup Invitation", message); // Removed from here, moved to background after response
 
         } else {
-            // Self-Registration Flow (Standard)
+            // Self-Registration flow OR Admin-created with direct password
             const hashedPass = await generateHash(password)
             user = await User.create({
                 firstName,
@@ -99,18 +99,42 @@ export const registerUser = async (req, res, next) => {
                 email,
                 password: hashedPass,
                 role,
-                managerId: null, // Self-registered usually don't have manager assigned immediately
+                managerId: isInvitation && role === "sales_rep" ? managerId : null,
                 isSetupComplete: true
             })
 
-            const token = await generateToken(user._id, user.role);
-            res.cookie("token", token, {
-                httpOnly: true,
-                secure: true,
-                sameSite: "none",
-                partitioned: true,
-                maxAge: 15 * 60 * 1000
-            })
+            // If it's an invite with a password, we still want to notify them they have an account
+            if (isInvitation) {
+                const frontendUrl = process.env.FRONTEND_URL || req.get("origin") || "http://localhost:5173";
+                const logoUrl = `${frontendUrl}/Logo.png`;
+                message = `
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <img src="${logoUrl}" alt="mbdConsulting Logo" style="height: 50px; width: auto;" />
+                        </div>
+                        <h2 style="color: #e11d48; text-align: center;">Welcome to mbdConsulting</h2>
+                        <p>Hello ${firstName},</p>
+                        <p>An account has been created for you by your administrator.</p>
+                        <p>You can now log in to your dashboard using the button below.</p>
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="${frontendUrl}/login" style="background-color: #e11d48; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Login Now</a>
+                        </div>
+                        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+                        <p style="font-size: 12px; color: #94a3b8; text-align: center;">&copy; ${new Date().getFullYear()} mbdConsulting. All rights reserved.</p>
+                    </div>
+                `;
+            }
+
+            if (!isInvitation) {
+                const token = await generateToken(user._id, user.role);
+                res.cookie("token", token, {
+                    httpOnly: true,
+                    secure: true,
+                    sameSite: "none",
+                    partitioned: true,
+                    maxAge: 15 * 60 * 1000
+                })
+            }
         }
 
         res.status(201).json({
@@ -125,11 +149,11 @@ export const registerUser = async (req, res, next) => {
 
         if (isInvitation) {
             // Send email in background to prevent hanging the UI
-            console.log(`[registerUser] Triggering background invitation email for: ${email}`);
-            sendEmail(email, "Account Setup Invitation", message).then(() => {
-                console.log(`[registerUser] Background invitation email SENT to: ${email}`);
+            console.log(`[registerUser] Triggering background ${user.isSetupComplete ? 'Welcome' : 'Invitation'} email for: ${email}`);
+            sendEmail(email, user.isSetupComplete ? "Welcome to mbdConsulting" : "Account Setup Invitation", message).then(() => {
+                console.log(`[registerUser] Background email SENT to: ${email}`);
             }).catch(err => {
-                console.error("❌ Background Email Error (Invitation):", err);
+                console.error("❌ Background Email Error:", err);
             });
         }
 
@@ -175,6 +199,13 @@ export const loginUser = async (req, res, next) => {
             return res.status(403).json({
                 message: "Your account has been deactivated. Please contact your administrator.",
                 code: "ACCOUNT_DEACTIVATED"
+            })
+        }
+
+        if (!user.password) {
+            return res.status(401).json({
+                message: "This account was created via invitation and does not have a password set yet. Please check your email for the setup link or use the 'Forgot Password' option.",
+                code: "PASSWORD_NOT_SET"
             })
         }
 
