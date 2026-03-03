@@ -24,7 +24,7 @@ export const sendEmail = async (to, subject, html) => {
             method: "POST",
             headers: {
                 "accept": "application/json",
-                "api-key": brevoApiKey,
+                "api-key": brevoApiKey.trim(),
                 "content-type": "application/json"
             },
             body: JSON.stringify({
