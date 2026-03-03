@@ -28,6 +28,8 @@ export const sendEmail = async (to, subject, html) => {
                 user: process.env.EMAIL_USER.trim(),
                 pass: process.env.EMAIL_PASS.trim(),
             },
+            // Force IPv4 to avoid ENETUNREACH on Render
+            family: 4,
             // Timeouts to prevent hanging
             connectionTimeout: 15000,
             greetingTimeout: 15000,
