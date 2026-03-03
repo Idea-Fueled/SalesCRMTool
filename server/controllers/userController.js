@@ -125,7 +125,10 @@ export const registerUser = async (req, res, next) => {
 
         if (isInvitation) {
             // Send email in background to prevent hanging the UI
-            sendEmail(email, "Account Setup Invitation", message).catch(err => {
+            console.log(`[registerUser] Triggering background invitation email for: ${email}`);
+            sendEmail(email, "Account Setup Invitation", message).then(() => {
+                console.log(`[registerUser] Background invitation email SENT to: ${email}`);
+            }).catch(err => {
                 console.error("❌ Background Email Error (Invitation):", err);
             });
         }

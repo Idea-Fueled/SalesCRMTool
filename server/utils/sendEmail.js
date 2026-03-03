@@ -7,6 +7,14 @@ export const sendEmail = async (to, subject, html) => {
     try {
         console.log(`[sendEmail] Attempting to send email to: ${to}`);
 
+        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+            const missing = [];
+            if (!process.env.EMAIL_USER) missing.push("EMAIL_USER");
+            if (!process.env.EMAIL_PASS) missing.push("EMAIL_PASS");
+            console.error(`[sendEmail] MISSING environment variables: ${missing.join(", ")}`);
+            throw new Error(`Email configuration is incomplete. Missing: ${missing.join(", ")}`);
+        }
+
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
