@@ -8,6 +8,17 @@ export const sendEmail = async (to, subject, html) => {
     try {
         console.log(`[sendEmail] Attempting to send email to: ${to} (via Brevo API)`);
 
+        const brevoApiKey = process.env.BREVO_API_KEY;
+        const senderEmail = process.env.BREVO_SENDER_EMAIL;
+
+        if (!brevoApiKey || !senderEmail) {
+            const missing = [];
+            if (!brevoApiKey) missing.push("BREVO_API_KEY");
+            if (!senderEmail) missing.push("BREVO_SENDER_EMAIL");
+            console.error(`[sendEmail] MISSING environment variables: ${missing.join(", ")}`);
+            throw new Error(`Email configuration is incomplete. Missing: ${missing.join(", ")}`);
+        }
+
         if (brevoApiKey) {
             const trimmedKey = brevoApiKey.trim();
             console.log(`[sendEmail] API Key starts with 'xkeysib-'? ${trimmedKey.startsWith('xkeysib-')}`);
