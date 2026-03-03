@@ -1,40 +1,32 @@
-import fetch, { Headers } from 'node-fetch';
-if (!global.Headers) {
-    global.Headers = Headers;
-}
-if (!global.fetch) {
-    global.fetch = fetch;
-}
+import nodemailer from 'nodemailer';
 
-import { Resend } from 'resend';
-
-// Initialize Resend with API key
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-// The "from" address MUST use a verified domain in Resend.
-// Until domain is verified, use onboarding@resend.dev (only works for sending to account owner's email).
-const FROM_ADDRESS = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
-
+/**
+ * Send an email using Gmail SMTP (via Nodemailer)
+ */
 export const sendEmail = async (to, subject, html) => {
     try {
-        console.log(`Attempting to send email to: ${to} via Resend`);
+        console.log(`Attempting to send email to: ${to} via Gmail/Nodemailer`);
 
-        const { data, error } = await resend.emails.send({
-            from: `mbdConsulting <${FROM_ADDRESS}>`,
-            to: [to],
-            subject,
-            html,
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
         });
 
-        if (error) {
-            console.error("Resend API Error:", error);
-            throw new Error(error.message);
-        }
+        const mailOptions = {
+            from: `"mbdConsulting" <${process.env.EMAIL_USER}>`,
+            to: to,
+            subject: subject,
+            html: html,
+        };
 
-        console.log("Email sent successfully. Resend ID:", data.id);
-        return data;
+        const info = await transporter.sendMail(mailOptions);
+        console.log("✅ Email sent successfully: %s", info.messageId);
+        return info;
     } catch (error) {
-        console.error("Detailed Email Error:", error);
+        console.error("❌ Error in sendEmail utility:", error);
         throw new Error(`Failed to send email: ${error.message}`);
     }
 }
