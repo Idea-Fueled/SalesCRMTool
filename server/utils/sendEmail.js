@@ -15,11 +15,15 @@ export const sendEmail = async (to, subject, html) => {
             throw new Error(`Email configuration is incomplete. Missing: ${missing.join(", ")}`);
         }
 
+        // Diagnostic logs for Render (checking for hidden spaces)
+        console.log(`[sendEmail] EMAIL_USER character count: ${process.env.EMAIL_USER.trim().length} (raw: ${process.env.EMAIL_USER.length})`);
+        console.log(`[sendEmail] EMAIL_PASS character count: ${process.env.EMAIL_PASS.trim().length} (raw: ${process.env.EMAIL_PASS.length})`);
+
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
+                user: process.env.EMAIL_USER.trim(),
+                pass: process.env.EMAIL_PASS.trim(),
             },
             // Add a short timeout to prevent hanging the entire process
             connectionTimeout: 10000, // 10 seconds
