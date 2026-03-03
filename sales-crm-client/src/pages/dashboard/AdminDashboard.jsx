@@ -235,12 +235,6 @@ export default function AdminDashboard() {
                                 </div>
                             </li>
                         </ul>
-                        <div className="mt-auto pt-6 border-t border-gray-50 bg-gray-50/30 -mx-6 -mb-6 p-6 rounded-b-2xl">
-                            <div className="flex items-center justify-between items-center">
-                                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">System Health</span>
-                                <span className="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded-full uppercase">Operational</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
