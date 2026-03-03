@@ -1,7 +1,13 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 
-const getBaseURL = () => "/api";
+const getBaseURL = () => {
+    if (import.meta.env.MODE === "development") {
+        return "http://localhost:8000/api";
+    } else {
+        return import.meta.env.VITE_BASE_URL + "/api";
+    }
+};
 
 const API = axios.create({
     baseURL: getBaseURL(),
