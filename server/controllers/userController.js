@@ -48,6 +48,7 @@ export const registerUser = async (req, res, next) => {
         }
 
         let user;
+        let message = ""; // Declare message here so it's accessible in the background send
         if (isInvitation) {
             // Invitation Flow: No password yet
             const invitationToken = crypto.randomBytes(32).toString("hex");
@@ -69,7 +70,7 @@ export const registerUser = async (req, res, next) => {
             const logoUrl = `${frontendUrl}/Logo.png`;
             const setupUrl = `${frontendUrl}/setup-password?token=${invitationToken}`;
 
-            const message = `
+            message = `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
                     <div style="text-align: center; margin-bottom: 20px;">
                         <img src="${logoUrl}" alt="mbdConsulting Logo" style="height: 50px; width: auto;" />
@@ -87,8 +88,7 @@ export const registerUser = async (req, res, next) => {
                     <p style="font-size: 12px; color: #94a3b8; text-align: center;">&copy; ${new Date().getFullYear()} mbdConsulting. All rights reserved.</p>
                 </div>
             `;
-
-            await sendEmail(email, "Account Setup Invitation", message);
+            // sendEmail(email, "Account Setup Invitation", message); // Removed from here, moved to background after response
 
         } else {
             // Self-Registration Flow (Standard)
@@ -123,6 +123,13 @@ export const registerUser = async (req, res, next) => {
             }
         })
 
+        if (isInvitation) {
+            // Send email in background to prevent hanging the UI
+            sendEmail(email, "Account Setup Invitation", message).catch(err => {
+                console.error("❌ Background Email Error (Invitation):", err);
+            });
+        }
+
         // Log registration
         await logAction({
             entityType: "User",
@@ -135,6 +142,7 @@ export const registerUser = async (req, res, next) => {
         return;
 
     } catch (error) {
+        console.error("❌ Registration Error:", error);
         return res.status(500).json({
             message: error.message || "Server error"
         })
@@ -786,11 +794,12 @@ export const forgotPassword = async (req, res, next) => {
 
         console.log("Constructed Reset URL:", resetUrl);
 
-        console.log("Triggering sendEmail...");
-        await sendEmail(user.email, "Password Reset Request", message);
-        console.log("sendEmail completed successfully.");
-
         res.status(200).json({ message: "Reset link sent to your email!" });
+
+        // Send email in background to prevent hanging the UI
+        sendEmail(user.email, "Password Reset Request", message).catch(err => {
+            console.error("❌ Background Email Error (Forgot Password):", err);
+        });
     } catch (error) {
         return res.status(500).json({
             message: error.message || "Server error!"
