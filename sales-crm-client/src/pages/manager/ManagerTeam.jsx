@@ -135,6 +135,13 @@ export default function ManagerTeam() {
                     <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Team Management</h1>
                     <p className="text-xs sm:text-sm text-gray-400 mt-0.5">Manage your sales representatives</p>
                 </div>
+                <button
+                    onClick={() => setIsModalOpen(true)}
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-700 transition shadow-md shadow-red-100"
+                >
+                    <Plus size={18} />
+                    <span>Add Member</span>
+                </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

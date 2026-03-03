@@ -152,7 +152,14 @@ export default function ManagerDeals() {
                     <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Deal Pipeline</h1>
                     <p className="text-xs sm:text-sm text-gray-400 mt-0.5">Track and manage your team's sales opportunities</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <button
+                        onClick={() => { setSelectedDeal(null); setIsDealModalOpen(true); }}
+                        className="flex items-center justify-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-700 transition shadow-md shadow-red-100"
+                    >
+                        <PlusIcon size={18} />
+                        <span>Add Deal</span>
+                    </button>
                     <div className="flex items-center bg-gray-100 rounded-lg p-1">
                         <button
                             onClick={() => setViewMode("list")}
