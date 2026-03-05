@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import io from "socket.io-client";
 import { useAuth } from "./AuthContext";
-import axios from "axios";
+import API from "../../API/Interceptor";
 import { toast } from "react-hot-toast";
 
 const NotificationContext = createContext();
@@ -17,12 +17,14 @@ export const NotificationProvider = ({ children }) => {
     const fetchNotifications = useCallback(async () => {
         if (!user) return;
         try {
-            const response = await axios.get("/api/notifications");
+            console.log("[NotificationContext] Fetching notifications...");
+            const response = await API.get("/notifications"); // Interceptor already prepends /api
             const data = response.data.data;
+            console.log("[NotificationContext] Notifications fetched:", data.length);
             setNotifications(data);
             setUnreadCount(data.filter(n => !n.isRead).length);
         } catch (error) {
-            console.error("Error fetching notifications:", error);
+            console.error("[NotificationContext] Error fetching notifications:", error);
         }
     }, [user]);
 
@@ -69,7 +71,7 @@ export const NotificationProvider = ({ children }) => {
 
     const markAsRead = async (id) => {
         try {
-            await axios.patch(`/api/notifications/${id}/read`);
+            await API.patch(`/notifications/${id}/read`);
             setNotifications(prev =>
                 prev.map(n => n._id === id ? { ...n, isRead: true } : n)
             );
@@ -81,7 +83,7 @@ export const NotificationProvider = ({ children }) => {
 
     const markAllAsRead = async () => {
         try {
-            await axios.post("/api/notifications/read-all");
+            await API.post("/notifications/read-all");
             setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
             setUnreadCount(0);
         } catch (error) {
@@ -91,7 +93,7 @@ export const NotificationProvider = ({ children }) => {
 
     const deleteNotification = async (id) => {
         try {
-            await axios.delete(`/api/notifications/${id}`);
+            await API.delete(`/notifications/${id}`);
             setNotifications(prev => prev.filter(n => n._id !== id));
             // Update unread count if the deleted notification was unread
             const deletedNotification = notifications.find(n => n._id === id);
