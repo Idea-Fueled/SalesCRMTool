@@ -1,9 +1,5 @@
 // import nodemailer from "nodemailer";
 
-// /**
-//  * Send an email using Mailtrap SMTP
-//  * @param {Object} options - { to, subject, html }
-//  */
 // export const sendEmail = async (options) => {
 //     try {
 //         const transporter = nodemailer.createTransport({
@@ -23,10 +19,10 @@
 //         };
 
 //         const info = await transporter.sendMail(mailOptions);
-//         console.log("✅ Email sent successfully: %s", info.messageId);
+//         console.log("Email sent successfully: %s", info.messageId);
 //         return info;
 //     } catch (error) {
-//         console.error("❌ Error in sendEmail service:", error.message);
+//         console.error("Error in sendEmail service:", error.message);
 //         throw new Error("Email delivery failed. Please check SMTP configuration.");
 //     }
 // };
