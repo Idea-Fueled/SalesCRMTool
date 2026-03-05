@@ -61,12 +61,10 @@ const NotificationDropdown = () => {
                 navigate(`${basePath}/contacts/${entityId}`);
                 break;
             case "User":
-                // Navigates to the team/users list
                 if (user.role === "admin") navigate("/dashboard/users");
                 else if (user.role === "sales_manager") navigate("/manager/team");
                 break;
             default:
-                // Default fallback if no specific path
                 navigate(basePath);
                 break;
         }
