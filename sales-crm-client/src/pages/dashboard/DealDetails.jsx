@@ -193,10 +193,6 @@ export default function DealDetails() {
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    <div className="text-right">
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Current Forecast</p>
-                        <p className="text-2xl font-black text-gray-900">{deal.currency} {deal.value?.toLocaleString()}</p>
-                    </div>
                     {canEdit && (
                         <div className="flex items-center gap-2 ml-4">
                             <button
