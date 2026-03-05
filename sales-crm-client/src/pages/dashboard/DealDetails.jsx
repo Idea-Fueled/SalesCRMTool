@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { getDealById } from "../../../API/services/dealService";
+import { getDealById, updateDeal, deleteDeal } from "../../../API/services/dealService";
+import { useAuth } from "../../context/AuthContext";
+import DealModal from "../../components/modals/DealModal";
+import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
 import {
     Briefcase, Building2, User, DollarSign,
     Calendar, Clock, Target, Info,
     TrendingUp, ArrowLeft, Tag, Share2, Loader2,
     Star, RotateCw, Maximize2, Lock, ThumbsUp, Shield,
     MoreHorizontal, Download, ChevronRight,
-    MapPin, Mail, Phone, FileText, Paperclip, List, History, MessageSquare
+    MapPin, Mail, Phone, FileText, Paperclip, List, History, MessageSquare,
+    Edit2, Trash2
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -37,8 +41,11 @@ const formatDate = (date, includeTime = false) => {
 export default function DealDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { user: currentUser } = useAuth();
     const [deal, setDeal] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchDeal = async () => {
@@ -54,6 +61,51 @@ export default function DealDetails() {
         };
         fetchDeal();
     }, [id]);
+
+    // Compute base path early so handlers can use it
+    const basePath = window.location.pathname.startsWith('/rep') ? '/rep' :
+        window.location.pathname.startsWith('/manager') ? '/manager' : '/dashboard';
+
+    // Role-based authorization
+    const canEdit = (() => {
+        if (!currentUser || !deal) return false;
+        const role = currentUser.role;
+        const ownerId = deal.ownerId?._id || deal.ownerId;
+        if (role === "admin") return true;
+        if (role === "sales_manager") {
+            // Manager can edit their own deals or their team's deals
+            // deal.ownerId.managerId indicates the owner's manager
+            const ownerManagerId = deal.ownerId?.managerId?._id || deal.ownerId?.managerId;
+            return ownerId === currentUser._id || ownerManagerId === currentUser._id;
+        }
+        if (role === "sales_rep") {
+            return ownerId === currentUser._id;
+        }
+        return false;
+    })();
+
+    const handleSaveDeal = async (formData) => {
+        try {
+            await updateDeal(deal._id, formData);
+            toast.success("Deal updated successfully");
+            setIsEditModalOpen(false);
+            // Refresh deal
+            const res = await getDealById(id);
+            setDeal(res.data.data);
+        } catch (err) {
+            toast.error(err?.response?.data?.message || "Failed to update deal");
+        }
+    };
+
+    const handleDeleteDeal = async () => {
+        try {
+            await deleteDeal(deal._id);
+            toast.success("Deal deleted successfully");
+            navigate(`${basePath}/deals`);
+        } catch (err) {
+            toast.error(err?.response?.data?.message || "Failed to delete deal");
+        }
+    };
 
     const getInitials = (name) => {
         if (!name) return "D";
@@ -85,9 +137,6 @@ export default function DealDetails() {
             </div>
         );
     }
-
-    const basePath = window.location.pathname.startsWith('/rep') ? '/rep' :
-        window.location.pathname.startsWith('/manager') ? '/manager' : '/dashboard';
 
     return (
         <div className="min-h-screen bg-gray-50/50 p-6 space-y-6">
@@ -148,6 +197,24 @@ export default function DealDetails() {
                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Current Forecast</p>
                         <p className="text-2xl font-black text-gray-900">{deal.currency} {deal.value?.toLocaleString()}</p>
                     </div>
+                    {canEdit && (
+                        <div className="flex items-center gap-2 ml-4">
+                            <button
+                                onClick={() => setIsEditModalOpen(true)}
+                                title="Edit Deal"
+                                className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-sm shadow-red-200 transition-all active:scale-[0.97]"
+                            >
+                                <Edit2 size={13} /> Edit
+                            </button>
+                            <button
+                                onClick={() => setIsDeleteModalOpen(true)}
+                                title="Delete Deal"
+                                className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 rounded-xl transition-all active:scale-[0.97]"
+                            >
+                                <Trash2 size={13} /> Delete
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -353,6 +420,25 @@ export default function DealDetails() {
                     <span>Active Deal Stream</span>
                 </div>
             </div>
+            {/* Edit Deal Modal */}
+            <DealModal
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                deal={deal}
+                onSave={handleSaveDeal}
+                companies={[]}
+                contacts={[]}
+                userRole={currentUser?.role}
+                potentialOwners={[]}
+            />
+
+            {/* Delete Confirmation Modal */}
+            <DeleteConfirmModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleDeleteDeal}
+                itemName={deal?.name}
+            />
         </div>
     );
 }
