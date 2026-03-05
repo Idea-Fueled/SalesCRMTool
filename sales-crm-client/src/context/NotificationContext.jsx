@@ -89,12 +89,27 @@ export const NotificationProvider = ({ children }) => {
         }
     };
 
+    const deleteNotification = async (id) => {
+        try {
+            await axios.delete(`/api/notifications/${id}`);
+            setNotifications(prev => prev.filter(n => n._id !== id));
+            // Update unread count if the deleted notification was unread
+            const deletedNotification = notifications.find(n => n._id === id);
+            if (deletedNotification && !deletedNotification.isRead) {
+                setUnreadCount(prev => Math.max(0, prev - 1));
+            }
+        } catch (error) {
+            console.error("Error deleting notification:", error);
+        }
+    };
+
     return (
         <NotificationContext.Provider value={{
             notifications,
             unreadCount,
             markAsRead,
             markAllAsRead,
+            deleteNotification,
             fetchNotifications
         }}>
             {children}
