@@ -1,17 +1,21 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Bell, Check, Clock, User, Briefcase, ChevronRight } from "lucide-react";
 import { useNotifications } from "../context/NotificationContext";
-import { formatDistanceToNow } from "date-fns"; // Need to check if installed
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { formatDistanceToNow } from "date-fns";
 
 const NotificationDropdown = () => {
     const [isOpen, setIsOpen] = useState(false);
     const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+    const { user } = useAuth();
+    const navigate = useNavigate();
     const dropdownRef = useRef(null);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setIsOpen(isOpen => false);
+                setIsOpen(false);
             }
         };
         document.addEventListener("mousedown", handleClickOutside);
@@ -24,6 +28,47 @@ const NotificationDropdown = () => {
             case "deal_reassigned": return <User size={14} className="text-blue-500" />;
             case "deal_updated": return <Clock size={14} className="text-orange-500" />;
             default: return <Bell size={14} className="text-gray-500" />;
+        }
+    };
+
+    const handleNotificationClick = async (notification) => {
+        // Mark as read if unread
+        if (!notification.isRead) {
+            await markAsRead(notification._id);
+        }
+
+        // Close dropdown
+        setIsOpen(false);
+
+        // Determine destination based on role and entity
+        if (!user) return;
+
+        let basePath = "";
+        if (user.role === "admin") basePath = "/dashboard";
+        else if (user.role === "sales_manager") basePath = "/manager";
+        else if (user.role === "sales_rep") basePath = "/rep";
+
+        const { entityType, entityId } = notification;
+
+        switch (entityType) {
+            case "Deal":
+                navigate(`${basePath}/deals/${entityId}`);
+                break;
+            case "Company":
+                navigate(`${basePath}/companies/${entityId}`);
+                break;
+            case "Contact":
+                navigate(`${basePath}/contacts/${entityId}`);
+                break;
+            case "User":
+                // Navigates to the team/users list
+                if (user.role === "admin") navigate("/dashboard/users");
+                else if (user.role === "sales_manager") navigate("/manager/team");
+                break;
+            default:
+                // Default fallback if no specific path
+                navigate(basePath);
+                break;
         }
     };
 
@@ -65,7 +110,7 @@ const NotificationDropdown = () => {
                             notifications.map((notification) => (
                                 <div
                                     key={notification._id}
-                                    onClick={() => !notification.isRead && markAsRead(notification._id)}
+                                    onClick={() => handleNotificationClick(notification)}
                                     className={`p-4 border-b border-gray-50 hover:bg-gray-50 transition cursor-pointer relative group ${!notification.isRead ? "bg-red-50/30" : ""}`}
                                 >
                                     <div className="flex gap-3">
@@ -78,7 +123,7 @@ const NotificationDropdown = () => {
                                             </p>
                                             <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
                                                 <Clock size={10} />
-                                                {new Date(notification.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
                                             </p>
                                         </div>
                                         {!notification.isRead && (
@@ -91,7 +136,13 @@ const NotificationDropdown = () => {
                     </div>
 
                     <div className="p-3 border-t border-gray-100 text-center bg-gray-50/50">
-                        <button className="text-[10px] font-bold text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1 mx-auto uppercase">
+                        <button
+                            onClick={() => {
+                                setIsOpen(false);
+                                if (user?.role === "admin") navigate("/dashboard/audit-logs");
+                            }}
+                            className="text-[10px] font-bold text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1 mx-auto uppercase"
+                        >
                             View all history <ChevronRight size={10} />
                         </button>
                     </div>
