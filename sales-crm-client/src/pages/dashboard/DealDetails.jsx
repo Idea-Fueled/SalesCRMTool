@@ -202,16 +202,16 @@ export default function DealDetails() {
                             <button
                                 onClick={() => setIsEditModalOpen(true)}
                                 title="Edit Deal"
-                                className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-sm shadow-red-200 transition-all active:scale-[0.97]"
+                                className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-sm shadow-red-200 transition-all active:scale-[0.97]"
                             >
-                                <Edit2 size={13} /> Edit
+                                <Edit2 size={11} /> Edit
                             </button>
                             <button
                                 onClick={() => setIsDeleteModalOpen(true)}
                                 title="Delete Deal"
-                                className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 rounded-xl transition-all active:scale-[0.97]"
+                                className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 rounded-lg transition-all active:scale-[0.97]"
                             >
-                                <Trash2 size={13} /> Delete
+                                <Trash2 size={11} /> Delete
                             </button>
                         </div>
                     )}
