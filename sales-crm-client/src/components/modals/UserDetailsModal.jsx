@@ -50,14 +50,14 @@ export default function UserDetailsModal({ isOpen, onClose, user }) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {/* Information Sections */}
-                    <div className="space-y-4">
+                    <div className="space-y-4 min-w-0">
                         <section>
                             <h4 className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
                                 <Mail size={12} className="text-gray-400" />
                                 Contact Details
                             </h4>
-                            <div className="flex flex-col">
-                                <span className="text-sm font-semibold text-gray-700">{user.email}</span>
+                            <div className="flex flex-col min-w-0">
+                                <span className="text-sm font-semibold text-gray-700 break-all">{user.email}</span>
                                 <span className="text-[11px] text-gray-400 italic">Primary Business Email</span>
                             </div>
                         </section>
@@ -76,7 +76,7 @@ export default function UserDetailsModal({ isOpen, onClose, user }) {
                         </section>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-4 min-w-0">
                         <section>
                             <h4 className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
                                 <User size={12} className="text-gray-400" />
