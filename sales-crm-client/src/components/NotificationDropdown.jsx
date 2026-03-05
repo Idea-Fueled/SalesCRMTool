@@ -12,7 +12,24 @@ const NotificationDropdown = () => {
     const navigate = useNavigate();
     const dropdownRef = useRef(null);
 
-    // ... existing useEffect ...
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const getTypeIcon = (type) => {
+        switch (type) {
+            case "deal_created": return <Briefcase size={14} className="text-green-500" />;
+            case "deal_reassigned": return <User size={14} className="text-blue-500" />;
+            case "deal_updated": return <Clock size={14} className="text-orange-500" />;
+            default: return <Bell size={14} className="text-gray-500" />;
+        }
+    };
 
     const handleNotificationClick = async (notification) => {
         // Mark as read if unread
@@ -23,7 +40,36 @@ const NotificationDropdown = () => {
         // Close dropdown
         setIsOpen(false);
 
-        // ... existing navigation logic ...
+        // Determine destination based on role and entity
+        if (!user) return;
+
+        let basePath = "";
+        if (user.role === "admin") basePath = "/dashboard";
+        else if (user.role === "sales_manager") basePath = "/manager";
+        else if (user.role === "sales_rep") basePath = "/rep";
+
+        const { entityType, entityId } = notification;
+
+        switch (entityType) {
+            case "Deal":
+                navigate(`${basePath}/deals/${entityId}`);
+                break;
+            case "Company":
+                navigate(`${basePath}/companies/${entityId}`);
+                break;
+            case "Contact":
+                navigate(`${basePath}/contacts/${entityId}`);
+                break;
+            case "User":
+                // Navigates to the team/users list
+                if (user.role === "admin") navigate("/dashboard/users");
+                else if (user.role === "sales_manager") navigate("/manager/team");
+                break;
+            default:
+                // Default fallback if no specific path
+                navigate(basePath);
+                break;
+        }
     };
 
     const handleDelete = async (e, id) => {
@@ -33,11 +79,31 @@ const NotificationDropdown = () => {
 
     return (
         <div className="relative" ref={dropdownRef}>
-            {/* ... bell button ... */}
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition relative"
+            >
+                <Bell size={20} />
+                {unreadCount > 0 && (
+                    <span className="absolute top-1 right-1 w-4 h-4 bg-red-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                )}
+            </button>
 
             {isOpen && (
                 <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
-                    {/* ... header ... */}
+                    <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                        <h3 className="font-bold text-gray-800 text-sm">Notifications</h3>
+                        {unreadCount > 0 && (
+                            <button
+                                onClick={markAllAsRead}
+                                className="text-[11px] font-bold text-red-600 hover:text-red-700 transition uppercase"
+                            >
+                                Mark all as read
+                            </button>
+                        )}
+                    </div>
 
                     <div className="max-h-[400px] overflow-y-auto">
                         {notifications.length === 0 ? (
@@ -84,7 +150,17 @@ const NotificationDropdown = () => {
                         )}
                     </div>
 
-                    {/* ... footer ... */}
+                    <div className="p-3 border-t border-gray-100 text-center bg-gray-50/50">
+                        <button
+                            onClick={() => {
+                                setIsOpen(false);
+                                if (user?.role === "admin") navigate("/dashboard/audit-logs");
+                            }}
+                            className="text-[10px] font-bold text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1 mx-auto uppercase"
+                        >
+                            View all history <ChevronRight size={10} />
+                        </button>
+                    </div>
                 </div>
             )}
         </div>
