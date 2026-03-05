@@ -299,11 +299,11 @@ export default function ManagerDeals() {
                                                     <select
                                                         value={d.stage}
                                                         onChange={e => handleMoveStage(d._id, e.target.value)}
-                                                        className={`appearance-none text-[11px] pl-2.5 pr-6 py-1 rounded-full font-bold border-none cursor-pointer focus:ring-0 whitespace-nowrap ${getStageStyles(d.stage)}`}
+                                                        className={`appearance-none text-[11px] pl-2.5 pr-7 py-1 rounded-full font-bold border-none cursor-pointer focus:ring-0 whitespace-nowrap ${getStageStyles(d.stage)}`}
                                                     >
                                                         {STAGES.map(s => <option key={s} value={s}>{s}</option>)}
                                                     </select>
-                                                    <ChevronDownIcon size={10} className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 opacity-60" />
+                                                    <ChevronDownIcon size={10} className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 opacity-60" />
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3 font-semibold text-gray-800 whitespace-nowrap">
