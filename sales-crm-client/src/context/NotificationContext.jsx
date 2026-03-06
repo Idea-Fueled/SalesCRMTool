@@ -9,7 +9,7 @@ const NotificationContext = createContext();
 const SOCKET_URL = import.meta.env.VITE_BASE_URL || "http://localhost:8000";
 
 export const NotificationProvider = ({ children }) => {
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [socket, setSocket] = useState(null);
@@ -54,6 +54,16 @@ export const NotificationProvider = ({ children }) => {
                         duration: 5000
                     });
                 }
+            });
+
+            // Force logout when admin deactivates this user
+            newSocket.on("force_logout", (data) => {
+                console.warn("[NotificationContext] force_logout received:", data.message);
+                toast.error(data.message || "Your account has been deactivated.", {
+                    duration: 6000,
+                    icon: "🔒"
+                });
+                logout();
             });
 
             setSocket(newSocket);

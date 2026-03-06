@@ -19,6 +19,14 @@ export const protect = async (req, res, next) => {
             })
         }
 
+        // Block deactivated users from accessing any protected route
+        if (!user.isActive) {
+            return res.status(403).json({
+                message: "Your account has been deactivated. Please contact your administrator.",
+                code: "ACCOUNT_DEACTIVATED"
+            });
+        }
+
         // Sliding Session: Re-issue token to extend the session by another 15 minutes on every active request
         const newToken = await generateToken(user._id, user.role);
         res.cookie("token", newToken, {

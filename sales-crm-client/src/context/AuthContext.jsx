@@ -37,6 +37,20 @@ export const AuthProvider = ({ children }) => {
         return () => clearTimeout(failsafe);
     }, []);
 
+    // Fallback: listen for account_deactivated event fired by Interceptor (in case socket missed it)
+    useEffect(() => {
+        const handleDeactivated = (e) => {
+            console.warn("[AuthContext] account_deactivated event received");
+            toast.error(e.detail?.message || "Your account has been deactivated.", {
+                duration: 6000,
+                icon: "🔒"
+            });
+            setUser(null);
+        };
+        window.addEventListener("account_deactivated", handleDeactivated);
+        return () => window.removeEventListener("account_deactivated", handleDeactivated);
+    }, []);
+
     const login = (userData) => {
         setUser(userData);
     };

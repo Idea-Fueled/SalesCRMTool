@@ -8,6 +8,7 @@ import { Deal } from "../models/dealSchema.js";
 import { logAction } from "../utils/auditLogger.js";
 import crypto from "crypto";
 import { sendEmail } from "../utils/sendEmail.js";
+import { getIO } from "../utils/socket.js";
 
 export const registerUser = async (req, res, next) => {
     try {
@@ -525,6 +526,16 @@ export const deactivateUser = async (req, res, next) => {
         // Deactivate user
         user.isActive = false;
         await user.save();
+
+        // Emit real-time force logout to the deactivated user's socket room
+        try {
+            const io = getIO();
+            io.to(`user_${id}`).emit("force_logout", {
+                message: "Your account has been deactivated by an administrator."
+            });
+        } catch (socketErr) {
+            console.warn("[deactivateUser] Socket emit failed (non-critical):", socketErr.message);
+        }
 
         const responseMsg = newOwnerId
             ? "User deactivated and records reassigned successfully!"

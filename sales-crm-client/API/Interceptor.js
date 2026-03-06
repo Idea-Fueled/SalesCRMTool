@@ -45,9 +45,13 @@ API.interceptors.response.use(
             console.log("Status", error.response.status);
             console.log("Message", error.response.data.message || error.message);
 
-            if (error.response.status === 401) {
+            if (error.response.status === 403 && error.response.data?.code === "ACCOUNT_DEACTIVATED") {
+                // Fallback: force logout if socket event was missed
+                window.dispatchEvent(new CustomEvent("account_deactivated", {
+                    detail: { message: error.response.data.message }
+                }));
+            } else if (error.response.status === 401) {
                 // Silenced 401 logs to reduce console noise for unauthenticated users
-                // console.warn("Unauthorized! Maybe session expired or not logged in!");
             } else if (error.response.status === 500) {
                 console.log("Internal server error");
             } else {
