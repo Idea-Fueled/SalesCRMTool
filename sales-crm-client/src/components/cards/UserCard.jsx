@@ -1,17 +1,5 @@
 import React from "react";
-import { ShieldCheck, Briefcase, UserCheck, Edit2, Trash2, Eye, Mail, Clock, ChevronRight } from "lucide-react";
-
-// Person with circular arrows — matches the reassign icon
-const ReassignIcon = ({ size = 16 }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12z" />
-        <path d="M4.05 19.2C4.36 15.85 7.87 13.2 12 13.2s7.64 2.65 7.95 6H4.05z" opacity="0.6" />
-        <path d="M3.5 10.5A8.5 8.5 0 0 1 12 3.5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-        <path d="M20.5 13.5A8.5 8.5 0 0 1 12 20.5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-        <path d="M3.5 10.5 1.5 8.5M3.5 10.5l2-2" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M20.5 13.5l2 2M20.5 13.5l-2 2" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-);
+import { ShieldCheck, Briefcase, UserCheck, Edit2, Trash2, Eye, Mail, Clock, ChevronRight, RefreshCcwDot } from "lucide-react";
 
 const roleBadge = {
     admin: "bg-red-100 text-red-700",
@@ -117,7 +105,7 @@ const UserCard = ({ user, onEdit, onDeactivate, onActivate, onReassign, onDelete
                             className="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition"
                             title="Reassign records"
                         >
-                            <ReassignIcon size={16} />
+                            <RefreshCcwDot size={16} />
                         </button>
                     )}
                     {user.role !== "admin" && (
