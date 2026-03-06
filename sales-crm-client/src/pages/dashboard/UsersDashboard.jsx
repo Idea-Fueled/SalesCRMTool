@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Users2, ShieldCheck, Briefcase, UserCheck, Edit2, Plus, X, Search, Trash2, Eye, ArrowLeft, ChevronRight, LayoutGrid, LayoutList, RefreshCcwDot } from "lucide-react";
+import { Users2, ShieldCheck, Briefcase, UserCheck, Edit2, Plus, X, Search, Trash2, Eye, ArrowLeft, ChevronRight, LayoutGrid, LayoutList, FolderSync } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import UserCard from "../../components/cards/UserCard";
 import { getTeamUsers, deactivateUser, activateUser, bulkReassignRecords, softDeleteUser, resendInvitation as apiResendInvitation } from "../../../API/services/userService";
@@ -404,7 +404,7 @@ export default function UsersDashboard() {
                                                                 className="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition"
                                                                 title="Reassign all records"
                                                             >
-                                                                <RefreshCcwDot size={15} />
+                                                                <FolderSync size={15} />
                                                             </button>
                                                         )}
                                                         {u.role !== "admin" && (

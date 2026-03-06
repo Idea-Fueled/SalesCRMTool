@@ -1,5 +1,5 @@
 import React from "react";
-import { ShieldCheck, Briefcase, UserCheck, Edit2, Trash2, Eye, Mail, Clock, ChevronRight, RefreshCcwDot } from "lucide-react";
+import { ShieldCheck, Briefcase, UserCheck, Edit2, Trash2, Eye, Mail, Clock, ChevronRight, FolderSync } from "lucide-react";
 
 const roleBadge = {
     admin: "bg-red-100 text-red-700",
@@ -105,7 +105,7 @@ const UserCard = ({ user, onEdit, onDeactivate, onActivate, onReassign, onDelete
                             className="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition"
                             title="Reassign records"
                         >
-                            <RefreshCcwDot size={16} />
+                            <FolderSync size={16} />
                         </button>
                     )}
                     {user.role !== "admin" && (
