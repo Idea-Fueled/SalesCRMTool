@@ -29,9 +29,12 @@ const Card = ({ children, className = "" }) => (
 );
 
 const stageBadge = {
-    Lead: "bg-red-50 text-red-600 border border-red-100", Qualified: "bg-orange-100 text-orange-700",
-    Proposal: "bg-yellow-100 text-yellow-700", Negotiation: "bg-orange-100 text-orange-700",
-    "Closed Won": "bg-green-100 text-green-700", "Closed Lost": "bg-red-100 text-red-700",
+    Lead: "bg-blue-100 text-blue-700 border border-blue-200",
+    Qualified: "bg-purple-100 text-purple-700 border border-purple-200",
+    Proposal: "bg-amber-100 text-amber-700 border border-amber-200",
+    Negotiation: "bg-orange-100 text-orange-700 border border-orange-200",
+    "Closed Won": "bg-green-100 text-green-700 border border-green-200",
+    "Closed Lost": "bg-red-100 text-red-700 border border-red-200",
 };
 
 const stageOptions = ["All Stages", "Lead", "Qualified", "Proposal", "Negotiation", "Closed Won", "Closed Lost"];
@@ -247,13 +250,16 @@ export default function RepDeals() {
                                                 {d.contactId ? `${d.contactId.firstName} ${d.contactId.lastName}` : (d.contactName || "—")}
                                             </td>
                                             <td className="px-4 py-3">
-                                                <select
-                                                    value={d.stage}
-                                                    onChange={e => handleMoveStage(d._id, e.target.value)}
-                                                    className={`text-[11px] px-2 py-1 rounded-full font-bold border-none cursor-pointer focus:ring-0 whitespace-nowrap ${stageBadge[d.stage]}`}
-                                                >
-                                                    {STAGES.map(s => <option key={s} value={s}>{s}</option>)}
-                                                </select>
+                                                <div className="relative inline-flex items-center">
+                                                    <select
+                                                        value={d.stage}
+                                                        onChange={e => handleMoveStage(d._id, e.target.value)}
+                                                        className={`appearance-none text-[11px] pl-2.5 pr-8 py-1 rounded-full font-bold border-none cursor-pointer focus:ring-0 whitespace-nowrap ${stageBadge[d.stage] || "bg-gray-100 text-gray-600"}`}
+                                                    >
+                                                        {STAGES.map(s => <option key={s} value={s}>{s}</option>)}
+                                                    </select>
+                                                    <ChevronDown size={10} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 opacity-60" />
+                                                </div>
                                             </td>
                                             <td className="px-4 py-3 font-semibold text-gray-800 whitespace-nowrap">${d.value?.toLocaleString()}</td>
                                             <td className="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">{d.expectedCloseDate ? new Date(d.expectedCloseDate).toLocaleDateString() : "—"}</td>

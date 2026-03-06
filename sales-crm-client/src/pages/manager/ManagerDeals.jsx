@@ -44,9 +44,12 @@ const StatCard = ({ label, value, color, icon: IconComp }) => (
 );
 
 const stageBadge = {
-    Lead: "bg-red-50 text-red-600 border border-red-100", Qualified: "bg-orange-100 text-orange-700",
-    Proposal: "bg-yellow-100 text-yellow-700", Negotiation: "bg-orange-100 text-orange-700",
-    "Closed Won": "bg-green-100 text-green-700", "Closed Lost": "bg-red-100 text-red-700",
+    Lead: "bg-blue-100 text-blue-700 border border-blue-200",
+    Qualified: "bg-purple-100 text-purple-700 border border-purple-200",
+    Proposal: "bg-amber-100 text-amber-700 border border-amber-200",
+    Negotiation: "bg-orange-100 text-orange-700 border border-orange-200",
+    "Closed Won": "bg-green-100 text-green-700 border border-green-200",
+    "Closed Lost": "bg-red-100 text-red-700 border border-red-200",
 };
 
 const getStageStyles = (stage) => stageBadge[stage] || "bg-gray-100 text-gray-700";

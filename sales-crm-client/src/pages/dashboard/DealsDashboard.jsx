@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
     Briefcase, Zap, CheckCircle2, DollarSign,
     MoreHorizontal, Plus, Edit2, Trash2,
-    LayoutDashboard, Users, Building2, LayoutList, Kanban, Eye, ArrowLeft, ChevronRight, LayoutGrid, ChevronDown
+    LayoutDashboard, Users, Building2, LayoutList, Kanban, Eye, ChevronRight, ChevronDown
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import KanbanBoard from "../../components/KanbanBoard";
@@ -42,9 +42,12 @@ const StatCard = ({ label, value, sub, color, icon: IconComp }) => (
 );
 
 const stageBadge = {
-    Lead: "bg-red-50 text-red-600 border border-red-100", Qualified: "bg-orange-100 text-orange-700",
-    Proposal: "bg-yellow-100 text-yellow-700", Negotiation: "bg-orange-100 text-orange-700",
-    "Closed Won": "bg-green-100 text-green-700", "Closed Lost": "bg-red-100 text-red-700",
+    Lead: "bg-blue-100 text-blue-700 border border-blue-200",
+    Qualified: "bg-purple-100 text-purple-700 border border-purple-200",
+    Proposal: "bg-amber-100 text-amber-700 border border-amber-200",
+    Negotiation: "bg-orange-100 text-orange-700 border border-orange-200",
+    "Closed Won": "bg-green-100 text-green-700 border border-green-200",
+    "Closed Lost": "bg-red-100 text-red-700 border border-red-200",
 };
 
 const STAGES = ["Lead", "Qualified", "Proposal", "Negotiation", "Closed Won", "Closed Lost"];
