@@ -46,10 +46,12 @@ API.interceptors.response.use(
             console.log("Message", error.response.data.message || error.message);
 
             if (error.response.status === 403 && error.response.data?.code === "ACCOUNT_DEACTIVATED") {
-                // Fallback: force logout if socket event was missed
+                // Dispatch once so AuthContext handles the single toast + logout
                 window.dispatchEvent(new CustomEvent("account_deactivated", {
                     detail: { message: error.response.data.message }
                 }));
+                // Swallow — don't propagate so page-level catch blocks don't show "Failed to load data"
+                return new Promise(() => { });
             } else if (error.response.status === 401) {
                 // Silenced 401 logs to reduce console noise for unauthenticated users
             } else if (error.response.status === 500) {

@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, { createContext, useState, useEffect, useContext, useRef } from "react";
 import API from "../../API/Interceptor";
 import { toast } from "react-hot-toast";
 
@@ -37,11 +37,15 @@ export const AuthProvider = ({ children }) => {
         return () => clearTimeout(failsafe);
     }, []);
 
-    // Fallback: listen for account_deactivated event fired by Interceptor (in case socket missed it)
+    const handlingDeactivation = useRef(false);
+
+    // Fallback: listen for account_deactivated event fired by Interceptor or socket
     useEffect(() => {
         const handleDeactivated = (e) => {
-            console.warn("[AuthContext] account_deactivated event received");
-            toast.error(e.detail?.message || "Your account has been deactivated.", {
+            if (handlingDeactivation.current) return; // deduplicate
+            handlingDeactivation.current = true;
+            toast.error(e.detail?.message || "Your account has been deactivated. Please contact your administrator.", {
+                id: "account-deactivated", // fixed ID prevents duplicate toasts
                 duration: 6000,
                 icon: "🔒"
             });

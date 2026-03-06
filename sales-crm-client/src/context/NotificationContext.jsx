@@ -58,12 +58,10 @@ export const NotificationProvider = ({ children }) => {
 
             // Force logout when admin deactivates this user
             newSocket.on("force_logout", (data) => {
-                console.warn("[NotificationContext] force_logout received:", data.message);
-                toast.error(data.message || "Your account has been deactivated.", {
-                    duration: 6000,
-                    icon: "🔒"
-                });
-                logout();
+                // Dispatch same event as Interceptor so AuthContext handles it once
+                window.dispatchEvent(new CustomEvent("account_deactivated", {
+                    detail: { message: data.message }
+                }));
             });
 
             setSocket(newSocket);
