@@ -1,5 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Users2, ShieldCheck, Briefcase, UserCheck, Edit2, RefreshCw, Plus, X, Search, Trash2, Eye, ArrowLeft, ChevronRight, LayoutGrid, LayoutList } from "lucide-react";
+import { Users2, ShieldCheck, Briefcase, UserCheck, Edit2, Plus, X, Search, Trash2, Eye, ArrowLeft, ChevronRight, LayoutGrid, LayoutList } from "lucide-react";
+
+// Person with circular arrows — reassign icon
+const ReassignIcon = ({ size = 15 }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12z" />
+        <path d="M4.05 19.2C4.36 15.85 7.87 13.2 12 13.2s7.64 2.65 7.95 6H4.05z" opacity="0.6" />
+        <path d="M3.5 10.5A8.5 8.5 0 0 1 12 3.5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+        <path d="M20.5 13.5A8.5 8.5 0 0 1 12 20.5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+        <path d="M3.5 10.5 1.5 8.5M3.5 10.5l2-2" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M20.5 13.5l2 2M20.5 13.5l-2 2" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+);
 import { Link, useNavigate } from "react-router-dom";
 import UserCard from "../../components/cards/UserCard";
 import { getTeamUsers, deactivateUser, activateUser, bulkReassignRecords, softDeleteUser, resendInvitation as apiResendInvitation } from "../../../API/services/userService";
@@ -404,7 +416,7 @@ export default function UsersDashboard() {
                                                                 className="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition"
                                                                 title="Reassign all records"
                                                             >
-                                                                <RefreshCw size={15} />
+                                                                <ReassignIcon size={15} />
                                                             </button>
                                                         )}
                                                         {u.role !== "admin" && (
