@@ -49,7 +49,11 @@ API.interceptors.response.use(
             console.log("Message", error.response.data.message || error.message);
 
             if (error.response.status === 403 && error.response.data?.code === "ACCOUNT_DEACTIVATED") {
-                // Show ONE toast and dispatch ONE event, no matter how many 403s arrive
+                // Login page needs the error to show the blocked screen — let it through
+                if (error.config?.url?.includes("/auth/login")) {
+                    return Promise.reject(error);
+                }
+                // For all other protected routes: ONE toast + ONE logout event
                 if (!deactivationHandled) {
                     deactivationHandled = true;
                     toast.error(
@@ -58,7 +62,7 @@ API.interceptors.response.use(
                     );
                     window.dispatchEvent(new CustomEvent("account_deactivated"));
                 }
-                // Always swallow — prevents page-level catch blocks from running
+                // Swallow all — prevents page-level catch blocks from showing "Failed to load data"
                 return new Promise(() => { });
             } else if (error.response.status === 401) {
                 // Silenced 401 logs to reduce console noise for unauthenticated users
