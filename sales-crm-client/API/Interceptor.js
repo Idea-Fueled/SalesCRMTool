@@ -30,6 +30,9 @@ API.interceptors.request.use((config) => {
     return Promise.reject(error);
 })
 
+// Module-level flag — guaranteed to be true only once per JS session (page lifetime)
+let deactivationHandled = false;
+
 API.interceptors.response.use(
     (response) => {
         console.log("Response recieved!");
@@ -46,11 +49,16 @@ API.interceptors.response.use(
             console.log("Message", error.response.data.message || error.message);
 
             if (error.response.status === 403 && error.response.data?.code === "ACCOUNT_DEACTIVATED") {
-                // Dispatch once so AuthContext handles the single toast + logout
-                window.dispatchEvent(new CustomEvent("account_deactivated", {
-                    detail: { message: error.response.data.message }
-                }));
-                // Swallow — don't propagate so page-level catch blocks don't show "Failed to load data"
+                // Show ONE toast and dispatch ONE event, no matter how many 403s arrive
+                if (!deactivationHandled) {
+                    deactivationHandled = true;
+                    toast.error(
+                        error.response.data.message || "Your account has been deactivated. Please contact your administrator.",
+                        { id: "account-deactivated", duration: 6000, icon: "🔒" }
+                    );
+                    window.dispatchEvent(new CustomEvent("account_deactivated"));
+                }
+                // Always swallow — prevents page-level catch blocks from running
                 return new Promise(() => { });
             } else if (error.response.status === 401) {
                 // Silenced 401 logs to reduce console noise for unauthenticated users

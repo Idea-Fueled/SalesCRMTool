@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext, useRef } from "react";
+import React, { createContext, useState, useEffect, useContext } from "react";
 import API from "../../API/Interceptor";
 import { toast } from "react-hot-toast";
 
@@ -23,7 +23,6 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         fetchProfile();
 
-
         const failsafe = setTimeout(() => {
             setLoading(currentLoading => {
                 if (currentLoading) {
@@ -37,19 +36,12 @@ export const AuthProvider = ({ children }) => {
         return () => clearTimeout(failsafe);
     }, []);
 
-    const handlingDeactivation = useRef(false);
-
-    // Fallback: listen for account_deactivated event fired by Interceptor or socket
+    // Listen for account_deactivated event — toast is already shown by Interceptor,
+    // here we just clear the user and stop the loading state.
     useEffect(() => {
-        const handleDeactivated = (e) => {
-            if (handlingDeactivation.current) return; // deduplicate
-            handlingDeactivation.current = true;
-            toast.error(e.detail?.message || "Your account has been deactivated. Please contact your administrator.", {
-                id: "account-deactivated", // fixed ID prevents duplicate toasts
-                duration: 6000,
-                icon: "🔒"
-            });
+        const handleDeactivated = () => {
             setUser(null);
+            setLoading(false); // unblock the loading spinner immediately
         };
         window.addEventListener("account_deactivated", handleDeactivated);
         return () => window.removeEventListener("account_deactivated", handleDeactivated);
