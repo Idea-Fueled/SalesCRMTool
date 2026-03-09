@@ -1,6 +1,6 @@
 import express from "express"
 import { protect } from "../middlewares/authMiddleware.js";
-import { changeOwnership, createCompany, deleteCompany, getCompanies, getCompanyById, updateCompany } from "../controllers/companyController.js";
+import { changeOwnership, createCompany, deleteCompany, getCompanies, getCompanyById, updateCompany, getArchivedCompanies, restoreCompany } from "../controllers/companyController.js";
 
 const router = express.Router();
 

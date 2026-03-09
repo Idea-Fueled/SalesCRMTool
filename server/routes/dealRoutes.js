@@ -1,6 +1,6 @@
 import express from "express";
 import { protect } from "../middlewares/authMiddleware.js";
-import { createDeal, deleteDeal, getDeals, getDealById, markDealResult, moveDealStage, updateDealInformation } from "../controllers/dealController.js";
+import { createDeal, deleteDeal, getDeals, getDealById, markDealResult, moveDealStage, updateDealInformation, getArchivedDeals, restoreDeal } from "../controllers/dealController.js";
 
 const router = express.Router();
 
