@@ -3,7 +3,7 @@ import Modal from "./Modal";
 
 const STAGES = ["Lead", "Qualified", "Proposal", "Negotiation", "Closed Won", "Closed Lost"];
 const CURRENCIES = [{ value: "USD", label: "USD ($)" }, { value: "EUR", label: "EUR (€)" }, { value: "INR", label: "INR (₹)" }];
-const SOURCE_OPTIONS = ["Inbound", "Outbound", "Referral", "Website", "Cold Call", "Event", "Partner", "Other"];
+const SOURCE_OPTIONS = ["Inbound", "Referral", "Outbound"];
 
 export default function DealModal({ isOpen, onClose, deal, onSave, companies, contacts, freeText = false, userRole, potentialOwners = [] }) {
     const emptyForm = {
