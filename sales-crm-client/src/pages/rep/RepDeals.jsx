@@ -3,12 +3,13 @@ import { useNavigate, Link } from "react-router-dom";
 import {
     Briefcase, Zap, CheckCircle2, DollarSign,
     ChevronDown, Plus, Edit2, Trash2,
-    ChevronRight, LayoutList, Kanban, Eye
+    ChevronRight, LayoutList, LayoutGrid, Kanban, Eye
 } from "lucide-react";
 import { getDeals, createDeal, updateDeal, deleteDeal, updateDealStage } from "../../../API/services/dealService";
 import { getCompanies } from "../../../API/services/companyService";
 import { getContacts } from "../../../API/services/contactService";
 import KanbanBoard from "../../components/KanbanBoard";
+import DealCard from "../../components/cards/DealCard";
 import DealModal from "../../components/modals/DealModal";
 import ContactDetailsModal from "../../components/modals/ContactDetailsModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
@@ -157,6 +158,16 @@ export default function RepDeals() {
                             <LayoutList size={18} />
                         </button>
                         <button
+                            onClick={() => setViewMode("card")}
+                            title="Card View"
+                            className={`p-1.5 rounded-md transition text-sm flex items-center justify-center font-medium ${viewMode === "card"
+                                ? "bg-white text-red-600 shadow-sm"
+                                : "text-gray-400 hover:text-gray-600"
+                                }`}
+                        >
+                            <LayoutGrid size={18} />
+                        </button>
+                        <button
                             onClick={() => setViewMode("kanban")}
                             title="Kanban View"
                             className={`p-1.5 rounded-md transition text-sm flex items-center justify-center font-medium ${viewMode === "kanban"
@@ -202,6 +213,34 @@ export default function RepDeals() {
                             onDelete={(d) => { setSelectedDeal(d); setIsDeleteModalOpen(true); }}
                         />
                     )}
+                </div>
+            ) : viewMode === "card" ? (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+                    <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+                        <h2 className="font-bold text-gray-800">My Deals Grid</h2>
+                        <div className="flex flex-wrap items-stretch sm:items-center gap-2">
+                            <div className="flex-1 sm:flex-none">
+                                <Select options={stageOptions} value={stageFilter} onChange={setStageFilter} />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-auto max-h-[calc(100vh-350px)] custom-scrollbar">
+                        {loading && deals.length === 0 ? (
+                            <div className="col-span-full text-center py-10 text-gray-400">Loading deals...</div>
+                        ) : deals.length === 0 ? (
+                            <div className="col-span-full text-center py-10 text-gray-400">No deals found.</div>
+                        ) : (
+                            deals.map((d) => (
+                                <DealCard
+                                    key={d._id}
+                                    deal={d}
+                                    onEdit={(deal) => { setSelectedDeal(deal); setIsDealModalOpen(true); }}
+                                    onDelete={(deal) => { setSelectedDeal(deal); setIsDeleteModalOpen(true); }}
+                                    onView={(deal) => navigate(`/rep/deals/${deal._id}`)}
+                                />
+                            ))
+                        )}
+                    </div>
                 </div>
             ) : (
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">

@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import {
     Briefcase, Zap, CheckCircle2, DollarSign,
     MoreHorizontal, Plus, Edit2, Trash2,
-    LayoutDashboard, Users, Building2, LayoutList, Kanban, Eye, ChevronRight, ChevronDown
+    LayoutDashboard, Users, Building2, LayoutList, LayoutGrid, Kanban, Eye, ChevronRight, ChevronDown
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import KanbanBoard from "../../components/KanbanBoard";
+import DealCard from "../../components/cards/DealCard";
 import { getDeals, createDeal, updateDeal, deleteDeal, updateDealStage } from "../../../API/services/dealService";
 import { getCompanies } from "../../../API/services/companyService";
 import { getContacts } from "../../../API/services/contactService";
@@ -51,6 +52,7 @@ const stageBadge = {
 };
 
 const STAGES = ["Lead", "Qualified", "Proposal", "Negotiation", "Closed Won", "Closed Lost"];
+const stageOptions = ["All Stages", "Lead", "Qualified", "Proposal", "Negotiation", "Closed Won", "Closed Lost"];
 
 export default function DealsDashboard() {
     const navigate = useNavigate();
@@ -68,7 +70,8 @@ export default function DealsDashboard() {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedDeal, setSelectedDeal] = useState(null);
     const [selectedContact, setSelectedContact] = useState(null);
-    const [viewMode, setViewMode] = useState("list"); // "list" | "kanban"
+    const [viewMode, setViewMode] = useState("list"); // "list" | "card" | "kanban"
+    const [stageFilter, setStageFilter] = useState("All Stages");
 
     const fetchData = async () => {
         setLoading(true);
@@ -177,6 +180,16 @@ export default function DealsDashboard() {
                             <LayoutList size={18} />
                         </button>
                         <button
+                            onClick={() => setViewMode("card")}
+                            title="Card View"
+                            className={`p-1.5 rounded-md transition text-sm flex items-center justify-center font-medium ${viewMode === "card"
+                                ? "bg-white text-red-600 shadow-sm"
+                                : "text-gray-400 hover:text-gray-600"
+                                }`}
+                        >
+                            <LayoutGrid size={18} />
+                        </button>
+                        <button
                             onClick={() => setViewMode("kanban")}
                             title="Kanban View"
                             className={`p-1.5 rounded-md transition text-sm flex items-center justify-center font-medium ${viewMode === "kanban"
@@ -229,6 +242,45 @@ export default function DealsDashboard() {
                             onDelete={(d) => { setSelectedDeal(d); setIsDeleteModalOpen(true); }}
                         />
                     )}
+                </div>
+            )}
+
+            {/* Card Grid View */}
+            {viewMode === "card" && (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+                    <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+                        <h2 className="font-bold text-gray-800">All Deals Grid</h2>
+                        <div className="flex flex-wrap items-stretch sm:items-center gap-2">
+                            <div className="flex-1 sm:flex-none">
+                                <select
+                                    value={stageFilter}
+                                    onChange={e => setStageFilter(e.target.value)}
+                                    className="appearance-none text-sm font-medium text-gray-700 border border-gray-200 rounded-lg px-3 py-1.5 pr-8 bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-400 hover:border-gray-300 transition"
+                                >
+                                    {stageOptions.map(o => <option key={o}>{o}</option>)}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-auto max-h-[calc(100vh-350px)] custom-scrollbar">
+                        {loading && deals.length === 0 ? (
+                            <div className="col-span-full text-center py-10 text-gray-400">Loading deals...</div>
+                        ) : (
+                            (stageFilter === "All Stages" ? deals : deals.filter(d => d.stage === stageFilter)).length === 0 ? (
+                                <div className="col-span-full text-center py-10 text-gray-400">No deals found.</div>
+                            ) : (
+                                (stageFilter === "All Stages" ? deals : deals.filter(d => d.stage === stageFilter)).map((d) => (
+                                    <DealCard
+                                        key={d._id}
+                                        deal={d}
+                                        onEdit={(deal) => { setSelectedDeal(deal); setIsDealModalOpen(true); }}
+                                        onDelete={(deal) => { setSelectedDeal(deal); setIsDeleteModalOpen(true); }}
+                                        onView={(deal) => navigate(`/dashboard/deals/${deal._id}`)}
+                                    />
+                                ))
+                            )
+                        )}
+                    </div>
                 </div>
             )}
 
