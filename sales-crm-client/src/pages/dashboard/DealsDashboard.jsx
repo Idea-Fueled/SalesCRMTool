@@ -85,7 +85,7 @@ export default function DealsDashboard() {
             setDeals(dealsRes.data.data);
             setCompanies(companiesRes.data.data);
             setContacts(contactsRes.data.data);
-            setUsers(usersRes.data.data || []);
+            setUsers(usersRes.data || []);
         } catch (error) {
             console.error(error);
             toast.error("Failed to load dashboard data");

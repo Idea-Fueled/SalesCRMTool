@@ -73,7 +73,7 @@ export default function RepDeals() {
             setDeals(dealsRes.data.data);
             setCompanies(companiesRes.data.data);
             setContacts(contactsRes.data.data);
-            setUsers(usersRes.data.data || usersRes.data || []);
+            setUsers(usersRes.data || []);
         } catch (error) {
             console.error(error);
             toast.error("Failed to load data");

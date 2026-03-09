@@ -57,7 +57,7 @@ export default function DealDetails() {
                     getTeamUsers()
                 ]);
                 setDeal(dealRes.data.data);
-                setUsers(usersRes.data.data || usersRes.data || []);
+                setUsers(usersRes.data || []);
             } catch (error) {
                 console.error(error);
                 toast.error("Failed to fetch deal details");
