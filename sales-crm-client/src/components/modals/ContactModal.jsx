@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Modal from "./Modal";
 
-export default function ContactModal({ isOpen, onClose, contact, onSave, companies, userRole, potentialOwners = [] }) {
+export default function ContactModal({ isOpen, onClose, contact, onSave, companies = [], userRole, potentialOwners = [] }) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^[+\d\s\-()]{7,15}$/;
 
@@ -11,6 +11,7 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
     });
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const [showCompanySuggest, setShowCompanySuggest] = useState(false);
 
     useEffect(() => {
         if (contact) {
@@ -113,18 +114,21 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
                         <label className="text-xs font-semibold text-gray-500 uppercase">Company Name *</label>
                         <input type="text" className={inputClass("companyName")}
                             value={formData.companyName}
+                            onFocus={() => setShowCompanySuggest(true)}
+                            onBlur={() => setTimeout(() => setShowCompanySuggest(false), 200)}
                             onChange={e => {
                                 const val = e.target.value;
                                 set("companyName", val);
                                 set("companyId", ""); // Reset ID when typing
+                                setShowCompanySuggest(true);
                             }}
                             placeholder="e.g. Acme Corp" />
                         
                         {/* Searchable Dropdown */}
-                        {formData.companyName.trim() !== "" && !formData.companyId && companies.filter(c => c.name.toLowerCase().includes(formData.companyName.toLowerCase())).length > 0 && (
+                        {showCompanySuggest && companies.some(c => c.name && c.name.toLowerCase().includes(formData.companyName.toLowerCase())) && (
                             <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
                                 {companies
-                                    .filter(c => c.name.toLowerCase().includes(formData.companyName.toLowerCase()))
+                                    .filter(c => c.name && c.name.toLowerCase().includes(formData.companyName.toLowerCase()))
                                     .map(comp => (
                                         <button
                                             key={comp._id}
@@ -133,6 +137,7 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
                                             onClick={() => {
                                                 set("companyName", comp.name);
                                                 set("companyId", comp._id);
+                                                setShowCompanySuggest(false);
                                             }}
                                         >
                                             <div className="font-bold text-gray-800">{comp.name}</div>
