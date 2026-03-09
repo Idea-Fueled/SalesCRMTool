@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getDealById, updateDeal, deleteDeal } from "../../../API/services/dealService";
+import { getCompanies } from "../../../API/services/companyService";
+import { getContacts } from "../../../API/services/contactService";
 import { getTeamUsers } from "../../../API/services/userService";
 import { useAuth } from "../../context/AuthContext";
 import DealModal from "../../components/modals/DealModal";
@@ -45,6 +47,8 @@ export default function DealDetails() {
     const { user: currentUser } = useAuth();
     const [deal, setDeal] = useState(null);
     const [users, setUsers] = useState([]);
+    const [companies, setCompanies] = useState([]);
+    const [contacts, setContacts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -54,12 +58,16 @@ export default function DealDetails() {
         if (!silent) setLoading(true);
         else setIsRefreshing(true);
         try {
-            const [dealRes, usersRes] = await Promise.all([
+            const [dealRes, usersRes, companiesRes, contactsRes] = await Promise.all([
                 getDealById(id),
-                getTeamUsers()
+                getTeamUsers(),
+                getCompanies({ limit: 1000 }),
+                getContacts({ limit: 1000 })
             ]);
             setDeal(dealRes.data.data);
             setUsers(usersRes.data || []);
+            setCompanies(companiesRes.data.data);
+            setContacts(contactsRes.data.data);
         } catch (error) {
             console.error(error);
             toast.error("Failed to fetch deal details");
@@ -440,8 +448,8 @@ export default function DealDetails() {
                 onClose={() => setIsEditModalOpen(false)}
                 deal={deal}
                 onSave={handleSaveDeal}
-                companies={[]}
-                contacts={[]}
+                companies={companies}
+                contacts={contacts}
                 userRole={currentUser?.role}
                 potentialOwners={users}
                 currentUserId={currentUser?._id || currentUser?.id}

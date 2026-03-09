@@ -18,6 +18,8 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
     const [formData, setFormData] = useState(emptyForm);
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const [showCompanySuggest, setShowCompanySuggest] = useState(false);
+    const [showContactSuggest, setShowContactSuggest] = useState(false);
 
     useEffect(() => {
         if (deal) {
@@ -99,20 +101,89 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
 
                 {/* Company + Contact */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1">
+                    <div className="space-y-1 relative">
                         <label className="text-xs font-semibold text-gray-500 uppercase">Company Name *</label>
                         <input type="text" className={inputClass("companyName")}
                             value={formData.companyName}
-                            onChange={e => set("companyName", e.target.value)}
+                            onFocus={() => setShowCompanySuggest(true)}
+                            onBlur={() => setTimeout(() => setShowCompanySuggest(false), 200)}
+                            onChange={e => {
+                                const val = e.target.value;
+                                set("companyName", val);
+                                set("companyId", "");
+                                setShowCompanySuggest(true);
+                            }}
                             placeholder="e.g. Acme Corp" />
+                        
+                        {/* Searchable Company Dropdown */}
+                        {showCompanySuggest && companies && companies.some(c => c.name && c.name.toLowerCase().includes(formData.companyName.toLowerCase())) && (
+                            <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                                {companies
+                                    .filter(c => c.name && c.name.toLowerCase().includes(formData.companyName.toLowerCase()))
+                                    .map(comp => (
+                                        <button
+                                            key={comp._id}
+                                            type="button"
+                                            className="w-full text-left px-3 py-2 text-xs hover:bg-red-50 transition-colors border-b border-gray-50 last:border-0"
+                                            onClick={() => {
+                                                set("companyName", comp.name);
+                                                set("companyId", comp._id);
+                                                setShowCompanySuggest(false);
+                                            }}
+                                        >
+                                            <div className="font-bold text-gray-800">{comp.name}</div>
+                                            <div className="text-[10px] text-gray-400">{comp.industry || "General Industry"}</div>
+                                        </button>
+                                    ))
+                                }
+                            </div>
+                        )}
                         {errors.companyName && <p className="text-red-500 text-xs">{errors.companyName}</p>}
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1 relative">
                         <label className="text-xs font-semibold text-gray-500 uppercase">Contact Name *</label>
                         <input type="text" className={inputClass("contactName")}
                             value={formData.contactName}
-                            onChange={e => set("contactName", e.target.value)}
+                            onFocus={() => setShowContactSuggest(true)}
+                            onBlur={() => setTimeout(() => setShowContactSuggest(false), 200)}
+                            onChange={e => {
+                                const val = e.target.value;
+                                set("contactName", val);
+                                set("contactId", "");
+                                setShowContactSuggest(true);
+                            }}
                             placeholder="e.g. Jane Smith" />
+                            
+                        {/* Searchable Contact Dropdown */}
+                        {showContactSuggest && contacts && contacts.some(c => `${c.firstName || ''} ${c.lastName || ''}`.trim().toLowerCase().includes(formData.contactName.toLowerCase())) && (
+                            <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                                {contacts
+                                    .filter(c => `${c.firstName || ''} ${c.lastName || ''}`.trim().toLowerCase().includes(formData.contactName.toLowerCase()))
+                                    .map(cont => {
+                                        const fullName = `${cont.firstName || ''} ${cont.lastName || ''}`.trim();
+                                        return (
+                                            <button
+                                                key={cont._id}
+                                                type="button"
+                                                className="w-full text-left px-3 py-2 text-xs hover:bg-red-50 transition-colors border-b border-gray-50 last:border-0"
+                                                onClick={() => {
+                                                    set("contactName", fullName);
+                                                    set("contactId", cont._id);
+                                                    if(cont.companyId && !formData.companyId) { // Auto-fill company if not set
+                                                        set("companyId", cont.companyId._id || cont.companyId);
+                                                        set("companyName", cont.companyId.name || cont.companyName || "");
+                                                    }
+                                                    setShowContactSuggest(false);
+                                                }}
+                                            >
+                                                <div className="font-bold text-gray-800">{fullName}</div>
+                                                <div className="text-[10px] text-gray-400">{cont.jobTitle || "Professional"}</div>
+                                            </button>
+                                        )
+                                    })
+                                }
+                            </div>
+                        )}
                         {errors.contactName && <p className="text-red-500 text-xs">{errors.contactName}</p>}
                     </div>
                 </div>
