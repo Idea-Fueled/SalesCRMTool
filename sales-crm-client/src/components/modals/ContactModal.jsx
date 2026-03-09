@@ -115,7 +115,7 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
                         <input type="text" className={inputClass("companyName")}
                             value={formData.companyName}
                             onFocus={() => setShowCompanySuggest(true)}
-                            onBlur={() => setTimeout(() => setShowCompanySuggest(false), 200)}
+                            onBlur={() => setShowCompanySuggest(false)}
                             onChange={e => {
                                 const val = e.target.value;
                                 set("companyName", val);
@@ -134,7 +134,8 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
                                             key={comp._id}
                                             type="button"
                                             className="w-full text-left px-3 py-2 text-xs hover:bg-red-50 transition-colors border-b border-gray-50 last:border-0"
-                                            onClick={() => {
+                                            onMouseDown={(e) => {
+                                                e.preventDefault(); // Prevent onBlur from firing on the input
                                                 set("companyName", comp.name);
                                                 set("companyId", comp._id);
                                                 setShowCompanySuggest(false);
