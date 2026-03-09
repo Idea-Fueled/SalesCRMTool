@@ -109,12 +109,39 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
                         <input type="text" className={inputClass("jobTitle")} value={formData.jobTitle}
                             onChange={e => set("jobTitle", e.target.value)} placeholder="Sales Director" />
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1 relative">
                         <label className="text-xs font-semibold text-gray-500 uppercase">Company Name *</label>
                         <input type="text" className={inputClass("companyName")}
                             value={formData.companyName}
-                            onChange={e => set("companyName", e.target.value)}
+                            onChange={e => {
+                                const val = e.target.value;
+                                set("companyName", val);
+                                set("companyId", ""); // Reset ID when typing
+                            }}
                             placeholder="e.g. Acme Corp" />
+                        
+                        {/* Searchable Dropdown */}
+                        {formData.companyName.trim() !== "" && !formData.companyId && companies.filter(c => c.name.toLowerCase().includes(formData.companyName.toLowerCase())).length > 0 && (
+                            <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                                {companies
+                                    .filter(c => c.name.toLowerCase().includes(formData.companyName.toLowerCase()))
+                                    .map(comp => (
+                                        <button
+                                            key={comp._id}
+                                            type="button"
+                                            className="w-full text-left px-3 py-2 text-xs hover:bg-red-50 transition-colors border-b border-gray-50 last:border-0"
+                                            onClick={() => {
+                                                set("companyName", comp.name);
+                                                set("companyId", comp._id);
+                                            }}
+                                        >
+                                            <div className="font-bold text-gray-800">{comp.name}</div>
+                                            <div className="text-[10px] text-gray-400">{comp.industry || "General Industry"}</div>
+                                        </button>
+                                    ))
+                                }
+                            </div>
+                        )}
                         {errors.companyName && <p className="text-red-500 text-xs">{errors.companyName}</p>}
                     </div>
                 </div>
