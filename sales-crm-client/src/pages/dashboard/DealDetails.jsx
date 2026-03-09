@@ -287,7 +287,14 @@ export default function DealDetails() {
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
                             <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Pipeline Transition Log</h3>
-                            <RotateCw size={12} className="text-gray-300" />
+                            <button
+                                onClick={() => fetchDealData(true)}
+                                disabled={isRefreshing}
+                                className={`text-gray-300 hover:text-red-500 transition-all ${isRefreshing ? "animate-spin text-red-500" : ""}`}
+                                title="Refresh History"
+                            >
+                                <RotateCw size={12} />
+                            </button>
                         </div>
                         <div className="p-6 space-y-6">
                             {(!deal.stageHistory || deal.stageHistory.length === 0) ? (
