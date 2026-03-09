@@ -125,7 +125,7 @@ export default function CompanyModal({ isOpen, onClose, company, onSave, userRol
                     <div className="space-y-1">
                         <label className="text-xs font-semibold text-gray-500 uppercase">Phone</label>
                         <input type="text" className={inputClass("phone")} value={formData.phone}
-                            onChange={e => set("phone", e.target.value)} placeholder="+91 98765 43210" />
+                            onChange={e => set("phone", e.target.value)} placeholder="+1 (555) 123-4567" />
                         {errors.phone && <p className="text-red-500 text-xs">{errors.phone}</p>}
                     </div>
                 </div>
@@ -133,7 +133,7 @@ export default function CompanyModal({ isOpen, onClose, company, onSave, userRol
                 <div className="space-y-1">
                     <label className="text-xs font-semibold text-gray-500 uppercase">Address</label>
                     <input type="text" className={inputClass("address")} value={formData.address}
-                        onChange={e => set("address", e.target.value)} placeholder="123 MG Road, Bangalore" />
+                        onChange={e => set("address", e.target.value)} placeholder="123 Main St, New York, NY" />
                 </div>
 
                 <div className="space-y-1">

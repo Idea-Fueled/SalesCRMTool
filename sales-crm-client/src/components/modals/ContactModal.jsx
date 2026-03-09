@@ -150,13 +150,13 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
                     <div className="space-y-1">
                         <label className="text-xs font-semibold text-gray-500 uppercase">Phone</label>
                         <input type="text" className={inputClass("phone")} value={formData.phone}
-                            onChange={e => set("phone", e.target.value)} placeholder="+91 98765 43210" />
+                            onChange={e => set("phone", e.target.value)} placeholder="+1 (555) 123-4567" />
                         {errors.phone && <p className="text-red-500 text-xs">{errors.phone}</p>}
                     </div>
                     <div className="space-y-1">
                         <label className="text-xs font-semibold text-gray-500 uppercase">Mobile</label>
                         <input type="text" className={inputClass("mobile")} value={formData.mobile}
-                            onChange={e => set("mobile", e.target.value)} placeholder="+91 98765 43210" />
+                            onChange={e => set("mobile", e.target.value)} placeholder="+1 (555) 123-4567" />
                         {errors.mobile && <p className="text-red-500 text-xs">{errors.mobile}</p>}
                     </div>
                 </div>
