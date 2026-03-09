@@ -420,6 +420,7 @@ export default function DealsDashboard() {
                 contacts={contacts}
                 userRole={currentUser?.role}
                 potentialOwners={users}
+                currentUserId={currentUser?._id || currentUser?.id}
             />
 
             <DealDetailsModal
@@ -439,6 +440,7 @@ export default function DealsDashboard() {
                 onClose={() => setIsDeleteModalOpen(false)}
                 onConfirm={handleDeleteDeal}
                 itemName={selectedDeal?.name}
+                currentUserId={currentUser?._id || currentUser?.id}
             />
         </div>
     );

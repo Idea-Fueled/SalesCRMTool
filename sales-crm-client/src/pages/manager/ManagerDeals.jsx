@@ -360,6 +360,7 @@ export default function ManagerDeals() {
                 contacts={contacts}
                 userRole={currentUser?.role}
                 potentialOwners={users}
+                currentUserId={currentUser?._id || currentUser?.id}
             />
 
             <ContactDetailsModal

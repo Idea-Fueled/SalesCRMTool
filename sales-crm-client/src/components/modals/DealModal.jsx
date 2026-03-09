@@ -5,13 +5,15 @@ const STAGES = ["Lead", "Qualified", "Proposal", "Negotiation", "Closed Won", "C
 const CURRENCIES = [{ value: "USD", label: "USD ($)" }, { value: "EUR", label: "EUR (€)" }, { value: "INR", label: "INR (₹)" }];
 const SOURCE_OPTIONS = ["Inbound", "Referral", "Outbound"];
 
-export default function DealModal({ isOpen, onClose, deal, onSave, companies, contacts, freeText = false, userRole, potentialOwners = [] }) {
+export default function DealModal({ isOpen, onClose, deal, onSave, companies, contacts, freeText = false, userRole, potentialOwners = [], currentUserId }) {
     const emptyForm = {
         name: "", companyId: "", contactId: "",
         companyName: "", contactName: "",
         value: "", currency: "USD", stage: "Lead",
         expectedCloseDate: "", probability: 10, source: "", notes: "", ownerId: ""
     };
+
+    const options = potentialOwners.filter(u => u._id !== currentUserId);
 
     const [formData, setFormData] = useState(emptyForm);
     const [errors, setErrors] = useState({});
@@ -192,8 +194,8 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
                             value={formData.ownerId}
                             onChange={e => set("ownerId", e.target.value)}
                         >
-                            <option value="">Select Owner</option>
-                            {potentialOwners.map(u => (
+                            <option value="">Default (Myself)</option>
+                            {options.map(u => (
                                 <option key={u._id} value={u._id}>{u.firstName} {u.lastName} ({u.role === "admin" ? "ADMIN" : u.role === "sales_manager" ? "SALES MANAGER" : u.role === "sales_rep" ? "SALES REPRESENTATIVE" : u.role.replace(/_/g, " ").toUpperCase()})</option>
                             ))}
                         </select>

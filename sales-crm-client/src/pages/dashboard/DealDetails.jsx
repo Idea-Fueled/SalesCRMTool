@@ -432,6 +432,7 @@ export default function DealDetails() {
                 contacts={[]}
                 userRole={currentUser?.role}
                 potentialOwners={users}
+                currentUserId={currentUser?._id || currentUser?.id}
             />
 
             {/* Delete Confirmation Modal */}

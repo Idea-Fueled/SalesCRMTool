@@ -351,6 +351,7 @@ export default function RepDeals() {
                 userRole={currentUser?.role}
                 potentialOwners={users}
                 freeText={true}
+                currentUserId={currentUser?._id || currentUser?.id}
             />
 
             <ContactDetailsModal
