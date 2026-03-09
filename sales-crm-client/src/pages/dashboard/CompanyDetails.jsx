@@ -37,19 +37,24 @@ export default function CompanyDetails() {
     const navigate = useNavigate();
     const [company, setCompany] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const fetchCompany = async (silent = false) => {
+        if (!silent) setLoading(true);
+        else setIsRefreshing(true);
+        try {
+            const res = await getCompanyById(id);
+            setCompany(res.data.data);
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to fetch company details");
+        } finally {
+            setLoading(false);
+            setIsRefreshing(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchCompany = async () => {
-            try {
-                const res = await getCompanyById(id);
-                setCompany(res.data.data);
-            } catch (error) {
-                console.error(error);
-                toast.error("Failed to fetch company details");
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchCompany();
     }, [id]);
 
@@ -238,8 +243,18 @@ export default function CompanyDetails() {
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-h-[400px]">
                         <div className="px-6 h-14 border-b border-gray-50 flex items-center justify-between">
                             <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider">Corporate Remarks</h3>
-                            <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-50 px-2.5 py-1 rounded-full">
-                                <Clock size={12} className="text-red-400" /> Operational Status
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={() => fetchCompany(true)}
+                                    disabled={isRefreshing}
+                                    className={`text-gray-300 hover:text-red-500 transition-all ${isRefreshing ? "animate-spin text-red-500" : ""}`}
+                                    title="Refresh Details"
+                                >
+                                    <RotateCw size={12} />
+                                </button>
+                                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-50 px-2.5 py-1 rounded-full">
+                                    <Clock size={12} className="text-red-400" /> Operational Status
+                                </div>
                             </div>
                         </div>
 

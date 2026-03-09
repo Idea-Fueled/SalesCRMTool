@@ -38,19 +38,24 @@ export default function ContactDetails() {
     const navigate = useNavigate();
     const [contact, setContact] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const fetchContact = async (silent = false) => {
+        if (!silent) setLoading(true);
+        else setIsRefreshing(true);
+        try {
+            const res = await getContactById(id);
+            setContact(res.data.data);
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to fetch contact details");
+        } finally {
+            setLoading(false);
+            setIsRefreshing(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchContact = async () => {
-            try {
-                const res = await getContactById(id);
-                setContact(res.data.data);
-            } catch (error) {
-                console.error(error);
-                toast.error("Failed to fetch contact details");
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchContact();
     }, [id]);
 
@@ -195,8 +200,18 @@ export default function ContactDetails() {
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-h-[400px]">
                         <div className="px-6 h-14 border-b border-gray-50 flex items-center justify-between">
                             <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider">Remarks & Intel</h3>
-                            <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-50 px-2.5 py-1 rounded-full">
-                                <Clock size={12} className="text-red-400" /> Latest Update
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={() => fetchContact(true)}
+                                    disabled={isRefreshing}
+                                    className={`text-gray-300 hover:text-red-500 transition-all ${isRefreshing ? "animate-spin text-red-500" : ""}`}
+                                    title="Refresh Details"
+                                >
+                                    <RotateCw size={12} />
+                                </button>
+                                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-50 px-2.5 py-1 rounded-full">
+                                    <Clock size={12} className="text-red-400" /> Latest Update
+                                </div>
                             </div>
                         </div>
 
