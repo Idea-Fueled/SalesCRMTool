@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
     LayoutDashboard, Users, Building2, Briefcase, Zap,
     TrendingUp, ArrowUpRight, ArrowDownRight, Activity,
-    Calendar, DollarSign, ArrowLeft, ChevronRight
+    Calendar, DollarSign, ArrowLeft, ChevronRight, Trash2
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { getDeals } from "../../../API/services/dealService";
