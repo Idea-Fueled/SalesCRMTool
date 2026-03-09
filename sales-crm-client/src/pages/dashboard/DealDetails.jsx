@@ -46,25 +46,30 @@ export default function DealDetails() {
     const [deal, setDeal] = useState(null);
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+    const fetchDealData = async (silent = false) => {
+        if (!silent) setLoading(true);
+        else setIsRefreshing(true);
+        try {
+            const [dealRes, usersRes] = await Promise.all([
+                getDealById(id),
+                getTeamUsers()
+            ]);
+            setDeal(dealRes.data.data);
+            setUsers(usersRes.data || []);
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to fetch deal details");
+        } finally {
+            setLoading(false);
+            setIsRefreshing(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchDealData = async () => {
-            try {
-                const [dealRes, usersRes] = await Promise.all([
-                    getDealById(id),
-                    getTeamUsers()
-                ]);
-                setDeal(dealRes.data.data);
-                setUsers(usersRes.data || []);
-            } catch (error) {
-                console.error(error);
-                toast.error("Failed to fetch deal details");
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchDealData();
     }, [id]);
 
