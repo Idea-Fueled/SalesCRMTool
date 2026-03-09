@@ -470,10 +470,12 @@ export const deleteDeal = async (req, res, next) => {
             }
         }
 
-        await deal.deleteOne();
+        deal.isDeleted = true;
+        deal.deletedAt = new Date();
+        await deal.save();
 
         res.status(200).json({
-            message: "Deal deleted successfully!"
+            message: "Deal moved to trash successfully!"
         })
 
         // Log deletion
@@ -482,7 +484,7 @@ export const deleteDeal = async (req, res, next) => {
             entityId: id,
             action: "DELETE",
             performedBy: userId,
-            details: { oldValues: deal },
+            details: { message: `Deal "${deal.name}" moved to trash.`, oldValues: deal },
             req
         });
         return;
@@ -499,7 +501,7 @@ export const getDeals = async (req, res, next) => {
         const { role, id: userId } = req.user;
         const { name, stage, minValue, maxValue, startDate, endDate, owner, page = 1, limit = 10, sort = "-createdAt" } = req.query;
 
-        let filter = {}
+        let filter = { isDeleted: { $ne: true } }
 
         if (name) filter.name = { $regex: name, $options: "i" };
 
@@ -579,6 +581,62 @@ export const getDealById = async (req, res, next) => {
         }
 
         res.status(200).json({ data: deal });
+    } catch (error) {
+        res.status(500).json({ message: error.message || "Server error!" });
+    }
+};
+
+export const getArchivedDeals = async (req, res) => {
+    try {
+        const { role } = req.user;
+        if (role !== "admin") return res.status(403).json({ message: "Access denied!" });
+
+        const deals = await Deal.find({ isDeleted: true })
+            .populate("ownerId", "firstName lastName email")
+            .populate("companyId", "name")
+            .populate("contactId", "firstName lastName")
+            .sort({ deletedAt: -1 });
+
+        res.status(200).json({ data: deals });
+    } catch (error) {
+        res.status(500).json({ message: error.message || "Server error!" });
+    }
+};
+
+export const restoreDeal = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { role, id: userId } = req.user;
+        if (role !== "admin") return res.status(403).json({ message: "Access denied!" });
+
+        const deal = await Deal.findById(id);
+        if (!deal) return res.status(404).json({ message: "Deal not found!" });
+
+        if (!deal.isDeleted) return res.status(400).json({ message: "Deal is not in trash!" });
+
+        // Check 30 days
+        const deletedAt = new Date(deal.deletedAt);
+        const now = new Date();
+        const diffDays = Math.ceil((now - deletedAt) / (1000 * 60 * 60 * 24));
+
+        if (diffDays > 30) {
+            return res.status(400).json({ message: "Restore period expired (30 days max)!" });
+        }
+
+        deal.isDeleted = false;
+        deal.deletedAt = null;
+        await deal.save();
+
+        res.status(200).json({ message: "Deal restored successfully!" });
+
+        await logAction({
+            entityType: "Deal",
+            entityId: id,
+            action: "ACTIVATE",
+            performedBy: userId,
+            details: { message: `Deal "${deal.name}" restored from trash.` },
+            req
+        });
     } catch (error) {
         res.status(500).json({ message: error.message || "Server error!" });
     }

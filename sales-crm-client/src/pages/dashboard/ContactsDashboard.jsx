@@ -122,7 +122,7 @@ export default function ContactsDashboard() {
         if (!selectedContact) return;
         try {
             await deleteContact(selectedContact._id);
-            toast.success("Contact deleted successfully");
+            toast.success("Contact moved to archive");
             setIsDeleteModalOpen(false);
             fetchData();
         } catch (error) {

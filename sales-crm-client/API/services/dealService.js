@@ -27,3 +27,11 @@ export const markDealResult = async (id, result) => {
 export const getDealById = async (id) => {
     return API.get(`/deals/${id}`);
 };
+
+export const getArchivedDeals = async () => {
+    return API.get("/deals/archived");
+};
+
+export const restoreDeal = async (id) => {
+    return API.patch(`/deals/${id}/restore`);
+};

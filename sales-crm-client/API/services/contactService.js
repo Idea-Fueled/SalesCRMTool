@@ -19,3 +19,11 @@ export const deleteContact = async (id) => {
 export const getContactById = async (id) => {
     return API.get(`/contacts/${id}`);
 };
+
+export const getArchivedContacts = async () => {
+    return API.get("/contacts/archived");
+};
+
+export const restoreContact = async (id) => {
+    return API.patch(`/contacts/restore/${id}`);
+};

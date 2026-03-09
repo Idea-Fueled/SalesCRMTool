@@ -91,7 +91,7 @@ export const getContacts = async (req, res, next) => {
         const { id, role } = req.user;
         const { name, company, jobTitle, page = 1, limit = 10, sort = "-createdAt" } = req.query;
 
-        let filter = {};
+        let filter = { isDeleted: { $ne: true } };
         if (name) {
             filter.$or = [
                 { firstName: { $regex: name, $options: "i" } },
@@ -270,10 +270,12 @@ export const deleteContact = async (req, res, next) => {
             }
         }
 
-        await contact.deleteOne();
+        contact.isDeleted = true;
+        contact.deletedAt = new Date();
+        await contact.save();
 
         res.status(200).json({
-            message: "Contact deleted successfully!"
+            message: "Contact moved to trash successfully!"
         })
 
         // Log contact deletion
@@ -282,7 +284,7 @@ export const deleteContact = async (req, res, next) => {
             entityId: id,
             action: "DELETE",
             performedBy: userId,
-            details: { oldValues: contact },
+            details: { message: `Contact "${contact.firstName} ${contact.lastName}" moved to trash.`, oldValues: contact },
             req
         });
         return;
@@ -306,6 +308,61 @@ export const getContactById = async (req, res, next) => {
         }
 
         res.status(200).json({ data: contact });
+    } catch (error) {
+        res.status(500).json({ message: error.message || "Server error!" });
+    }
+};
+
+export const getArchivedContacts = async (req, res) => {
+    try {
+        const { role } = req.user;
+        if (role !== "admin") return res.status(403).json({ message: "Access denied!" });
+
+        const contacts = await Contact.find({ isDeleted: true })
+            .populate("ownerId", "firstName lastName email")
+            .populate("companyId", "name")
+            .sort({ deletedAt: -1 });
+
+        res.status(200).json({ data: contacts });
+    } catch (error) {
+        res.status(500).json({ message: error.message || "Server error!" });
+    }
+};
+
+export const restoreContact = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { role, id: userId } = req.user;
+        if (role !== "admin") return res.status(403).json({ message: "Access denied!" });
+
+        const contact = await Contact.findById(id);
+        if (!contact) return res.status(404).json({ message: "Contact not found!" });
+
+        if (!contact.isDeleted) return res.status(400).json({ message: "Contact is not in trash!" });
+
+        // Check 30 days
+        const deletedAt = new Date(contact.deletedAt);
+        const now = new Date();
+        const diffDays = Math.ceil((now - deletedAt) / (1000 * 60 * 60 * 24));
+
+        if (diffDays > 30) {
+            return res.status(400).json({ message: "Restore period expired (30 days max)!" });
+        }
+
+        contact.isDeleted = false;
+        contact.deletedAt = null;
+        await contact.save();
+
+        res.status(200).json({ message: "Contact restored successfully!" });
+
+        await logAction({
+            entityType: "Contact",
+            entityId: id,
+            action: "ACTIVATE",
+            performedBy: userId,
+            details: { message: `Contact "${contact.firstName} ${contact.lastName}" restored from trash.` },
+            req
+        });
     } catch (error) {
         res.status(500).json({ message: error.message || "Server error!" });
     }

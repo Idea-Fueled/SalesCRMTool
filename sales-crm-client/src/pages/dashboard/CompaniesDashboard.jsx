@@ -106,7 +106,7 @@ export default function CompaniesDashboard() {
         if (!selectedCompany) return;
         try {
             await deleteCompany(selectedCompany._id);
-            toast.success("Company deleted successfully");
+            toast.success("Company moved to archive");
             setIsDeleteModalOpen(false);
             fetchData();
         } catch (error) {

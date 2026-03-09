@@ -67,7 +67,7 @@ export const getCompanies = async (req, res) => {
         const { id, role } = req.user;
         const { name, industry, status, page = 1, limit = 10, sort = "-createdAt" } = req.query;
 
-        let filter = {};
+        let filter = { isDeleted: { $ne: true } };
 
         if (name) filter.name = { $regex: name, $options: "i" };
         if (industry) filter.industry = industry;
@@ -242,10 +242,12 @@ export const deleteCompany = async (req, res) => {
             }
         }
 
-        await company.deleteOne();
+        company.isDeleted = true;
+        company.deletedAt = new Date();
+        await company.save();
 
         res.json({
-            message: "Company deleted successfully!"
+            message: "Company moved to trash successfully!"
         });
 
         // Log company deletion
@@ -254,7 +256,7 @@ export const deleteCompany = async (req, res) => {
             entityId: id,
             action: "DELETE",
             performedBy: userId,
-            details: { oldValues: company },
+            details: { message: `Company "${company.name}" moved to trash.`, oldValues: company },
             req
         });
         return;
@@ -342,6 +344,60 @@ export const getCompanyById = async (req, res) => {
         }
 
         res.status(200).json({ data: company });
+    } catch (error) {
+        res.status(500).json({ message: error.message || "Server error!" });
+    }
+};
+
+export const getArchivedCompanies = async (req, res) => {
+    try {
+        const { role } = req.user;
+        if (role !== "admin") return res.status(403).json({ message: "Access denied!" });
+
+        const companies = await Company.find({ isDeleted: true })
+            .populate("ownerId", "firstName lastName email")
+            .sort({ deletedAt: -1 });
+
+        res.status(200).json({ data: companies });
+    } catch (error) {
+        res.status(500).json({ message: error.message || "Server error!" });
+    }
+};
+
+export const restoreCompany = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { role, id: userId } = req.user;
+        if (role !== "admin") return res.status(403).json({ message: "Access denied!" });
+
+        const company = await Company.findById(id);
+        if (!company) return res.status(404).json({ message: "Company not found!" });
+
+        if (!company.isDeleted) return res.status(400).json({ message: "Company is not in trash!" });
+
+        // Check 30 days
+        const deletedAt = new Date(company.deletedAt);
+        const now = new Date();
+        const diffDays = Math.ceil((now - deletedAt) / (1000 * 60 * 60 * 24));
+
+        if (diffDays > 30) {
+            return res.status(400).json({ message: "Restore period expired (30 days max)!" });
+        }
+
+        company.isDeleted = false;
+        company.deletedAt = null;
+        await company.save();
+
+        res.status(200).json({ message: "Company restored successfully!" });
+
+        await logAction({
+            entityType: "Company",
+            entityId: id,
+            action: "ACTIVATE",
+            performedBy: userId,
+            details: { message: `Company "${company.name}" restored from trash.` },
+            req
+        });
     } catch (error) {
         res.status(500).json({ message: error.message || "Server error!" });
     }

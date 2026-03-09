@@ -5,6 +5,8 @@ import { createContact, getContacts, getContactById, updateContact, deleteContac
 const router = express.Router();
 
 router.post("/create", protect, createContact)
+router.get("/archived", protect, getArchivedContacts)
+router.patch("/restore/:id", protect, restoreContact)
 router.get("/", protect, getContacts)
 router.get("/:id", protect, getContactById)
 router.put("/update/:id", protect, updateContact)

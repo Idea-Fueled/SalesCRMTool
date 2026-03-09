@@ -5,6 +5,8 @@ import { changeOwnership, createCompany, deleteCompany, getCompanies, getCompany
 const router = express.Router();
 
 router.post("/create", protect, createCompany)
+router.get("/archived", protect, getArchivedCompanies)
+router.patch("/:id/restore", protect, restoreCompany)
 router.get("/", protect, getCompanies)
 router.get("/:id", protect, getCompanyById)
 router.put("/:id", protect, updateCompany)

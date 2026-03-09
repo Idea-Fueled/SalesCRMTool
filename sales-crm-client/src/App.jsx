@@ -22,6 +22,7 @@ import ContactsDashboard from "./pages/dashboard/ContactsDashboard";
 import UsersDashboard from "./pages/dashboard/UsersDashboard";
 import AuditLogs from "./pages/dashboard/AuditLogs";
 import TrashDashboard from "./pages/dashboard/TrashDashboard";
+import ArchiveDashboard from "./pages/dashboard/ArchiveDashboard";
 import DealDetails from "./pages/dashboard/DealDetails";
 import CompanyDetails from "./pages/dashboard/CompanyDetails";
 import ContactDetails from "./pages/dashboard/ContactDetails";
@@ -85,6 +86,7 @@ const router = createBrowserRouter([
       { path: "users", element: <UsersDashboard /> },
       { path: "audit-logs", element: <AuditLogs /> },
       { path: "trash", element: <TrashDashboard /> },
+      { path: "archive", element: <ArchiveDashboard /> },
       { path: "deals/:id", element: <DealDetails /> },
       { path: "companies/:id", element: <CompanyDetails /> },
       { path: "contacts/:id", element: <ContactDetails /> },

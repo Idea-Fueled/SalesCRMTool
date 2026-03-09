@@ -119,7 +119,7 @@ export default function DealsDashboard() {
         if (!selectedDeal) return;
         try {
             await deleteDeal(selectedDeal._id);
-            toast.success("Deal deleted successfully");
+            toast.success("Deal moved to archive");
             setIsDeleteModalOpen(false);
             fetchData();
         } catch (error) {

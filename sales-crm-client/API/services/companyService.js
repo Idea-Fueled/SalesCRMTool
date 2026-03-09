@@ -23,3 +23,11 @@ export const changeCompanyOwnership = async (id, newOwnerId) => {
 export const getCompanyById = async (id) => {
     return API.get(`/companies/${id}`);
 };
+
+export const getArchivedCompanies = async () => {
+    return API.get("/companies/archived");
+};
+
+export const restoreCompany = async (id) => {
+    return API.patch(`/companies/${id}/restore`);
+};

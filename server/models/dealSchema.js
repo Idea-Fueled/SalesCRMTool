@@ -101,6 +101,14 @@ const dealSchema = new mongoose.Schema(
         stageHistory: {
             type: [stageHistorySchema],
             default: []
+        },
+        isDeleted: {
+            type: Boolean,
+            default: false
+        },
+        deletedAt: {
+            type: Date,
+            default: null
         }
     },
     { timestamps: true }
