@@ -80,7 +80,7 @@ export default function DeactivateModal({ isOpen, onClose, user, activeUsers, on
                             <p className={`text-sm font-semibold ${reassignMode === "reassign" ? "text-red-700" : "text-gray-700"}`}>
                                 Reassign to another user
                             </p>
-                            <p className="text-xs text-gray-400 mt-0.5">All companies, contacts and deals will be transferred to the selected person.</p>
+                            <p className="text-xs text-gray-400 mt-0.5">All companies, contacts, deals, and <span className="font-bold">subordinate sales representatives</span> will be transferred to the selected person.</p>
                         </div>
                     </label>
 
@@ -132,7 +132,7 @@ export default function DeactivateModal({ isOpen, onClose, user, activeUsers, on
                 {reassignMode === "keep" && (
                     <div className="flex items-start gap-2.5 p-3 bg-red-50 border border-red-100 rounded-xl text-xs text-red-800">
                         <AlertTriangle size={14} className="mt-0.5 flex-shrink-0 text-red-500" />
-                        <p>The user's companies, contacts, and deals will remain assigned to them. They won't be visible to others but will be fully restored when the user is reactivated.</p>
+                        <p>The user's records will remain assigned to them. <span className="font-bold text-red-900">Any reporting sales representatives will be set to "No Manager".</span> Data will be fully restored when the user is reactivated.</p>
                     </div>
                 )}
 

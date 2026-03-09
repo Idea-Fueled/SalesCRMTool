@@ -339,6 +339,11 @@ export const softDeleteUser = async (req, res, next) => {
             await Company.updateMany({ ownerId: id }, { ownerId: newOwnerId });
             await Contact.updateMany({ ownerId: id }, { ownerId: newOwnerId });
             await Deal.updateMany({ ownerId: id }, { ownerId: newOwnerId });
+            // Reassign subordinates if user is a manager
+            await User.updateMany({ managerId: id }, { managerId: newOwnerId });
+        } else {
+            // If no new owner, clear managerId for subordinates
+            await User.updateMany({ managerId: id }, { managerId: null });
         }
 
         user.isDeleted = true;
@@ -521,6 +526,11 @@ export const deactivateUser = async (req, res, next) => {
             await Company.updateMany({ ownerId: id }, { ownerId: newOwnerId });
             await Contact.updateMany({ ownerId: id }, { ownerId: newOwnerId });
             await Deal.updateMany({ ownerId: id }, { ownerId: newOwnerId });
+            // Reassign subordinates if user is a manager
+            await User.updateMany({ managerId: id }, { managerId: newOwnerId });
+        } else {
+            // If no new owner, clear managerId for subordinates
+            await User.updateMany({ managerId: id }, { managerId: null });
         }
 
         // Deactivate user
@@ -758,6 +768,8 @@ export const bulkReassignRecords = async (req, res, next) => {
             { ownerId: id },
             { ownerId: newOwnerId }
         );
+        // Reassign subordinates
+        await User.updateMany({ managerId: id }, { managerId: newOwnerId });
 
         // Log the bulk reassignment
         await logAction({

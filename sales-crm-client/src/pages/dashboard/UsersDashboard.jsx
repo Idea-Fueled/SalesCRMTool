@@ -227,7 +227,7 @@ export default function UsersDashboard() {
         }
     };
 
-    const potentialManagers = users.filter(u => u.isActive);
+    const potentialManagers = users.filter(u => u.isActive && (u.role === "admin" || u.role === "sales_manager"));
     const adminCount = users.filter(u => u.role === "admin").length;
     const managerCount = users.filter(u => u.role === "sales_manager").length;
     const repCount = users.filter(u => u.role === "sales_rep").length;
