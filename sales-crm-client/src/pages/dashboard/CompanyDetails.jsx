@@ -12,10 +12,9 @@ import {
 import toast from "react-hot-toast";
 
 const companyStatusPipeline = [
-    { id: "Lead", label: "Lead Identification" },
     { id: "Prospect", label: "Professional Prospect" },
-    { id: "Customer", label: "Active Customer" },
-    { id: "Churned", label: "Relationship Ended" }
+    { id: "Active", label: "Active Company" },
+    { id: "Inactive", label: "Inactive Company" }
 ];
 
 const formatDate = (date, includeTime = false) => {
@@ -211,7 +210,7 @@ export default function CompanyDetails() {
                         <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest">Account Lifecycle Status</h3>
                         <div className="flex flex-wrap items-center">
                             {companyStatusPipeline.map((stage, index) => {
-                                const currentStatusIndex = companyStatusPipeline.findIndex(s => s.id === (company.status || "Lead"));
+                                const currentStatusIndex = companyStatusPipeline.findIndex(s => s.id === (company.status || "Prospect"));
                                 const isActive = index <= (currentStatusIndex === -1 ? 0 : currentStatusIndex);
                                 return (
                                     <div key={stage.id} className="flex-1 min-w-[150px] relative group h-10 mb-2 mr-2">

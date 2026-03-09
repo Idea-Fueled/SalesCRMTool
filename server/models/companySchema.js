@@ -25,7 +25,7 @@ const companySchema = new mongoose.Schema(
         },
         status: {
             type: String,
-            enum: ["Lead", "Prospect", "Customer", "Churned"],
+            enum: ["Active", "Inactive", "Prospect"],
             default: "Prospect"
         },
         address: {

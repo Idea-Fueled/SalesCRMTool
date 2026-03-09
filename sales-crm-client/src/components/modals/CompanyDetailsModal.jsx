@@ -23,10 +23,9 @@ export default function CompanyDetailsModal({ isOpen, onClose, company }) {
     };
 
     const statusBadge = {
-        Lead: "bg-red-50 text-red-600 border-red-100",
-        Prospect: "bg-orange-50 text-orange-600 border-orange-100",
-        Customer: "bg-green-50 text-green-700 border-green-100",
-        Churned: "bg-gray-100 text-gray-600 border-gray-200",
+        Active: "bg-green-50 text-green-700 border-green-100",
+        Inactive: "bg-red-50 text-red-600 border-red-100",
+        Prospect: "bg-blue-50 text-blue-600 border-blue-100",
     };
 
     return (
@@ -41,7 +40,7 @@ export default function CompanyDetailsModal({ isOpen, onClose, company }) {
                         <h2 className="text-xl font-bold text-gray-900 truncate">{company.name}</h2>
                         <div className="flex items-center gap-2 mt-1">
                             <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${statusBadge[company.status] || "bg-gray-100 text-gray-600"}`}>
-                                {company.status || "Lead"}
+                                {company.status || "Prospect"}
                             </span>
                             <span className="text-gray-300">•</span>
                             <span className="text-xs text-gray-500 font-medium">{company.industry || "General Industry"}</span>

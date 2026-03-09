@@ -38,10 +38,9 @@ const StatCard = ({ label, value, sub, color, icon: IconComp }) => (
 );
 
 const statusBg = {
-    Lead: "bg-blue-100 text-blue-600",
-    Prospect: "bg-purple-100 text-purple-600",
-    Customer: "bg-green-100 text-green-700",
-    Churned: "bg-red-100 text-red-600",
+    Active: "bg-green-100 text-green-700",
+    Inactive: "bg-red-100 text-red-600",
+    Prospect: "bg-blue-100 text-blue-600",
 };
 
 // Internal CompanyCard removed in favor of global component
@@ -116,9 +115,9 @@ export default function CompaniesDashboard() {
     };
 
     // Aggregations
-    const activeCount = companies.filter(c => c.status === "Customer").length;
+    const activeCount = companies.filter(c => c.status === "Active").length;
     const prospectCount = companies.filter(c => c.status === "Prospect").length;
-    const churnedCount = companies.filter(c => c.status === "Churned").length;
+    const inactiveCount = companies.filter(c => c.status === "Inactive").length;
 
     // Industries breakdown
     const indCount = {};
@@ -158,7 +157,7 @@ export default function CompaniesDashboard() {
                 <StatCard label="Total Companies" value={String(companies.length)} sub="Organization wide" color="bg-red-50 text-red-600" icon={Building2} />
                 <StatCard label="Active Customers" value={String(activeCount)} sub={`${Math.round((activeCount / companies.length) * 100 || 0)}% of total`} color="bg-green-50 text-green-600" icon={CheckCircle2} />
                 <StatCard label="Prospects" value={String(prospectCount)} sub={`${Math.round((prospectCount / companies.length) * 100 || 0)}% potential`} color="bg-orange-50 text-orange-600" icon={Eye} />
-                <StatCard label="Churned" value={String(churnedCount)} sub="Action required" color="bg-red-50 text-red-500" icon={XCircle} />
+                <StatCard label="Inactive" value={String(inactiveCount)} sub="Action required" color="bg-red-50 text-red-500" icon={XCircle} />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">

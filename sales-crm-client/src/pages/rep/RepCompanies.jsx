@@ -19,10 +19,9 @@ const CardHeader = ({ title, children }) => (
 );
 
 const statusBg = {
-    Lead: "bg-red-50 text-red-600 border border-red-100",
-    Prospect: "bg-orange-100 text-orange-600",
-    Customer: "bg-green-100 text-green-700",
-    Churned: "bg-red-100 text-red-600",
+    Active: "bg-green-100 text-green-700",
+    Inactive: "bg-red-100 text-red-600",
+    Prospect: "bg-blue-100 text-blue-600",
 };
 
 export default function RepCompanies() {
@@ -89,7 +88,7 @@ export default function RepCompanies() {
 
     const stats = [
         { label: "My Companies", value: String(companies.length), color: "bg-red-50 text-red-600", icon: Building2 },
-        { label: "Active", value: String(companies.filter(c => c.status === "Customer").length), color: "bg-red-600 text-white shadow-sm shadow-red-100", icon: CheckCircle2 },
+        { label: "Active", value: String(companies.filter(c => c.status === "Active").length), color: "bg-red-600 text-white shadow-sm shadow-red-100", icon: CheckCircle2 },
         { label: "Prospects", value: String(companies.filter(c => c.status === "Prospect").length), color: "bg-orange-50 text-orange-600", icon: Eye },
     ];
 

@@ -2,10 +2,9 @@ import React from "react";
 import { Building2, Star, MoreVertical, Eye, Edit2, Trash2, Phone, MapPin, Mail, ExternalLink } from "lucide-react";
 
 const statusBg = {
-    Lead: "bg-blue-100 text-blue-600",
-    Prospect: "bg-purple-100 text-purple-600",
-    Customer: "bg-green-100 text-green-700",
-    Churned: "bg-red-100 text-red-600",
+    Active: "bg-green-100 text-green-700",
+    Inactive: "bg-red-100 text-red-600",
+    Prospect: "bg-blue-100 text-blue-600",
 };
 
 const CompanyCard = ({ company, onEdit, onDelete, onView }) => {

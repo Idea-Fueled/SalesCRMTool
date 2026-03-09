@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Modal from "./Modal";
 
 const SIZES = ["", "1-10", "11-50", "51-200", "201-500", "500+"];
-const STATUSES = ["Lead", "Prospect", "Customer", "Churned"];
+const STATUSES = ["Active", "Inactive", "Prospect"];
 
 export default function CompanyModal({ isOpen, onClose, company, onSave, userRole, potentialOwners = [] }) {
     const phoneRegex = /^[+\d\s\-()]{7,15}$/;
@@ -10,7 +10,7 @@ export default function CompanyModal({ isOpen, onClose, company, onSave, userRol
 
     const [formData, setFormData] = useState({
         name: "", industry: "", size: "", website: "", primaryContact: "",
-        status: "Lead", address: "", phone: "", revenueRange: "", notes: "", ownerId: ""
+        status: "Prospect", address: "", phone: "", revenueRange: "", notes: "", ownerId: ""
     });
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
@@ -23,7 +23,7 @@ export default function CompanyModal({ isOpen, onClose, company, onSave, userRol
                 size: company.size || "",
                 website: company.website || "",
                 primaryContact: company.primaryContact || "",
-                status: company.status || "Lead",
+                status: company.status || "Prospect",
                 address: company.address || "",
                 phone: company.phone || "",
                 revenueRange: company.revenueRange || "",
@@ -31,7 +31,7 @@ export default function CompanyModal({ isOpen, onClose, company, onSave, userRol
                 ownerId: company.ownerId?._id || company.ownerId || ""
             });
         } else {
-            setFormData({ name: "", industry: "", size: "", website: "", primaryContact: "", status: "Lead", address: "", phone: "", revenueRange: "", notes: "", ownerId: "" });
+            setFormData({ name: "", industry: "", size: "", website: "", primaryContact: "", status: "Prospect", address: "", phone: "", revenueRange: "", notes: "", ownerId: "" });
         }
         setErrors({});
     }, [company, isOpen]);
