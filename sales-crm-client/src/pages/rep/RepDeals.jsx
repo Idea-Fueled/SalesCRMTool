@@ -8,6 +8,8 @@ import {
 import { getDeals, createDeal, updateDeal, deleteDeal, updateDealStage } from "../../../API/services/dealService";
 import { getCompanies } from "../../../API/services/companyService";
 import { getContacts } from "../../../API/services/contactService";
+import { getTeamUsers } from "../../../API/services/userService";
+import { useAuth } from "../../context/AuthContext";
 import KanbanBoard from "../../components/KanbanBoard";
 import DealCard from "../../components/cards/DealCard";
 import DealModal from "../../components/modals/DealModal";
@@ -46,7 +48,9 @@ export default function RepDeals() {
     const [deals, setDeals] = useState([]);
     const [companies, setCompanies] = useState([]);
     const [contacts, setContacts] = useState([]);
+    const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { user: currentUser } = useAuth();
     const [stageFilter, setStageFilter] = useState("All Stages");
     const [viewMode, setViewMode] = useState("list"); // "list" | "kanban"
 
@@ -60,14 +64,16 @@ export default function RepDeals() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const [dealsRes, companiesRes, contactsRes] = await Promise.all([
+            const [dealsRes, companiesRes, contactsRes, usersRes] = await Promise.all([
                 getDeals({ stage: stageFilter === "All Stages" ? undefined : stageFilter }),
                 getCompanies({ limit: 1000 }),
-                getContacts({ limit: 1000 })
+                getContacts({ limit: 1000 }),
+                getTeamUsers()
             ]);
             setDeals(dealsRes.data.data);
             setCompanies(companiesRes.data.data);
             setContacts(contactsRes.data.data);
+            setUsers(usersRes.data.data || usersRes.data || []);
         } catch (error) {
             console.error(error);
             toast.error("Failed to load data");
@@ -342,6 +348,8 @@ export default function RepDeals() {
                 onSave={handleSaveDeal}
                 companies={companies}
                 contacts={contacts}
+                userRole={currentUser?.role}
+                potentialOwners={users}
                 freeText={true}
             />
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getDealById, updateDeal, deleteDeal } from "../../../API/services/dealService";
+import { getTeamUsers } from "../../../API/services/userService";
 import { useAuth } from "../../context/AuthContext";
 import DealModal from "../../components/modals/DealModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
@@ -43,15 +44,20 @@ export default function DealDetails() {
     const navigate = useNavigate();
     const { user: currentUser } = useAuth();
     const [deal, setDeal] = useState(null);
+    const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     useEffect(() => {
-        const fetchDeal = async () => {
+        const fetchDealData = async () => {
             try {
-                const res = await getDealById(id);
-                setDeal(res.data.data);
+                const [dealRes, usersRes] = await Promise.all([
+                    getDealById(id),
+                    getTeamUsers()
+                ]);
+                setDeal(dealRes.data.data);
+                setUsers(usersRes.data.data || usersRes.data || []);
             } catch (error) {
                 console.error(error);
                 toast.error("Failed to fetch deal details");
@@ -59,7 +65,7 @@ export default function DealDetails() {
                 setLoading(false);
             }
         };
-        fetchDeal();
+        fetchDealData();
     }, [id]);
 
     // Compute base path early so handlers can use it
@@ -425,7 +431,7 @@ export default function DealDetails() {
                 companies={[]}
                 contacts={[]}
                 userRole={currentUser?.role}
-                potentialOwners={[]}
+                potentialOwners={users}
             />
 
             {/* Delete Confirmation Modal */}

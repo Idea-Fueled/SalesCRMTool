@@ -61,7 +61,7 @@ export default function DealsDashboard() {
     const [contacts, setContacts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [users, setUsers] = useState([]);
-    const { currentUser } = useAuth();
+    const { user: currentUser } = useAuth();
 
     // Modal states
     const [isDealModalOpen, setIsDealModalOpen] = useState(false);
