@@ -134,7 +134,6 @@ export default function RepDeals() {
         { label: "Pipeline Value", value: `$${pipelineValue.toLocaleString()}`, color: "bg-red-50 text-red-600", icon: DollarSign },
         { label: "Active Deals", value: String(activeDealsCount), color: "bg-orange-50 text-orange-600", icon: Briefcase },
         { label: "Deals Won", value: String(wonDealsCount), color: "bg-red-600 text-white shadow-sm shadow-red-100", icon: CheckCircle2 },
-        { label: "Success Rate", value: "85%", color: "bg-red-50 text-red-600 border border-red-100", icon: Zap },
     ];
 
     return (
@@ -194,7 +193,7 @@ export default function RepDeals() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 {stats.map(s => (
                     <div key={s.label} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 sm:p-5 flex items-start gap-4">
                         <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${s.color}`}>
