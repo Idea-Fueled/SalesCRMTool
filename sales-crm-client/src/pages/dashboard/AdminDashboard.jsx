@@ -59,6 +59,7 @@ export default function AdminDashboard() {
     const [loading, setLoading] = useState(true);
     const [modalConfig, setModalConfig] = useState({ isOpen: false, category: null, data: [] });
     const [selectedMonth, setSelectedMonth] = useState("");
+    const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
     const fetchStats = async () => {
         try {
@@ -136,37 +137,70 @@ export default function AdminDashboard() {
 
     const maxChartValue = Math.max(...stats.revenueChart.map(m => m.value), 1000);
 
+    const getMonthString = (offsetMonths) => {
+        const d = new Date();
+        d.setMonth(d.getMonth() + offsetMonths);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    };
+
     return (
         <div className="p-6 space-y-6 max-w-7xl mx-auto">
+            {/* Click outside overlay for dropdown */}
+            {isDatePickerOpen && (
+                <div 
+                    className="fixed inset-0 z-40" 
+                    onClick={() => setIsDatePickerOpen(false)} 
+                />
+            )}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
                     <p className="text-gray-500 mt-1">Global sales performance and activity overview</p>
                 </div>
-                <div className="flex items-center gap-2">
-                    {selectedMonth && (
-                        <button
-                            onClick={() => setSelectedMonth("")}
-                            className="text-xs font-bold text-gray-500 hover:text-red-500 transition-colors uppercase tracking-wider"
-                        >
-                            Reset
-                        </button>
-                    )}
-                    <div className="relative group">
-                        <input
-                            type="month"
-                            value={selectedMonth}
-                            onChange={(e) => setSelectedMonth(e.target.value)}
-                            className="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10"
-                            title="Filter by month"
-                        />
-                        <div className={`flex items-center gap-2 px-4 py-2 border rounded-xl text-sm font-bold shadow-sm transition-all group-hover:border-red-200 ${selectedMonth ? 'bg-red-50 border-red-200 text-red-700' : 'bg-white border-gray-200 text-gray-700'}`}>
-                            <Calendar size={16} className={selectedMonth ? "text-red-600" : "text-gray-400 group-hover:text-red-500"} />
-                            {selectedMonth 
-                                ? new Date(selectedMonth + "-01").toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) 
-                                : "All Time"}
+                <div className="flex items-center gap-2 relative z-50">
+                    <button
+                        onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
+                        className={`flex items-center gap-2 px-4 py-2 border rounded-xl text-sm font-bold shadow-sm transition-all hover:border-red-200 ${selectedMonth ? 'bg-red-50 border-red-200 text-red-700' : 'bg-white border-gray-200 text-gray-700'}`}
+                    >
+                        <Calendar size={16} className={selectedMonth ? "text-red-600" : "text-gray-400"} />
+                        {selectedMonth 
+                            ? new Date(selectedMonth + "-01").toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) 
+                            : "All Time"}
+                        <ChevronRight size={14} className={`text-gray-400 transition-transform ${isDatePickerOpen ? 'rotate-90' : ''}`} />
+                    </button>
+
+                    {isDatePickerOpen && (
+                        <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 animate-in fade-in slide-in-from-top-2">
+                            <button
+                                onClick={() => { setSelectedMonth(""); setIsDatePickerOpen(false); }}
+                                className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors ${!selectedMonth ? "text-red-600 bg-red-50/50" : "text-gray-700"}`}
+                            >
+                                All Time
+                            </button>
+                            <button
+                                onClick={() => { setSelectedMonth(getMonthString(0)); setIsDatePickerOpen(false); }}
+                                className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors ${selectedMonth === getMonthString(0) ? "text-red-600 bg-red-50/50" : "text-gray-700"}`}
+                            >
+                                This Month
+                            </button>
+                            <button
+                                onClick={() => { setSelectedMonth(getMonthString(-1)); setIsDatePickerOpen(false); }}
+                                className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors ${selectedMonth === getMonthString(-1) ? "text-red-600 bg-red-50/50" : "text-gray-700"}`}
+                            >
+                                Last Month
+                            </button>
+                            <div className="h-px bg-gray-100 my-1 mx-2" />
+                            <div className="px-3 py-2">
+                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 block px-1">Custom Month</label>
+                                <input
+                                    type="month"
+                                    value={selectedMonth}
+                                    onChange={(e) => { setSelectedMonth(e.target.value); setIsDatePickerOpen(false); }}
+                                    className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-red-500 transition-colors"
+                                />
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
 
