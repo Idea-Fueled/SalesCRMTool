@@ -90,21 +90,25 @@ export default function AdminDashboard() {
 
             const totalValue = filteredDeals.reduce((sum, d) => sum + (d.value || 0), 0);
 
-            // Group by month for chart (last 6 months, always un-filtered)
+            // Group by month for chart (last 6 months trailing from selected month or today)
             const months = [];
+            const baseDate = selectedMonth ? new Date(selectedMonth + "-01T12:00:00") : new Date();
+            
             for (let i = 5; i >= 0; i--) {
-                const date = new Date();
+                const date = new Date(baseDate);
                 date.setMonth(date.getMonth() - i);
                 months.push({
                     name: date.toLocaleString('default', { month: 'short' }),
+                    monthStr: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`,
                     value: 0
                 });
             }
 
             dealsData.forEach(d => {
                 const dDate = new Date(d.createdAt);
-                const monthName = dDate.toLocaleString('default', { month: 'short' });
-                const mIndex = months.findIndex(m => m.name === monthName);
+                const dMonthStr = `${dDate.getFullYear()}-${String(dDate.getMonth() + 1).padStart(2, '0')}`;
+                
+                const mIndex = months.findIndex(m => m.monthStr === dMonthStr);
                 if (mIndex !== -1) {
                     months[mIndex].value += (d.value || 0);
                 }
