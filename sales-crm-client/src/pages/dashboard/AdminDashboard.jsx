@@ -13,7 +13,7 @@ import { getTeamUsers } from "../../../API/services/userService";
 import { toast } from "react-hot-toast";
 import DashboardDetailModal from "../../components/modals/DashboardDetailModal";
 
-const OverviewStat = ({ label, value, trend, icon: IconComp, color, onClick }) => (
+const OverviewStat = ({ label, value, icon: IconComp, color, onClick }) => (
     <div
         onClick={onClick}
         className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer active:scale-95 group"
@@ -22,12 +22,6 @@ const OverviewStat = ({ label, value, trend, icon: IconComp, color, onClick }) =
             <div className={`p-3 rounded-xl ${color} group-hover:scale-110 transition-transform duration-300`}>
                 <IconComp size={20} />
             </div>
-            {trend && (
-                <div className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${trend > 0 ? "bg-green-50 text-green-600" : "bg-red-50 text-red-600"}`}>
-                    {trend > 0 ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-                    {Math.abs(trend)}%
-                </div>
-            )}
         </div>
         <div className="mt-4">
             <h3 className="text-2xl font-bold text-gray-900 group-hover:text-red-500 transition-colors">{value}</h3>
@@ -241,7 +235,6 @@ export default function AdminDashboard() {
                 <OverviewStat
                     label="Total Revenue"
                     value={`$${(stats.totalValue / (stats.totalValue >= 1000000 ? 1000000 : 1000)).toFixed(1)}${stats.totalValue >= 1000000 ? 'M' : 'K'}`}
-                    trend={12}
                     icon={DollarSign}
                     color="bg-red-50 text-red-600"
                     onClick={() => setModalConfig({ isOpen: true, category: 'revenue', data: stats.dealList })}
@@ -249,7 +242,6 @@ export default function AdminDashboard() {
                 <OverviewStat
                     label="Active Deals"
                     value={stats.deals}
-                    trend={8}
                     icon={Briefcase}
                     color="bg-orange-50 text-orange-600"
                     onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: stats.dealList.filter(d => !d.stage.startsWith('Closed')) })}
@@ -257,7 +249,6 @@ export default function AdminDashboard() {
                 <OverviewStat
                     label="Total Companies"
                     value={stats.companies}
-                    trend={-2}
                     icon={Building2}
                     color="bg-rose-50 text-rose-600"
                     onClick={() => setModalConfig({ isOpen: true, category: 'companies', data: stats.companyList })}
@@ -265,7 +256,6 @@ export default function AdminDashboard() {
                 <OverviewStat
                     label="System Users"
                     value={stats.users}
-                    trend={5}
                     icon={Users}
                     color="bg-gray-100 text-gray-700"
                     onClick={() => setModalConfig({ isOpen: true, category: 'users', data: stats.userList })}

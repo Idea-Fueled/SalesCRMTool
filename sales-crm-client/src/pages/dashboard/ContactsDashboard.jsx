@@ -164,8 +164,8 @@ export default function ContactsDashboard() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <StatCard label="Total Contacts" value={String(contacts.length)} sub="Organization wide" color="bg-red-50 text-red-600" icon={Users} />
-                <StatCard label="With Company" value={String(withCompany)} sub={`${Math.round((withCompany / contacts.length) * 100 || 0)}% coverage`} color="bg-green-50 text-green-600" icon={Link2} />
-                <StatCard label="On LinkedIn" value={String(withLinkedIn)} sub={`${Math.round((withLinkedIn / contacts.length) * 100 || 0)}% verified`} color="bg-orange-50 text-orange-600" icon={Linkedin} />
+                <StatCard label="With Company" value={String(withCompany)} color="bg-green-50 text-green-600" icon={Link2} />
+                <StatCard label="On LinkedIn" value={String(withLinkedIn)} color="bg-orange-50 text-orange-600" icon={Linkedin} />
                 <StatCard label="Records Loaded" value={String(contacts.length)} sub="Showing recent" color="bg-red-50 text-red-500" icon={CalendarPlus} />
             </div>
 

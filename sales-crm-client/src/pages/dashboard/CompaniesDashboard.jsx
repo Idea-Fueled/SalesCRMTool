@@ -147,8 +147,8 @@ export default function CompaniesDashboard() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <StatCard label="Total Companies" value={String(companies.length)} sub="Organization wide" color="bg-red-50 text-red-600" icon={Building2} />
-                <StatCard label="Active Customers" value={String(activeCount)} sub={`${Math.round((activeCount / companies.length) * 100 || 0)}% of total`} color="bg-green-50 text-green-600" icon={CheckCircle2} />
-                <StatCard label="Prospects" value={String(prospectCount)} sub={`${Math.round((prospectCount / companies.length) * 100 || 0)}% potential`} color="bg-orange-50 text-orange-600" icon={Eye} />
+                <StatCard label="Active Customers" value={String(activeCount)} color="bg-green-50 text-green-600" icon={CheckCircle2} />
+                <StatCard label="Prospects" value={String(prospectCount)} color="bg-orange-50 text-orange-600" icon={Eye} />
                 <StatCard label="Inactive" value={String(inactiveCount)} sub="Action required" color="bg-red-50 text-red-500" icon={XCircle} />
             </div>
 
