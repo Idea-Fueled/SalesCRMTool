@@ -44,7 +44,8 @@ export default function ArchiveDashboard() {
             else if (activeTab === 'contacts') await restoreContact(id);
             else if (activeTab === 'companies') await restoreCompany(id);
             
-            toast.success(`${activeTab.slice(0, -1).charAt(0).toUpperCase() + activeTab.slice(1, -1)} restored successfully!`);
+            const singularName = activeTab === 'companies' ? 'Company' : activeTab.slice(0, -1).charAt(0).toUpperCase() + activeTab.slice(1, -1);
+            toast.success(`${singularName} restored successfully!`);
             fetchData();
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to restore item");
@@ -160,7 +161,7 @@ export default function ArchiveDashboard() {
                                             </td>
                                             <td className="px-4 py-3 whitespace-nowrap">
                                                 <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 bg-gray-50 px-2 py-1 rounded-md border border-gray-100">
-                                                    {activeTab.slice(0, -1)}
+                                                    {activeTab === 'companies' ? 'company' : activeTab.slice(0, -1)}
                                                 </span>
                                             </td>
                                             <td className="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">
