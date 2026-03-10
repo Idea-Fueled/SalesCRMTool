@@ -8,7 +8,7 @@ import {
     ChevronRight, Download, RotateCw, Maximize2,
     Star, Layers, Users, Target, Info, DollarSign,
     MoreHorizontal, List, FileText, Paperclip,
-    Loader2, ExternalLink
+    Loader2, ExternalLink, MessageSquare
 } from "lucide-react";
 import toast from "react-hot-toast";
 
