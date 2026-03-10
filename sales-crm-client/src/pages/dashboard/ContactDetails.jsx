@@ -125,13 +125,14 @@ export default function ContactDetails() {
         if (!currentUser || !contact) return false;
         const role = currentUser.role;
         const ownerId = contact.ownerId?._id || contact.ownerId;
+        const currentUserId = currentUser._id || currentUser.id;
         if (role === "admin") return true;
         if (role === "sales_manager") {
             const ownerManagerId = contact.ownerId?.managerId?._id || contact.ownerId?.managerId;
-            return ownerId === currentUser._id || ownerManagerId === currentUser._id;
+            return ownerId === currentUserId || ownerManagerId === currentUserId;
         }
         if (role === "sales_rep") {
-            return ownerId === currentUser._id;
+            return ownerId === currentUserId;
         }
         return false;
     })();

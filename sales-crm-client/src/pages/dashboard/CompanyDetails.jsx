@@ -123,13 +123,14 @@ export default function CompanyDetails() {
         if (!currentUser || !company) return false;
         const role = currentUser.role;
         const ownerId = company.ownerId?._id || company.ownerId;
+        const currentUserId = currentUser._id || currentUser.id;
         if (role === "admin") return true;
         if (role === "sales_manager") {
             const ownerManagerId = company.ownerId?.managerId?._id || company.ownerId?.managerId;
-            return ownerId === currentUser._id || ownerManagerId === currentUser._id;
+            return ownerId === currentUserId || ownerManagerId === currentUserId;
         }
         if (role === "sales_rep") {
-            return ownerId === currentUser._id;
+            return ownerId === currentUserId;
         }
         return false;
     })();
