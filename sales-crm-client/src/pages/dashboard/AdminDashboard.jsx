@@ -58,6 +58,7 @@ export default function AdminDashboard() {
     });
     const [loading, setLoading] = useState(true);
     const [modalConfig, setModalConfig] = useState({ isOpen: false, category: null, data: [] });
+    const [selectedMonth, setSelectedMonth] = useState("");
 
     const fetchStats = async () => {
         try {
@@ -69,9 +70,26 @@ export default function AdminDashboard() {
             ]);
 
             const dealsData = dealsRes.data.data || [];
-            const totalValue = dealsData.reduce((sum, d) => sum + (d.value || 0), 0);
+            const companyData = companiesRes.data.data || [];
+            const userData = usersRes.data || [];
 
-            // Group by month for chart (last 6 months)
+            // Filter logic based on selectedMonth (YYYY-MM)
+            const isMatch = (dateStr) => {
+                if (!selectedMonth) return true;
+                if (!dateStr) return false;
+                const d = new Date(dateStr);
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const yyyy = d.getFullYear();
+                return `${yyyy}-${mm}` === selectedMonth;
+            };
+
+            const filteredDeals = dealsData.filter(d => isMatch(d.createdAt));
+            const filteredCompanies = companyData.filter(c => isMatch(c.createdAt));
+            const filteredUsers = userData.filter(u => isMatch(u.createdAt));
+
+            const totalValue = filteredDeals.reduce((sum, d) => sum + (d.value || 0), 0);
+
+            // Group by month for chart (last 6 months, always un-filtered)
             const months = [];
             for (let i = 5; i >= 0; i--) {
                 const date = new Date();
@@ -92,17 +110,17 @@ export default function AdminDashboard() {
             });
 
             setStats({
-                deals: dealsRes.data.total || 0,
-                companies: companiesRes.data.total || 0,
-                contacts: contactsRes.data.total || 0,
-                users: usersRes.data?.length || 0,
+                deals: filteredDeals.length,
+                companies: filteredCompanies.length,
+                contacts: contactsRes.data.total || 0, // contacts not explicitly filtered here yet per plan but fine
+                users: filteredUsers.length,
                 totalValue,
                 revenueChart: months,
-                pendingUsers: usersRes.data?.filter(u => !u.isSetupComplete)?.length || 0,
+                pendingUsers: userData.filter(u => !u.isSetupComplete)?.length || 0,
                 stagnantDeals: dealsData.filter(d => d.stage === 'Negotiation' && new Date(d.updatedAt) < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length || 0,
-                dealList: dealsData,
-                companyList: companiesRes.data.data || [],
-                userList: usersRes.data || []
+                dealList: filteredDeals,
+                companyList: filteredCompanies,
+                userList: filteredUsers
             });
         } catch (error) {
             console.error(error);
@@ -114,20 +132,41 @@ export default function AdminDashboard() {
 
     useEffect(() => {
         fetchStats();
-    }, []);
+    }, [selectedMonth]);
 
     const maxChartValue = Math.max(...stats.revenueChart.map(m => m.value), 1000);
 
     return (
         <div className="p-6 space-y-6 max-w-7xl mx-auto">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
                     <p className="text-gray-500 mt-1">Global sales performance and activity overview</p>
                 </div>
-                <div className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-700 shadow-sm">
-                    <Calendar size={16} className="text-red-500" />
-                    {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                <div className="flex items-center gap-2">
+                    {selectedMonth && (
+                        <button
+                            onClick={() => setSelectedMonth("")}
+                            className="text-xs font-bold text-gray-500 hover:text-red-500 transition-colors uppercase tracking-wider"
+                        >
+                            Reset
+                        </button>
+                    )}
+                    <div className="relative group">
+                        <input
+                            type="month"
+                            value={selectedMonth}
+                            onChange={(e) => setSelectedMonth(e.target.value)}
+                            className="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10"
+                            title="Filter by month"
+                        />
+                        <div className={`flex items-center gap-2 px-4 py-2 border rounded-xl text-sm font-bold shadow-sm transition-all group-hover:border-red-200 ${selectedMonth ? 'bg-red-50 border-red-200 text-red-700' : 'bg-white border-gray-200 text-gray-700'}`}>
+                            <Calendar size={16} className={selectedMonth ? "text-red-600" : "text-gray-400 group-hover:text-red-500"} />
+                            {selectedMonth 
+                                ? new Date(selectedMonth + "-01").toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) 
+                                : "All Time"}
+                        </div>
+                    </div>
                 </div>
             </div>
 
