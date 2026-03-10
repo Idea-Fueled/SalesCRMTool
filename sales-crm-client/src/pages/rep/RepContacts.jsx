@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Users, Building2, MapPin, Mail, Phone, ExternalLink, Plus, Edit2, Trash2, Search, Linkedin, ChevronRight, LayoutGrid, LayoutList } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getContacts, createContact, updateContact, deleteContact } from "../../../API/services/contactService";
 import { getCompanies } from "../../../API/services/companyService";
 import ContactModal from "../../components/modals/ContactModal";
@@ -32,6 +32,7 @@ const Avatar = ({ name }) => {
 };
 
 export default function RepContacts() {
+    const navigate = useNavigate();
     const [contacts, setContacts] = useState([]);
     const [companies, setCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -190,7 +191,7 @@ export default function RepContacts() {
                                         <tr key={c._id} className="hover:bg-gray-50/50 transition-colors group">
                                             <td className="px-4 py-3 whitespace-nowrap">
                                                 <div className="flex items-center gap-3 cursor-pointer group/item"
-                                                    onClick={() => { setSelectedContact(c); setIsDetailsModalOpen(true); }}>
+                                                    onClick={() => navigate(`/rep/contacts/${c._id}`)}>
                                                     <Avatar name={`${c.firstName} ${c.lastName}`} />
                                                     <div>
                                                         <p className="font-medium text-gray-800 leading-none group-hover/item:text-red-600 transition-colors uppercase text-[11px] font-bold">{c.firstName} {c.lastName}</p>
@@ -208,7 +209,7 @@ export default function RepContacts() {
                                             <td className="px-4 py-3 whitespace-nowrap">
                                                 {c.linkedin ? (
                                                     <span className="text-xs text-blue-600 hover:underline flex items-center gap-1 cursor-pointer"
-                                                        onClick={() => { setSelectedContact(c); setIsDetailsModalOpen(true); }}>
+                                                        onClick={() => navigate(`/rep/contacts/${c._id}`)}>
                                                         <Eye size={12} /> View Details
                                                     </span>
                                                 ) : (
@@ -218,7 +219,7 @@ export default function RepContacts() {
                                             <td className="px-4 py-3 whitespace-nowrap">
                                                 <div className="flex items-center gap-2">
                                                     <button
-                                                        onClick={() => { setSelectedContact(c); setIsDetailsModalOpen(true); }}
+                                                        onClick={() => navigate(`/rep/contacts/${c._id}`)}
                                                         title="View details"
                                                         className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
                                                     >
@@ -257,7 +258,7 @@ export default function RepContacts() {
                                         basePath="/rep"
                                         onEdit={(contact) => { setSelectedContact(contact); setIsContactModalOpen(true); }}
                                         onDelete={(contact) => { setSelectedContact(contact); setIsDeleteModalOpen(true); }}
-                                        onView={(contact) => { setSelectedContact(contact); setIsDetailsModalOpen(true); }}
+                                        onView={(contact) => navigate(`/rep/contacts/${contact._id}`)}
                                     />
                                 ))
                             )}

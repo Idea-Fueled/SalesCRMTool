@@ -297,45 +297,6 @@ export default function ContactDetails() {
                                 </div>
                             </div>
 
-                            {/* Simplified Activity Feed as Remarks */}
-                            <div className="space-y-6 pt-6 border-t border-gray-50">
-                                <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
-                                    <History size={10} /> Recent Activities
-                                </div>
-
-                                <div className="space-y-6 relative before:absolute before:left-5 before:top-2 before:bottom-0 before:w-px before:bg-gray-100">
-                                    <div className="relative pl-12 group">
-                                        <div className="absolute left-0 top-0 w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center border-2 border-white shadow-sm z-10 transition-transform group-hover:scale-110">
-                                            <Mail size={18} />
-                                        </div>
-                                        <div className="space-y-1">
-                                            <p className="text-sm font-bold text-gray-800">Email sent regarding upcoming meeting</p>
-                                            <p className="text-[10px] text-gray-400 font-medium">{formatDate(contact.updatedAt, true)}</p>
-                                        </div>
-                                    </div>
-                                    <div className="relative pl-12 group">
-                                        <div className="absolute left-0 top-0 w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center border-2 border-white shadow-sm z-10 transition-transform group-hover:scale-110">
-                                            <User size={18} />
-                                        </div>
-                                        <div className="space-y-1">
-                                            <p className="text-sm font-bold text-gray-800">Contact profile updated by system</p>
-                                            <p className="text-[10px] text-gray-400 font-medium">{formatDate(contact.createdAt, true)}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Meta Placeholder for Files/Calls */}
-                            <div className="pt-8 grid grid-cols-2 gap-4">
-                                <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-50/50 border border-gray-100/50">
-                                    <Paperclip size={14} className="text-gray-300" />
-                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">0 Documents Linked</span>
-                                </div>
-                                <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-50/50 border border-gray-100/50">
-                                    <Phone size={14} className="text-gray-300" />
-                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">0 Calls Logged</span>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
