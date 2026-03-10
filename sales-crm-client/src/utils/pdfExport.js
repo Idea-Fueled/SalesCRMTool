@@ -1,5 +1,5 @@
 import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
+import { toCanvas } from 'html-to-image';
 import { toast } from 'react-hot-toast';
 
 /**
@@ -24,12 +24,10 @@ export const exportToPDF = async (elementId, filename = 'export.pdf') => {
     const loadingToast = toast.loading("Generating PDF...");
 
     try {
-        // Render the element to a canvas
-        const canvas = await html2canvas(element, {
-            scale: 2, // Higher scale for better quality
-            useCORS: true,
-            logging: false,
-            backgroundColor: '#ffffff'
+        // html-to-image's toCanvas handles modern CSS (oklch, oklab) much better
+        const canvas = await toCanvas(element, {
+            backgroundColor: '#ffffff',
+            pixelRatio: 2, // Equivalent to scale in html2canvas
         });
 
         // Calculate PDF dimensions
