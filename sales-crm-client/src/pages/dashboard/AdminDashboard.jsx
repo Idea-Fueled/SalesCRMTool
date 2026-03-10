@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import {
     LayoutDashboard, Users, Building2, Briefcase, Zap,
     TrendingUp, ArrowUpRight, ArrowDownRight, Activity,
-    Calendar, DollarSign, ArrowLeft, ChevronRight, Trash2
+    Calendar, DollarSign, ArrowLeft, ChevronRight, Trash2,
+    CircleDashed, CheckCircle2, XCircle
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { getDeals } from "../../../API/services/dealService";
@@ -145,6 +146,34 @@ export default function AdminDashboard() {
         const d = new Date();
         d.setMonth(d.getMonth() + offsetMonths);
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    };
+
+    // Computations for Detail Widgets
+    const topDeals = [...stats.dealList].sort((a, b) => (b.value || 0) - (a.value || 0)).slice(0, 5);
+    
+    const pipelineStages = [
+        { name: 'Lead', color: 'bg-red-500' },
+        { name: 'Qualified', color: 'bg-orange-500' },
+        { name: 'Proposal', color: 'bg-yellow-500' },
+        { name: 'Negotiation', color: 'bg-indigo-500' }
+    ];
+    
+    const pipelineStats = pipelineStages.map(stage => {
+        const stageDeals = stats.dealList.filter(d => d.stage === stage.name);
+        return {
+            ...stage,
+            count: stageDeals.length,
+            value: stageDeals.reduce((sum, d) => sum + (d.value || 0), 0)
+        };
+    });
+
+    const pipelineTotalDeals = pipelineStats.reduce((sum, s) => sum + s.count, 0);
+
+    const dealsOverview = {
+        successful: stats.dealList.filter(d => d.stage === 'Closed Won').length,
+        pending: stats.dealList.filter(d => !['Closed Won', 'Closed Lost'].includes(d.stage)).length,
+        rejected: stats.dealList.filter(d => d.stage === 'Closed Lost').length,
+        total: stats.dealList.length
     };
 
     return (
@@ -317,6 +346,137 @@ export default function AdminDashboard() {
                                 </div>
                             </li>
                         </ul>
+                    </div>
+                </div>
+            </div>
+
+            {/* Detailed Widgets Row */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Top Deals Widget */}
+                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col min-h-[400px]">
+                    <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-2">
+                            <div className="w-1 h-4 bg-red-500 rounded-full"></div>
+                            <h2 className="text-lg font-bold text-gray-900">Top Deals</h2>
+                        </div>
+                    </div>
+                    <div className="flex-1 overflow-y-auto pr-2 space-y-4">
+                        {topDeals.map((deal, index) => (
+                            <div key={deal._id || index} className="flex items-center justify-between group cursor-pointer hover:bg-gray-50 p-2 -mx-2 rounded-xl transition-colors" onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: [deal] })}>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center font-bold text-gray-400 shadow-sm border border-gray-100 group-hover:bg-red-50 group-hover:text-red-500 group-hover:border-red-100 transition-colors">
+                                        {index + 1}
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-bold text-gray-900 group-hover:text-red-600 transition-colors line-clamp-1">{deal.name}</p>
+                                        <p className="text-xs text-gray-500 line-clamp-1">{deal.companyName || deal.companyId?.name || "Unknown Company"}</p>
+                                    </div>
+                                </div>
+                                <div className="text-sm font-black text-gray-900">
+                                    ${(deal.value || 0).toLocaleString()}
+                                </div>
+                            </div>
+                        ))}
+                        {topDeals.length === 0 && (
+                            <div className="h-full flex items-center justify-center text-sm text-gray-400 font-medium">No deals found for this period</div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Pipeline Statistics Widget */}
+                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col min-h-[400px]">
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-2">
+                            <div className="w-1 h-4 bg-orange-500 rounded-full"></div>
+                            <h2 className="text-lg font-bold text-gray-900">Pipeline Statistics</h2>
+                        </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-4 gap-2 mb-8">
+                        {pipelineStats.map((stat, i) => (
+                            <div key={i} className="flex flex-col gap-1">
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tight line-clamp-1">{stat.name}</span>
+                                <span className="text-xs font-bold text-gray-900">${(stat.value >= 1000 ? (stat.value / 1000).toFixed(1) + 'K' : stat.value)}</span>
+                                <span className="text-[10px] text-gray-500">{stat.count} Deals</span>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="flex gap-1 h-32 rounded-xl overflow-hidden mb-6 flex-1 items-end">
+                        {pipelineStats.map((stat, i) => {
+                            const heightPercent = pipelineTotalDeals > 0 ? Math.max((stat.count / pipelineTotalDeals) * 100, 10) : 0;
+                            if (heightPercent === 0) return null;
+                            return (
+                                <div 
+                                    key={i} 
+                                    className={`${stat.color} flex-1 rounded-t-md transition-all duration-500 hover:opacity-80 relative group cursor-pointer`}
+                                    style={{ height: `${heightPercent}%` }}
+                                    onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: stats.dealList.filter(d => d.stage === stat.name) })}
+                                >
+                                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
+                                        {stat.count} Deals
+                                    </div>
+                                </div>
+                            );
+                        })}
+                        {pipelineTotalDeals === 0 && (
+                            <div className="bg-gray-100 w-full h-full flex items-center justify-center text-xs text-gray-400 font-medium rounded-xl">No active pipeline</div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Deals Overview Widget */}
+                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between min-h-[400px]">
+                    <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-2">
+                            <div className="w-1 h-4 bg-indigo-500 rounded-full"></div>
+                            <h2 className="text-lg font-bold text-gray-900">Deals Overview</h2>
+                        </div>
+                    </div>
+
+                    <div className="flex items-baseline gap-2 mb-8">
+                        <span className="text-4xl font-black text-gray-900">{dealsOverview.total}</span>
+                        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Deals</span>
+                    </div>
+
+                    <div className="space-y-4 mb-8">
+                        <div className="flex items-center justify-between group cursor-pointer hover:bg-gray-50 p-2 -mx-2 rounded-xl transition-colors" onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: stats.dealList.filter(d => d.stage === 'Closed Won') })}>
+                            <div className="flex items-center gap-3">
+                                <CheckCircle2 size={16} className="text-green-500 group-hover:scale-110 transition-transform" />
+                                <span className="text-sm font-medium text-gray-600 group-hover:text-gray-900">Successful Deals</span>
+                            </div>
+                            <span className="text-sm font-bold text-gray-900">{dealsOverview.successful} Deals</span>
+                        </div>
+                        <div className="flex items-center justify-between group cursor-pointer hover:bg-gray-50 p-2 -mx-2 rounded-xl transition-colors" onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: stats.dealList.filter(d => !['Closed Won', 'Closed Lost'].includes(d.stage)) })}>
+                            <div className="flex items-center gap-3">
+                                <CircleDashed size={16} className="text-yellow-500 group-hover:scale-110 transition-transform" />
+                                <span className="text-sm font-medium text-gray-600 group-hover:text-gray-900">Pending Deals</span>
+                            </div>
+                            <span className="text-sm font-bold text-gray-900">{dealsOverview.pending} Deals</span>
+                        </div>
+                        <div className="flex items-center justify-between group cursor-pointer hover:bg-gray-50 p-2 -mx-2 rounded-xl transition-colors" onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: stats.dealList.filter(d => d.stage === 'Closed Lost') })}>
+                            <div className="flex items-center gap-3">
+                                <XCircle size={16} className="text-red-500 group-hover:scale-110 transition-transform" />
+                                <span className="text-sm font-medium text-gray-600 group-hover:text-gray-900">Rejected Deals</span>
+                            </div>
+                            <span className="text-sm font-bold text-gray-900">{dealsOverview.rejected} Deals</span>
+                        </div>
+                    </div>
+
+                    <div className="bg-gray-50 rounded-xl p-4 flex items-center justify-between border border-gray-100">
+                        <div>
+                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Win Rate</p>
+                            <p className="text-2xl font-black text-gray-900">
+                                {dealsOverview.total > 0 ? Math.round((dealsOverview.successful / dealsOverview.total) * 100) : 0}%
+                            </p>
+                        </div>
+                        <div className="flex -space-x-2">
+                            {[1, 2, 3].map(idx => (
+                                <div key={idx} className="w-10 h-10 rounded-full bg-white border-2 border-gray-50 flex items-center justify-center text-[10px] font-bold text-gray-400 shadow-sm relative group cursor-pointer">
+                                    <Users size={14} className="group-hover:text-indigo-500 transition-colors" />
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
