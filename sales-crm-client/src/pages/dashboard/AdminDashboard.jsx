@@ -462,22 +462,6 @@ export default function AdminDashboard() {
                             <span className="text-sm font-bold text-gray-900">{dealsOverview.rejected} Deals</span>
                         </div>
                     </div>
-
-                    <div className="bg-gray-50 rounded-xl p-4 flex items-center justify-between border border-gray-100">
-                        <div>
-                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Win Rate</p>
-                            <p className="text-2xl font-black text-gray-900">
-                                {dealsOverview.total > 0 ? Math.round((dealsOverview.successful / dealsOverview.total) * 100) : 0}%
-                            </p>
-                        </div>
-                        <div className="flex -space-x-2">
-                            {[1, 2, 3].map(idx => (
-                                <div key={idx} className="w-10 h-10 rounded-full bg-white border-2 border-gray-50 flex items-center justify-center text-[10px] font-bold text-gray-400 shadow-sm relative group cursor-pointer">
-                                    <Users size={14} className="group-hover:text-indigo-500 transition-colors" />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
                 </div>
             </div>
 
