@@ -105,7 +105,7 @@ export default function RepCompanies() {
         <div className="p-4 sm:p-6 max-w-screen-xl mx-auto">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-6">
                 <div>
-                    <h1 className="text-xl sm:text-2xl font-bold text-gray-800">My Accounts</h1>
+                    <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Companies</h1>
                     <p className="text-xs sm:text-sm text-gray-400 mt-0.5">Manage the companies in your portfolio</p>
                 </div>
                 <button
@@ -133,7 +133,7 @@ export default function RepCompanies() {
 
             <Card>
                 <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-                    <h3 className="font-semibold text-gray-800 text-base">My Companies List</h3>
+                    <h3 className="font-semibold text-gray-800 text-base">All Companies</h3>
                     <div className="relative">
                         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                         <input type="text" placeholder="Search company..."

@@ -110,7 +110,7 @@ export default function RepContacts() {
         <div className="p-4 sm:p-6 max-w-screen-xl mx-auto">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-6">
                 <div>
-                    <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Business Network</h1>
+                    <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Contacts</h1>
                     <p className="text-xs sm:text-sm text-gray-400 mt-0.5">Manage your personal business network</p>
                 </div>
                 <button
@@ -139,7 +139,7 @@ export default function RepContacts() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
-                        <h2 className="font-bold text-gray-800">My Contacts</h2>
+                        <h2 className="font-bold text-gray-800">All Contacts</h2>
                         <div className="flex items-center bg-gray-100 p-1 rounded-lg">
                             <button
                                 onClick={() => setViewMode("list")}
