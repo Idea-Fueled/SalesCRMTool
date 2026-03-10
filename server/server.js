@@ -14,12 +14,16 @@ import notificationRoutes from "./routes/notificationRoutes.js"
 
 import http from "http";
 import { initSocket } from "./utils/socket.js";
+import { initArchiveCleanupJob } from "./services/archiveService.js";
 
 const app = express();
 const server = http.createServer(app);
 
 // Initialize Socket.io
 initSocket(server);
+
+// Initialize Archive Cleanup Job (Daily)
+initArchiveCleanupJob();
 
 app.set("trust proxy", 1);
 
