@@ -134,7 +134,7 @@ export const updateCompany = async (req, res) => {
 
                 const teamIds = teamUsers.map(u => u._id.toString());
 
-                if (!teamIds.includes(company.ownerId.toString())) {
+                if (!company.ownerId || !teamIds.includes(company.ownerId.toString())) {
                     return res.status(403).json({
                         message: "Access denied!"
                     });
@@ -142,7 +142,7 @@ export const updateCompany = async (req, res) => {
             }
 
             if (role === "sales_rep") {
-                if (company.ownerId.toString() !== userId) {
+                if (!company.ownerId || company.ownerId.toString() !== userId) {
                     return res.status(403).json({
                         message: "Access denied!"
                     });
@@ -150,7 +150,7 @@ export const updateCompany = async (req, res) => {
             }
         }
 
-        if (req.body.ownerId !== undefined && req.body.ownerId !== company.ownerId.toString()) {
+        if (req.body.ownerId !== undefined && (!company.ownerId || req.body.ownerId !== company.ownerId.toString())) {
             if (role === "sales_rep") {
                 return res.status(403).json({ message: "Sales representatives cannot reassign companies!" });
             }
@@ -226,7 +226,7 @@ export const deleteCompany = async (req, res) => {
 
                 const teamIds = teamUsers.map(u => u._id.toString());
 
-                if (!teamIds.includes(company.ownerId.toString())) {
+                if (!company.ownerId || !teamIds.includes(company.ownerId.toString())) {
                     return res.status(403).json({
                         message: "Access denied!"
                     });
@@ -234,7 +234,7 @@ export const deleteCompany = async (req, res) => {
             }
 
             if (role === "sales_rep") {
-                if (company.ownerId.toString() !== userId) {
+                if (!company.ownerId || company.ownerId.toString() !== userId) {
                     return res.status(403).json({
                         message: "Access denied!"
                     });
