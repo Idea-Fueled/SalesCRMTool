@@ -9,56 +9,7 @@ import { getArchivedContacts, restoreContact } from "../../../API/services/conta
 import { getArchivedCompanies, restoreCompany } from "../../../API/services/companyService";
 import { toast } from "react-hot-toast";
 
-const TrashItem = ({ item, type, onRestore }) => {
-    const deletedDate = new Date(item.deletedAt);
-    const now = new Date();
-    const diffTime = Math.abs(now - deletedDate);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    const daysLeft = Math.max(0, 30 - diffDays);
 
-    const getDisplayName = () => {
-        if (type === 'deals') return item.name;
-        if (type === 'contacts') return `${item.firstName} ${item.lastName}`;
-        if (type === 'companies') return item.name;
-        return 'Unknown';
-    };
-
-    return (
-        <div className="bg-white p-4 rounded-xl border border-gray-100 hover:shadow-md transition-all group">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover:scale-110 transition-transform">
-                        {type === 'deals' && <Briefcase size={20} />}
-                        {type === 'contacts' && <Users size={20} />}
-                        {type === 'companies' && <Building2 size={20} />}
-                    </div>
-                    <div>
-                        <h4 className="font-bold text-gray-900 group-hover:text-red-500 transition-colors uppercase tracking-tight">
-                            {getDisplayName()}
-                        </h4>
-                        <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
-                            <span className="flex items-center gap-1">
-                                <Calendar size={12} />
-                                Deleted on {deletedDate.toLocaleDateString()}
-                            </span>
-                            <span className={`flex items-center gap-1 font-bold ${daysLeft < 7 ? 'text-red-500' : 'text-orange-500'}`}>
-                                <Clock size={12} />
-                                {daysLeft} Days Left
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <button
-                    onClick={() => onRestore(item._id)}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-xl text-xs font-bold hover:bg-red-600 hover:text-white transition-all active:scale-95 shadow-sm"
-                >
-                    <RefreshCcw size={14} />
-                    Restore
-                </button>
-            </div>
-        </div>
-    );
-};
 
 export default function ArchiveDashboard() {
     const [activeTab, setActiveTab] = useState('deals');
@@ -106,94 +57,141 @@ export default function ArchiveDashboard() {
     });
 
     return (
-        <div className="p-6 space-y-6 max-w-7xl mx-auto">
-            {/* Breadcrumbs */}
+        <div className="p-6 space-y-6 max-w-screen-xl mx-auto">
+            {/* Symmetric Navigation Header */}
             <div className="flex items-center mb-1.5 text-[10px] font-black uppercase tracking-[0.12em] text-gray-400">
                 <Link to="/dashboard" className="hover:text-red-600 transition-colors">Dashboard</Link>
                 <ChevronRight size={10} className="mx-1.5 text-gray-200" />
-                <Link to="/dashboard" className="hover:text-red-600 transition-colors">Admin Overview</Link>
-                <ChevronRight size={10} className="mx-1.5 text-gray-200" />
-                <span className="text-gray-900">Trash & Archive</span>
+                <span className="text-gray-900">Archive</span>
             </div>
 
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-                        <Trash2 className="text-red-500" size={28} />
-                        Archived Records
-                    </h1>
-                    <p className="text-gray-500 mt-1">Restore deleted items within 30 days. After 30 days, they remain archived permanently.</p>
-                </div>
-                
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                    <input
-                        type="text"
-                        placeholder={`Search archived ${activeTab}...`}
-                        className="pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all w-full md:w-64"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-            </div>
-
-            {/* Tab Switcher */}
-            <div className="flex items-center gap-1 bg-gray-100/50 p-1 rounded-2xl w-fit">
-                {[
-                    { id: 'deals', label: 'Deals', icon: Briefcase },
-                    { id: 'contacts', label: 'Contacts', icon: Users },
-                    { id: 'companies', label: 'Companies', icon: Building2 }
-                ].map(tab => (
-                    <button
-                        key={tab.id}
-                        onClick={() => {
-                            setActiveTab(tab.id);
-                            setSearchTerm("");
-                        }}
-                        className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
-                            activeTab === tab.id 
-                            ? "bg-white text-red-600 shadow-sm" 
-                            : "text-gray-500 hover:text-gray-700 hover:bg-white/50"
-                        }`}
-                    >
-                        <tab.icon size={14} />
-                        {tab.label}
-                    </button>
-                ))}
-            </div>
-
-            {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {[1, 2, 3].map(i => (
-                        <div key={i} className="h-24 bg-gray-100 rounded-2xl animate-pulse" />
-                    ))}
-                </div>
-            ) : filteredData.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredData.map(item => (
-                        <TrashItem 
-                            key={item._id} 
-                            item={item} 
-                            type={activeTab} 
-                            onRestore={handleRestore} 
-                        />
-                    ))}
-                </div>
-            ) : (
-                <div className="bg-white rounded-3xl border border-dashed border-gray-200 p-20 text-center">
-                    <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <Trash2 size={32} className="text-gray-300" />
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-gray-50 rounded-xl border border-gray-100">
+                        <Briefcase size={22} className="text-gray-500" />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900">No archived {activeTab}</h3>
-                    <p className="text-gray-500 mt-2 max-w-sm mx-auto">Items you delete will appear here for 30 days before being moved to permanent archive.</p>
+                    <div>
+                        <h1 className="text-xl font-bold text-gray-800">Archived Records</h1>
+                        <p className="text-sm text-gray-400">Restore items within 30 days before permanent deletion.</p>
+                    </div>
                 </div>
-            )}
+            </div>
 
-            <div className="flex items-start gap-4 p-5 bg-red-50/50 border border-red-100/50 rounded-2xl">
-                <AlertCircle size={20} className="text-red-500 shrink-0" />
-                <div className="text-xs text-gray-600 leading-relaxed">
-                    <p className="font-bold text-red-700 mb-1 uppercase tracking-tight">Important Policy:</p>
-                    <p>Records in the trash can only be restored within <strong>30 days</strong> of deletion. After this period, they are automatically moved to terminal archive and cannot be restored to active dashboards but will remain in database for compliance and audit purposes.</p>
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-gray-50/30">
+                    {/* Tab Switcher */}
+                    <div className="flex items-center gap-1 bg-gray-100/50 p-1 rounded-lg w-fit">
+                        {[
+                            { id: 'deals', label: 'Deals', icon: Briefcase },
+                            { id: 'contacts', label: 'Contacts', icon: Users },
+                            { id: 'companies', label: 'Companies', icon: Building2 }
+                        ].map(tab => (
+                            <button
+                                key={tab.id}
+                                onClick={() => { setActiveTab(tab.id); setSearchTerm(""); }}
+                                className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide transition-all ${
+                                    activeTab === tab.id 
+                                    ? "bg-white text-red-600 shadow-sm" 
+                                    : "text-gray-500 hover:text-gray-700"
+                                }`}
+                            >
+                                <tab.icon size={14} />
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="relative w-full sm:w-64">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                        <input
+                            type="text"
+                            placeholder={`Search archived ${activeTab}...`}
+                            className="w-full pl-9 pr-4 py-1.5 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                </div>
+
+                <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-350px)] custom-scrollbar">
+                    <table className="w-full text-sm">
+                        <thead>
+                            <tr className="bg-gray-50 border-b border-gray-100">
+                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Record Name</th>
+                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</th>
+                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Deleted Date</th>
+                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Time Left</th>
+                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-50">
+                            {loading ? (
+                                <tr>
+                                    <td colSpan={5} className="text-center py-12 text-gray-400">
+                                        <div className="flex flex-col items-center gap-2">
+                                            <div className="w-6 h-6 border-2 border-gray-200 border-t-red-500 rounded-full animate-spin" />
+                                            <span>Loading...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : filteredData.length === 0 ? (
+                                <tr>
+                                    <td colSpan={5} className="text-center py-16">
+                                        <div className="flex flex-col items-center gap-3 text-gray-400">
+                                            <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center border border-gray-100">
+                                                <Trash2 size={26} className="text-gray-300" />
+                                            </div>
+                                            <p className="font-medium text-gray-500">No archived {activeTab} found</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : (
+                                filteredData.map(item => {
+                                    const deletedDate = new Date(item.deletedAt);
+                                    const diffDays = Math.ceil(Math.abs(new Date() - deletedDate) / (1000 * 60 * 60 * 24));
+                                    const daysLeft = Math.max(0, 30 - diffDays);
+                                    
+                                    const name = activeTab === 'contacts' ? `${item.firstName} ${item.lastName}` : item.name;
+
+                                    return (
+                                        <tr key={item._id} className="hover:bg-gray-50/50 transition-colors group">
+                                            <td className="px-4 py-3 whitespace-nowrap">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400">
+                                                        {activeTab === 'deals' && <Briefcase size={14} />}
+                                                        {activeTab === 'contacts' && <Users size={14} />}
+                                                        {activeTab === 'companies' && <Building2 size={14} />}
+                                                    </div>
+                                                    <span className="font-bold text-gray-800 tracking-tight uppercase text-xs">{name}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap">
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 bg-gray-50 px-2 py-1 rounded-md border border-gray-100">
+                                                    {activeTab.slice(0, -1)}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">
+                                                <span className="flex items-center gap-1.5"><Calendar size={12}/> {deletedDate.toLocaleDateString()}</span>
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap">
+                                                <span className={`text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 w-fit ${daysLeft < 7 ? 'bg-red-50 text-red-600' : 'bg-orange-50 text-orange-600'}`}>
+                                                    <Clock size={12} /> {daysLeft} Days
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap">
+                                                <button
+                                                    onClick={() => handleRestore(item._id)}
+                                                    className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-semibold border border-green-200 text-green-700 hover:bg-green-50 transition active:scale-95"
+                                                >
+                                                    <RefreshCcw size={13} /> Restore
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
