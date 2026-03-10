@@ -101,8 +101,8 @@ export default function ArchiveDashboard() {
     };
 
     const filteredData = data.filter(item => {
-        const name = (activeTab === 'contacts' ? `${item.firstName} ${item.lastName}` : item.name).toLowerCase();
-        return name.includes(searchTerm.toLowerCase());
+        const name = (activeTab === 'contacts' ? `${item.firstName || ""} ${item.lastName || ""}` : (item.name || "")).toLowerCase();
+        return name.includes((searchTerm || "").toLowerCase());
     });
 
     return (
