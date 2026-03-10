@@ -11,6 +11,7 @@ import {
     MapPin, Globe, ExternalLink, MoreHorizontal
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { exportToPDF } from "../../utils/pdfExport";
 
 const lifecycleStages = [
     { id: "Added", label: "Added" },
@@ -119,7 +120,7 @@ export default function ContactDetails() {
         window.location.pathname.startsWith('/manager') ? '/manager' : '/dashboard';
 
     return (
-        <div className="min-h-screen bg-gray-50/50 p-6 space-y-6">
+        <div id="exportable-contact-details" className="min-h-screen bg-gray-50/50 p-6 space-y-6 relative">
             {/* Hero Section */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex items-center justify-between">
                 <div className="flex items-center gap-6">
@@ -148,7 +149,15 @@ export default function ContactDetails() {
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 no-print">
+                    {currentUser?.role === 'admin' && (
+                        <button
+                            onClick={() => exportToPDF('exportable-contact-details', `${contact.firstName}_${contact.lastName}_Details.pdf`)}
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-gray-700 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl transition-all shadow-sm active:scale-[0.98]"
+                        >
+                            <Download size={16} className="text-gray-500" /> Export PDF
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -265,7 +274,7 @@ export default function ContactDetails() {
                                 </div>
                                 
                                 {/* Add Remark Input */}
-                                <div className="mt-4 pt-4 border-t border-gray-50 flex flex-col gap-3">
+                                <div className="mt-4 pt-4 border-t border-gray-50 flex flex-col gap-3 no-print">
                                     <textarea
                                         value={newRemark}
                                         onChange={(e) => setNewRemark(e.target.value)}
