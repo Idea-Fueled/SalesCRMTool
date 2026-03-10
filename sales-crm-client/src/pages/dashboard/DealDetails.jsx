@@ -302,6 +302,16 @@ export default function DealDetails() {
                                 </label>
                                 <p className="text-sm font-bold text-gray-900 capitalize">{deal.source || "Direct Identification"}</p>
                             </div>
+                            
+                            {/* Notes displayed in Commercial Parameters */}
+                            <div className="space-y-1 pt-2 border-t border-gray-50">
+                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
+                                    <FileText size={10} className="text-gray-400" /> Interaction Notes
+                                </label>
+                                <div className="p-4 bg-gray-50/50 rounded-xl border border-gray-100 text-[13px] text-gray-800 leading-relaxed whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto">
+                                    {deal.notes ? deal.notes : <span className="text-gray-400 italic">No notes yet. Add a remark from the right panel.</span>}
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -415,10 +425,7 @@ export default function DealDetails() {
                             {/* Narratives/Notes */}
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
-                                    <FileText size={10} /> Interaction Notes
-                                </div>
-                                <div className="p-4 bg-gray-50/50 rounded-2xl border border-gray-100 text-[14px] text-gray-800 leading-relaxed whitespace-pre-wrap shadow-inner max-h-[400px] overflow-y-auto">
-                                    {deal.notes ? deal.notes : <span className="text-gray-400 italic">No notes yet. Add a remark below.</span>}
+                                    <MessageSquare size={10} /> Add New Remark
                                 </div>
                                 
                                 {/* Add Remark Input */}
