@@ -73,11 +73,11 @@ export default function ContactDetails() {
             const author = `${currentUser?.firstName || "Unknown"} ${currentUser?.lastName || ""}`.trim();
             const remarkEntry = `\n\n--- [${timestamp}] Added by ${author} ---\n${newRemark.trim()}`;
             
-            const updatedNotes = (contact.notes || "").trim() + remarkEntry;
+            const updatedRemarks = (contact.remarks || "").trim() + remarkEntry;
             
-            await updateContact(contact._id, { notes: updatedNotes });
+            await updateContact(contact._id, { remarks: updatedRemarks });
             
-            setContact(prev => ({ ...prev, notes: updatedNotes }));
+            setContact(prev => ({ ...prev, remarks: updatedRemarks }));
             setNewRemark("");
             toast.success("Remark added successfully");
         } catch (err) {
@@ -201,6 +201,16 @@ export default function ContactDetails() {
                                     <p className="text-sm font-bold text-gray-300 italic">Not available</p>
                                 )}
                             </div>
+                            
+                            {/* Notes displayed in Contact Channels */}
+                            <div className="space-y-1 pt-2 border-t border-gray-50">
+                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
+                                    <FileText size={10} className="text-gray-400" /> Interaction Notes
+                                </label>
+                                <div className="p-4 bg-gray-50/50 rounded-xl border border-gray-100 text-[13px] text-gray-800 leading-relaxed whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto">
+                                    {contact.notes ? contact.notes : <span className="text-gray-400 italic">No notes yet. Add a remark from the right panel.</span>}
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -247,10 +257,10 @@ export default function ContactDetails() {
                             {/* Narratives/Notes */}
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2 text-[10px] font-black text-red-500 uppercase tracking-[0.2em]">
-                                    <FileText size={10} /> Interaction Notes
+                                    <MessageSquare size={10} /> Add New Remark
                                 </div>
                                 <div className="p-4 bg-gray-50/50 rounded-2xl border border-gray-100 text-[13px] text-gray-800 leading-relaxed whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto">
-                                    {contact.notes ? contact.notes : <span className="text-gray-400 italic">No notes yet. Add a remark below.</span>}
+                                    {contact.remarks ? contact.remarks : <span className="text-gray-400 italic">No remarks yet. Add a remark below.</span>}
                                 </div>
                                 
                                 {/* Add Remark Input */}

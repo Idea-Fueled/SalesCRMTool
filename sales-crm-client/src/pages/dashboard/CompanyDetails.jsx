@@ -71,11 +71,11 @@ export default function CompanyDetails() {
             const author = `${currentUser?.firstName || "Unknown"} ${currentUser?.lastName || ""}`.trim();
             const remarkEntry = `\n\n--- [${timestamp}] Added by ${author} ---\n${newRemark.trim()}`;
             
-            const updatedNotes = (company.notes || "").trim() + remarkEntry;
+            const updatedRemarks = (company.remarks || "").trim() + remarkEntry;
             
-            await updateCompany(company._id, { notes: updatedNotes });
+            await updateCompany(company._id, { remarks: updatedRemarks });
             
-            setCompany(prev => ({ ...prev, notes: updatedNotes }));
+            setCompany(prev => ({ ...prev, remarks: updatedRemarks }));
             setNewRemark("");
             toast.success("Remark added successfully");
         } catch (err) {
@@ -209,6 +209,16 @@ export default function CompanyDetails() {
                                 </label>
                                 <p className="text-sm font-bold text-gray-900 leading-relaxed">{company.address || "No address on file"}</p>
                             </div>
+                            
+                            {/* Notes displayed in Operational Identity */}
+                            <div className="space-y-1 pt-2 border-t border-gray-50">
+                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
+                                    <FileText size={10} className="text-gray-400" /> Operational Notes
+                                </label>
+                                <div className="p-4 bg-gray-50/50 rounded-xl border border-gray-100 text-[13px] text-gray-800 leading-relaxed whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto">
+                                    {company.notes ? company.notes : <span className="text-gray-400 italic">No notes yet. Add a remark from the right panel.</span>}
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -289,10 +299,10 @@ export default function CompanyDetails() {
                             {/* Narratives/Intel */}
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2 text-[10px] font-black text-red-500 uppercase tracking-[0.2em]">
-                                    <FileText size={10} /> Operational Intel
+                                    <MessageSquare size={10} /> Add New Remark
                                 </div>
                                 <div className="p-4 bg-gray-50/50 rounded-2xl border border-gray-100 text-[13px] text-gray-800 leading-relaxed whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto">
-                                    {company.notes ? company.notes : <span className="text-gray-400 italic">No notes yet. Add a remark below.</span>}
+                                    {company.remarks ? company.remarks : <span className="text-gray-400 italic">No remarks yet. Add a remark below.</span>}
                                 </div>
                                 
                                 {/* Add Remark Input */}

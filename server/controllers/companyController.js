@@ -165,7 +165,7 @@ export const updateCompany = async (req, res) => {
 
         const fields = [
             "name", "industry", "size", "website", "primaryContact",
-            "status", "address", "phone", "revenueRange", "notes", "ownerId"
+            "status", "address", "phone", "revenueRange", "notes", "remarks", "ownerId"
         ];
 
         fields.forEach(field => {

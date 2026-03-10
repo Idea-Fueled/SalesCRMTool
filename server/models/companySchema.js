@@ -43,6 +43,9 @@ const companySchema = new mongoose.Schema(
         notes: {
             type: String
         },
+        remarks: {
+            type: String
+        },
         ownerId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",

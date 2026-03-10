@@ -92,6 +92,10 @@ const dealSchema = new mongoose.Schema(
             type: String
         },
 
+        remarks: {
+            type: String
+        },
+
         ownerId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",

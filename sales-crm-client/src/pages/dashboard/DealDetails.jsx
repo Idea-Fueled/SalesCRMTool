@@ -128,12 +128,12 @@ export default function DealDetails() {
             const author = `${currentUser?.firstName || "Unknown"} ${currentUser?.lastName || ""}`.trim();
             const remarkEntry = `\n\n--- [${timestamp}] Added by ${author} ---\n${newRemark.trim()}`;
             
-            const updatedNotes = (deal.notes || "").trim() + remarkEntry;
+            const updatedRemarks = (deal.remarks || "").trim() + remarkEntry;
             
-            await updateDeal(deal._id, { notes: updatedNotes });
+            await updateDeal(deal._id, { remarks: updatedRemarks });
             
             // Refresh logic and reset
-            setDeal(prev => ({ ...prev, notes: updatedNotes }));
+            setDeal(prev => ({ ...prev, remarks: updatedRemarks }));
             setNewRemark("");
             toast.success("Remark added successfully");
         } catch (err) {
@@ -426,6 +426,9 @@ export default function DealDetails() {
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
                                     <MessageSquare size={10} /> Add New Remark
+                                </div>
+                                <div className="p-4 bg-gray-50/50 rounded-2xl border border-gray-100 text-[13px] text-gray-800 leading-relaxed whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto">
+                                    {deal.remarks ? deal.remarks : <span className="text-gray-400 italic">No remarks yet. Add a remark below.</span>}
                                 </div>
                                 
                                 {/* Add Remark Input */}

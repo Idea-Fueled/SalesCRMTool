@@ -169,7 +169,7 @@ export const updateDealInformation = async (req, res, next) => {
 
         const fields = [
             "name", "companyId", "contactId", "value", "currency",
-            "stage", "expectedCloseDate", "probability", "source", "notes", "ownerId"
+            "stage", "expectedCloseDate", "probability", "source", "notes", "remarks", "ownerId"
         ];
 
         fields.forEach(field => {

@@ -47,6 +47,9 @@ const contactSchema = new mongoose.Schema({
     notes: {
         type: String
     },
+    remarks: {
+        type: String
+    },
     isDeleted: {
         type: Boolean,
         default: false

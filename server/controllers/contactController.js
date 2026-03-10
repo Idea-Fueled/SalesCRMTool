@@ -186,7 +186,7 @@ export const updateContact = async (req, res, next) => {
 
         const fields = [
             "firstName", "lastName", "email", "jobTitle", "companyId",
-            "ownerId", "phone", "mobile", "linkedin", "notes"
+            "ownerId", "phone", "mobile", "linkedin", "notes", "remarks"
         ];
 
         fields.forEach(field => {
