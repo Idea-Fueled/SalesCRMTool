@@ -2,6 +2,14 @@ import React, { useState, useEffect } from "react";
 import Modal from "./Modal";
 
 const STAGES = ["Lead", "Qualified", "Proposal", "Negotiation", "Closed Won", "Closed Lost"];
+const STAGE_COLORS = {
+    "Lead": "bg-blue-600",
+    "Qualified": "bg-amber-400",
+    "Proposal": "bg-orange-600",
+    "Negotiation": "bg-pink-600",
+    "Closed Won": "bg-green-600",
+    "Closed Lost": "bg-red-600"
+};
 const CURRENCIES = [{ value: "USD", label: "USD ($)" }, { value: "EUR", label: "EUR (€)" }, { value: "INR", label: "INR (₹)" }];
 const SOURCE_OPTIONS = ["Inbound", "Referral", "Outbound"];
 
@@ -20,6 +28,7 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
     const [loading, setLoading] = useState(false);
     const [showCompanySuggest, setShowCompanySuggest] = useState(false);
     const [showContactSuggest, setShowContactSuggest] = useState(false);
+    const [showStageDropdown, setShowStageDropdown] = useState(false);
 
     useEffect(() => {
         if (deal) {
@@ -214,12 +223,52 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
 
                 {/* Stage + Expected Close */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1">
+                    <div className="space-y-1 relative">
                         <label className="text-xs font-semibold text-gray-500 uppercase">Pipeline Stage *</label>
-                        <select className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-400 bg-white"
-                            value={formData.stage} onChange={e => set("stage", e.target.value)}>
-                            {STAGES.map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
+                        <div className="relative">
+                            <button
+                                type="button"
+                                onClick={() => setShowStageDropdown(!showStageDropdown)}
+                                className="w-full flex items-center justify-between px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-400 bg-white transition-all shadow-sm"
+                            >
+                                <div className="flex items-center gap-2">
+                                    <div className={`w-2.5 h-2.5 rounded-full ${STAGE_COLORS[formData.stage] || "bg-gray-300"}`} />
+                                    <span className="font-semibold text-gray-700">{formData.stage}</span>
+                                </div>
+                                <div className={`transition-transform duration-200 ${showStageDropdown ? "rotate-180" : ""}`}>
+                                    <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </button>
+
+                            {showStageDropdown && (
+                                <>
+                                    <div className="fixed inset-0 z-40" onClick={() => setShowStageDropdown(false)} />
+                                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 py-1">
+                                        {STAGES.map(s => (
+                                            <button
+                                                key={s}
+                                                type="button"
+                                                onClick={() => {
+                                                    set("stage", s);
+                                                    setShowStageDropdown(false);
+                                                }}
+                                                className={`w-full flex items-center gap-3 px-3 py-2.5 text-xs font-bold transition-colors hover:bg-gray-50 group ${formData.stage === s ? "bg-red-50 text-red-600" : "text-gray-600"}`}
+                                            >
+                                                <div className={`w-2 h-2 rounded-full ring-2 ring-white shadow-sm ${STAGE_COLORS[s] || "bg-gray-300"}`} />
+                                                <span className="uppercase tracking-wider">{s}</span>
+                                                {formData.stage === s && (
+                                                    <svg className="ml-auto w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                        </div>
                     </div>
                     <div className="space-y-1">
                         <label className="text-xs font-semibold text-gray-500 uppercase">Expected Close *</label>
