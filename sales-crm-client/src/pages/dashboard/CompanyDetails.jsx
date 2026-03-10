@@ -243,37 +243,20 @@ export default function CompanyDetails() {
 
                 {/* Right Column - Status & Interactions */}
                 <div className="lg:col-span-8 space-y-8">
-                    {/* Pipeline Status */}
                     <div className="space-y-4">
-                        <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest">Account Lifecycle Status</h3>
-                        <div className="flex flex-wrap items-center">
-                            {companyStatusPipeline.map((stage, index) => {
-                                const currentStatusIndex = companyStatusPipeline.findIndex(s => s.id === (company.status || "Prospect"));
-                                const isActive = index <= (currentStatusIndex === -1 ? 0 : currentStatusIndex);
-                                return (
-                                    <div key={stage.id} className="flex-1 min-w-[150px] relative group h-10 mb-2 mr-2">
-                                        <div className={`
-                                            h-full w-full flex items-center justify-center text-[10px] font-bold px-4
-                                            transition-all duration-300 cursor-default
-                                            ${isActive
-                                                ? (index === 0 ? "bg-blue-600 text-white" : index === 1 ? "bg-amber-400 text-white" : index === 2 ? "bg-green-600 text-white" : "bg-red-600 text-white")
-                                                : "bg-gray-100 text-gray-400"}
-                                            ${index === 0 ? "rounded-l-lg" : ""}
-                                            ${index === companyStatusPipeline.length - 1 ? "rounded-r-lg" : ""}
-                                            relative z-10
-                                        `}
-                                            style={{
-                                                clipPath: index === 0
-                                                    ? "polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%)"
-                                                    : index === companyStatusPipeline.length - 1
-                                                        ? "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 10% 50%)"
-                                                        : "polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%, 10% 50%)"
-                                            }}>
-                                            {stage.label}
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                        <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
+                            <Target size={14} className="text-gray-400" /> Account Lifecycle Status
+                        </h3>
+                        <div className="flex items-center">
+                            <div className={`
+                                px-6 py-2.5 rounded-xl text-sm font-black tracking-wide border-2 flex items-center gap-2 shadow-sm
+                                ${company.status === "Active" ? "bg-green-50 text-green-700 border-green-200" : 
+                                  company.status === "Inactive" ? "bg-red-50 text-red-700 border-red-200" : 
+                                  "bg-blue-50 text-blue-700 border-blue-200"}
+                            `}>
+                                <div className={`w-2 h-2 rounded-full ${company.status === "Active" ? "bg-green-500 animate-pulse" : company.status === "Inactive" ? "bg-red-500" : "bg-blue-500 animate-pulse"}`}></div>
+                                {company.status || "Prospect"}
+                            </div>
                         </div>
                     </div>
 
