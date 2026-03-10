@@ -53,6 +53,10 @@ export default function DealDetails() {
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    
+    // Remarks State
+    const [newRemark, setNewRemark] = useState("");
+    const [savingRemark, setSavingRemark] = useState(false);
 
     const fetchDealData = async (silent = false) => {
         if (!silent) setLoading(true);
@@ -113,6 +117,29 @@ export default function DealDetails() {
             setDeal(res.data.data);
         } catch (err) {
             toast.error(err?.response?.data?.message || "Failed to update deal");
+        }
+    };
+
+    const handleAddRemark = async () => {
+        if (!newRemark.trim()) return;
+        setSavingRemark(true);
+        try {
+            const timestamp = formatDate(new Date(), true);
+            const author = `${currentUser?.firstName || "Unknown"} ${currentUser?.lastName || ""}`.trim();
+            const remarkEntry = `\n\n--- [${timestamp}] Added by ${author} ---\n${newRemark.trim()}`;
+            
+            const updatedNotes = (deal.notes || "").trim() + remarkEntry;
+            
+            await updateDeal(deal._id, { notes: updatedNotes });
+            
+            // Refresh logic and reset
+            setDeal(prev => ({ ...prev, notes: updatedNotes }));
+            setNewRemark("");
+            toast.success("Remark added successfully");
+        } catch (err) {
+            toast.error(err?.response?.data?.message || "Failed to add remark");
+        } finally {
+            setSavingRemark(false);
         }
     };
 
@@ -390,8 +417,31 @@ export default function DealDetails() {
                                 <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
                                     <FileText size={10} /> Interaction Notes
                                 </div>
-                                <div className="p-8 bg-gray-50/50 rounded-2xl border border-gray-100 text-[14px] text-gray-600 leading-relaxed italic whitespace-pre-wrap shadow-inner font-medium">
+                                <div className="p-8 bg-gray-50/50 rounded-2xl border border-gray-100 text-[14px] text-gray-600 leading-relaxed italic whitespace-pre-wrap shadow-inner font-medium max-h-[300px] overflow-y-auto">
                                     {deal.notes || "No interaction notes recorded for this deal node yet."}
+                                </div>
+                                
+                                {/* Add Remark Input */}
+                                <div className="mt-4 pt-4 border-t border-gray-50 flex flex-col gap-3">
+                                    <textarea
+                                        value={newRemark}
+                                        onChange={(e) => setNewRemark(e.target.value)}
+                                        placeholder="Type a new remark to append..."
+                                        className="w-full min-h-[80px] p-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-400 focus:bg-white transition resize-y"
+                                    />
+                                    <div className="flex justify-end">
+                                        <button
+                                            onClick={handleAddRemark}
+                                            disabled={savingRemark || !newRemark.trim()}
+                                            className="px-4 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-sm shadow-red-200 transition-all disabled:opacity-50 flex items-center gap-2"
+                                        >
+                                            {savingRemark ? (
+                                                <><Loader2 size={12} className="animate-spin" /> Saving...</>
+                                            ) : (
+                                                <><MessageSquare size={12} /> Add Remark</>
+                                            )}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
