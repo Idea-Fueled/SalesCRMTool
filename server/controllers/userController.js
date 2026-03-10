@@ -9,6 +9,7 @@ import { logAction } from "../utils/auditLogger.js";
 import crypto from "crypto";
 import { sendEmail } from "../utils/sendEmail.js";
 import { getIO } from "../utils/socket.js";
+import { notifyReassignment } from "../services/notificationService.js";
 
 export const registerUser = async (req, res, next) => {
     try {
@@ -351,11 +352,19 @@ export const softDeleteUser = async (req, res, next) => {
         user.deletedAt = new Date();
         await user.save();
 
-        const msg = newOwnerId
-            ? "User deleted and records reassigned successfully!"
-            : "User deleted. Records kept under their ownership.";
-
         res.status(200).json({ message: msg });
+
+        // Hierarchy Notification
+        if (newOwnerId) {
+            await notifyReassignment({
+                oldOwnerId: id,
+                newOwnerId,
+                actorId: currentUserId,
+                entityType: "User",
+                entityId: id,
+                customMessage: `User "${user.firstName} ${user.lastName}" soft-deleted. All records reassigned to ${newOwner.firstName} ${newOwner.lastName}.`
+            });
+        }
 
         await logAction({
             entityType: "User",
@@ -547,11 +556,19 @@ export const deactivateUser = async (req, res, next) => {
             console.warn("[deactivateUser] Socket emit failed (non-critical):", socketErr.message);
         }
 
-        const responseMsg = newOwnerId
-            ? "User deactivated and records reassigned successfully!"
-            : "User deactivated. Records kept under their ownership and will be accessible when reactivated.";
-
         res.status(200).json({ message: responseMsg });
+
+        // Hierarchy Notification
+        if (newOwnerId) {
+            await notifyReassignment({
+                oldOwnerId: id,
+                newOwnerId,
+                actorId: currentUserId,
+                entityType: "User",
+                entityId: id,
+                customMessage: `User "${user.firstName} ${user.lastName}" deactivated. All records reassigned to ${newOwner.firstName} ${newOwner.lastName}.`
+            });
+        }
 
         // Log the deactivation
         await logAction({
@@ -787,9 +804,21 @@ export const bulkReassignRecords = async (req, res, next) => {
             req
         });
 
-        return res.status(200).json({
+        res.status(200).json({
             message: "All records reassigned successfully!"
         });
+
+        // Hierarchy Notification
+        await notifyReassignment({
+            oldOwnerId: id,
+            newOwnerId,
+            actorId: currentUserId,
+            entityType: "User",
+            entityId: id,
+            customMessage: `All records reassigned from ${oldUser.firstName} ${oldUser.lastName} to ${newUser.firstName} ${newUser.lastName}.`
+        });
+
+        return;
 
     } catch (error) {
         return res.status(500).json({
