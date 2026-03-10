@@ -17,23 +17,23 @@ const DealCard = ({ deal, onEdit, onDelete, onView }) => {
             className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all group overflow-hidden flex flex-col h-full cursor-pointer hover:border-red-200"
         >
             <div className="p-5 flex-1">
-                <div className="flex justify-between items-start mb-4">
-                    <div className="flex gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-100 flex items-center justify-center text-gray-400 group-hover:from-red-50 group-hover:to-red-100 group-hover:border-red-100 group-hover:text-red-500 transition-all duration-300">
+                <div className="flex justify-between items-start gap-3 mb-4">
+                    <div className="flex gap-4 flex-1 min-w-0">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-100 flex items-center justify-center text-gray-400 group-hover:from-red-50 group-hover:to-red-100 group-hover:border-red-100 group-hover:text-red-500 transition-all duration-300 flex-shrink-0">
                             <Briefcase size={24} />
                         </div>
                         <div className="flex-1 min-w-0">
                             <h3 className="font-bold text-gray-800 group-hover:text-red-600 transition-colors uppercase text-xs tracking-wide truncate">
                                 {deal.name}
                             </h3>
-                            <div className="flex items-center gap-1.5 mt-1.5">
-                                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${stageBadge[deal.stage] || "bg-gray-100 text-gray-600"}`}>
+                            <div className="flex items-center gap-1.5 mt-1.5 overflow-hidden">
+                                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase truncate ${stageBadge[deal.stage] || "bg-gray-100 text-gray-600"}`}>
                                     {deal.stage}
                                 </span>
                             </div>
                         </div>
                     </div>
-                    <div className="relative group/menu">
+                    <div className="relative group/menu flex-shrink-0">
                         <button
                             onClick={(e) => e.stopPropagation()}
                             className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition"

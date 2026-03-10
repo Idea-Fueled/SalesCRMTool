@@ -22,21 +22,21 @@ export default function ContactCard({ contact, onEdit, onDelete, onView, basePat
             className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group overflow-hidden flex flex-col h-full cursor-pointer hover:border-red-200"
         >
             <div className="p-5 flex-1">
-                <div className="flex justify-between items-start mb-4">
-                    <div className="flex gap-4">
+                <div className="flex justify-between items-start gap-3 mb-4">
+                    <div className="flex gap-4 flex-1 min-w-0">
                         <Avatar name={`${contact.firstName} ${contact.lastName}`} />
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 pt-1">
                             <h3 className="font-bold text-gray-900 group-hover:text-red-600 transition-colors uppercase text-xs tracking-wide truncate">
                                 {contact.firstName} {contact.lastName}
                             </h3>
-                            <div className="flex items-center gap-1.5 mt-1 text-gray-400">
-                                <Briefcase size={12} className="text-gray-300" />
-                                <span className="text-[10px] font-bold uppercase tracking-tighter">{contact.jobTitle || "No Title"}</span>
+                            <div className="flex items-center gap-1.5 mt-1 text-gray-400 overflow-hidden">
+                                <Briefcase size={12} className="text-gray-300 flex-shrink-0" />
+                                <span className="text-[10px] font-bold uppercase tracking-tighter truncate font-['Inter']">{contact.jobTitle || "No Title"}</span>
                             </div>
                         </div>
                     </div>
 
-                    <div className="relative group/menu">
+                    <div className="relative group/menu flex-shrink-0">
                         <button
                             onClick={(e) => e.stopPropagation()}
                             className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition"
