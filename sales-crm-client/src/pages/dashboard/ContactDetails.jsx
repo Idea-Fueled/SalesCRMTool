@@ -71,7 +71,7 @@ export default function ContactDetails() {
         try {
             const timestamp = formatDate(new Date(), true);
             const author = `${currentUser?.firstName || "Unknown"} ${currentUser?.lastName || ""}`.trim();
-            const remarkEntry = `\n\n--- [${timestamp}] Added by ${author} ---\n${newRemark.trim()}`;
+            const remarkEntry = `\n\n[${timestamp}] Added by ${author}\n${newRemark.trim()}`;
             
             const updatedRemarks = (contact.remarks || "").trim() + remarkEntry;
             
@@ -260,7 +260,17 @@ export default function ContactDetails() {
                                     <MessageSquare size={10} /> Add New Remark
                                 </div>
                                 <div className="p-4 bg-gray-50/50 rounded-2xl border border-gray-100 text-[13px] text-gray-800 leading-relaxed whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto">
-                                    {contact.remarks ? contact.remarks : <span className="text-gray-400 italic">No remarks yet. Add a remark below.</span>}
+                                    {contact.remarks ? (
+                                        contact.remarks.split('\n').map((line, i) => {
+                                            const isHeader = line.trim().match(/^-*\s*\[.*?\] Added by .*?-*$/);
+                                            if (isHeader) {
+                                                return <span key={i} className="block text-[11px] text-gray-400 mt-4 mb-1">{line.replace(/-/g, '').trim()}</span>;
+                                            }
+                                            return <span key={i} className="block min-h-[1rem]">{line}</span>;
+                                        })
+                                    ) : (
+                                        <span className="text-gray-400 italic">No remarks yet. Add a remark below.</span>
+                                    )}
                                 </div>
                                 
                                 {/* Add Remark Input */}
