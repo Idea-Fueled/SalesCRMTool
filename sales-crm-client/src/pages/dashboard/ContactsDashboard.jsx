@@ -148,13 +148,6 @@ export default function ContactsDashboard() {
 
     return (
         <div className="p-4 sm:p-6 space-y-6 max-w-screen-xl mx-auto">
-            {/* Symmetric Navigation Header */}
-            <div className="flex items-center mb-1.5 text-[10px] font-black uppercase tracking-[0.12em] text-gray-400">
-                <Link to="/dashboard" className="hover:text-red-600 transition-colors">Dashboard</Link>
-                <ChevronRight size={10} className="mx-1.5 text-gray-200" />
-                <span className="text-gray-900">Contacts</span>
-            </div>
-
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
                 <div>
                     <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Contacts Dashboard</h1>

@@ -55,13 +55,6 @@ export default function TrashDashboard() {
 
     return (
         <div className="p-6 space-y-6 max-w-screen-xl mx-auto">
-            {/* Symmetric Navigation Header */}
-            <div className="flex items-center mb-1.5 text-[10px] font-black uppercase tracking-[0.12em] text-gray-400">
-                <Link to="/dashboard" className="hover:text-red-600 transition-colors">Dashboard</Link>
-                <ChevronRight size={10} className="mx-1.5 text-gray-200" />
-                <span className="text-gray-900">Trash</span>
-            </div>
-
             <div className="flex items-center gap-3">
                 <div className="p-2.5 bg-red-50 rounded-xl border border-red-100">
                     <Trash2 size={22} className="text-red-500" />

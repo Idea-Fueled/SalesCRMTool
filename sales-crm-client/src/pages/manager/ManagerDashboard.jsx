@@ -131,13 +131,6 @@ export default function ManagerDashboard() {
     }));
     return (
         <div className="p-4 sm:p-6 max-w-screen-xl mx-auto">
-            {/* Symmetric Navigation Header */}
-            <div className="flex items-center mb-6 text-[10px] font-black uppercase tracking-[0.12em] text-gray-400">
-                <Link to="/manager/dashboard" className="hover:text-red-600 transition-colors">Dashboard</Link>
-                <ChevronRight size={10} className="mx-1.5 text-gray-200" />
-                <span className="text-gray-900">Team Overview</span>
-            </div>
-
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <StatCard label="Team Members" value={loading ? "..." : String(teamMembers.length)} sub="+ you as manager" color="bg-red-50 text-red-600" icon={Users2} />
                 <StatCard label="Team Deals" value={loading ? "..." : String(deals.length)} sub="All stages" color="bg-orange-50 text-orange-600" icon={Briefcase} />
