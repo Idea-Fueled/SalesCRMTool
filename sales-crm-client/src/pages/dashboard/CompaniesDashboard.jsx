@@ -127,7 +127,6 @@ export default function CompaniesDashboard() {
     });
     const industries = Object.entries(indCount)
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 5)
         .map(([name, count]) => ({ name, count }));
 
     return (
@@ -154,7 +153,7 @@ export default function CompaniesDashboard() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-                <div className="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden h-full flex flex-col">
+                <div className="lg:col-span-4 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden h-full flex flex-col">
                     <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
                             <h2 className="font-bold text-gray-800">All Companies</h2>
@@ -250,25 +249,30 @@ export default function CompaniesDashboard() {
                     </div>
                 </div>
 
-                <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-5 h-full flex flex-col">
-                    <h3 className="font-bold text-gray-800 mb-4">Industry Mix</h3>
-                    <div className="space-y-4">
-                        {industries.length > 0 ? industries.map((ind, i) => {
-                            const total = companies.length || 1;
-                            const pct = Math.round((ind.count / total) * 100);
-                            const colors = ["bg-red-500", "bg-red-400", "bg-orange-500", "bg-rose-500", "bg-red-300"];
-                            return (
-                                <div key={ind.name}>
-                                    <div className="flex justify-between text-sm mb-1">
-                                        <span className="text-gray-600 font-medium">{ind.name}</span>
-                                        <span className="text-gray-500">{pct}%</span>
+                <div className="lg:col-span-1 bg-white rounded-xl shadow-sm border border-gray-100 p-5 h-[500px] flex flex-col">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="font-bold text-gray-800">Industry Mix</h3>
+                        <span className="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-bold uppercase">{industries.length}</span>
+                    </div>
+                    <div className="flex-1 overflow-y-auto custom-scrollbar pr-1">
+                        <div className="space-y-4">
+                            {industries.length > 0 ? industries.map((ind, i) => {
+                                const total = companies.length || 1;
+                                const pct = Math.round((ind.count / total) * 100);
+                                const colors = ["bg-red-500", "bg-red-400", "bg-orange-500", "bg-rose-500", "bg-red-300"];
+                                return (
+                                    <div key={ind.name} className="group">
+                                        <div className="flex justify-between text-[11px] mb-1.5">
+                                            <span className="text-gray-600 font-semibold truncate flex-1 mr-2">{ind.name}</span>
+                                            <span className="text-gray-400 font-bold">{pct}%</span>
+                                        </div>
+                                        <div className="h-1.5 bg-gray-50 rounded-full overflow-hidden">
+                                            <div className={`h-full ${colors[i % colors.length]} rounded-full transition-all duration-700`} style={{ width: `${pct}%` }} />
+                                        </div>
                                     </div>
-                                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                                        <div className={`h-full ${colors[i % colors.length]} rounded-full transition-all duration-500`} style={{ width: `${pct}%` }} />
-                                    </div>
-                                </div>
-                            );
-                        }) : <p className="text-center py-10 text-gray-400 text-sm">No industry data</p>}
+                                );
+                            }) : <p className="text-center py-10 text-gray-400 text-xs">No industry data</p>}
+                        </div>
                     </div>
                 </div>
             </div>
