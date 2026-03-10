@@ -11,13 +11,13 @@ export default function DeleteConfirmModal({ isOpen, onClose, onConfirm, title, 
                         <AlertTriangle size={24} />
                     </div>
                     <div>
-                        <p className="text-sm text-red-800 font-semibold">Careful! This action is permanent.</p>
-                        <p className="text-xs text-red-600">You are about to delete <span className="font-bold">{itemName}</span>. This cannot be undone.</p>
+                        <p className="text-sm text-red-800 font-semibold">Notice: This item will be archived.</p>
+                        <p className="text-xs text-red-600">You are about to move <span className="font-bold">{itemName}</span> to the archive. You can restore it within 30 days.</p>
                     </div>
                 </div>
 
                 <p className="text-sm text-gray-600 leading-relaxed px-1">
-                    {message || "Are you sure you want to delete this record? This will remove all associated data from the system."}
+                    {message || "Are you sure you want to delete this record? It will be moved to the Archive tab and can be restored for up to 30 days before permanent archival."}
                 </p>
 
                 <div className="flex gap-3">
