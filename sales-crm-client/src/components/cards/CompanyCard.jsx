@@ -19,8 +19,8 @@ const CompanyCard = ({ company, onEdit, onDelete, onView }) => {
                         <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-100 flex items-center justify-center text-gray-400 group-hover:from-red-50 group-hover:to-red-100 group-hover:border-red-100 group-hover:text-red-500 transition-all duration-300">
                             <Building2 size={24} />
                         </div>
-                        <div>
-                            <h3 className="font-bold text-gray-800 group-hover:text-red-600 transition-colors uppercase text-xs tracking-wide">
+                        <div className="flex-1 min-w-0">
+                            <h3 className="font-bold text-gray-800 group-hover:text-red-600 transition-colors uppercase text-xs tracking-wide truncate">
                                 {company.name}
                             </h3>
                         </div>

@@ -25,8 +25,8 @@ export default function ContactCard({ contact, onEdit, onDelete, onView, basePat
                 <div className="flex justify-between items-start mb-4">
                     <div className="flex gap-4">
                         <Avatar name={`${contact.firstName} ${contact.lastName}`} />
-                        <div>
-                            <h3 className="font-bold text-gray-900 group-hover:text-red-600 transition-colors uppercase text-xs tracking-wide">
+                        <div className="flex-1 min-w-0">
+                            <h3 className="font-bold text-gray-900 group-hover:text-red-600 transition-colors uppercase text-xs tracking-wide truncate">
                                 {contact.firstName} {contact.lastName}
                             </h3>
                             <div className="flex items-center gap-1.5 mt-1 text-gray-400">
