@@ -23,10 +23,6 @@ const CompanyCard = ({ company, onEdit, onDelete, onView }) => {
                             <h3 className="font-bold text-gray-800 group-hover:text-red-600 transition-colors uppercase text-xs tracking-wide">
                                 {company.name}
                             </h3>
-                            <div className="flex items-center gap-1 mt-1">
-                                <Star size={12} className="text-orange-400 fill-orange-400" />
-                                <span className="text-xs font-bold text-gray-500">4.5</span>
-                            </div>
                         </div>
                     </div>
                     <div className="relative group/menu">

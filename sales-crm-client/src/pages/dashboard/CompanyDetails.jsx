@@ -131,7 +131,6 @@ export default function CompanyDetails() {
                     <div>
                         <div className="flex items-center gap-2 mb-1">
                             <h1 className="text-2xl font-black text-gray-900 leading-none">{company.name}</h1>
-                            <Star size={18} className="text-yellow-400 fill-yellow-400" />
                         </div>
                         <div className="space-y-1.5">
                             <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
