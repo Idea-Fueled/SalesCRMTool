@@ -37,7 +37,7 @@ export const createDeal = async (req, res, next) => {
             const contact = await Contact.findById(sanitizedContactId);
             if (!contact) return res.status(404).json({ message: "Contact not found!" });
 
-            if (contact.companyId.toString() !== sanitizedCompanyId) {
+            if (contact.companyId && contact.companyId.toString() !== sanitizedCompanyId) {
                 return res.status(400).json({ message: "Contact does not belong to this company!" });
             }
 
@@ -147,7 +147,7 @@ export const updateDealInformation = async (req, res, next) => {
         if (req.body.contactId && req.body.companyId) {
             const contact = await Contact.findById(req.body.contactId);
 
-            if (!contact || contact.companyId.toString() !== req.body.companyId) {
+            if (!contact || (contact.companyId && contact.companyId.toString() !== req.body.companyId)) {
                 return res.status(400).json({
                     message: "Contact does not belong to this company!"
                 })
