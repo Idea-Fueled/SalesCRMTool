@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { getCompanyById, updateCompany } from "../../../API/services/companyService";
+import { getCompanyById, updateCompany, deleteCompany } from "../../../API/services/companyService";
+import { getTeamUsers } from "../../../API/services/userService";
 import { useAuth } from "../../context/AuthContext";
+import CompanyModal from "../../components/modals/CompanyModal";
+import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
 import {
     Building2, User, MapPin, Globe, Phone,
     Mail, Briefcase, Calendar, Clock, ArrowLeft,
     ChevronRight, Download, RotateCw, Maximize2,
     Star, Layers, Users, Target, Info, DollarSign,
     MoreHorizontal, List, FileText, Paperclip,
-    Loader2, ExternalLink, MessageSquare
+    Loader2, ExternalLink, MessageSquare, Edit2, Trash2
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { exportToPDF } from "../../utils/pdfExport";
@@ -41,16 +44,23 @@ export default function CompanyDetails() {
     const [loading, setLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
     
-    // Remarks State
+    // Modals & State
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [newRemark, setNewRemark] = useState("");
     const [savingRemark, setSavingRemark] = useState(false);
+    const [users, setUsers] = useState([]);
 
     const fetchCompany = async (silent = false) => {
         if (!silent) setLoading(true);
         else setIsRefreshing(true);
         try {
-            const res = await getCompanyById(id);
-            setCompany(res.data.data);
+            const [companyRes, usersRes] = await Promise.all([
+                getCompanyById(id),
+                getTeamUsers()
+            ]);
+            setCompany(companyRes.data.data);
+            setUsers(usersRes.data.data || []);
         } catch (error) {
             console.error(error);
             toast.error("Failed to fetch company details");
@@ -85,6 +95,44 @@ export default function CompanyDetails() {
             setSavingRemark(false);
         }
     };
+
+    const handleSaveCompany = async (formData) => {
+        try {
+            await updateCompany(company._id, formData);
+            toast.success("Company updated successfully");
+            setIsEditModalOpen(false);
+            fetchCompany(true);
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to update company");
+            throw error;
+        }
+    };
+
+    const handleDeleteCompany = async () => {
+        try {
+            await deleteCompany(company._id);
+            toast.success("Company moved to archive");
+            setIsDeleteModalOpen(false);
+            navigate(`${basePath}/companies`);
+        } catch (error) {
+            toast.error("Failed to delete company");
+        }
+    };
+
+    const canEdit = (() => {
+        if (!currentUser || !company) return false;
+        const role = currentUser.role;
+        const ownerId = company.ownerId?._id || company.ownerId;
+        if (role === "admin") return true;
+        if (role === "sales_manager") {
+            const ownerManagerId = company.ownerId?.managerId?._id || company.ownerId?.managerId;
+            return ownerId === currentUser._id || ownerManagerId === currentUser._id;
+        }
+        if (role === "sales_rep") {
+            return ownerId === currentUser._id;
+        }
+        return false;
+    })();
 
     const getInitials = (name) => {
         if (!name) return "C";
@@ -152,6 +200,24 @@ export default function CompanyDetails() {
                         >
                             <Download size={16} className="text-gray-500" /> Export PDF
                         </button>
+                    )}
+                    {canEdit && (
+                        <div className="flex items-center gap-2 ml-2">
+                            <button
+                                onClick={() => setIsEditModalOpen(true)}
+                                title="Edit Company"
+                                className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-sm shadow-red-100 transition-all active:scale-[0.97]"
+                            >
+                                <Edit2 size={13} /> Edit
+                            </button>
+                            <button
+                                onClick={() => setIsDeleteModalOpen(true)}
+                                title="Delete Company"
+                                className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 rounded-xl transition-all active:scale-[0.97]"
+                            >
+                                <Trash2 size={13} /> Delete
+                            </button>
+                        </div>
                     )}
                 </div>
             </div>
@@ -346,6 +412,22 @@ export default function CompanyDetails() {
                 </div>
                 <span>Ref-ID: {company._id}</span>
             </div>
+
+            {/* Modals */}
+            <CompanyModal
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                company={company}
+                onSave={handleSaveCompany}
+                userRole={currentUser?.role}
+                potentialOwners={users}
+            />
+            <DeleteConfirmModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleDeleteCompany}
+                itemName={company?.name}
+            />
         </div>
     );
 }

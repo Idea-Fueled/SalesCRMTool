@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { getContactById, updateContact } from "../../../API/services/contactService";
+import { getContactById, updateContact, deleteContact } from "../../../API/services/contactService";
+import { getTeamUsers } from "../../../API/services/userService";
 import { useAuth } from "../../context/AuthContext";
+import ContactModal from "../../components/modals/ContactModal";
+import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
 import {
     User, Mail, Phone, Smartphone, Linkedin,
     Building2, Briefcase, Calendar, Clock,
     ArrowLeft, ChevronRight, Download, RotateCw,
     Maximize2, Star, Shield, List, History,
     MessageSquare, FileText, Paperclip, Loader2,
-    MapPin, Globe, ExternalLink, MoreHorizontal
+    MapPin, Globe, ExternalLink, MoreHorizontal, Edit2, Trash2
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { exportToPDF } from "../../utils/pdfExport";
@@ -43,16 +46,23 @@ export default function ContactDetails() {
     const [loading, setLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
     
-    // Remarks State
+    // Modals & State
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [newRemark, setNewRemark] = useState("");
     const [savingRemark, setSavingRemark] = useState(false);
+    const [users, setUsers] = useState([]);
 
     const fetchContact = async (silent = false) => {
         if (!silent) setLoading(true);
         else setIsRefreshing(true);
         try {
-            const res = await getContactById(id);
-            setContact(res.data.data);
+            const [contactRes, usersRes] = await Promise.all([
+                getContactById(id),
+                getTeamUsers()
+            ]);
+            setContact(contactRes.data.data);
+            setUsers(usersRes.data.data || []);
         } catch (error) {
             console.error(error);
             toast.error("Failed to fetch contact details");
@@ -87,6 +97,44 @@ export default function ContactDetails() {
             setSavingRemark(false);
         }
     };
+
+    const handleSaveContact = async (formData) => {
+        try {
+            await updateContact(contact._id, formData);
+            toast.success("Contact updated successfully");
+            setIsEditModalOpen(false);
+            fetchContact(true);
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to update contact");
+            throw error;
+        }
+    };
+
+    const handleDeleteContact = async () => {
+        try {
+            await deleteContact(contact._id);
+            toast.success("Contact moved to archive");
+            setIsDeleteModalOpen(false);
+            navigate(`${basePath}/contacts`);
+        } catch (error) {
+            toast.error("Failed to delete contact");
+        }
+    };
+
+    const canEdit = (() => {
+        if (!currentUser || !contact) return false;
+        const role = currentUser.role;
+        const ownerId = contact.ownerId?._id || contact.ownerId;
+        if (role === "admin") return true;
+        if (role === "sales_manager") {
+            const ownerManagerId = contact.ownerId?.managerId?._id || contact.ownerId?.managerId;
+            return ownerId === currentUser._id || ownerManagerId === currentUser._id;
+        }
+        if (role === "sales_rep") {
+            return ownerId === currentUser._id;
+        }
+        return false;
+    })();
 
     const getInitials = (firstName, lastName) => {
         return (
@@ -157,6 +205,24 @@ export default function ContactDetails() {
                         >
                             <Download size={16} className="text-gray-500" /> Export PDF
                         </button>
+                    )}
+                    {canEdit && (
+                        <div className="flex items-center gap-2 ml-2">
+                            <button
+                                onClick={() => setIsEditModalOpen(true)}
+                                title="Edit Contact"
+                                className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-sm shadow-red-100 transition-all active:scale-[0.97]"
+                            >
+                                <Edit2 size={13} /> Edit
+                            </button>
+                            <button
+                                onClick={() => setIsDeleteModalOpen(true)}
+                                title="Delete Contact"
+                                className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 rounded-xl transition-all active:scale-[0.97]"
+                            >
+                                <Trash2 size={13} /> Delete
+                            </button>
+                        </div>
                     )}
                 </div>
             </div>
@@ -310,6 +376,22 @@ export default function ContactDetails() {
                 </div>
                 <span>Ref: {contact._id}</span>
             </div>
+
+            {/* Modals */}
+            <ContactModal
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                contact={contact}
+                onSave={handleSaveContact}
+                userRole={currentUser?.role}
+                potentialOwners={users}
+            />
+            <DeleteConfirmModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleDeleteContact}
+                itemName={`${contact.firstName} ${contact.lastName}`}
+            />
         </div>
     );
 }
