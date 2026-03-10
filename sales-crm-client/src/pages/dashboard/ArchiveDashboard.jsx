@@ -9,6 +9,15 @@ import { getArchivedContacts, restoreContact } from "../../../API/services/conta
 import { getArchivedCompanies, restoreCompany } from "../../../API/services/companyService";
 import { toast } from "react-hot-toast";
 
+const formatCurrency = (amount) => {
+    if (amount === undefined || amount === null || amount === "") return "—";
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 0
+    }).format(amount);
+};
+
 
 
 export default function ArchiveDashboard() {
@@ -157,6 +166,11 @@ export default function ArchiveDashboard() {
                                                         {activeTab === 'companies' && <Building2 size={14} />}
                                                     </div>
                                                     <span className="font-bold text-gray-800 tracking-tight uppercase text-xs">{name}</span>
+                                                    {activeTab === 'companies' && item.revenueRange && (
+                                                        <span className="text-[10px] text-green-600 font-bold bg-green-50 px-1.5 py-0.5 rounded ml-1">
+                                                            {formatCurrency(item.revenueRange)}
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3 whitespace-nowrap">

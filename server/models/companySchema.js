@@ -37,8 +37,8 @@ const companySchema = new mongoose.Schema(
             trim: true
         },
         revenueRange: {
-            type: String,
-            trim: true
+            type: Number,
+            default: 0
         },
         notes: {
             type: String

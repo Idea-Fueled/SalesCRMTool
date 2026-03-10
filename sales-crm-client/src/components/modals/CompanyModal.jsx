@@ -118,9 +118,14 @@ export default function CompanyModal({ isOpen, onClose, company, onSave, userRol
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                        <label className="text-xs font-semibold text-gray-500 uppercase">Revenue Range</label>
-                        <input type="text" className={inputClass("revenueRange")} value={formData.revenueRange}
-                            onChange={e => set("revenueRange", e.target.value)} placeholder="$1M – $5M" />
+                        <label className="text-xs font-semibold text-gray-500 uppercase">Revenue Range (USD)</label>
+                        <input 
+                            type="number" 
+                            className={inputClass("revenueRange")} 
+                            value={formData.revenueRange}
+                            onChange={e => set("revenueRange", e.target.value)} 
+                            placeholder="5000000" 
+                        />
                     </div>
                     <div className="space-y-1">
                         <label className="text-xs font-semibold text-gray-500 uppercase">Phone</label>

@@ -22,6 +22,15 @@ export default function CompanyDetailsModal({ isOpen, onClose, company }) {
         });
     };
 
+    const formatCurrency = (amount) => {
+        if (amount === undefined || amount === null || amount === "") return "—";
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            maximumFractionDigits: 0
+        }).format(amount);
+    };
+
     const statusBadge = {
         Active: "bg-green-50 text-green-700 border-green-100",
         Inactive: "bg-red-50 text-red-600 border-red-100",
@@ -83,7 +92,7 @@ export default function CompanyDetailsModal({ isOpen, onClose, company }) {
                                     <span className="text-[10px] text-gray-400 italic">Company Size</span>
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-sm font-semibold text-gray-700">{company.revenueRange || "—"}</span>
+                                    <span className="text-sm font-semibold text-gray-700">{formatCurrency(company.revenueRange)}</span>
                                     <span className="text-[10px] text-gray-400 italic">Annual Revenue</span>
                                 </div>
                             </div>

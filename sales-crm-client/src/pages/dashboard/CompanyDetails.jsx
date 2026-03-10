@@ -36,6 +36,15 @@ const formatDate = (date, includeTime = false) => {
     return new Date(date).toLocaleString("en-IN", options);
 };
 
+const formatCurrency = (amount) => {
+    if (amount === undefined || amount === null || amount === "") return "Not Set";
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 0
+    }).format(amount);
+};
+
 export default function CompanyDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -255,7 +264,7 @@ export default function CompanyDetails() {
                                 <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
                                     <DollarSign size={10} className="text-green-500" /> Revenue Range
                                 </label>
-                                <p className="text-sm font-bold text-gray-900">{company.revenueRange || "Private information"}</p>
+                                <p className="text-sm font-bold text-gray-900">{formatCurrency(company.revenueRange)}</p>
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">

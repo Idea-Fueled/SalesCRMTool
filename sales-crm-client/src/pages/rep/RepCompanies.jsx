@@ -24,6 +24,15 @@ const statusBg = {
     Prospect: "bg-blue-100 text-blue-600",
 };
 
+const formatCurrency = (amount) => {
+    if (amount === undefined || amount === null || amount === "") return "—";
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 0
+    }).format(amount);
+};
+
 export default function RepCompanies() {
     const navigate = useNavigate();
     const [companies, setCompanies] = useState([]);
@@ -158,7 +167,7 @@ export default function RepCompanies() {
                                         <td className="px-4 py-3">
                                             <span className={`text-[11px] px-2.5 py-1 rounded-full font-bold ${statusBg[c.status] || "bg-gray-100 text-gray-600"}`}>{c.status}</span>
                                         </td>
-                                        <td className="px-4 py-3 text-gray-600">{c.revenueRange || "—"}</td>
+                                        <td className="px-4 py-3 text-gray-600 font-medium">{formatCurrency(c.revenueRange)}</td>
                                         <td className="px-4 py-3">
                                             <div className="flex items-center gap-2">
                                                 <button
