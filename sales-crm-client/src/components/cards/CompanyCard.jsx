@@ -80,11 +80,7 @@ const CompanyCard = ({ company, onEdit, onDelete, onView }) => {
                         {company.ownerId ? `${company.ownerId.firstName} ${company.ownerId.lastName || ""}` : "System"}
                     </span>
                 </div>
-                <div className="flex items-center gap-2">
-                    <Mail size={12} className="text-gray-400 hover:text-red-500 cursor-pointer" />
-                    <Phone size={12} className="text-gray-400 hover:text-red-500 cursor-pointer" />
-                    <ExternalLink size={12} className="text-gray-400 hover:text-red-500 cursor-pointer" />
-                </div>
+
             </div>
         </div>
     );
