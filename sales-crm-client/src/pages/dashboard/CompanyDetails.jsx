@@ -291,8 +291,8 @@ export default function CompanyDetails() {
                                 <div className="flex items-center gap-2 text-[10px] font-black text-red-500 uppercase tracking-[0.2em]">
                                     <FileText size={10} /> Operational Intel
                                 </div>
-                                <div className="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 text-[13px] text-gray-600 leading-relaxed italic whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto">
-                                    {company.notes || "No operational intelligence or interaction notes recorded for this organization yet."}
+                                <div className="p-4 bg-gray-50/50 rounded-2xl border border-gray-100 text-[13px] text-gray-800 leading-relaxed whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto">
+                                    {company.notes ? company.notes : <span className="text-gray-400 italic">No notes yet. Add a remark below.</span>}
                                 </div>
                                 
                                 {/* Add Remark Input */}
@@ -301,7 +301,7 @@ export default function CompanyDetails() {
                                         value={newRemark}
                                         onChange={(e) => setNewRemark(e.target.value)}
                                         placeholder="Type a new remark to append..."
-                                        className="w-full min-h-[80px] p-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-400 focus:bg-white transition resize-y"
+                                        className="w-full min-h-[80px] p-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-400 focus:bg-white transition resize-y font-normal text-gray-800"
                                     />
                                     <div className="flex justify-end">
                                         <button

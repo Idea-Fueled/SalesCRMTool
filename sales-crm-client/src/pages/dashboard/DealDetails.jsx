@@ -417,8 +417,8 @@ export default function DealDetails() {
                                 <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
                                     <FileText size={10} /> Interaction Notes
                                 </div>
-                                <div className="p-8 bg-gray-50/50 rounded-2xl border border-gray-100 text-[14px] text-gray-600 leading-relaxed italic whitespace-pre-wrap shadow-inner font-medium max-h-[300px] overflow-y-auto">
-                                    {deal.notes || "No interaction notes recorded for this deal node yet."}
+                                <div className="p-4 bg-gray-50/50 rounded-2xl border border-gray-100 text-[14px] text-gray-800 leading-relaxed whitespace-pre-wrap shadow-inner max-h-[400px] overflow-y-auto">
+                                    {deal.notes ? deal.notes : <span className="text-gray-400 italic">No notes yet. Add a remark below.</span>}
                                 </div>
                                 
                                 {/* Add Remark Input */}
@@ -427,7 +427,7 @@ export default function DealDetails() {
                                         value={newRemark}
                                         onChange={(e) => setNewRemark(e.target.value)}
                                         placeholder="Type a new remark to append..."
-                                        className="w-full min-h-[80px] p-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-400 focus:bg-white transition resize-y"
+                                        className="w-full min-h-[80px] p-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-400 focus:bg-white transition resize-y font-normal text-gray-800"
                                     />
                                     <div className="flex justify-end">
                                         <button
