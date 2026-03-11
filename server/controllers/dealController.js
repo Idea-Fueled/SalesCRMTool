@@ -31,8 +31,12 @@ export const createDeal = async (req, res, next) => {
         };
 
         // Handle File Uploads for Attachments
+        console.log(`Creating deal. Files received: ${req.files?.length || 0}`);
         if (req.files && req.files.length > 0) {
-            const uploadPromises = req.files.map(file => uploadToCloudinary(file, "deals/attachments"));
+            const uploadPromises = req.files.map(file => {
+                console.log(`Uploading file: ${file.originalname}`);
+                return uploadToCloudinary(file, "deals/attachments");
+            });
             const uploadedFiles = await Promise.all(uploadPromises);
             dealData.attachments = uploadedFiles.map(file => ({
                 ...file,
@@ -123,9 +127,13 @@ export const addRemark = async (req, res) => {
             return res.status(404).json({ message: "Deal not found!" });
         }
 
+        console.log(`Adding remark. Files received: ${req.files?.length || 0}`);
         let remarkFiles = [];
         if (req.files && req.files.length > 0) {
-            const uploadPromises = req.files.map(file => uploadToCloudinary(file, "deals/remarks"));
+            const uploadPromises = req.files.map(file => {
+                console.log(`Uploading remark file: ${file.originalname}`);
+                return uploadToCloudinary(file, "deals/remarks");
+            });
             remarkFiles = await Promise.all(uploadPromises);
         }
 

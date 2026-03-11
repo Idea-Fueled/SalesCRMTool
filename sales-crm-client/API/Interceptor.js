@@ -11,13 +11,18 @@ const getBaseURL = () => {
 
 const API = axios.create({
     baseURL: getBaseURL(),
-    headers: {
-        "Content-Type": "application/json"
-    },
     withCredentials: true
 })
 
 API.interceptors.request.use((config) => {
+    // If we're sending FormData, let axios set the Content-Type automatically with the boundary
+    if (config.data instanceof FormData) {
+        if (config.headers) {
+            delete config.headers["Content-Type"];
+        }
+    } else if (!config.headers["Content-Type"]) {
+        config.headers["Content-Type"] = "application/json";
+    }
     console.log("req sent");
     console.log("URL", config.baseURL + config.url);
     console.log("Method", config.method);

@@ -441,18 +441,26 @@ export default function DealDetails() {
                                                     {remark.text}
                                                 </div>
                                                 {remark.files && remark.files.length > 0 && (
-                                                    <div className="mt-3 flex flex-wrap gap-2">
-                                                        {remark.files.map((file, fIdx) => (
-                                                            <a
-                                                                key={fIdx}
-                                                                href={file.url}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="flex items-center gap-2 px-2 py-1 bg-white border border-gray-200 rounded-lg text-[10px] font-bold text-gray-600 hover:text-red-600 hover:border-red-200 transition-all shadow-sm"
-                                                            >
-                                                                <Paperclip size={10} /> {file.fileName}
-                                                            </a>
-                                                        ))}
+                                                    <div className="mt-4 pt-3 border-t border-gray-100 flex flex-col gap-2">
+                                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                                                            <Paperclip size={10} /> Attached Files ({remark.files.length})
+                                                        </span>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {remark.files.map((file, fIdx) => (
+                                                                <a
+                                                                    key={fIdx}
+                                                                    href={file.url}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="flex items-center gap-2 px-3 py-1.5 bg-white border border-red-100 rounded-xl text-[11px] font-bold text-gray-700 hover:text-red-600 hover:border-red-400 hover:shadow-md transition-all shadow-sm"
+                                                                >
+                                                                    <div className="w-6 h-6 rounded-lg bg-red-50 flex items-center justify-center text-red-500">
+                                                                        <Download size={12} />
+                                                                    </div>
+                                                                    <span>{file.fileName}</span>
+                                                                </a>
+                                                            ))}
+                                                        </div>
                                                     </div>
                                                 )}
                                             </div>
