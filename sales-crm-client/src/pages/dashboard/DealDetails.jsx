@@ -122,6 +122,17 @@ export default function DealDetails() {
         }
     };
 
+    const formatFileUrl = (url, fileType) => {
+        if (!url) return "#";
+        // If it's a Cloudinary URL and not an image, ensure fl_attachment is present
+        if (url.includes("cloudinary.com") && !fileType?.startsWith("image/")) {
+            if (!url.includes("fl_attachment")) {
+                return url.replace("/upload/", "/upload/fl_attachment/");
+            }
+        }
+        return url;
+    };
+
     const handleAddRemark = async () => {
         if (!newRemark.trim()) return;
         setSavingRemark(true);
@@ -449,7 +460,7 @@ export default function DealDetails() {
                                                             {remark.files.map((file, fIdx) => (
                                                                 <a
                                                                     key={fIdx}
-                                                                    href={file.url}
+                                                                    href={formatFileUrl(file.url, file.fileType)}
                                                                     download={file.fileName}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
@@ -560,7 +571,7 @@ export default function DealDetails() {
                                                         {deal.attachments.map((asset, aIdx) => (
                                                             <a
                                                                 key={`deal-asset-${aIdx}`}
-                                                                href={asset.url}
+                                                                href={formatFileUrl(asset.url, asset.fileType)}
                                                                 download={asset.fileName}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
@@ -575,7 +586,7 @@ export default function DealDetails() {
                                                             (remark.files || []).map((file, fIdx) => (
                                                                 <a
                                                                     key={`remark-asset-${fIdx}`}
-                                                                    href={file.url}
+                                                                    href={formatFileUrl(file.url, file.fileType)}
                                                                     download={file.fileName}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"

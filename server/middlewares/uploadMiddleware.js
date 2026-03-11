@@ -18,13 +18,11 @@ export const uploadToCloudinary = async (file, folder = "deals") => {
     console.log("Config API Key:", cloudinary.config().api_key ? "Present" : "Missing");
     console.log("Config API Secret:", cloudinary.config().api_secret ? "Present" : "Missing");
 
-    const isImage = file.mimetype.startsWith("image/");
-    
     return new Promise((resolve, reject) => {
         const uploadOptions = {
             folder,
-            resource_type: isImage ? "image" : "raw",
-            flags: "attachment", // Force download headers to avoid browser rendering errors
+            resource_type: "auto",
+            content_disposition: `attachment; filename="${file.originalname}"`,
             timestamp: Math.round(new Date().getTime() / 1000)
         };
 
@@ -35,8 +33,15 @@ export const uploadToCloudinary = async (file, folder = "deals") => {
                     console.error("Cloudinary Upload Error:", error);
                     return reject(error);
                 }
+                
+                // For PDFs and other files, let's ensure the URL has the download flag
+                let finalUrl = result.secure_url;
+                if (!result.secure_url.includes("fl_attachment") && !file.mimetype.startsWith("image/")) {
+                    finalUrl = result.secure_url.replace("/upload/", "/upload/fl_attachment/");
+                }
+
                 resolve({
-                    url: result.secure_url,
+                    url: finalUrl,
                     publicId: result.public_id,
                     fileName: file.originalname,
                     fileType: file.mimetype,
