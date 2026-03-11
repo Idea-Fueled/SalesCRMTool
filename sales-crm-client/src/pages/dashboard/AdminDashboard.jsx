@@ -55,6 +55,7 @@ export default function AdminDashboard() {
     const [modalConfig, setModalConfig] = useState({ isOpen: false, category: null, data: [] });
     const [selectedMonth, setSelectedMonth] = useState("");
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+    const navigate = useNavigate();
 
     const fetchStats = async () => {
         try {
