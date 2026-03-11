@@ -173,7 +173,7 @@ export default function ManagerCompanies() {
                                 {loading && companies.length === 0 ? (
                                     <tr><td colSpan={7} className="text-center py-10 text-gray-400">Loading companies...</td></tr>
                                 ) : companies.length === 0 ? (
-                                    <tr><td colSpan={7} className="text-center py-10 text-gray-400">No companies found for your team.</td></tr>
+                                    <tr><td colSpan={7} className="text-center py-20 text-gray-400 font-medium italic">no companies found</td></tr>
                                 ) : (
                                     companies.map((c) => (
                                         <tr key={c._id} className="hover:bg-gray-50/50 transition-colors group">
@@ -222,7 +222,7 @@ export default function ManagerCompanies() {
                         {loading && companies.length === 0 ? (
                             <div className="col-span-full text-center py-10 text-gray-400">Loading companies...</div>
                         ) : companies.length === 0 ? (
-                            <div className="col-span-full text-center py-10 text-gray-400">No companies found for your team.</div>
+                            <div className="col-span-full text-center py-20 text-gray-400 font-medium italic">no companies found</div>
                         ) : (
                             companies.map((c) => (
                                 <CompanyCard

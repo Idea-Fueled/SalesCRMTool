@@ -194,6 +194,8 @@ export default function CompaniesDashboard() {
                                     <tbody className="divide-y divide-gray-50">
                                         {loading && companies.length === 0 ? (
                                             <tr><td colSpan={5} className="text-center py-10 text-gray-400">Loading companies...</td></tr>
+                                        ) : companies.length === 0 ? (
+                                            <tr><td colSpan={5} className="text-center py-20 text-gray-400 font-medium italic">no companies found</td></tr>
                                         ) : (
                                             companies.map((c) => (
                                                 <tr key={c._id} className="hover:bg-gray-50/50 transition-colors group">
@@ -232,6 +234,8 @@ export default function CompaniesDashboard() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                                     {loading && companies.length === 0 ? (
                                         <div className="col-span-full text-center py-10 text-gray-400">Loading companies...</div>
+                                    ) : companies.length === 0 ? (
+                                        <div className="col-span-full text-center py-20 text-gray-400 font-medium uppercase tracking-widest text-xs">no companies found</div>
                                     ) : (
                                         companies.map((c) => (
                                             <CompanyCard

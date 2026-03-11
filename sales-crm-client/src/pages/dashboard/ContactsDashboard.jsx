@@ -210,7 +210,9 @@ export default function ContactsDashboard() {
                                     </thead>
                                     <tbody className="divide-y divide-gray-50">
                                         {loading && contacts.length === 0 ? (
-                                            <tr><td colSpan={4} className="text-center py-10 text-gray-400">Loading contacts...</td></tr>
+                                            <tr><td colSpan={5} className="text-center py-10 text-gray-400">Loading contacts...</td></tr>
+                                        ) : contacts.length === 0 ? (
+                                            <tr><td colSpan={5} className="text-center py-20 text-gray-400 font-medium italic">no contacts found</td></tr>
                                         ) : (
                                             contacts.map((c) => (
                                                 <tr key={c._id} className="hover:bg-gray-50/50 transition-colors group">
@@ -267,6 +269,8 @@ export default function ContactsDashboard() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                                     {loading && contacts.length === 0 ? (
                                         <div className="col-span-full text-center py-10 text-gray-400">Loading contacts...</div>
+                                    ) : contacts.length === 0 ? (
+                                        <div className="col-span-full text-center py-20 text-gray-400 font-medium uppercase tracking-widest text-xs">no contacts found</div>
                                     ) : (
                                         contacts.map((c) => (
                                             <ContactCard

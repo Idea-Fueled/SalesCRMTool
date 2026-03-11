@@ -178,7 +178,7 @@ export default function RepContacts() {
                                 {loading && contacts.length === 0 ? (
                                     <tr><td colSpan={6} className="text-center py-10 text-gray-400">Loading contacts...</td></tr>
                                 ) : contacts.length === 0 ? (
-                                    <tr><td colSpan={6} className="text-center py-10 text-gray-400">No contacts found.</td></tr>
+                                    <tr><td colSpan={6} className="text-center py-20 text-gray-400 font-medium italic">no contacts found</td></tr>
                                 ) : (
                                     contacts.map((c) => (
                                         <tr key={c._id} className="hover:bg-gray-50/50 transition-colors group">
@@ -242,7 +242,7 @@ export default function RepContacts() {
                             {loading && contacts.length === 0 ? (
                                 <div className="col-span-full text-center py-10 text-gray-400">Loading contacts...</div>
                             ) : contacts.length === 0 ? (
-                                <div className="col-span-full text-center py-10 text-gray-400">No contacts found.</div>
+                                <div className="col-span-full text-center py-20 text-gray-400 font-medium italic">no contacts found</div>
                             ) : (
                                 contacts.map((c) => (
                                     <ContactCard

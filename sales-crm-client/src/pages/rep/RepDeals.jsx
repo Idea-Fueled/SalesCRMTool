@@ -226,7 +226,7 @@ export default function RepDeals() {
                         {loading && deals.length === 0 ? (
                             <div className="col-span-full text-center py-10 text-gray-400">Loading deals...</div>
                         ) : deals.length === 0 ? (
-                            <div className="col-span-full text-center py-10 text-gray-400">No deals found.</div>
+                            <div className="col-span-full text-center py-20 text-gray-400 font-medium italic">no deals found</div>
                         ) : (
                             deals.map((d) => (
                                 <DealCard
@@ -261,7 +261,7 @@ export default function RepDeals() {
                                 {loading && deals.length === 0 ? (
                                     <tr><td colSpan={7} className="text-center py-10 text-gray-400">Loading deals...</td></tr>
                                 ) : deals.length === 0 ? (
-                                    <tr><td colSpan={7} className="text-center py-10 text-gray-400">No deals found.</td></tr>
+                                    <tr><td colSpan={7} className="text-center py-20 text-gray-400 font-medium italic">no deals found</td></tr>
                                 ) : (
                                     deals.map((d) => (
                                         <tr key={d._id} className="hover:bg-gray-50/50 transition-colors group">
