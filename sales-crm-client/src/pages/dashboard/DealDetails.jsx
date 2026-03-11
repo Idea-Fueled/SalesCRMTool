@@ -132,10 +132,11 @@ export default function DealDetails() {
             
             const res = await addRemark(deal._id, formData);
             
-            // Refresh logic and reset
+            // Refresh logical state
+            const updatedRemarks = Array.isArray(deal.remarks) ? [...deal.remarks, res.data.data] : [res.data.data];
             setDeal(prev => ({ 
                 ...prev, 
-                remarks: [...(prev.remarks || []), res.data.data] 
+                remarks: updatedRemarks 
             }));
             setNewRemark("");
             setRemarkFiles([]);
@@ -541,23 +542,42 @@ export default function DealDetails() {
                                                 <div className="flex items-center gap-2">
                                                     <Paperclip size={14} className="text-gray-300" />
                                                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">
-                                                        {deal.attachments?.length || 0} Assets Uploaded
+                                                        {(deal.attachments?.length || 0) + (deal.remarks?.reduce((acc, r) => acc + (r.files?.length || 0), 0) || 0)} Assets identified
                                                     </span>
                                                 </div>
                                                 {deal.attachments && deal.attachments.length > 0 && (
                                                     <div className="space-y-1.5 mt-1">
+                                                        {/* Deal Attachments */}
                                                         {deal.attachments.map((asset, aIdx) => (
                                                             <a
-                                                                key={aIdx}
+                                                                key={`deal-asset-${aIdx}`}
                                                                 href={asset.url}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="flex items-center justify-between p-2 bg-white border border-gray-100 rounded text-[9px] font-bold text-gray-600 hover:text-red-600 hover:border-red-200 transition-all"
                                                             >
-                                                                <span className="truncate max-w-[150px]">{asset.fileName}</span>
+                                                                <span className="truncate max-w-[140px]">{asset.fileName}</span>
                                                                 <Download size={10} className="text-gray-300" />
                                                             </a>
                                                         ))}
+                                                        {/* Remark Attachments */}
+                                                        {deal.remarks && Array.isArray(deal.remarks) && deal.remarks.map((remark) => 
+                                                            (remark.files || []).map((file, fIdx) => (
+                                                                <a
+                                                                    key={`remark-asset-${fIdx}`}
+                                                                    href={file.url}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="flex items-center justify-between p-2 bg-blue-50/50 border border-blue-100 rounded text-[9px] font-bold text-gray-600 hover:text-blue-600 hover:border-blue-200 transition-all"
+                                                                >
+                                                                    <span className="truncate max-w-[140px]">{file.fileName}</span>
+                                                                    <div className="flex items-center gap-1">
+                                                                        <MessageSquare size={8} className="text-blue-300" />
+                                                                        <Download size={10} className="text-blue-300" />
+                                                                    </div>
+                                                                </a>
+                                                            ))
+                                                        )}
                                                     </div>
                                                 )}
                                             </div>
