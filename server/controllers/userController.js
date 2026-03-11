@@ -10,6 +10,7 @@ import crypto from "crypto";
 import { sendEmail } from "../utils/sendEmail.js";
 import { getIO } from "../utils/socket.js";
 import { notifyReassignment } from "../services/notificationService.js";
+import { uploadToCloudinary } from "../middlewares/uploadMiddleware.js";
 
 export const registerUser = async (req, res, next) => {
     try {
@@ -239,7 +240,8 @@ export const loginUser = async (req, res, next) => {
                 lastName: user.lastName,
                 email: user.email,
                 role: user.role,
-                lastLogin
+                lastLogin,
+                profilePicture: user.profilePicture
             }
         })
 
@@ -269,7 +271,8 @@ export const getProfile = async (req, res, next) => {
                 role: user.role,
                 managerId: user.managerId,
                 isActive: user.isActive,
-                lastLogin: user.lastLogin
+                lastLogin: user.lastLogin,
+                profilePicture: user.profilePicture
             }
         })
     } catch (error) {
@@ -1000,5 +1003,38 @@ export const resendInvitation = async (req, res) => {
         res.status(200).json({ message: "Invitation link resent successfully!" });
     } catch (error) {
         res.status(500).json({ message: error.message || "Server error resending invitation." });
+    }
+};
+
+export const uploadProfilePicture = async (req, res) => {
+    try {
+        const { id } = req.user;
+        const file = req.file;
+
+        if (!file) {
+            return res.status(400).json({ message: "No image file provided." });
+        }
+
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found!" });
+        }
+
+        // Use our existing Cloudinary upload service since Multer is using memoryStorage
+        const uploadResult = await uploadToCloudinary(file, "profiles");
+
+        user.profilePicture = uploadResult.url; 
+        await user.save();
+
+        res.status(200).json({
+            message: "Profile picture updated successfully!",
+            data: {
+                profilePicture: user.profilePicture
+            }
+        });
+
+    } catch (error) {
+        console.error("❌ Error uploading profile picture:", error);
+        res.status(500).json({ message: error.message || "Server error uploading picture." });
     }
 };

@@ -9,6 +9,7 @@ import { useAuth } from "../context/AuthContext";
 import GlobalSearch from "./GlobalSearch";
 import LogoutConfirmModal from "./LogoutConfirmModal";
 import NotificationDropdown from "./NotificationDropdown";
+import MyProfileModal from "./modals/MyProfileModal";
 
 
 const SidebarLink = ({ to, icon: IconComp, label, badge, onClick, end }) => (
@@ -41,6 +42,7 @@ const DashboardLayout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 1024);
     const [searchOpen, setSearchOpen] = useState(false);
     const [showLogout, setShowLogout] = useState(false);
+    const [profileModalOpen, setProfileModalOpen] = useState(false);
 
     const initials = user ? `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase() : "A";
 
@@ -162,10 +164,17 @@ const DashboardLayout = () => {
                         <NotificationDropdown />
                     </div>
                     <div className="flex items-center gap-2 sm:gap-3 sm:pl-3 sm:border-l border-gray-100">
-                        <div className="relative flex-shrink-0">
-                            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-red-500 to-orange-400 flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-sm">{initials}</div>
+                        <button 
+                            onClick={() => setProfileModalOpen(true)}
+                            className="relative flex-shrink-0 cursor-pointer focus:outline-none hover:opacity-90 transition-opacity"
+                        >
+                            {user?.profilePicture ? (
+                                <img src={user.profilePicture} alt="Profile" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover shadow-sm border-2 border-transparent hover:border-red-200 transition-colors" />
+                            ) : (
+                                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-red-500 to-orange-400 flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-sm">{initials}</div>
+                            )}
                             <span className="absolute bottom-0 right-0 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-green-500 border-2 border-white rounded-full" />
-                        </div>
+                        </button>
                         <div className="hidden sm:block min-w-0">
                             <p className="text-sm font-bold text-gray-800">{user ? `${user.firstName} ${user.lastName}` : "ADMIN"}</p>
                             <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">
@@ -195,6 +204,10 @@ const DashboardLayout = () => {
                 isOpen={showLogout}
                 onClose={() => setShowLogout(false)}
                 onConfirm={() => { logout(); navigate("/login"); }}
+            />
+            <MyProfileModal 
+                isOpen={profileModalOpen} 
+                onClose={() => setProfileModalOpen(false)} 
             />
         </div>
     );
