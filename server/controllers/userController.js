@@ -230,18 +230,22 @@ export const loginUser = async (req, res, next) => {
         })
 
         const lastLogin = new Date();
-        await User.findByIdAndUpdate(user._id, { lastLogin });
+        const updatedUser = await User.findByIdAndUpdate(user._id, { lastLogin }, { new: true })
+            .populate("managerId", "firstName lastName");
 
         res.status(200).json({
             message: "User logged in successfully!",
             data: {
-                id: user._id,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                role: user.role,
-                lastLogin,
-                profilePicture: user.profilePicture
+                id: updatedUser._id,
+                firstName: updatedUser.firstName,
+                lastName: updatedUser.lastName,
+                email: updatedUser.email,
+                role: updatedUser.role,
+                managerId: updatedUser.managerId,
+                isActive: updatedUser.isActive,
+                lastLogin: updatedUser.lastLogin,
+                createdAt: updatedUser.createdAt,
+                profilePicture: updatedUser.profilePicture
             }
         })
 
@@ -254,7 +258,7 @@ export const loginUser = async (req, res, next) => {
 
 export const getProfile = async (req, res, next) => {
     try {
-        const user = await User.findById(req.user.id);
+        const user = await User.findById(req.user.id).populate("managerId", "firstName lastName");
         if (!user) {
             return res.status(404).json({
                 message: "User does not exists!"
@@ -272,6 +276,7 @@ export const getProfile = async (req, res, next) => {
                 managerId: user.managerId,
                 isActive: user.isActive,
                 lastLogin: user.lastLogin,
+                createdAt: user.createdAt,
                 profilePicture: user.profilePicture
             }
         })
