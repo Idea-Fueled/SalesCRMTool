@@ -4,13 +4,9 @@ export const getContacts = async (params = {}) => {
     return API.get("/contacts", { params });
 };
 
-export const createContact = async (contactData) => {
-    return API.post("/contacts/create", contactData);
-};
-
-export const updateContact = async (id, contactData) => {
-    return API.put(`/contacts/update/${id}`, contactData);
-};
+export const createContact = (data) => API.post("/contacts/create", data);
+export const updateContact = (id, data) => API.put(`/contacts/update/${id}`, data);
+export const addRemark = (id, data) => API.post(`/contacts/${id}/add-remark`, data);
 
 export const deleteContact = async (id) => {
     return API.delete(`/contacts/delete/${id}`);

@@ -1,6 +1,7 @@
 import { Company } from "../models/companySchema.js";
 import User from "../models/userSchema.js";
 import { logAction } from "../utils/auditLogger.js";
+import { uploadToCloudinary } from "../middlewares/uploadMiddleware.js";
 
 export const createCompany = async (req, res) => {
     try {
@@ -25,7 +26,7 @@ export const createCompany = async (req, res) => {
             });
         }
 
-        const company = await Company.create({
+        let companyData = {
             name,
             industry,
             size,
@@ -36,8 +37,21 @@ export const createCompany = async (req, res) => {
             phone,
             revenueRange,
             notes,
-            ownerId: (role === "admin" || role === "sales_manager") && req.body.ownerId && req.body.ownerId.trim() !== "" ? req.body.ownerId : req.user.id
-        });
+            ownerId: (role === "admin" || role === "sales_manager") && req.body.ownerId && req.body.ownerId.trim() !== "" ? req.body.ownerId : req.user.id,
+            attachments: []
+        };
+
+        // Handle File Uploads
+        if (req.files && req.files.length > 0) {
+            const uploadPromises = req.files.map(file => uploadToCloudinary(file, "companies/attachments"));
+            const uploadedFiles = await Promise.all(uploadPromises);
+            companyData.attachments = uploadedFiles.map(file => ({
+                ...file,
+                uploadedBy: req.user.id
+            }));
+        }
+
+        const company = await Company.create(companyData);
 
         res.status(201).json({
             message: "Company created successfully!",
@@ -178,6 +192,28 @@ export const updateCompany = async (req, res) => {
                 company[field] = value;
             }
         });
+
+        // Handle legacy remarks migration
+        if (req.body.remarks !== undefined && typeof req.body.remarks === "string") {
+            const authorName = `${req.user.firstName} ${req.user.lastName || ""}`.trim();
+            company.remarks.push({
+                text: req.body.remarks,
+                author: userId,
+                authorName,
+                createdAt: new Date()
+            });
+        }
+
+        // Handle File Uploads for Attachments
+        if (req.files && req.files.length > 0) {
+            const uploadPromises = req.files.map(file => uploadToCloudinary(file, "companies/attachments"));
+            const uploadedFiles = await Promise.all(uploadPromises);
+            const newAttachments = uploadedFiles.map(file => ({
+                ...file,
+                uploadedBy: userId
+            }));
+            company.attachments.push(...newAttachments);
+        }
 
         await company.save();
 
@@ -398,6 +434,56 @@ export const restoreCompany = async (req, res) => {
             details: { message: `Company "${company.name}" restored from trash.` },
             req
         });
+    } catch (error) {
+        res.status(500).json({ message: error.message || "Server error!" });
+    }
+};
+
+export const addRemark = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { text } = req.body;
+        const { id: userId, firstName, lastName } = req.user;
+
+        if (!text) {
+            return res.status(400).json({ message: "Remark text is required!" });
+        }
+
+        const company = await Company.findById(id);
+        if (!company) {
+            return res.status(404).json({ message: "Company not found!" });
+        }
+
+        let remarkFiles = [];
+        if (req.files && req.files.length > 0) {
+            const uploadPromises = req.files.map(file => uploadToCloudinary(file, "companies/remarks"));
+            remarkFiles = await Promise.all(uploadPromises);
+        }
+
+        const authorName = `${firstName} ${lastName || ""}`.trim();
+        const newRemark = {
+            text,
+            files: remarkFiles,
+            author: userId,
+            authorName,
+            createdAt: new Date()
+        };
+
+        company.remarks.push(newRemark);
+        await company.save();
+
+        res.status(200).json({ message: "Remark added successfully!", data: newRemark });
+
+        // Log action
+        await logAction({
+            entityType: "Company",
+            entityId: id,
+            action: "UPDATE",
+            performedBy: userId,
+            details: { message: "Added a new remark", remark: newRemark },
+            req
+        });
+
     } catch (error) {
         res.status(500).json({ message: error.message || "Server error!" });
     }

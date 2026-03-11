@@ -96,13 +96,7 @@ export default function DealDetails() {
         if (!currentUser || !deal) return false;
         const role = currentUser.role;
         const ownerId = deal.ownerId?._id || deal.ownerId;
-        if (role === "admin") return true;
-        if (role === "sales_manager") {
-            // Manager can edit their own deals or their team's deals
-            const ownerManagerId = deal.ownerId?.managerId?._id || deal.ownerId?.managerId;
-            const currentUserId = currentUser._id || currentUser.id;
-            return ownerId === currentUserId || ownerManagerId === currentUserId;
-        }
+        if (role === "admin" || role === "sales_manager") return true;
         if (role === "sales_rep") {
             return ownerId === (currentUser._id || currentUser.id);
         }

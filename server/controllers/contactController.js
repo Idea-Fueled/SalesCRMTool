@@ -2,6 +2,7 @@ import { Company } from "../models/companySchema.js";
 import { Contact } from "../models/contactSchema.js";
 import User from "../models/userSchema.js";
 import { logAction } from "../utils/auditLogger.js";
+import { uploadToCloudinary } from "../middlewares/uploadMiddleware.js";
 
 export const createContact = async (req, res, next) => {
     try {
@@ -48,7 +49,7 @@ export const createContact = async (req, res, next) => {
             }
         }
 
-        const contact = await Contact.create({
+        let contactData = {
             firstName,
             lastName,
             email,
@@ -59,8 +60,21 @@ export const createContact = async (req, res, next) => {
             phone,
             mobile,
             linkedin,
-            notes
-        })
+            notes,
+            attachments: []
+        };
+
+        // Handle File Uploads
+        if (req.files && req.files.length > 0) {
+            const uploadPromises = req.files.map(file => uploadToCloudinary(file, "contacts/attachments"));
+            const uploadedFiles = await Promise.all(uploadPromises);
+            contactData.attachments = uploadedFiles.map(file => ({
+                ...file,
+                uploadedBy: id
+            }));
+        }
+
+        const contact = await Contact.create(contactData);
 
         res.status(201).json({
             message: "Contact created successfully!",
@@ -199,6 +213,28 @@ export const updateContact = async (req, res, next) => {
                 contact[field] = value;
             }
         });
+
+        // Handle legacy remarks migration
+        if (req.body.remarks !== undefined && typeof req.body.remarks === "string") {
+            const authorName = `${req.user.firstName} ${req.user.lastName || ""}`.trim();
+            contact.remarks.push({
+                text: req.body.remarks,
+                author: userId,
+                authorName,
+                createdAt: new Date()
+            });
+        }
+
+        // Handle File Uploads for Attachments
+        if (req.files && req.files.length > 0) {
+            const uploadPromises = req.files.map(file => uploadToCloudinary(file, "contacts/attachments"));
+            const uploadedFiles = await Promise.all(uploadPromises);
+            const newAttachments = uploadedFiles.map(file => ({
+                ...file,
+                uploadedBy: userId
+            }));
+            contact.attachments.push(...newAttachments);
+        }
 
         await contact.save();
 
@@ -363,6 +399,56 @@ export const restoreContact = async (req, res) => {
             details: { message: `Contact "${contact.firstName} ${contact.lastName}" restored from trash.` },
             req
         });
+    } catch (error) {
+        res.status(500).json({ message: error.message || "Server error!" });
+    }
+};
+
+export const addRemark = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { text } = req.body;
+        const { id: userId, firstName, lastName } = req.user;
+
+        if (!text) {
+            return res.status(400).json({ message: "Remark text is required!" });
+        }
+
+        const contact = await Contact.findById(id);
+        if (!contact) {
+            return res.status(404).json({ message: "Contact not found!" });
+        }
+
+        let remarkFiles = [];
+        if (req.files && req.files.length > 0) {
+            const uploadPromises = req.files.map(file => uploadToCloudinary(file, "contacts/remarks"));
+            remarkFiles = await Promise.all(uploadPromises);
+        }
+
+        const authorName = `${firstName} ${lastName || ""}`.trim();
+        const newRemark = {
+            text,
+            files: remarkFiles,
+            author: userId,
+            authorName,
+            createdAt: new Date()
+        };
+
+        contact.remarks.push(newRemark);
+        await contact.save();
+
+        res.status(200).json({ message: "Remark added successfully!", data: newRemark });
+
+        // Log action
+        await logAction({
+            entityType: "Contact",
+            entityId: id,
+            action: "UPDATE",
+            performedBy: userId,
+            details: { message: "Added a new remark", remark: newRemark },
+            req
+        });
+
     } catch (error) {
         res.status(500).json({ message: error.message || "Server error!" });
     }

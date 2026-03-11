@@ -4,13 +4,9 @@ export const getCompanies = async (params = {}) => {
     return API.get("/companies", { params });
 };
 
-export const createCompany = async (companyData) => {
-    return API.post("/companies/create", companyData);
-};
-
-export const updateCompany = async (id, companyData) => {
-    return API.put(`/companies/${id}`, companyData);
-};
+export const createCompany = (data) => API.post("/companies/create", data);
+export const updateCompany = (id, data) => API.put(`/companies/${id}`, data);
+export const addRemark = (id, data) => API.post(`/companies/${id}/add-remark`, data);
 
 export const deleteCompany = async (id) => {
     return API.delete(`/companies/${id}`);

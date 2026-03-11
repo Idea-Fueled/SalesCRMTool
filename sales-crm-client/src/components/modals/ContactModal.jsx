@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Paperclip, X } from "lucide-react";
 import Modal from "./Modal";
 
 export default function ContactModal({ isOpen, onClose, contact, onSave, companies = [], userRole, potentialOwners = [] }) {
@@ -7,7 +8,8 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
 
     const [formData, setFormData] = useState({
         firstName: "", lastName: "", email: "", jobTitle: "",
-        companyId: "", companyName: "", phone: "", mobile: "", linkedin: "", notes: "", ownerId: ""
+        companyId: "", companyName: "", phone: "", mobile: "", linkedin: "", notes: "", ownerId: "",
+        files: []
     });
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
@@ -26,10 +28,11 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
                 mobile: contact.mobile || "",
                 linkedin: contact.linkedin || "",
                 notes: contact.notes || "",
-                ownerId: contact.ownerId?._id || contact.ownerId || ""
+                ownerId: contact.ownerId?._id || contact.ownerId || "",
+                files: []
             });
         } else {
-            setFormData({ firstName: "", lastName: "", email: "", jobTitle: "", companyId: "", companyName: "", phone: "", mobile: "", linkedin: "", notes: "", ownerId: "" });
+            setFormData({ firstName: "", lastName: "", email: "", jobTitle: "", companyId: "", companyName: "", phone: "", mobile: "", linkedin: "", notes: "", ownerId: "", files: [] });
         }
         setErrors({});
     }, [contact, isOpen]);
@@ -60,9 +63,14 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
         if (Object.keys(errs).length > 0) { setErrors(errs); return; }
         setLoading(true);
         try {
-            const dataToSave = { ...formData };
-            if (dataToSave.companyId === "") dataToSave.companyId = null;
-            if (dataToSave.ownerId === "") dataToSave.ownerId = null;
+            const dataToSave = new FormData();
+            Object.keys(formData).forEach(key => {
+                if (key === 'files') {
+                    formData.files.forEach(file => dataToSave.append('files', file));
+                } else if (formData[key] !== null && formData[key] !== "") {
+                    dataToSave.append(key, formData[key]);
+                }
+            });
             await onSave(dataToSave);
             onClose();
         } catch (error) {
@@ -179,6 +187,39 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
                     <textarea className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-400 h-20"
                         value={formData.notes} onChange={e => set("notes", e.target.value)}
                         placeholder="Additional details..." />
+                </div>
+
+                {/* File Attachments */}
+                <div className="space-y-2 pt-2 border-t border-gray-100">
+                    <label className="text-xs font-semibold text-gray-500 uppercase flex items-center gap-1.5">
+                        <Paperclip size={12} className="text-gray-400" /> Attachments
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                        {formData.files.map((file, idx) => (
+                            <div key={idx} className="flex items-center gap-2 bg-gray-50 px-2 py-1 rounded-lg border border-gray-200 text-[11px] text-gray-600">
+                                <span className="max-w-[150px] truncate">{file.name}</span>
+                                <button
+                                    type="button"
+                                    onClick={() => set("files", formData.files.filter((_, i) => i !== idx))}
+                                    className="text-gray-400 hover:text-red-500"
+                                >
+                                    <X size={12} />
+                                </button>
+                            </div>
+                        ))}
+                        <label className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-dashed border-gray-300 rounded-lg text-[11px] font-bold text-gray-500 hover:border-red-400 hover:text-red-600 cursor-pointer transition-all">
+                            <Paperclip size={12} /> Add Files
+                            <input
+                                type="file"
+                                multiple
+                                className="hidden"
+                                onChange={(e) => {
+                                    const newFiles = Array.from(e.target.files);
+                                    set("files", [...formData.files, ...newFiles]);
+                                }}
+                            />
+                        </label>
+                    </div>
                 </div>
 
                 {/* Owner field - visible to Admin/Manager */}

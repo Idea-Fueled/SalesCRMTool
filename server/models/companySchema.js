@@ -43,9 +43,44 @@ const companySchema = new mongoose.Schema(
         notes: {
             type: String
         },
-        remarks: {
-            type: String
-        },
+        remarks: [
+            {
+                text: String,
+                files: [
+                    {
+                        url: String,
+                        publicId: String,
+                        fileName: String,
+                        fileType: String
+                    }
+                ],
+                author: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "User"
+                },
+                authorName: String,
+                createdAt: {
+                    type: Date,
+                    default: Date.now
+                }
+            }
+        ],
+        attachments: [
+            {
+                url: String,
+                publicId: String,
+                fileName: String,
+                fileType: String,
+                uploadedBy: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "User"
+                },
+                uploadedAt: {
+                    type: Date,
+                    default: Date.now
+                }
+            }
+        ],
         ownerId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",

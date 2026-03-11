@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { getCompanyById, updateCompany, deleteCompany } from "../../../API/services/companyService";
+import { getCompanyById, updateCompany, deleteCompany, addRemark as addCompanyRemark } from "../../../API/services/companyService";
 import { getTeamUsers } from "../../../API/services/userService";
 import { useAuth } from "../../context/AuthContext";
 import CompanyModal from "../../components/modals/CompanyModal";
@@ -10,7 +10,7 @@ import {
     Mail, Briefcase, Calendar, Clock, ArrowLeft,
     ChevronRight, Download, RotateCw, Maximize2,
     Star, Layers, Users, Target, Info, DollarSign,
-    MoreHorizontal, List, FileText, Paperclip,
+    MoreHorizontal, List, FileText, Paperclip, X,
     Loader2, ExternalLink, MessageSquare, Edit2, Trash2
 } from "lucide-react";
 import toast from "react-hot-toast";
@@ -45,6 +45,21 @@ const formatCurrency = (amount) => {
     }).format(amount);
 };
 
+const formatFileUrl = (url) => {
+    if (!url) return "";
+    if (url.toLowerCase().endsWith('.pdf') || 
+        url.toLowerCase().endsWith('.doc') || 
+        url.toLowerCase().endsWith('.docx') || 
+        url.toLowerCase().endsWith('.xls') || 
+        url.toLowerCase().endsWith('.xlsx') ||
+        url.toLowerCase().endsWith('.zip')) {
+        if (url.includes('/upload/')) {
+            return url.replace('/upload/', '/upload/fl_attachment/');
+        }
+    }
+    return url;
+};
+
 export default function CompanyDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -57,6 +72,7 @@ export default function CompanyDetails() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [newRemark, setNewRemark] = useState("");
+    const [remarkFiles, setRemarkFiles] = useState([]);
     const [savingRemark, setSavingRemark] = useState(false);
     const [users, setUsers] = useState([]);
 
@@ -84,19 +100,24 @@ export default function CompanyDetails() {
     }, [id]);
 
     const handleAddRemark = async () => {
-        if (!newRemark.trim()) return;
+        if (!newRemark.trim() && remarkFiles.length === 0) return;
         setSavingRemark(true);
         try {
-            const timestamp = formatDate(new Date(), true);
-            const author = `${currentUser?.firstName || "Unknown"} ${currentUser?.lastName || ""}`.trim();
-            const remarkEntry = `\n\n[${timestamp}] Added by ${author}\n${newRemark.trim()}`;
+            const formData = new FormData();
+            formData.append("text", newRemark.trim());
+            remarkFiles.forEach(file => {
+                formData.append("files", file);
+            });
+
+            const res = await addCompanyRemark(company._id, formData);
             
-            const updatedRemarks = (company.remarks || "").trim() + remarkEntry;
+            setCompany(prev => ({
+                ...prev,
+                remarks: [...(Array.isArray(prev.remarks) ? prev.remarks : []), res.data.data]
+            }));
             
-            await updateCompany(company._id, { remarks: updatedRemarks });
-            
-            setCompany(prev => ({ ...prev, remarks: updatedRemarks }));
             setNewRemark("");
+            setRemarkFiles([]);
             toast.success("Remark added successfully");
         } catch (err) {
             toast.error(err?.response?.data?.message || "Failed to add remark");
@@ -133,11 +154,7 @@ export default function CompanyDetails() {
         const role = currentUser.role;
         const ownerId = company.ownerId?._id || company.ownerId;
         const currentUserId = currentUser._id || currentUser.id;
-        if (role === "admin") return true;
-        if (role === "sales_manager") {
-            const ownerManagerId = company.ownerId?.managerId?._id || company.ownerId?.managerId;
-            return ownerId === currentUserId || ownerManagerId === currentUserId;
-        }
+        if (role === "admin" || role === "sales_manager") return true;
         if (role === "sales_rep") {
             return ownerId === currentUserId;
         }
@@ -355,44 +372,116 @@ export default function CompanyDetails() {
 
                         <div className="p-8 space-y-8">
                             {/* Narratives/Intel */}
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-2 text-[10px] font-black text-red-500 uppercase tracking-[0.2em]">
-                                    <MessageSquare size={10} /> Add New Remark
+                            <div className="space-y-6">
+                                <div className="flex items-center gap-2 text-[10px] font-black text-red-500 uppercase tracking-[0.2em] mb-4">
+                                    <MessageSquare size={10} /> Internal Intel & Threads
                                 </div>
-                                <div className="p-4 bg-gray-50/50 rounded-2xl border border-gray-100 text-[13px] text-gray-800 leading-relaxed whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto">
-                                    {company.remarks ? (
-                                        company.remarks.split('\n').map((line, i) => {
-                                            const isHeader = line.trim().match(/^-*\s*\[.*?\] Added by .*?-*$/);
-                                            if (isHeader) {
-                                                return <span key={i} className="block text-[11px] text-gray-400 mt-4 mb-1">{line.replace(/-/g, '').trim()}</span>;
-                                            }
-                                            return <span key={i} className="block min-h-[1rem]">{line}</span>;
-                                        })
+                                
+                                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                                    {Array.isArray(company.remarks) && company.remarks.length > 0 ? (
+                                        company.remarks.map((remark, idx) => (
+                                            <div key={idx} className="group relative bg-gray-50/50 rounded-2xl p-4 border border-gray-100/50 hover:bg-white hover:shadow-md transition-all duration-300">
+                                                <div className="flex items-start justify-between mb-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center text-[10px] font-bold text-red-600 border border-red-200 uppercase">
+                                                            {remark.authorName?.[0] || 'U'}
+                                                        </div>
+                                                        <div>
+                                                            <span className="text-xs font-black text-gray-900">{remark.authorName}</span>
+                                                            <span className="text-[10px] text-gray-400 font-bold ml-2 uppercase tracking-tighter">
+                                                                {formatDate(remark.createdAt, true)}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p className="text-sm text-gray-700 leading-relaxed font-medium">
+                                                    {remark.text}
+                                                </p>
+                                                
+                                                {/* Attachments within Remark */}
+                                                {remark.files && remark.files.length > 0 && (
+                                                    <div className="mt-3 flex flex-wrap gap-2 border-t border-gray-100 pt-3">
+                                                        {remark.files.map((file, fIdx) => (
+                                                            <a
+                                                                key={fIdx}
+                                                                href={formatFileUrl(file.url)}
+                                                                download={file.fileName}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-bold text-gray-600 hover:border-red-400 hover:text-red-600 transition-all shadow-sm"
+                                                            >
+                                                                <Paperclip size={10} />
+                                                                <span className="max-w-[120px] truncate">{file.fileName}</span>
+                                                                <Download size={10} className="ml-1 opacity-40" />
+                                                            </a>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))
                                     ) : (
-                                        <span className="text-gray-400 italic">No remarks yet. Add a remark below.</span>
+                                        <div className="text-center py-10 bg-gray-50/30 rounded-2xl border border-dashed border-gray-200">
+                                            <MessageSquare size={24} className="mx-auto text-gray-300 mb-2 opacity-20" />
+                                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest italic">No chronological threads yet</p>
+                                        </div>
                                     )}
                                 </div>
                                 
                                 {/* Add Remark Input */}
-                                <div className="mt-4 pt-4 border-t border-gray-50 flex flex-col gap-3 no-print">
-                                    <textarea
-                                        value={newRemark}
-                                        onChange={(e) => setNewRemark(e.target.value)}
-                                        placeholder="Type a new remark to append..."
-                                        className="w-full min-h-[80px] p-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-400 focus:bg-white transition resize-y font-normal text-gray-800"
-                                    />
-                                    <div className="flex justify-end">
-                                        <button
-                                            onClick={handleAddRemark}
-                                            disabled={savingRemark || !newRemark.trim()}
-                                            className="px-4 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-sm shadow-red-200 transition-all disabled:opacity-50 flex items-center gap-2"
-                                        >
-                                            {savingRemark ? (
-                                                <><Loader2 size={12} className="animate-spin" /> Saving...</>
-                                            ) : (
-                                                <><MessageSquare size={12} /> Add Remark</>
-                                            )}
-                                        </button>
+                                <div className="mt-8 pt-6 border-t border-gray-100 no-print">
+                                    <div className="relative">
+                                        <textarea
+                                            value={newRemark}
+                                            onChange={(e) => setNewRemark(e.target.value)}
+                                            placeholder="Append strategy or update thread..."
+                                            className="w-full min-h-[100px] p-4 text-sm bg-gray-50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-red-50 focus:border-red-400 focus:bg-white transition-all resize-none font-medium text-gray-800 shadow-inner"
+                                        />
+                                        
+                                        {/* Attachment Preview in Remark Input */}
+                                        {remarkFiles.length > 0 && (
+                                            <div className="mt-2 flex flex-wrap gap-2 px-1">
+                                                {remarkFiles.map((file, idx) => (
+                                                    <div key={idx} className="flex items-center gap-2 bg-red-50 px-2 py-1 rounded-lg border border-red-100 text-[10px] font-bold text-red-600 animate-in fade-in zoom-in duration-200">
+                                                        <Paperclip size={10} />
+                                                        <span className="max-w-[100px] truncate">{file.name}</span>
+                                                        <button 
+                                                            onClick={() => setRemarkFiles(prev => prev.filter((_, i) => i !== idx))}
+                                                            className="hover:text-red-800 transition-colors"
+                                                        >
+                                                            <X size={10} />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                        
+                                        <div className="mt-4 flex items-center justify-between">
+                                            <label className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-[11px] font-black text-gray-500 hover:border-red-400 hover:text-red-600 cursor-pointer transition-all shadow-sm active:scale-95 group">
+                                                <Paperclip size={14} className="group-hover:rotate-12 transition-transform" />
+                                                <span>{remarkFiles.length > 0 ? "Add More" : "Attach Intel"}</span>
+                                                <input
+                                                    type="file"
+                                                    multiple
+                                                    className="hidden"
+                                                    onChange={(e) => {
+                                                        const files = Array.from(e.target.files);
+                                                        setRemarkFiles(prev => [...prev, ...files]);
+                                                    }}
+                                                />
+                                            </label>
+                                            
+                                            <button
+                                                onClick={handleAddRemark}
+                                                disabled={savingRemark || (!newRemark.trim() && remarkFiles.length === 0)}
+                                                className="px-6 py-2.5 text-xs font-black text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-lg shadow-red-100 transition-all disabled:opacity-50 flex items-center gap-2 active:scale-95"
+                                            >
+                                                {savingRemark ? (
+                                                    <><Loader2 size={14} className="animate-spin" /> Committing...</>
+                                                ) : (
+                                                    <><MessageSquare size={14} /> Commit Remark</>
+                                                )}
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -400,14 +489,83 @@ export default function CompanyDetails() {
 
                             {/* Cross-Linking Stats */}
                             <div className="pt-8 grid grid-cols-2 gap-4">
-                                <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-50/50 border border-gray-100/50">
-                                    <Target size={14} className="text-gray-300" />
-                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">0 Opportunities Open</span>
+                                <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-50/50 border border-gray-100/50 hover:bg-white transition-all cursor-default">
+                                    <Target size={14} className="text-red-400" />
+                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Target Ops: 0 Open</span>
                                 </div>
-                                <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-50/50 border border-gray-100/50">
-                                    <Users size={14} className="text-gray-300" />
-                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Multiple Stakeholders Linked</span>
+                                <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-50/50 border border-gray-100/50 hover:bg-white transition-all cursor-default">
+                                    <Users size={14} className="text-blue-400" />
+                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Stakeholders Linked</span>
                                 </div>
+                            </div>
+
+                            {/* Digital Assets & Documentation */}
+                            <div className="pt-8 border-t border-gray-100">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="text-xs font-black text-gray-900 uppercase tracking-[0.2em] flex items-center gap-2">
+                                        <Layers size={14} className="text-red-500" /> Digital Assets & Dossiers
+                                    </h3>
+                                    <span className="px-3 py-1 bg-gray-100 text-[10px] font-black text-gray-500 rounded-full uppercase tracking-tighter">
+                                        {((company.attachments?.length || 0) + (company.remarks?.reduce((acc, r) => acc + (r.files?.length || 0), 0) || 0))} Secure Files
+                                    </span>
+                                </div>
+                                
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    {/* Main Company Attachments */}
+                                    {company.attachments && company.attachments.length > 0 && company.attachments.map((file, idx) => (
+                                        <a
+                                            key={`main-${idx}`}
+                                            href={formatFileUrl(file.url)}
+                                            download={file.fileName}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="group flex items-center gap-3 p-4 bg-white border border-gray-100 rounded-2xl hover:border-red-400 hover:shadow-md transition-all duration-300 active:scale-95"
+                                        >
+                                            <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
+                                                <FileText size={18} />
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-xs font-black text-gray-900 truncate mb-0.5">{file.fileName}</p>
+                                                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter flex items-center gap-1">
+                                                    <Calendar size={8} /> {formatDate(file.uploadedAt)}
+                                                </p>
+                                            </div>
+                                            <Download size={14} className="text-gray-300 group-hover:text-red-600 transition-colors" />
+                                        </a>
+                                    ))}
+                                    
+                                    {/* Remark-level Attachments also listed here for global view */}
+                                    {company.remarks && company.remarks.some(r => r.files && r.files.length > 0) && 
+                                        company.remarks.flatMap((r, rIdx) => (r.files || []).map((file, fIdx) => (
+                                            <a
+                                                key={`rem-${rIdx}-${fIdx}`}
+                                                href={formatFileUrl(file.url)}
+                                                download={file.fileName}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="group flex items-center gap-3 p-4 bg-gray-50/30 border border-gray-100 rounded-2xl hover:border-red-400 hover:bg-white hover:shadow-md transition-all duration-300 active:scale-95"
+                                            >
+                                                <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-red-600 group-hover:text-white transition-colors">
+                                                    <Paperclip size={18} />
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="text-xs font-black text-gray-900 truncate mb-0.5">{file.fileName}</p>
+                                                    <p className="text-[9px] font-bold text-red-400 uppercase tracking-tighter flex items-center gap-1">
+                                                        <MessageSquare size={8} /> Linked to Intel
+                                                    </p>
+                                                </div>
+                                                <Download size={14} className="text-gray-300 group-hover:text-red-600 transition-colors" />
+                                            </a>
+                                        )))
+                                    }
+                                </div>
+                                
+                                {(!company.attachments || company.attachments.length === 0) && (!company.remarks || !company.remarks.some(r => r.files && r.files.length > 0)) && (
+                                    <div className="py-12 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200 text-center">
+                                        <Layers size={32} className="mx-auto text-gray-200 mb-3 opacity-30" />
+                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">No Digital Dossiers Available</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
