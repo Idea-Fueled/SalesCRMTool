@@ -541,21 +541,26 @@ export default function DealDetails() {
                             </div>
 
                             {/* Internal Metadata */}
-                            <div className="pt-8 border-t border-gray-50">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-4">
-                                        <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">System Metadata</h4>
-                                        <div className="space-y-3">
-                                            <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50/50 border border-gray-100">
-                                                <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-tighter">Object ID</span>
-                                                <span className="text-[10px] font-mono font-semibold text-gray-500">{deal._id}</span>
-                                            </div>
-                                            <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50/50 border border-gray-100">
-                                                <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-tighter">Schema Sync</span>
-                                                <span className="text-[10px] font-bold text-green-600/80 uppercase">Synchronized</span>
+                            {currentUser?.role === 'Admin' && (
+                                <div className="pt-8 border-t border-gray-50">
+                                    <div className="grid grid-cols-2 gap-6">
+                                        <div className="space-y-4">
+                                            <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">System Metadata</h4>
+                                            <div className="space-y-3">
+                                                <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50/50 border border-gray-100">
+                                                    <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-tighter">Object ID</span>
+                                                    <span className="text-[10px] font-mono font-semibold text-gray-500">{deal._id}</span>
+                                                </div>
+                                                <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50/50 border border-gray-100">
+                                                    <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-tighter">Schema Sync</span>
+                                                    <span className="text-[10px] font-bold text-green-600/80 uppercase">Synchronized</span>
+                                                </div>
                                             </div>
                                         </div>
+                                        {/* You can add more admin-only tools here */}
                                     </div>
+                                </div>
+                            )}
                             {/* Digital Assets Section */}
                             <div className="pt-8 border-t border-gray-100">
                                 <div className="flex items-center justify-between mb-6">

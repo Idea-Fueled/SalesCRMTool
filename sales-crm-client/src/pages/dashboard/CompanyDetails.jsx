@@ -578,8 +578,10 @@ export default function CompanyDetails() {
                 <div className="flex items-center gap-6">
                     <span className="flex items-center gap-1.5"><Calendar size={12} className="text-gray-300" /> Registry Datestamp: {formatDate(company.createdAt)}</span>
                     <span className="flex items-center gap-1.5"><Clock size={12} className="text-gray-300" /> Last System Update: {formatDate(company.updatedAt)}</span>
+                    {currentUser?.role === 'Admin' && (
+                        <span className="flex items-center gap-1.5 text-gray-300 border-l border-gray-100 pl-6">Ref-ID: {company._id}</span>
+                    )}
                 </div>
-                <span>Ref-ID: {company._id}</span>
             </div>
 
             {/* Modals */}
