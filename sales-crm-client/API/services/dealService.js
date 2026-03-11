@@ -14,7 +14,7 @@ export const updateDeal = async (id, dealData) => {
 };
 
 export const addRemark = async (id, remarkData) => {
-    return API.post(`/deals/${id}/remark`, remarkData);
+    return API.post(`/deals/${id}/add-remark`, remarkData);
 };
 
 export const deleteDeal = async (id) => {
