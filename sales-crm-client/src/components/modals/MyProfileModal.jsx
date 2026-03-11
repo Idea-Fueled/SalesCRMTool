@@ -66,7 +66,7 @@ export default function MyProfileModal({ isOpen, onClose }) {
 
         setUploading(true);
         try {
-            const response = await API.put("/users/profile/picture", formData, {
+            const response = await API.put("/auth/profile/picture", formData, {
                 headers: { "Content-Type": "multipart/form-data" }
             });
             
