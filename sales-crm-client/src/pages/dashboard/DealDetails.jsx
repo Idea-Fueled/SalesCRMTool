@@ -450,6 +450,7 @@ export default function DealDetails() {
                                                                 <a
                                                                     key={fIdx}
                                                                     href={file.url}
+                                                                    download={file.fileName}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
                                                                     className="flex items-center gap-2 px-3 py-1.5 bg-white border border-red-100 rounded-xl text-[11px] font-bold text-gray-700 hover:text-red-600 hover:border-red-400 hover:shadow-md transition-all shadow-sm"
@@ -560,6 +561,7 @@ export default function DealDetails() {
                                                             <a
                                                                 key={`deal-asset-${aIdx}`}
                                                                 href={asset.url}
+                                                                download={asset.fileName}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="flex items-center justify-between p-2 bg-white border border-gray-100 rounded text-[9px] font-bold text-gray-600 hover:text-red-600 hover:border-red-200 transition-all"
@@ -574,6 +576,7 @@ export default function DealDetails() {
                                                                 <a
                                                                     key={`remark-asset-${fIdx}`}
                                                                     href={file.url}
+                                                                    download={file.fileName}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
                                                                     className="flex items-center justify-between p-2 bg-blue-50/50 border border-blue-100 rounded text-[9px] font-bold text-gray-600 hover:text-blue-600 hover:border-blue-200 transition-all"
