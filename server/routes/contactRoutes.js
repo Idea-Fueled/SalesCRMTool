@@ -1,7 +1,7 @@
 import express from "express";
 import { protect } from "../middlewares/authMiddleware.js";
 import { createContact, getContacts, getContactById, updateContact, deleteContact, getArchivedContacts, restoreContact, addRemark } from "../controllers/contactController.js";
-import upload from "../middlewares/uploadMiddleware.js";
+import { upload } from "../middlewares/uploadMiddleware.js";
 
 const router = express.Router();
 
