@@ -540,95 +540,96 @@ export default function DealDetails() {
                                 </div>
                             </div>
 
-                            {/* Internal Metadata */}
-                            {currentUser?.role === 'Admin' && (
-                                <div className="pt-8 border-t border-gray-50">
-                                    <div className="grid grid-cols-2 gap-6">
-                                        <div className="space-y-4">
-                                            <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">System Metadata</h4>
-                                            <div className="space-y-3">
-                                                <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50/50 border border-gray-100">
-                                                    <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-tighter">Object ID</span>
-                                                    <span className="text-[10px] font-mono font-semibold text-gray-500">{deal._id}</span>
+                            {/* Technical & Digital Assets Unified Section */}
+                            <div className="pt-8 border-t border-gray-100">
+                                <div className={`grid gap-8 ${currentUser?.role === 'Admin' ? 'grid-cols-1 lg:grid-cols-12' : 'grid-cols-1'}`}>
+                                    {/* System Metadata - Admin Visibility Only */}
+                                    {currentUser?.role === 'Admin' && (
+                                        <div className="lg:col-span-5 space-y-4">
+                                            <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                                                <Info size={14} className="text-blue-500" /> System Metadata
+                                            </h3>
+                                            <div className="grid grid-cols-1 gap-3">
+                                                <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50/50 border border-gray-100">
+                                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Object ID</span>
+                                                    <span className="text-[10px] font-mono font-bold text-gray-500">{deal._id}</span>
                                                 </div>
-                                                <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50/50 border border-gray-100">
-                                                    <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-tighter">Schema Sync</span>
+                                                <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50/50 border border-gray-100">
+                                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Schema Sync</span>
                                                     <span className="text-[10px] font-bold text-green-600/80 uppercase">Synchronized</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        {/* You can add more admin-only tools here */}
-                                    </div>
-                                </div>
-                            )}
-                            {/* Digital Assets Section */}
-                            <div className="pt-8 border-t border-gray-100">
-                                <div className="flex items-center justify-between mb-6">
-                                    <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2">
-                                        <Layers size={14} className="text-red-500" /> Digital Assets
-                                    </h3>
-                                    <span className="px-3 py-1 bg-gray-50 text-[10px] font-bold text-gray-500 rounded-full border border-gray-100 uppercase tracking-tighter">
-                                        {((deal.attachments?.length || 0) + (deal.remarks?.reduce((acc, r) => acc + (r.files?.length || 0), 0) || 0))} Files
-                                    </span>
-                                </div>
-                                
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    {/* Main Deal Attachments */}
-                                    {deal.attachments && deal.attachments.length > 0 && deal.attachments.map((file, idx) => (
-                                        <a
-                                            key={`main-${idx}`}
-                                            href={formatFileUrl(file.url)}
-                                            download={file.fileName}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="group flex items-center gap-3 p-4 bg-white border border-gray-100 rounded-2xl hover:border-red-400 hover:shadow-md transition-all duration-300 active:scale-95"
-                                        >
-                                            <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
-                                                <FileText size={18} />
+                                    )}
+
+                                    {/* Digital Assets Section */}
+                                    <div className={`${currentUser?.role === 'Admin' ? 'lg:col-span-7' : 'col-span-1'} space-y-4`}>
+                                        <div className="flex items-center justify-between mb-2">
+                                            <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2">
+                                                <Layers size={14} className="text-red-500" /> Digital Assets
+                                            </h3>
+                                            <span className="px-3 py-1 bg-gray-50 text-[10px] font-bold text-gray-500 rounded-full border border-gray-100 uppercase tracking-tighter">
+                                                {((deal.attachments?.length || 0) + (deal.remarks?.reduce((acc, r) => acc + (r.files?.length || 0), 0) || 0))} Files
+                                            </span>
+                                        </div>
+                                        
+                                        <div className={`grid gap-3 ${currentUser?.role === 'Admin' ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
+                                            {/* Main Deal Attachments */}
+                                            {deal.attachments && deal.attachments.length > 0 && deal.attachments.map((file, idx) => (
+                                                <a
+                                                    key={`main-${idx}`}
+                                                    href={formatFileUrl(file.url)}
+                                                    download={file.fileName}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="group flex items-center gap-3 p-3.5 bg-white border border-gray-100 rounded-xl hover:border-red-400 hover:shadow-md transition-all duration-300 active:scale-95"
+                                                >
+                                                    <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
+                                                        <FileText size={16} />
+                                                    </div>
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="text-xs font-bold text-gray-900 truncate">{file.fileName}</p>
+                                                        <p className="text-[8px] font-medium text-gray-400 uppercase tracking-tighter flex items-center gap-1">
+                                                            <Calendar size={8} /> {formatDate(file.uploadedAt)}
+                                                        </p>
+                                                    </div>
+                                                    <Download size={14} className="text-gray-300 group-hover:text-red-600 transition-colors" />
+                                                </a>
+                                            ))}
+                                            
+                                            {/* Remark-level Attachments */}
+                                            {deal.remarks && deal.remarks.some(r => r.files && r.files.length > 0) && 
+                                                deal.remarks.flatMap((r, rIdx) => (r.files || []).map((file, fIdx) => (
+                                                    <a
+                                                        key={`rem-${rIdx}-${fIdx}`}
+                                                        href={formatFileUrl(file.url)}
+                                                        download={file.fileName}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="group flex items-center gap-3 p-3.5 bg-gray-50/30 border border-gray-100 rounded-xl hover:border-red-400 hover:bg-white hover:shadow-md transition-all duration-300 active:scale-95"
+                                                    >
+                                                        <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-red-600 group-hover:text-white transition-colors">
+                                                            <Paperclip size={16} />
+                                                        </div>
+                                                        <div className="min-w-0 flex-1">
+                                                            <p className="text-xs font-bold text-gray-900 truncate">{file.fileName}</p>
+                                                            <p className="text-[8px] font-medium text-red-600 uppercase tracking-tighter flex items-center gap-1">
+                                                                <MessageSquare size={8} /> Linked
+                                                            </p>
+                                                        </div>
+                                                        <Download size={14} className="text-gray-300 group-hover:text-red-600 transition-colors" />
+                                                    </a>
+                                                )))
+                                            }
+                                        </div>
+                                        
+                                        {(!deal.attachments || deal.attachments.length === 0) && (!deal.remarks || !deal.remarks.some(r => r.files && r.files.length > 0)) && (
+                                            <div className="py-8 bg-gray-50/50 rounded-xl border border-dashed border-gray-200 text-center">
+                                                <Layers size={24} className="mx-auto text-gray-300 mb-2 opacity-30" />
+                                                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest italic">No files available</p>
                                             </div>
-                                            <div className="min-w-0 flex-1">
-                                                <p className="text-xs font-bold text-gray-900 truncate mb-0.5">{file.fileName}</p>
-                                                <p className="text-[9px] font-medium text-gray-400 uppercase tracking-tighter flex items-center gap-1">
-                                                    <Calendar size={8} /> {formatDate(file.uploadedAt)}
-                                                </p>
-                                            </div>
-                                            <Download size={14} className="text-gray-300 group-hover:text-red-600 transition-colors" />
-                                        </a>
-                                    ))}
-                                    
-                                    {/* Remark-level Attachments */}
-                                    {deal.remarks && deal.remarks.some(r => r.files && r.files.length > 0) && 
-                                        deal.remarks.flatMap((r, rIdx) => (r.files || []).map((file, fIdx) => (
-                                            <a
-                                                key={`rem-${rIdx}-${fIdx}`}
-                                                href={formatFileUrl(file.url)}
-                                                download={file.fileName}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="group flex items-center gap-3 p-4 bg-gray-50/30 border border-gray-100 rounded-2xl hover:border-red-400 hover:bg-white hover:shadow-md transition-all duration-300 active:scale-95"
-                                            >
-                                                <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-red-600 group-hover:text-white transition-colors">
-                                                    <Paperclip size={18} />
-                                                </div>
-                                                <div className="min-w-0 flex-1">
-                                                    <p className="text-xs font-bold text-gray-900 truncate mb-0.5">{file.fileName}</p>
-                                                    <p className="text-[9px] font-medium text-red-500 uppercase tracking-tighter flex items-center gap-1">
-                                                        <MessageSquare size={8} /> Linked to Intel
-                                                    </p>
-                                                </div>
-                                                <Download size={14} className="text-gray-300 group-hover:text-red-600 transition-colors" />
-                                            </a>
-                                        )))
-                                    }
-                                </div>
-                                
-                                {(!deal.attachments || deal.attachments.length === 0) && (!deal.remarks || !deal.remarks.some(r => r.files && r.files.length > 0)) && (
-                                    <div className="py-12 bg-gray-50/50 rounded-xl border border-dashed border-gray-200 text-center">
-                                        <Layers size={32} className="mx-auto text-gray-300 mb-3 opacity-30" />
-                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest italic">No files available</p>
+                                        )}
                                     </div>
-                                )}
-                            </div>
                                 </div>
                             </div>
                         </div>
