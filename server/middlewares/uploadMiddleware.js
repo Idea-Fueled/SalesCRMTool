@@ -11,14 +11,27 @@ export const upload = multer({
 });
 
 export const uploadToCloudinary = async (file, folder = "deals") => {
+    console.log("--- Cloudinary Upload Debug ---");
+    console.log("Current Server Time:", new Date().toString());
+    console.log("Current Timestamp (s):", Math.round(new Date().getTime() / 1000));
+    console.log("Config Cloud Name:", cloudinary.config().cloud_name);
+    console.log("Config API Key:", cloudinary.config().api_key ? "Present" : "Missing");
+    console.log("Config API Secret:", cloudinary.config().api_secret ? "Present" : "Missing");
+
     return new Promise((resolve, reject) => {
+        const uploadOptions = {
+            folder,
+            resource_type: "auto",
+            timestamp: Math.round(new Date().getTime() / 1000)
+        };
+
         const uploadStream = cloudinary.uploader.upload_stream(
-            {
-                folder,
-                resource_type: "auto",
-            },
+            uploadOptions,
             (error, result) => {
-                if (error) return reject(error);
+                if (error) {
+                    console.error("Cloudinary Upload Error:", error);
+                    return reject(error);
+                }
                 resolve({
                     url: result.secure_url,
                     publicId: result.public_id,
