@@ -153,13 +153,8 @@ const SalesRepLayout = () => {
 
                 <main className="flex-1 overflow-y-auto"><Outlet /></main>
 
-                <footer className="h-auto py-4 sm:h-10 sm:py-0 bg-white border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between px-6 text-[10px] sm:text-xs text-gray-400 flex-shrink-0 gap-2 sm:gap-0">
+                <footer className="h-auto py-4 sm:h-10 sm:py-0 bg-white border-t border-gray-100 flex items-center justify-center px-6 text-[10px] sm:text-xs text-gray-400 flex-shrink-0">
                     <span>Copyright &copy; <span className="text-red-500 font-medium">mbdConsulting</span></span>
-                    <div className="flex gap-4">
-                        <span className="hover:text-gray-600 cursor-pointer">About</span>
-                        <span className="hover:text-gray-600 cursor-pointer">Terms</span>
-                        <span className="hover:text-gray-600 cursor-pointer">Contact Us</span>
-                    </div>
                 </footer>
             </div>
 
