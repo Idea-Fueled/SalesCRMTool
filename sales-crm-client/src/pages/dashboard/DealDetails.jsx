@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { getDealById, updateDeal, deleteDeal } from "../../../API/services/dealService";
+import { getDealById, updateDeal, deleteDeal, addRemark } from "../../../API/services/dealService";
 import { getCompanies } from "../../../API/services/companyService";
 import { getContacts } from "../../../API/services/contactService";
 import { getTeamUsers } from "../../../API/services/userService";
@@ -57,6 +57,7 @@ export default function DealDetails() {
     
     // Remarks State
     const [newRemark, setNewRemark] = useState("");
+    const [remarkFiles, setRemarkFiles] = useState([]);
     const [savingRemark, setSavingRemark] = useState(false);
 
     const fetchDealData = async (silent = false) => {
@@ -125,17 +126,19 @@ export default function DealDetails() {
         if (!newRemark.trim()) return;
         setSavingRemark(true);
         try {
-            const timestamp = formatDate(new Date(), true);
-            const author = `${currentUser?.firstName || "Unknown"} ${currentUser?.lastName || ""}`.trim();
-            const remarkEntry = `\n\n[${timestamp}] Added by ${author}\n${newRemark.trim()}`;
+            const formData = new FormData();
+            formData.append("text", newRemark.trim());
+            remarkFiles.forEach(file => formData.append("files", file));
             
-            const updatedRemarks = (deal.remarks || "").trim() + remarkEntry;
-            
-            await updateDeal(deal._id, { remarks: updatedRemarks });
+            const res = await addRemark(deal._id, formData);
             
             // Refresh logic and reset
-            setDeal(prev => ({ ...prev, remarks: updatedRemarks }));
+            setDeal(prev => ({ 
+                ...prev, 
+                remarks: [...(prev.remarks || []), res.data.data] 
+            }));
             setNewRemark("");
+            setRemarkFiles([]);
             toast.success("Remark added successfully");
         } catch (err) {
             toast.error(err?.response?.data?.message || "Failed to add remark");
@@ -424,41 +427,91 @@ export default function DealDetails() {
                         <div className="p-8 space-y-8">
                             {/* Narratives/Notes */}
                             <div className="space-y-4">
-                                <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
-                                    <MessageSquare size={10} /> Add New Remark
-                                </div>
-                                <div className="p-4 bg-gray-50/50 rounded-2xl border border-gray-100 text-[13px] text-gray-800 leading-relaxed whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto">
-                                    {deal.remarks ? (
-                                        deal.remarks.split('\n').map((line, i) => {
-                                            const isHeader = line.trim().match(/^-*\s*\[.*?\] Added by .*?-*$/);
-                                            if (isHeader) {
-                                                return <span key={i} className="block text-[11px] text-gray-400 mt-4 mb-1">{line.replace(/-/g, '').trim()}</span>;
-                                            }
-                                            return <span key={i} className="block min-h-[1rem]">{line}</span>;
-                                        })
+                                <div className="space-y-4 max-h-[500px] overflow-y-auto px-1">
+                                    {deal.remarks && Array.isArray(deal.remarks) && deal.remarks.length > 0 ? (
+                                        deal.remarks.map((remark, i) => (
+                                            <div key={i} className="p-4 bg-gray-50/50 rounded-2xl border border-gray-100 shadow-inner">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-tight">
+                                                        [{formatDate(remark.createdAt, true)}] Added by {remark.authorName || "Unknown"}
+                                                    </span>
+                                                </div>
+                                                <div className="text-[13px] text-gray-800 leading-relaxed whitespace-pre-wrap">
+                                                    {remark.text}
+                                                </div>
+                                                {remark.files && remark.files.length > 0 && (
+                                                    <div className="mt-3 flex flex-wrap gap-2">
+                                                        {remark.files.map((file, fIdx) => (
+                                                            <a
+                                                                key={fIdx}
+                                                                href={file.url}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="flex items-center gap-2 px-2 py-1 bg-white border border-gray-200 rounded-lg text-[10px] font-bold text-gray-600 hover:text-red-600 hover:border-red-200 transition-all shadow-sm"
+                                                            >
+                                                                <Paperclip size={10} /> {file.fileName}
+                                                            </a>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))
                                     ) : (
-                                        <span className="text-gray-400 italic">No remarks yet. Add a remark below.</span>
+                                        <div className="p-4 text-center text-gray-400 italic bg-gray-50/30 rounded-xl border border-dashed border-gray-200 whitespace-pre-wrap">
+                                            {typeof deal.remarks === 'string' ? deal.remarks : "No remarks yet. Add a remark below."}
+                                        </div>
                                     )}
                                 </div>
                                 
                                 {/* Add Remark Input */}
-                                <div className="mt-4 pt-4 border-t border-gray-50 flex flex-col gap-3 no-print">
+                                <div className="mt-6 pt-6 border-t border-gray-100 flex flex-col gap-4 no-print">
+                                    <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                                        <MessageSquare size={10} /> Add New Remark
+                                    </div>
                                     <textarea
                                         value={newRemark}
                                         onChange={(e) => setNewRemark(e.target.value)}
                                         placeholder="Type a new remark to append..."
-                                        className="w-full min-h-[80px] p-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-400 focus:bg-white transition resize-y font-normal text-gray-800"
+                                        className="w-full min-h-[100px] p-4 text-sm bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-red-400 focus:bg-white transition resize-y font-normal text-gray-800 shadow-inner"
                                     />
+                                    
+                                    {/* Remark File Upload */}
+                                    <div className="flex flex-wrap gap-2">
+                                        {remarkFiles.map((file, idx) => (
+                                            <div key={idx} className="flex items-center gap-2 bg-red-50 px-2 py-1 rounded-lg border border-red-100 text-[10px] font-bold text-red-700">
+                                                <span className="max-w-[150px] truncate">{file.name}</span>
+                                                <button
+                                                    onClick={() => setRemarkFiles(prev => prev.filter((_, i) => i !== idx))}
+                                                    className="hover:text-red-900"
+                                                >
+                                                    <X size={12} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                        <label className="flex items-center gap-2 px-3 py-1.5 bg-white border border-dashed border-gray-300 rounded-xl text-[10px] font-black text-gray-400 hover:border-red-400 hover:text-red-600 cursor-pointer transition-all uppercase tracking-widest">
+                                            <Paperclip size={12} /> Attach Files
+                                            <input
+                                                type="file"
+                                                multiple
+                                                className="hidden"
+                                                onChange={(e) => {
+                                                    const files = Array.from(e.target.files);
+                                                    setRemarkFiles(prev => [...prev, ...files]);
+                                                }}
+                                            />
+                                        </label>
+                                    </div>
+
                                     <div className="flex justify-end">
                                         <button
                                             onClick={handleAddRemark}
                                             disabled={savingRemark || !newRemark.trim()}
-                                            className="px-4 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-sm shadow-red-200 transition-all disabled:opacity-50 flex items-center gap-2"
+                                            className="px-6 py-2.5 text-xs font-black text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-lg shadow-red-200 transition-all disabled:opacity-50 disabled:shadow-none flex items-center gap-2 active:scale-95 uppercase tracking-widest"
                                         >
                                             {savingRemark ? (
-                                                <><Loader2 size={12} className="animate-spin" /> Saving...</>
+                                                <><Loader2 size={12} className="animate-spin" /> Sharing...</>
                                             ) : (
-                                                <><MessageSquare size={12} /> Add Remark</>
+                                                <><MessageSquare size={12} /> Post Remark</>
                                             )}
                                         </button>
                                     </div>
@@ -482,15 +535,35 @@ export default function DealDetails() {
                                         </div>
                                     </div>
                                     <div className="space-y-4">
-                                        <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Relationship Links</h4>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <div className="p-3 rounded-lg bg-gray-50/50 border border-gray-100 flex flex-col items-center justify-center text-center">
-                                                <Paperclip size={14} className="text-gray-300 mb-1" />
-                                                <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">0 Digital Assets</span>
+                                        <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Digital Assets & Relationship Links</h4>
+                                        <div className="grid grid-cols-1 gap-3">
+                                            <div className="p-3 rounded-lg bg-gray-50/50 border border-gray-100 flex flex-col gap-2">
+                                                <div className="flex items-center gap-2">
+                                                    <Paperclip size={14} className="text-gray-300" />
+                                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">
+                                                        {deal.attachments?.length || 0} Assets Uploaded
+                                                    </span>
+                                                </div>
+                                                {deal.attachments && deal.attachments.length > 0 && (
+                                                    <div className="space-y-1.5 mt-1">
+                                                        {deal.attachments.map((asset, aIdx) => (
+                                                            <a
+                                                                key={aIdx}
+                                                                href={asset.url}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="flex items-center justify-between p-2 bg-white border border-gray-100 rounded text-[9px] font-bold text-gray-600 hover:text-red-600 hover:border-red-200 transition-all"
+                                                            >
+                                                                <span className="truncate max-w-[150px]">{asset.fileName}</span>
+                                                                <Download size={10} className="text-gray-300" />
+                                                            </a>
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </div>
-                                            <div className="p-3 rounded-lg bg-gray-50/50 border border-gray-100 flex flex-col items-center justify-center text-center">
-                                                <Mail size={14} className="text-gray-300 mb-1" />
-                                                <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">1 Message Logged</span>
+                                            <div className="p-3 rounded-lg bg-gray-50/50 border border-gray-100 flex items-center gap-3">
+                                                <Mail size={14} className="text-gray-300" />
+                                                <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Communication Records Authenticated</span>
                                             </div>
                                         </div>
                                     </div>

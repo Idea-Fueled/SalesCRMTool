@@ -5,11 +5,16 @@ export const getDeals = async (params = {}) => {
 };
 
 export const createDeal = async (dealData) => {
+    // Check if dealData is FormData, if not, it will be the original object
     return API.post("/deals/create", dealData);
 };
 
 export const updateDeal = async (id, dealData) => {
     return API.put(`/deals/${id}/update`, dealData);
+};
+
+export const addRemark = async (id, remarkData) => {
+    return API.post(`/deals/${id}/remark`, remarkData);
 };
 
 export const deleteDeal = async (id) => {

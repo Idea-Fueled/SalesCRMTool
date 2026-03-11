@@ -93,8 +93,42 @@ const dealSchema = new mongoose.Schema(
         },
 
         remarks: {
-            type: String
+            type: [{
+                text: { type: String, required: true },
+                files: [{
+                    url: String,
+                    publicId: String,
+                    fileName: String,
+                    fileType: String
+                }],
+                author: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "User",
+                    required: true
+                },
+                authorName: { type: String },
+                createdAt: {
+                    type: Date,
+                    default: Date.now
+                }
+            }],
+            default: []
         },
+
+        attachments: [{
+            url: String,
+            publicId: String,
+            fileName: String,
+            fileType: String,
+            uploadedBy: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User"
+            },
+            uploadedAt: {
+                type: Date,
+                default: Date.now
+            }
+        }],
 
         ownerId: {
             type: mongoose.Schema.Types.ObjectId,

@@ -5,6 +5,7 @@ import { Company } from "../models/companySchema.js";
 import { logAction } from "../utils/auditLogger.js";
 import { Notification } from "../models/notificationSchema.js";
 import { emitNotification } from "../utils/socket.js";
+import { uploadToCloudinary } from "../middlewares/uploadMiddleware.js";
 
 export const createDeal = async (req, res, next) => {
     try {
@@ -18,16 +19,26 @@ export const createDeal = async (req, res, next) => {
 
         const sanitizedCompanyId = companyId && companyId.trim() !== "" ? companyId : null;
         const sanitizedContactId = contactId && contactId.trim() !== "" ? contactId : null;
-        const sanitizedOwnerId = req.body.ownerId && req.body.ownerId.trim() !== "" ? req.body.ownerId : userId;
-
+        
         let dealData = {
             name, value,
             currency: currency || "USD",
             stage: stage || "Lead",
             expectedCloseDate, probability, source, notes,
             ownerId: (role === "admin" || role === "sales_manager") && req.body.ownerId ? req.body.ownerId : userId,
-            stageHistory: [{ stage: stage || "Lead", changedBy: userId }]
+            stageHistory: [{ stage: stage || "Lead", changedBy: userId }],
+            attachments: []
         };
+
+        // Handle File Uploads for Attachments
+        if (req.files && req.files.length > 0) {
+            const uploadPromises = req.files.map(file => uploadToCloudinary(file, "deals/attachments"));
+            const uploadedFiles = await Promise.all(uploadPromises);
+            dealData.attachments = uploadedFiles.map(file => ({
+                ...file,
+                uploadedBy: userId
+            }));
+        }
 
         if (sanitizedCompanyId && sanitizedContactId) {
             // ID-based flow — validate against DB
@@ -96,6 +107,56 @@ export const createDeal = async (req, res, next) => {
         return res.status(500).json({ message: error.message || "Server error!" });
     }
 }
+
+export const addRemark = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { text } = req.body;
+        const { id: userId, firstName, lastName } = req.user;
+
+        if (!text) {
+            return res.status(400).json({ message: "Remark text is required!" });
+        }
+
+        const deal = await Deal.findById(id);
+        if (!deal) {
+            return res.status(404).json({ message: "Deal not found!" });
+        }
+
+        let remarkFiles = [];
+        if (req.files && req.files.length > 0) {
+            const uploadPromises = req.files.map(file => uploadToCloudinary(file, "deals/remarks"));
+            remarkFiles = await Promise.all(uploadPromises);
+        }
+
+        const authorName = `${firstName} ${lastName || ""}`.trim();
+        const newRemark = {
+            text,
+            files: remarkFiles,
+            author: userId,
+            authorName,
+            createdAt: new Date()
+        };
+
+        deal.remarks.push(newRemark);
+        await deal.save();
+
+        res.status(200).json({ message: "Remark added successfully!", data: newRemark });
+
+        // Log action
+        await logAction({
+            entityType: "Deal",
+            entityId: id,
+            action: "UPDATE",
+            performedBy: userId,
+            details: { message: "Added a new remark", remark: newRemark },
+            req
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message || "Server error!" });
+    }
+};
 
 export const updateDealInformation = async (req, res, next) => {
     try {
@@ -169,7 +230,7 @@ export const updateDealInformation = async (req, res, next) => {
 
         const fields = [
             "name", "companyId", "contactId", "value", "currency",
-            "stage", "expectedCloseDate", "probability", "source", "notes", "remarks", "ownerId"
+            "stage", "expectedCloseDate", "probability", "source", "notes", "ownerId"
         ];
 
         fields.forEach(field => {
@@ -182,6 +243,28 @@ export const updateDealInformation = async (req, res, next) => {
                 deal[field] = value;
             }
         });
+
+        // Handle legacy remarks update if text is passed (though addRemark is preferred)
+        if (req.body.remarks !== undefined && typeof req.body.remarks === "string") {
+             const authorName = `${req.user.firstName} ${req.user.lastName || ""}`.trim();
+             deal.remarks.push({
+                 text: req.body.remarks,
+                 author: userId,
+                 authorName,
+                 createdAt: new Date()
+             });
+        }
+
+        // Handle File Uploads for Attachments if updating
+        if (req.files && req.files.length > 0) {
+            const uploadPromises = req.files.map(file => uploadToCloudinary(file, "deals/attachments"));
+            const uploadedFiles = await Promise.all(uploadPromises);
+            const newAttachments = uploadedFiles.map(file => ({
+                ...file,
+                uploadedBy: userId
+            }));
+            deal.attachments.push(...newAttachments);
+        }
 
         await deal.save();
 
