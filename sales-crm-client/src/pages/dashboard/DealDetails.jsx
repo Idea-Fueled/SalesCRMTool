@@ -542,9 +542,9 @@ export default function DealDetails() {
 
                             {/* Technical & Digital Assets Unified Section */}
                             <div className="pt-8 border-t border-gray-100">
-                                <div className={`grid gap-8 ${currentUser?.role === 'Admin' ? 'grid-cols-1 lg:grid-cols-12' : 'grid-cols-1'}`}>
+                                <div className={`grid gap-8 ${currentUser?.role === 'admin' ? 'grid-cols-1 lg:grid-cols-12' : 'grid-cols-1'}`}>
                                     {/* System Metadata - Admin Visibility Only */}
-                                    {currentUser?.role === 'Admin' && (
+                                    {currentUser?.role === 'admin' && (
                                         <div className="lg:col-span-5 space-y-4">
                                             <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
                                                 <Info size={14} className="text-blue-500" /> System Metadata
@@ -563,7 +563,7 @@ export default function DealDetails() {
                                     )}
 
                                     {/* Digital Assets Section */}
-                                    <div className={`${currentUser?.role === 'Admin' ? 'lg:col-span-7' : 'col-span-1'} space-y-4`}>
+                                    <div className={`${currentUser?.role === 'admin' ? 'lg:col-span-7' : 'col-span-1'} space-y-4`}>
                                         <div className="flex items-center justify-between mb-2">
                                             <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2">
                                                 <Layers size={14} className="text-red-500" /> Digital Assets
@@ -573,7 +573,7 @@ export default function DealDetails() {
                                             </span>
                                         </div>
                                         
-                                        <div className={`grid gap-3 ${currentUser?.role === 'Admin' ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
+                                        <div className={`grid gap-3 ${currentUser?.role === 'admin' ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
                                             {/* Main Deal Attachments */}
                                             {deal.attachments && deal.attachments.length > 0 && deal.attachments.map((file, idx) => (
                                                 <a

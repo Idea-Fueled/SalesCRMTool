@@ -530,7 +530,7 @@ export default function ContactDetails() {
                 <div className="flex items-center gap-6">
                     <span className="flex items-center gap-1.5"><History size={12} className="text-gray-300" /> Registry: {formatDate(contact.createdAt)}</span>
                     <span className="flex items-center gap-1.5"><Clock size={12} className="text-gray-300" /> Synchronization: {formatDate(contact.updatedAt)}</span>
-                    {currentUser?.role === 'Admin' && (
+                    {currentUser?.role === 'admin' && (
                         <span className="flex items-center gap-1.5 text-gray-300 border-l border-gray-100 pl-6">Ref: {contact._id}</span>
                     )}
                 </div>
