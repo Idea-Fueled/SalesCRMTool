@@ -14,7 +14,7 @@ import {
     Star, RotateCw, Maximize2, Lock, ThumbsUp, Shield,
     MoreHorizontal, Download, ChevronRight,
     MapPin, Mail, Phone, FileText, Paperclip, List, History, MessageSquare,
-    Edit2, Trash2
+    Edit2, Trash2, X
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { exportToPDF } from "../../utils/pdfExport";
