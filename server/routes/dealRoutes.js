@@ -5,8 +5,8 @@ import { upload } from "../middlewares/uploadMiddleware.js";
 
 const router = express.Router();
 
-router.post("/create", protect, upload.array("files"), createDeal)
 router.post("/:id/remark", protect, upload.array("files"), addRemark)
+router.post("/create", protect, upload.array("files"), createDeal)
 router.put("/:id/update", protect, upload.array("files"), updateDealInformation)
 router.patch("/:id/update-stage", protect, moveDealStage)
 router.patch("/:id/result", protect, markDealResult)
