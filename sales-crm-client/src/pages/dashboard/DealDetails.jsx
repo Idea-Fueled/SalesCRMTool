@@ -12,7 +12,7 @@ import {
     Calendar, Clock, Target, Info,
     TrendingUp, ArrowLeft, Tag, Share2, Loader2,
     Star, RotateCw, Maximize2, Lock, ThumbsUp, Shield,
-    MoreHorizontal, Download, ChevronRight,
+    MoreHorizontal, Download, ChevronRight, Layers,
     MapPin, Mail, Phone, FileText, Paperclip, List, History, MessageSquare,
     Edit2, Trash2, X
 } from "lucide-react";
