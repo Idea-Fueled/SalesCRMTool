@@ -373,28 +373,28 @@ export default function CompanyDetails() {
                         <div className="p-8 space-y-8">
                             {/* Narratives/Intel */}
                             <div className="space-y-6">
-                                <div className="flex items-center gap-2 text-[10px] font-black text-red-500 uppercase tracking-[0.2em] mb-4">
+                                <div className="flex items-center gap-2 text-[10px] font-bold text-red-400 uppercase tracking-wider mb-4">
                                     <MessageSquare size={10} /> Internal Intel & Threads
                                 </div>
                                 
                                 <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                                     {Array.isArray(company.remarks) && company.remarks.length > 0 ? (
                                         company.remarks.map((remark, idx) => (
-                                            <div key={idx} className="group relative bg-gray-50/50 rounded-2xl p-4 border border-gray-100/50 hover:bg-white hover:shadow-md transition-all duration-300">
+                                            <div key={idx} className="group relative bg-gray-50/30 rounded-2xl p-4 border border-gray-100/50 hover:bg-white hover:border-gray-200 transition-all duration-300">
                                                 <div className="flex items-start justify-between mb-2">
                                                     <div className="flex items-center gap-2">
-                                                        <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center text-[10px] font-bold text-red-600 border border-red-200 uppercase">
+                                                        <div className="w-6 h-6 rounded-full bg-red-50 flex items-center justify-center text-[10px] font-semibold text-red-600 border border-red-100 uppercase">
                                                             {remark.authorName?.[0] || 'U'}
                                                         </div>
                                                         <div>
-                                                            <span className="text-xs font-black text-gray-900">{remark.authorName}</span>
-                                                            <span className="text-[10px] text-gray-400 font-bold ml-2 uppercase tracking-tighter">
+                                                            <span className="text-xs font-bold text-gray-800">{remark.authorName}</span>
+                                                            <span className="text-[10px] text-gray-400 font-medium ml-2 uppercase tracking-tight">
                                                                 {formatDate(remark.createdAt, true)}
                                                             </span>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <p className="text-sm text-gray-700 leading-relaxed font-medium">
+                                                <p className="text-sm text-gray-600 leading-relaxed font-medium">
                                                     {remark.text}
                                                 </p>
                                                 
@@ -408,7 +408,7 @@ export default function CompanyDetails() {
                                                                 download={file.fileName}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
-                                                                className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-bold text-gray-600 hover:border-red-400 hover:text-red-600 transition-all shadow-sm"
+                                                                className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-medium text-gray-500 hover:border-red-400 hover:text-red-600 transition-all shadow-sm"
                                                             >
                                                                 <Paperclip size={10} />
                                                                 <span className="max-w-[120px] truncate">{file.fileName}</span>
@@ -422,7 +422,7 @@ export default function CompanyDetails() {
                                     ) : (
                                         <div className="text-center py-10 bg-gray-50/30 rounded-2xl border border-dashed border-gray-200">
                                             <MessageSquare size={24} className="mx-auto text-gray-300 mb-2 opacity-20" />
-                                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest italic">No chronological threads yet</p>
+                                            <p className="text-xs font-medium text-gray-400 uppercase tracking-widest italic">No chronological threads yet</p>
                                         </div>
                                     )}
                                 </div>
@@ -434,14 +434,14 @@ export default function CompanyDetails() {
                                             value={newRemark}
                                             onChange={(e) => setNewRemark(e.target.value)}
                                             placeholder="Append strategy or update thread..."
-                                            className="w-full min-h-[100px] p-4 text-sm bg-gray-50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-red-50 focus:border-red-400 focus:bg-white transition-all resize-none font-medium text-gray-800 shadow-inner"
+                                            className="w-full min-h-[100px] p-4 text-sm bg-gray-50/50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-red-50 focus:border-red-300 focus:bg-white transition-all resize-none font-medium text-gray-700 shadow-inner"
                                         />
                                         
                                         {/* Attachment Preview in Remark Input */}
                                         {remarkFiles.length > 0 && (
                                             <div className="mt-2 flex flex-wrap gap-2 px-1">
                                                 {remarkFiles.map((file, idx) => (
-                                                    <div key={idx} className="flex items-center gap-2 bg-red-50 px-2 py-1 rounded-lg border border-red-100 text-[10px] font-bold text-red-600 animate-in fade-in zoom-in duration-200">
+                                                    <div key={idx} className="flex items-center gap-2 bg-red-50 px-2 py-1 rounded-lg border border-red-100 text-[10px] font-semibold text-red-600 animate-in fade-in zoom-in duration-200">
                                                         <Paperclip size={10} />
                                                         <span className="max-w-[100px] truncate">{file.name}</span>
                                                         <button 

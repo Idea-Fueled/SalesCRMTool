@@ -424,8 +424,8 @@ export default function DealDetails() {
 
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-h-[450px]">
                         <div className="px-6 h-14 border-b border-gray-50 flex items-center justify-between">
-                            <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider">Remarks</h3>
-                            <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-50 px-2.5 py-1 rounded-full border border-gray-100">
+                            <h3 className="text-sm font-bold text-gray-900 tracking-tight">Remarks</h3>
+                            <div className="flex items-center gap-2 text-[10px] font-medium text-gray-400 bg-gray-50/50 px-2.5 py-1 rounded-full border border-gray-100">
                                 <MessageSquare size={12} /> Communication History
                             </div>
                         </div>
@@ -436,19 +436,24 @@ export default function DealDetails() {
                                 <div className="space-y-4 max-h-[500px] overflow-y-auto px-1">
                                     {deal.remarks && Array.isArray(deal.remarks) && deal.remarks.length > 0 ? (
                                         deal.remarks.map((remark, i) => (
-                                            <div key={i} className="p-4 bg-gray-50/50 rounded-2xl border border-gray-100 shadow-inner">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-tight">
-                                                        [{formatDate(remark.createdAt, true)}] Added by {remark.authorName || "Unknown"}
-                                                    </span>
+                                            <div key={i} className="p-4 bg-gray-50/30 rounded-xl border border-gray-100">
+                                                <div className="flex items-start justify-between mb-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-5 h-5 rounded-full bg-red-50 flex items-center justify-center text-[9px] font-bold text-red-600 border border-red-100">
+                                                            {remark.authorName?.[0] || 'U'}
+                                                        </div>
+                                                        <span className="text-[11px] font-semibold text-gray-500">
+                                                            {remark.authorName || "Unknown"} <span className="text-gray-300 mx-1">•</span> {formatDate(remark.createdAt, true)}
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                                <div className="text-[13px] text-gray-800 leading-relaxed whitespace-pre-wrap">
+                                                <div className="text-[13px] text-gray-700 leading-relaxed font-medium">
                                                     {remark.text}
                                                 </div>
                                                 {remark.files && remark.files.length > 0 && (
                                                     <div className="mt-4 pt-3 border-t border-gray-100 flex flex-col gap-2">
-                                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
-                                                            <Paperclip size={10} /> Attached Files ({remark.files.length})
+                                                        <span className="text-[10px] font-bold text-gray-400 flex items-center gap-1.5">
+                                                            <Paperclip size={10} /> ATTACHED ASSETS ({remark.files.length})
                                                         </span>
                                                         <div className="flex flex-wrap gap-2">
                                                             {remark.files.map((file, fIdx) => (
@@ -458,7 +463,7 @@ export default function DealDetails() {
                                                                     download={file.fileName}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    className="flex items-center gap-2 px-3 py-1.5 bg-white border border-red-100 rounded-xl text-[11px] font-bold text-gray-700 hover:text-red-600 hover:border-red-400 hover:shadow-md transition-all shadow-sm"
+                                                                    className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-medium text-gray-600 hover:text-red-600 hover:border-red-400 transition-all shadow-sm"
                                                                 >
                                                                     <div className="w-6 h-6 rounded-lg bg-red-50 flex items-center justify-center text-red-500">
                                                                         <Download size={12} />
@@ -480,20 +485,20 @@ export default function DealDetails() {
                                 
                                 {/* Add Remark Input */}
                                 <div className="mt-6 pt-6 border-t border-gray-100 flex flex-col gap-4 no-print">
-                                    <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
-                                        <MessageSquare size={10} /> Add New Remark
+                                    <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                        <MessageSquare size={10} /> Internal Transmission
                                     </div>
                                     <textarea
                                         value={newRemark}
                                         onChange={(e) => setNewRemark(e.target.value)}
-                                        placeholder="Type a new remark to append..."
-                                        className="w-full min-h-[100px] p-4 text-sm bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-red-400 focus:bg-white transition resize-y font-normal text-gray-800 shadow-inner"
+                                        placeholder="Add to narrative..."
+                                        className="w-full min-h-[80px] p-4 text-sm bg-gray-50/50 border border-gray-100 rounded-xl focus:ring-4 focus:ring-red-50 focus:border-red-300 focus:bg-white transition-all resize-none font-medium text-gray-700 shadow-inner"
                                     />
                                     
                                     {/* Remark File Upload */}
                                     <div className="flex flex-wrap gap-2">
                                         {remarkFiles.map((file, idx) => (
-                                            <div key={idx} className="flex items-center gap-2 bg-red-50 px-2 py-1 rounded-lg border border-red-100 text-[10px] font-bold text-red-700">
+                                            <div key={idx} className="flex items-center gap-2 bg-red-50 px-2 py-1 rounded-lg border border-red-100 text-[10px] font-semibold text-red-700">
                                                 <span className="max-w-[150px] truncate">{file.name}</span>
                                                 <button
                                                     onClick={() => setRemarkFiles(prev => prev.filter((_, i) => i !== idx))}
@@ -503,8 +508,9 @@ export default function DealDetails() {
                                                 </button>
                                             </div>
                                         ))}
-                                        <label className="flex items-center gap-2 px-3 py-1.5 bg-white border border-dashed border-gray-300 rounded-xl text-[10px] font-black text-gray-400 hover:border-red-400 hover:text-red-600 cursor-pointer transition-all uppercase tracking-widest">
-                                            <Paperclip size={12} /> Attach Files
+                                        <label className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-xl text-[10px] font-bold text-gray-500 hover:border-red-400 hover:text-red-600 cursor-pointer transition-all active:scale-95 group">
+                                            <Paperclip size={12} className="group-hover:rotate-12 transition-transform" />
+                                            <span>Attach Objects</span>
                                             <input
                                                 type="file"
                                                 multiple
@@ -521,7 +527,7 @@ export default function DealDetails() {
                                         <button
                                             onClick={handleAddRemark}
                                             disabled={savingRemark || !newRemark.trim()}
-                                            className="px-6 py-2.5 text-xs font-black text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-lg shadow-red-200 transition-all disabled:opacity-50 disabled:shadow-none flex items-center gap-2 active:scale-95 uppercase tracking-widest"
+                                            className="px-6 py-2.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-md shadow-red-100 transition-all disabled:opacity-50 disabled:shadow-none flex items-center gap-2 active:scale-95"
                                         >
                                             {savingRemark ? (
                                                 <><Loader2 size={12} className="animate-spin" /> Sharing...</>
@@ -537,26 +543,26 @@ export default function DealDetails() {
                             <div className="pt-8 border-t border-gray-50">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-4">
-                                        <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Administrative Metadata</h4>
+                                        <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">System Metadata</h4>
                                         <div className="space-y-3">
                                             <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50/50 border border-gray-100">
-                                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Unified ID</span>
-                                                <span className="text-[10px] font-mono font-bold text-gray-600">{deal._id}</span>
+                                                <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-tighter">Object ID</span>
+                                                <span className="text-[10px] font-mono font-semibold text-gray-500">{deal._id}</span>
                                             </div>
                                             <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50/50 border border-gray-100">
-                                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Schema Sync</span>
-                                                <span className="text-[10px] font-bold text-green-600 uppercase">Synchronized</span>
+                                                <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-tighter">Schema Sync</span>
+                                                <span className="text-[10px] font-bold text-green-600/80 uppercase">Synchronized</span>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="space-y-4">
-                                        <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Digital Assets & Relationship Links</h4>
+                                        <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Secure Assets dossier</h4>
                                         <div className="grid grid-cols-1 gap-3">
                                             <div className="p-3 rounded-lg bg-gray-50/50 border border-gray-100 flex flex-col gap-2">
                                                 <div className="flex items-center gap-2">
                                                     <Paperclip size={14} className="text-gray-300" />
-                                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">
-                                                        {(deal.attachments?.length || 0) + (deal.remarks?.reduce((acc, r) => acc + (r.files?.length || 0), 0) || 0)} Assets identified
+                                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
+                                                        {(deal.attachments?.length || 0) + (deal.remarks?.reduce((acc, r) => acc + (r.files?.length || 0), 0) || 0)} OBJECTS IDENTIFIED
                                                     </span>
                                                 </div>
                                                 {deal.attachments && deal.attachments.length > 0 && (
@@ -569,7 +575,7 @@ export default function DealDetails() {
                                                                 download={asset.fileName}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
-                                                                className="flex items-center justify-between p-2 bg-white border border-gray-100 rounded text-[9px] font-bold text-gray-600 hover:text-red-600 hover:border-red-200 transition-all"
+                                                                className="flex items-center justify-between p-2 bg-white border border-gray-100 rounded text-[9px] font-semibold text-gray-500 hover:text-red-600 hover:border-red-200 transition-all"
                                                             >
                                                                 <span className="truncate max-w-[140px]">{asset.fileName}</span>
                                                                 <Download size={10} className="text-gray-300" />
@@ -584,7 +590,7 @@ export default function DealDetails() {
                                                                     download={file.fileName}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    className="flex items-center justify-between p-2 bg-blue-50/50 border border-blue-100 rounded text-[9px] font-bold text-gray-600 hover:text-blue-600 hover:border-blue-200 transition-all"
+                                                                    className="flex items-center justify-between p-2 bg-gray-100/30 border border-gray-100 rounded text-[9px] font-semibold text-gray-500 hover:text-red-600 hover:border-red-200 transition-all"
                                                                 >
                                                                     <span className="truncate max-w-[140px]">{file.fileName}</span>
                                                                     <div className="flex items-center gap-1">
