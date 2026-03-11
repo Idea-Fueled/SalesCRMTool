@@ -252,7 +252,7 @@ export default function ContactDetails() {
                     {/* Contact Information */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <div className="px-6 py-4 border-b border-gray-50">
-                            <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider">Contact Channels</h3>
+                            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Contact Channels</h3>
                         </div>
                         <div className="p-6 space-y-5">
                             <div className="space-y-1">
@@ -301,7 +301,7 @@ export default function ContactDetails() {
                     {/* Relationship Owner */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
-                            <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider">Relationship Owner</h3>
+                            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Relationship Owner</h3>
                         </div>
                         <div className="p-5">
                             <div className="flex items-center gap-3">
@@ -321,7 +321,7 @@ export default function ContactDetails() {
                 <div className="lg:col-span-8 space-y-8">
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-h-[400px]">
                         <div className="px-6 h-14 border-b border-gray-50 flex items-center justify-between">
-                            <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider">Remarks & Intel</h3>
+                            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Remarks</h3>
                             <div className="flex items-center gap-3">
                                 <button
                                     onClick={() => fetchContact(true)}
@@ -339,49 +339,50 @@ export default function ContactDetails() {
 
                         <div className="p-8 space-y-8">
                             {/* Narratives/Intel */}
-                            <div className="space-y-6">
-                                <div className="flex items-center gap-2 text-[10px] font-bold text-red-400 uppercase tracking-wider mb-4">
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
                                     <MessageSquare size={10} /> Remarks
                                 </div>
                                 
                                 <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                                     {Array.isArray(contact.remarks) && contact.remarks.length > 0 ? (
                                         contact.remarks.map((remark, idx) => (
-                                            <div key={idx} className="group relative bg-gray-50/50 rounded-2xl p-4 border border-gray-100/50 hover:bg-white hover:shadow-md transition-all duration-300">
+                                            <div key={idx} className="p-4 bg-gray-50/30 rounded-xl border border-gray-100">
                                                 <div className="flex items-start justify-between mb-2">
                                                     <div className="flex items-center gap-2">
-                                                        <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center text-[10px] font-bold text-red-600 border border-red-200 uppercase">
+                                                        <div className="w-6 h-6 rounded-full bg-red-50 flex items-center justify-center text-[10px] font-bold text-red-600 border border-red-100">
                                                             {remark.authorName?.[0] || 'U'}
                                                         </div>
-                                                        <div>
-                                                            <span className="text-xs font-black text-gray-900">{remark.authorName}</span>
-                                                            <span className="text-[10px] text-gray-400 font-bold ml-2 uppercase tracking-tighter">
-                                                                {formatDate(remark.createdAt, true)}
-                                                            </span>
-                                                        </div>
+                                                        <span className="text-[11px] font-semibold text-gray-500">
+                                                            {remark.authorName || "Unknown"} <span className="text-gray-300 mx-1">•</span> {formatDate(remark.createdAt, true)}
+                                                        </span>
                                                     </div>
                                                 </div>
-                                                <p className="text-sm text-gray-700 leading-relaxed font-medium">
+                                                <div className="text-[13px] text-gray-700 leading-relaxed font-medium">
                                                     {remark.text}
-                                                </p>
-                                                
-                                                {/* Attachments within Remark */}
+                                                </div>
                                                 {remark.files && remark.files.length > 0 && (
-                                                    <div className="mt-3 flex flex-wrap gap-2 border-t border-gray-100 pt-3">
-                                                        {remark.files.map((file, fIdx) => (
-                                                            <a
-                                                                key={fIdx}
-                                                                href={formatFileUrl(file.url)}
-                                                                download={file.fileName}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-medium text-gray-500 hover:border-red-400 hover:text-red-600 transition-all shadow-sm"
-                                                            >
-                                                                <Paperclip size={10} />
-                                                                <span className="max-w-[120px] truncate">{file.fileName}</span>
-                                                                <Download size={10} className="ml-1 opacity-40" />
-                                                            </a>
-                                                        ))}
+                                                    <div className="mt-4 pt-3 border-t border-gray-100 flex flex-col gap-2">
+                                                        <span className="text-[10px] font-bold text-gray-400 flex items-center gap-1.5">
+                                                            <Paperclip size={10} /> ATTACHED FILES ({remark.files.length})
+                                                        </span>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {remark.files.map((file, fIdx) => (
+                                                                <a
+                                                                    key={fIdx}
+                                                                    href={formatFileUrl(file.url)}
+                                                                    download={file.fileName}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-medium text-gray-500 hover:border-red-400 hover:text-red-600 transition-all shadow-sm"
+                                                                >
+                                                                    <div className="w-6 h-6 rounded-lg bg-red-50 flex items-center justify-center text-red-500">
+                                                                        <Download size={12} />
+                                                                    </div>
+                                                                    <span>{file.fileName}</span>
+                                                                </a>
+                                                            ))}
+                                                        </div>
                                                     </div>
                                                 )}
                                             </div>
@@ -394,61 +395,56 @@ export default function ContactDetails() {
                                     )}
                                 </div>
                                 
-                                {/* Add Remark Input */}
-                                <div className="mt-8 pt-6 border-t border-gray-100 no-print">
-                                    <div className="relative">
-                                        <textarea
-                                            value={newRemark}
-                                            onChange={(e) => setNewRemark(e.target.value)}
-                                            placeholder="Add a remark..."
-                                            className="w-full min-h-[100px] p-4 text-sm bg-gray-50/50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-red-50 focus:border-red-300 focus:bg-white transition-all resize-none font-medium text-gray-700 shadow-inner"
-                                        />
-                                        
-                                        {/* Attachment Preview in Remark Input */}
-                                        {remarkFiles.length > 0 && (
-                                            <div className="mt-2 flex flex-wrap gap-2 px-1">
-                                                {remarkFiles.map((file, idx) => (
-                                                    <div key={idx} className="flex items-center gap-2 bg-red-50 px-2 py-1 rounded-lg border border-red-100 text-[10px] font-semibold text-red-600 animate-in fade-in zoom-in duration-200">
-                                                        <Paperclip size={10} />
-                                                        <span className="max-w-[100px] truncate">{file.name}</span>
-                                                        <button 
-                                                            onClick={() => setRemarkFiles(prev => prev.filter((_, i) => i !== idx))}
-                                                            className="hover:text-red-800 transition-colors"
-                                                        >
-                                                            <X size={10} />
-                                                        </button>
-                                                    </div>
-                                                ))}
+                                <div className="mt-6 pt-6 border-t border-gray-100 flex flex-col gap-4 no-print">
+                                    <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                        <MessageSquare size={10} /> Remarks
+                                    </div>
+                                    <textarea
+                                        value={newRemark}
+                                        onChange={(e) => setNewRemark(e.target.value)}
+                                        placeholder="Add a remark..."
+                                        className="w-full min-h-[100px] p-4 text-sm bg-gray-50/50 border border-gray-100 rounded-xl focus:ring-4 focus:ring-red-50 focus:border-red-300 focus:bg-white transition-all resize-none font-medium text-gray-700 shadow-inner"
+                                    />
+                                    
+                                    <div className="flex flex-wrap gap-2">
+                                        {remarkFiles.map((file, idx) => (
+                                            <div key={idx} className="flex items-center gap-2 bg-red-50 px-2 py-1 rounded-lg border border-red-100 text-[10px] font-semibold text-red-700">
+                                                <span className="max-w-[150px] truncate">{file.name}</span>
+                                                <button
+                                                    onClick={() => setRemarkFiles(prev => prev.filter((_, i) => i !== idx))}
+                                                    className="hover:text-red-900"
+                                                >
+                                                    <X size={12} />
+                                                </button>
                                             </div>
-                                        )}
-                                        
-                                        <div className="mt-4 flex items-center justify-between">
-                                            <label className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-[11px] font-bold text-gray-500 hover:border-red-400 hover:text-red-600 cursor-pointer transition-all shadow-sm active:scale-95 group">
-                                                <Paperclip size={14} className="group-hover:rotate-12 transition-transform" />
-                                                <span>{remarkFiles.length > 0 ? "Add More" : "Attach File"}</span>
-                                                <input
-                                                    type="file"
-                                                    multiple
-                                                    className="hidden"
-                                                    onChange={(e) => {
-                                                        const files = Array.from(e.target.files);
-                                                        setRemarkFiles(prev => [...prev, ...files]);
-                                                    }}
-                                                />
-                                            </label>
-                                            
-                                            <button
-                                                onClick={handleAddRemark}
-                                                disabled={savingRemark || (!newRemark.trim() && remarkFiles.length === 0)}
-                                                className="px-6 py-2.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-md shadow-red-100 transition-all disabled:opacity-50 flex items-center gap-2 active:scale-95"
-                                            >
-                                                {savingRemark ? (
-                                                    <><Loader2 size={14} className="animate-spin" /> Committing...</>
-                                                ) : (
-                                                    <><MessageSquare size={14} /> Post Remark</>
-                                                )}
-                                            </button>
-                                        </div>
+                                        ))}
+                                        <label className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-[11px] font-bold text-gray-500 hover:border-red-400 hover:text-red-600 cursor-pointer transition-all shadow-sm active:scale-95 group">
+                                            <Paperclip size={14} className="group-hover:rotate-12 transition-transform" />
+                                            <span>{remarkFiles.length > 0 ? "Add More" : "Attach File"}</span>
+                                            <input
+                                                type="file"
+                                                multiple
+                                                className="hidden"
+                                                onChange={(e) => {
+                                                    const files = Array.from(e.target.files);
+                                                    setRemarkFiles(prev => [...prev, ...files]);
+                                                }}
+                                            />
+                                        </label>
+                                    </div>
+
+                                    <div className="flex justify-end">
+                                        <button
+                                            onClick={handleAddRemark}
+                                            disabled={savingRemark || (!newRemark.trim() && remarkFiles.length === 0)}
+                                            className="px-6 py-2.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-md shadow-red-100 transition-all disabled:opacity-50 flex items-center gap-2 active:scale-95"
+                                        >
+                                            {savingRemark ? (
+                                                <><Loader2 size={14} className="animate-spin" /> Sharing...</>
+                                            ) : (
+                                                <><MessageSquare size={14} /> Post Remark</>
+                                            )}
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -459,10 +455,10 @@ export default function ContactDetails() {
                     {/* Digital Assets & Documentation */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-h-[200px] mt-8">
                         <div className="px-6 h-14 border-b border-gray-50 flex items-center justify-between">
-                            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                            <h3 className="text-sm font-bold text-gray-900 tracking-tight flex items-center gap-2">
                                 <Layers size={14} className="text-red-500" /> Digital Assets
                             </h3>
-                            <span className="px-3 py-1 bg-gray-50 text-[10px] font-bold text-gray-500 rounded-full uppercase tracking-tighter border border-gray-100">
+                            <span className="px-3 py-1 bg-gray-50 text-[10px] font-bold text-gray-500 rounded-full border border-gray-100 uppercase tracking-tighter">
                                 {((contact.attachments?.length || 0) + (contact.remarks?.reduce((acc, r) => acc + (r.files?.length || 0), 0) || 0))} Files
                             </span>
                         </div>
@@ -483,8 +479,8 @@ export default function ContactDetails() {
                                             <FileText size={18} />
                                         </div>
                                         <div className="min-w-0 flex-1">
-                                            <p className="text-xs font-black text-gray-900 truncate mb-0.5">{file.fileName}</p>
-                                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter flex items-center gap-1">
+                                            <p className="text-xs font-bold text-gray-900 truncate mb-0.5">{file.fileName}</p>
+                                            <p className="text-[9px] font-medium text-gray-400 uppercase tracking-tighter flex items-center gap-1">
                                                 <Calendar size={8} /> {formatDate(file.uploadedAt)}
                                             </p>
                                         </div>
@@ -507,8 +503,8 @@ export default function ContactDetails() {
                                                 <Paperclip size={18} />
                                             </div>
                                             <div className="min-w-0 flex-1">
-                                                <p className="text-xs font-black text-gray-900 truncate mb-0.5">{file.fileName}</p>
-                                                <p className="text-[9px] font-bold text-red-400 uppercase tracking-tighter flex items-center gap-1">
+                                                <p className="text-xs font-bold text-gray-900 truncate mb-0.5">{file.fileName}</p>
+                                                <p className="text-[9px] font-medium text-red-400 uppercase tracking-tighter flex items-center gap-1">
                                                     <MessageSquare size={8} /> Linked to Intel
                                                 </p>
                                             </div>
@@ -519,9 +515,9 @@ export default function ContactDetails() {
                             </div>
                             
                             {(!contact.attachments || contact.attachments.length === 0) && (!contact.remarks || !contact.remarks.some(r => r.files && r.files.length > 0)) && (
-                                <div className="py-12 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200 text-center">
-                                    <Layers size={32} className="mx-auto text-gray-200 mb-3 opacity-30" />
-                                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">No Digital Dossiers Available</p>
+                                <div className="py-12 bg-gray-50/50 rounded-xl border border-dashed border-gray-200 text-center">
+                                    <Layers size={32} className="mx-auto text-gray-300 mb-3 opacity-30" />
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest italic">No files available</p>
                                 </div>
                             )}
                         </div>

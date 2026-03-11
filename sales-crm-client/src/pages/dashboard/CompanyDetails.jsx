@@ -256,7 +256,7 @@ export default function CompanyDetails() {
                     {/* Company Information */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <div className="px-6 py-4 border-b border-gray-50">
-                            <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider">Operational Identity</h3>
+                            <h3 className="text-sm font-bold">Operational Identity</h3>
                         </div>
                         <div className="p-6 space-y-5">
                             <div className="space-y-1">
@@ -317,7 +317,7 @@ export default function CompanyDetails() {
                     {/* Strategic Owner */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
-                            <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider">Strategic Owner</h3>
+                            <h3 className="text-sm font-bold">Strategic Owner</h3>
                         </div>
                         <div className="p-5">
                             <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
@@ -336,12 +336,12 @@ export default function CompanyDetails() {
                 {/* Right Column - Status & Interactions */}
                 <div className="lg:col-span-8 space-y-8">
                     <div className="space-y-4">
-                        <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
+                        <h3 className="text-sm font-bold flex items-center gap-2">
                             <Target size={14} className="text-gray-400" /> Account Lifecycle Status
                         </h3>
                         <div className="flex items-center">
                             <div className={`
-                                px-6 py-2.5 rounded-xl text-sm font-black tracking-wide border-2 flex items-center gap-2 shadow-sm
+                                px-6 py-2.5 rounded-xl text-sm font-bold tracking-wide border-2 flex items-center gap-2 shadow-sm
                                 ${company.status === "Active" ? "bg-green-50 text-green-700 border-green-200" : 
                                   company.status === "Inactive" ? "bg-red-50 text-red-700 border-red-200" : 
                                   "bg-blue-50 text-blue-700 border-blue-200"}
@@ -354,8 +354,8 @@ export default function CompanyDetails() {
 
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-h-[400px]">
                         <div className="px-6 h-14 border-b border-gray-50 flex items-center justify-between">
-                            <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider">Corporate Remarks</h3>
-                            <div className="flex items-center gap-3">
+                            <h3 className="text-sm font-bold text-gray-900 tracking-tight">Remarks</h3>
+                            <div className="flex items-center gap-2">
                                 <button
                                     onClick={() => fetchCompany(true)}
                                     disabled={isRefreshing}
@@ -364,8 +364,8 @@ export default function CompanyDetails() {
                                 >
                                     <RotateCw size={12} />
                                 </button>
-                                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-50 px-2.5 py-1 rounded-full">
-                                    <Clock size={12} className="text-red-400" /> Operational Status
+                                <div className="flex items-center gap-2 text-[10px] font-medium text-gray-400 bg-gray-50/50 px-2.5 py-1 rounded-full border border-gray-100">
+                                    <MessageSquare size={12} /> History
                                 </div>
                             </div>
                         </div>
@@ -373,54 +373,55 @@ export default function CompanyDetails() {
                         <div className="p-8 space-y-8">
                             {/* Narratives/Intel */}
                             <div className="space-y-6">
-                                <div className="flex items-center gap-2 text-[10px] font-bold text-red-400 uppercase tracking-wider mb-4">
+                                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
                                     <MessageSquare size={10} /> Remarks
                                 </div>
                                 
                                 <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                                     {Array.isArray(company.remarks) && company.remarks.length > 0 ? (
                                         company.remarks.map((remark, idx) => (
-                                            <div key={idx} className="group relative bg-gray-50/30 rounded-2xl p-4 border border-gray-100/50 hover:bg-white hover:border-gray-200 transition-all duration-300">
+                                            <div key={idx} className="p-4 bg-gray-50/30 rounded-xl border border-gray-100">
                                                 <div className="flex items-start justify-between mb-2">
                                                     <div className="flex items-center gap-2">
-                                                        <div className="w-6 h-6 rounded-full bg-red-50 flex items-center justify-center text-[10px] font-semibold text-red-600 border border-red-100 uppercase">
+                                                        <div className="w-6 h-6 rounded-full bg-red-50 flex items-center justify-center text-[10px] font-bold text-red-600 border border-red-100">
                                                             {remark.authorName?.[0] || 'U'}
                                                         </div>
-                                                        <div>
-                                                            <span className="text-xs font-bold text-gray-800">{remark.authorName}</span>
-                                                            <span className="text-[10px] text-gray-400 font-medium ml-2 uppercase tracking-tight">
-                                                                {formatDate(remark.createdAt, true)}
-                                                            </span>
-                                                        </div>
+                                                        <span className="text-[11px] font-semibold text-gray-500">
+                                                            {remark.authorName || "Unknown"} <span className="text-gray-300 mx-1">•</span> {formatDate(remark.createdAt, true)}
+                                                        </span>
                                                     </div>
                                                 </div>
-                                                <p className="text-sm text-gray-600 leading-relaxed font-medium">
+                                                <div className="text-[13px] text-gray-700 leading-relaxed font-medium">
                                                     {remark.text}
-                                                </p>
-                                                
-                                                {/* Attachments within Remark */}
+                                                </div>
                                                 {remark.files && remark.files.length > 0 && (
-                                                    <div className="mt-3 flex flex-wrap gap-2 border-t border-gray-100 pt-3">
-                                                        {remark.files.map((file, fIdx) => (
-                                                            <a
-                                                                key={fIdx}
-                                                                href={formatFileUrl(file.url)}
-                                                                download={file.fileName}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-medium text-gray-500 hover:border-red-400 hover:text-red-600 transition-all shadow-sm"
-                                                            >
-                                                                <Paperclip size={10} />
-                                                                <span className="max-w-[120px] truncate">{file.fileName}</span>
-                                                                <Download size={10} className="ml-1 opacity-40" />
-                                                            </a>
-                                                        ))}
+                                                    <div className="mt-4 pt-3 border-t border-gray-100 flex flex-col gap-2">
+                                                        <span className="text-[10px] font-bold text-gray-400 flex items-center gap-1.5">
+                                                            <Paperclip size={10} /> ATTACHED FILES ({remark.files.length})
+                                                        </span>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {remark.files.map((file, fIdx) => (
+                                                                <a
+                                                                    key={fIdx}
+                                                                    href={formatFileUrl(file.url)}
+                                                                    download={file.fileName}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-medium text-gray-500 hover:border-red-400 hover:text-red-600 transition-all shadow-sm"
+                                                                >
+                                                                    <div className="w-6 h-6 rounded-lg bg-red-50 flex items-center justify-center text-red-500">
+                                                                        <Download size={12} />
+                                                                    </div>
+                                                                    <span>{file.fileName}</span>
+                                                                </a>
+                                                            ))}
+                                                        </div>
                                                     </div>
                                                 )}
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="text-center py-10 bg-gray-50/30 rounded-2xl border border-dashed border-gray-200">
+                                        <div className="text-center py-10 bg-gray-50/30 rounded-xl border border-dashed border-gray-200">
                                             <MessageSquare size={24} className="mx-auto text-gray-300 mb-2 opacity-20" />
                                             <p className="text-xs font-medium text-gray-400 uppercase tracking-widest italic">No remarks yet</p>
                                         </div>
@@ -434,7 +435,7 @@ export default function CompanyDetails() {
                                             value={newRemark}
                                             onChange={(e) => setNewRemark(e.target.value)}
                                             placeholder="Add a remark..."
-                                            className="w-full min-h-[100px] p-4 text-sm bg-gray-50/50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-red-50 focus:border-red-300 focus:bg-white transition-all resize-none font-medium text-gray-700 shadow-inner"
+                                            className="w-full min-h-[100px] p-4 text-sm bg-gray-50/50 border border-gray-100 rounded-xl focus:ring-4 focus:ring-red-50 focus:border-red-300 focus:bg-white transition-all resize-none font-medium text-gray-700 shadow-inner"
                                         />
                                         
                                         {/* Attachment Preview in Remark Input */}
@@ -448,7 +449,7 @@ export default function CompanyDetails() {
                                                             onClick={() => setRemarkFiles(prev => prev.filter((_, i) => i !== idx))}
                                                             className="hover:text-red-800 transition-colors"
                                                         >
-                                                            <X size={10} />
+                                                            <X size={12} />
                                                         </button>
                                                     </div>
                                                 ))}
@@ -456,9 +457,9 @@ export default function CompanyDetails() {
                                         )}
                                         
                                         <div className="mt-4 flex items-center justify-between">
-                                            <label className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-[11px] font-black text-gray-500 hover:border-red-400 hover:text-red-600 cursor-pointer transition-all shadow-sm active:scale-95 group">
+                                            <label className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-[11px] font-bold text-gray-500 hover:border-red-400 hover:text-red-600 cursor-pointer transition-all shadow-sm active:scale-95 group">
                                                 <Paperclip size={14} className="group-hover:rotate-12 transition-transform" />
-                                                <span>{remarkFiles.length > 0 ? "Add More" : "Attach Intel"}</span>
+                                                <span>{remarkFiles.length > 0 ? "Add More" : "Attach File"}</span>
                                                 <input
                                                     type="file"
                                                     multiple
@@ -473,12 +474,12 @@ export default function CompanyDetails() {
                                             <button
                                                 onClick={handleAddRemark}
                                                 disabled={savingRemark || (!newRemark.trim() && remarkFiles.length === 0)}
-                                                className="px-6 py-2.5 text-xs font-black text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-lg shadow-red-100 transition-all disabled:opacity-50 flex items-center gap-2 active:scale-95"
+                                                className="px-6 py-2.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-md shadow-red-100 transition-all disabled:opacity-50 flex items-center gap-2 active:scale-95"
                                             >
                                                 {savingRemark ? (
-                                                    <><Loader2 size={14} className="animate-spin" /> Committing...</>
+                                                    <><Loader2 size={14} className="animate-spin" /> Sharing...</>
                                                 ) : (
-                                                    <><MessageSquare size={14} /> Commit Remark</>
+                                                    <><MessageSquare size={14} /> Post Remark</>
                                                 )}
                                             </button>
                                         </div>
@@ -491,22 +492,22 @@ export default function CompanyDetails() {
                             <div className="pt-8 grid grid-cols-2 gap-4">
                                 <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-50/50 border border-gray-100/50 hover:bg-white transition-all cursor-default">
                                     <Target size={14} className="text-red-400" />
-                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Target Ops: 0 Open</span>
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Target Ops: 0 Open</span>
                                 </div>
                                 <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-50/50 border border-gray-100/50 hover:bg-white transition-all cursor-default">
                                     <Users size={14} className="text-blue-400" />
-                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Stakeholders Linked</span>
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Stakeholders Linked</span>
                                 </div>
                             </div>
 
                             {/* Digital Assets & Documentation */}
                             <div className="pt-8 border-t border-gray-100">
                                 <div className="flex items-center justify-between mb-6">
-                                    <h3 className="text-xs font-black text-gray-900 uppercase tracking-[0.2em] flex items-center gap-2">
-                                        <Layers size={14} className="text-red-500" /> Digital Assets & Dossiers
+                                    <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2">
+                                        <Layers size={14} className="text-red-500" /> Digital Assets
                                     </h3>
-                                    <span className="px-3 py-1 bg-gray-100 text-[10px] font-black text-gray-500 rounded-full uppercase tracking-tighter">
-                                        {((company.attachments?.length || 0) + (company.remarks?.reduce((acc, r) => acc + (r.files?.length || 0), 0) || 0))} Secure Files
+                                    <span className="px-3 py-1 bg-gray-100 text-[10px] font-bold text-gray-500 rounded-full uppercase tracking-tighter">
+                                        {((company.attachments?.length || 0) + (company.remarks?.reduce((acc, r) => acc + (r.files?.length || 0), 0) || 0))} Files
                                     </span>
                                 </div>
                                 
@@ -525,8 +526,8 @@ export default function CompanyDetails() {
                                                 <FileText size={18} />
                                             </div>
                                             <div className="min-w-0 flex-1">
-                                                <p className="text-xs font-black text-gray-900 truncate mb-0.5">{file.fileName}</p>
-                                                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter flex items-center gap-1">
+                                                <p className="text-xs font-bold text-gray-900 truncate mb-0.5">{file.fileName}</p>
+                                                <p className="text-[9px] font-medium text-gray-400 uppercase tracking-tighter flex items-center gap-1">
                                                     <Calendar size={8} /> {formatDate(file.uploadedAt)}
                                                 </p>
                                             </div>
@@ -549,8 +550,8 @@ export default function CompanyDetails() {
                                                     <Paperclip size={18} />
                                                 </div>
                                                 <div className="min-w-0 flex-1">
-                                                    <p className="text-xs font-black text-gray-900 truncate mb-0.5">{file.fileName}</p>
-                                                    <p className="text-[9px] font-bold text-red-400 uppercase tracking-tighter flex items-center gap-1">
+                                                    <p className="text-xs font-bold text-gray-900 truncate mb-0.5">{file.fileName}</p>
+                                                    <p className="text-[9px] font-medium text-red-500 uppercase tracking-tighter flex items-center gap-1">
                                                         <MessageSquare size={8} /> Linked to Intel
                                                     </p>
                                                 </div>
@@ -561,9 +562,9 @@ export default function CompanyDetails() {
                                 </div>
                                 
                                 {(!company.attachments || company.attachments.length === 0) && (!company.remarks || !company.remarks.some(r => r.files && r.files.length > 0)) && (
-                                    <div className="py-12 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200 text-center">
-                                        <Layers size={32} className="mx-auto text-gray-200 mb-3 opacity-30" />
-                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">No Digital Dossiers Available</p>
+                                    <div className="py-12 bg-gray-50/50 rounded-xl border border-dashed border-gray-200 text-center">
+                                        <Layers size={32} className="mx-auto text-gray-300 mb-3 opacity-30" />
+                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest italic">No files available</p>
                                     </div>
                                 )}
                             </div>
