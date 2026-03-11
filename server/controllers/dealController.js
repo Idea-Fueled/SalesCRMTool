@@ -94,13 +94,20 @@ export const createDeal = async (req, res, next) => {
 
         // Create Notification
         const owner = await User.findById(deal.ownerId);
+        const creatorName = `${req.user.firstName} ${req.user.lastName || ""}`.trim();
+        const ownerFullName = `${owner?.firstName || ""} ${owner?.lastName || ""}`.trim();
+        
+        const notificationMessage = deal.ownerId.toString() === userId
+            ? `Deal "${deal.name}" has been created by ${creatorName}.`
+            : `Deal "${deal.name}" has been created by ${creatorName} and assigned to ${ownerFullName}.`;
+
         const notification = await Notification.create({
             recipientId: deal.ownerId,
             senderId: userId,
             entityId: deal._id,
             entityType: "Deal",
             type: "deal_created",
-            message: `New deal "${deal.name}" has been created and assigned to you.`,
+            message: notificationMessage,
             teamId: owner?.managerId || (role === "sales_manager" ? userId : null)
         });
         emitNotification(notification);
@@ -310,7 +317,7 @@ export const updateDealInformation = async (req, res, next) => {
                 entityId: deal._id,
                 entityType: "Deal",
                 type: "deal_reassigned",
-                message: `Deal "${deal.name}" has been reassigned to you.`,
+                message: `Deal "${deal.name}" has been reassigned to ${reassignedToName}.`,
                 teamId: newOwner?.managerId || null
             });
             emitNotification(notification);
