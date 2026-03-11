@@ -426,7 +426,7 @@ export default function DealDetails() {
                         <div className="px-6 h-14 border-b border-gray-50 flex items-center justify-between">
                             <h3 className="text-sm font-bold text-gray-900 tracking-tight">Remarks</h3>
                             <div className="flex items-center gap-2 text-[10px] font-medium text-gray-400 bg-gray-50/50 px-2.5 py-1 rounded-full border border-gray-100">
-                                <MessageSquare size={12} /> Communication History
+                                <MessageSquare size={12} /> History
                             </div>
                         </div>
 
@@ -453,7 +453,7 @@ export default function DealDetails() {
                                                 {remark.files && remark.files.length > 0 && (
                                                     <div className="mt-4 pt-3 border-t border-gray-100 flex flex-col gap-2">
                                                         <span className="text-[10px] font-bold text-gray-400 flex items-center gap-1.5">
-                                                            <Paperclip size={10} /> ATTACHED ASSETS ({remark.files.length})
+                                                            <Paperclip size={10} /> ATTACHED FILES ({remark.files.length})
                                                         </span>
                                                         <div className="flex flex-wrap gap-2">
                                                             {remark.files.map((file, fIdx) => (
@@ -486,12 +486,12 @@ export default function DealDetails() {
                                 {/* Add Remark Input */}
                                 <div className="mt-6 pt-6 border-t border-gray-100 flex flex-col gap-4 no-print">
                                     <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                                        <MessageSquare size={10} /> Internal Transmission
+                                        <MessageSquare size={10} /> New Remark
                                     </div>
                                     <textarea
                                         value={newRemark}
                                         onChange={(e) => setNewRemark(e.target.value)}
-                                        placeholder="Add to narrative..."
+                                        placeholder="Add a remark..."
                                         className="w-full min-h-[80px] p-4 text-sm bg-gray-50/50 border border-gray-100 rounded-xl focus:ring-4 focus:ring-red-50 focus:border-red-300 focus:bg-white transition-all resize-none font-medium text-gray-700 shadow-inner"
                                     />
                                     
@@ -510,7 +510,7 @@ export default function DealDetails() {
                                         ))}
                                         <label className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-xl text-[10px] font-bold text-gray-500 hover:border-red-400 hover:text-red-600 cursor-pointer transition-all active:scale-95 group">
                                             <Paperclip size={12} className="group-hover:rotate-12 transition-transform" />
-                                            <span>Attach Objects</span>
+                                            <span>Attach File</span>
                                             <input
                                                 type="file"
                                                 multiple
@@ -556,13 +556,13 @@ export default function DealDetails() {
                                         </div>
                                     </div>
                                     <div className="space-y-4">
-                                        <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Secure Assets dossier</h4>
+                                        <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Digital Assets</h4>
                                         <div className="grid grid-cols-1 gap-3">
                                             <div className="p-3 rounded-lg bg-gray-50/50 border border-gray-100 flex flex-col gap-2">
                                                 <div className="flex items-center gap-2">
                                                     <Paperclip size={14} className="text-gray-300" />
                                                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
-                                                        {(deal.attachments?.length || 0) + (deal.remarks?.reduce((acc, r) => acc + (r.files?.length || 0), 0) || 0)} OBJECTS IDENTIFIED
+                                                        {(deal.attachments?.length || 0) + (deal.remarks?.reduce((acc, r) => acc + (r.files?.length || 0), 0) || 0)} FILES IDENTIFIED
                                                     </span>
                                                 </div>
                                                 {deal.attachments && deal.attachments.length > 0 && (

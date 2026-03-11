@@ -341,7 +341,7 @@ export default function ContactDetails() {
                             {/* Narratives/Intel */}
                             <div className="space-y-6">
                                 <div className="flex items-center gap-2 text-[10px] font-bold text-red-400 uppercase tracking-wider mb-4">
-                                    <MessageSquare size={10} /> Internal Intel & Threads
+                                    <MessageSquare size={10} /> Remarks
                                 </div>
                                 
                                 <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
@@ -389,7 +389,7 @@ export default function ContactDetails() {
                                     ) : (
                                         <div className="text-center py-10 bg-gray-50/30 rounded-2xl border border-dashed border-gray-200">
                                             <MessageSquare size={24} className="mx-auto text-gray-300 mb-2 opacity-20" />
-                                            <p className="text-xs font-medium text-gray-400 uppercase tracking-widest italic">No chronological threads yet</p>
+                                            <p className="text-xs font-medium text-gray-400 uppercase tracking-widest italic">No remarks yet</p>
                                         </div>
                                     )}
                                 </div>
@@ -400,7 +400,7 @@ export default function ContactDetails() {
                                         <textarea
                                             value={newRemark}
                                             onChange={(e) => setNewRemark(e.target.value)}
-                                            placeholder="Append strategy or update thread..."
+                                            placeholder="Add a remark..."
                                             className="w-full min-h-[100px] p-4 text-sm bg-gray-50/50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-red-50 focus:border-red-300 focus:bg-white transition-all resize-none font-medium text-gray-700 shadow-inner"
                                         />
                                         
@@ -425,7 +425,7 @@ export default function ContactDetails() {
                                         <div className="mt-4 flex items-center justify-between">
                                             <label className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-[11px] font-bold text-gray-500 hover:border-red-400 hover:text-red-600 cursor-pointer transition-all shadow-sm active:scale-95 group">
                                                 <Paperclip size={14} className="group-hover:rotate-12 transition-transform" />
-                                                <span>{remarkFiles.length > 0 ? "Add More" : "Attach Intel"}</span>
+                                                <span>{remarkFiles.length > 0 ? "Add More" : "Attach File"}</span>
                                                 <input
                                                     type="file"
                                                     multiple
@@ -445,7 +445,7 @@ export default function ContactDetails() {
                                                 {savingRemark ? (
                                                     <><Loader2 size={14} className="animate-spin" /> Committing...</>
                                                 ) : (
-                                                    <><MessageSquare size={14} /> Commit Remark</>
+                                                    <><MessageSquare size={14} /> Post Remark</>
                                                 )}
                                             </button>
                                         </div>
@@ -460,10 +460,10 @@ export default function ContactDetails() {
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-h-[200px] mt-8">
                         <div className="px-6 h-14 border-b border-gray-50 flex items-center justify-between">
                             <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
-                                <Layers size={14} className="text-red-500" /> Digital Assets & Documentation
+                                <Layers size={14} className="text-red-500" /> Digital Assets
                             </h3>
                             <span className="px-3 py-1 bg-gray-50 text-[10px] font-bold text-gray-500 rounded-full uppercase tracking-tighter border border-gray-100">
-                                {((contact.attachments?.length || 0) + (contact.remarks?.reduce((acc, r) => acc + (r.files?.length || 0), 0) || 0))} Secure Objects
+                                {((contact.attachments?.length || 0) + (contact.remarks?.reduce((acc, r) => acc + (r.files?.length || 0), 0) || 0))} Files
                             </span>
                         </div>
                         
