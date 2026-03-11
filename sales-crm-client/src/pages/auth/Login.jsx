@@ -85,7 +85,8 @@ const Login = () => {
                 localStorage.setItem("rememberedUser", JSON.stringify({
                     email: user.email,
                     firstName: user.firstName,
-                    lastName: user.lastName
+                    lastName: user.lastName,
+                    profilePicture: user.profilePicture
                 }));
             } else {
                 localStorage.removeItem("rememberedUser");
@@ -173,9 +174,13 @@ const Login = () => {
                             <div className="text-center w-full">
                                 <div className="relative inline-block mb-4">
                                     <div className="w-24 h-24 rounded-full bg-red-100 flex items-center justify-center border-4 border-white shadow-lg overflow-hidden">
-                                        <span className="text-3xl font-bold text-red-600 uppercase">
-                                            {rememberedUser.firstName[0]}{rememberedUser.lastName[0]}
-                                        </span>
+                                        {rememberedUser.profilePicture ? (
+                                            <img src={rememberedUser.profilePicture} alt="Profile" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <span className="text-3xl font-bold text-red-600 uppercase">
+                                                {rememberedUser.firstName[0]}{rememberedUser.lastName[0]}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                                 <h2 className="text-2xl font-bold text-gray-800 mb-1">Welcome back!</h2>
