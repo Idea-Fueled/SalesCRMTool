@@ -131,7 +131,7 @@ export default function DealsDashboard() {
     const handleMoveStage = async (id, newStage) => {
         try {
             await updateDealStage(id, newStage);
-            // toast.success(`Moved to ${newStage}`);
+            toast.success(`Moved to ${newStage}`);
             fetchData();
         } catch (error) {
             console.error(error);
