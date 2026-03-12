@@ -366,7 +366,15 @@ export const getContactById = async (req, res, next) => {
             return res.status(404).json({ message: "Contact not found!" });
         }
 
-        res.status(200).json({ data: contact });
+        const { Deal } = await import("../models/dealSchema.js");
+        const dealCount = await Deal.countDocuments({ contactId: contact._id, isDeleted: { $ne: true } });
+
+        res.status(200).json({ 
+            data: {
+                ...contact.toObject(),
+                dealCount
+            } 
+        });
     } catch (error) {
         res.status(500).json({ message: error.message || "Server error!" });
     }

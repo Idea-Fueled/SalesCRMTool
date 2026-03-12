@@ -11,10 +11,11 @@ import {
     ArrowLeft, ChevronRight, Download, RotateCw,
     Maximize2, Star, Shield, List, History,
     MessageSquare, FileText, Paperclip, Loader2, Layers,
-    MapPin, Globe, ExternalLink, MoreHorizontal, Edit2, Trash2, X
+    MapPin, Globe, ExternalLink, MoreHorizontal, Edit2, Trash2, X, DollarSign
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { exportToPDF } from "../../utils/pdfExport";
+import ContactDealsModal from "../../components/modals/ContactDealsModal";
 
 const lifecycleStages = [
     { id: "Added", label: "Added" },
@@ -68,6 +69,7 @@ export default function ContactDetails() {
     const [remarkFiles, setRemarkFiles] = useState([]);
     const [savingRemark, setSavingRemark] = useState(false);
     const [users, setUsers] = useState([]);
+    const [isDealsModalOpen, setIsDealsModalOpen] = useState(false);
 
     const fetchContact = async (silent = false) => {
         if (!silent) setLoading(true);
@@ -199,9 +201,19 @@ export default function ContactDetails() {
                             <Star size={18} className="text-yellow-400 fill-yellow-400" />
                         </div>
                         <div className="space-y-1.5">
-                            <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
-                                <Briefcase size={14} className="text-gray-300" />
-                                <span>{contact.jobTitle}</span>
+                            <div className="flex items-center gap-3 mt-1">
+                                <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
+                                    <Briefcase size={14} className="text-gray-300" />
+                                    <span>{contact.jobTitle}</span>
+                                </div>
+                                <div className="w-1 h-1 rounded-full bg-gray-300"></div>
+                                <button
+                                    onClick={() => setIsDealsModalOpen(true)}
+                                    className="flex items-center gap-1.5 px-2 py-0.5 bg-green-50 text-green-700 rounded-lg text-[10px] font-black uppercase tracking-tight border border-green-100 hover:bg-green-100 transition-colors"
+                                >
+                                    <DollarSign size={10} />
+                                    Deals: {contact.dealCount || 0}
+                                </button>
                             </div>
                             <div className="flex items-center gap-2 text-xs text-red-500">
                                 <Building2 size={12} className="text-red-400" />
@@ -544,6 +556,11 @@ export default function ContactDetails() {
                 onClose={() => setIsDeleteModalOpen(false)}
                 onConfirm={handleDeleteContact}
                 itemName={`${contact.firstName} ${contact.lastName}`}
+            />
+            <ContactDealsModal
+                isOpen={isDealsModalOpen}
+                onClose={() => setIsDealsModalOpen(false)}
+                contact={contact}
             />
         </div>
     );
