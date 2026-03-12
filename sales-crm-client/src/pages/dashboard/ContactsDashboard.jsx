@@ -13,6 +13,7 @@ import ContactModal from "../../components/modals/ContactModal";
 import ContactDetailsModal from "../../components/modals/ContactDetailsModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
 import ContactCard from "../../components/cards/ContactCard";
+import ContactDealsModal from "../../components/modals/ContactDealsModal";
 import { toast } from "react-hot-toast";
 
 const Select = ({ options, value, onChange }) => (
@@ -72,6 +73,7 @@ export default function ContactsDashboard() {
     // Modal states
     const [isContactModalOpen, setIsContactModalOpen] = useState(false);
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+    const [isDealsModalOpen, setIsDealsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedContact, setSelectedContact] = useState(null);
 
@@ -203,7 +205,7 @@ export default function ContactsDashboard() {
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className="border-b border-gray-100 bg-gray-50">
-                                            {["Contact", "Company", "Owner", "LinkedIn", "Actions"].map(h => (
+                                            {["Contact", "Company", "Deals", "Owner", "LinkedIn", "Actions"].map(h => (
                                                 <th key={h} className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wide whitespace-nowrap">{h}</th>
                                             ))}
                                         </tr>
@@ -232,6 +234,14 @@ export default function ContactsDashboard() {
                                                                 {c.companyId.name}
                                                             </button>
                                                         ) : (c.companyName || "—")}
+                                                    </td>
+                                                    <td className="px-4 py-3 whitespace-nowrap">
+                                                        <button 
+                                                            onClick={() => { setSelectedContact(c); setIsDealsModalOpen(true); }}
+                                                            className="px-2 py-1 rounded-md bg-gray-50 text-gray-600 hover:bg-red-50 hover:text-red-600 border border-gray-100 hover:border-red-200 transition-all text-[10px] font-black uppercase tracking-widest"
+                                                        >
+                                                            Deals: {c.dealCount || 0}
+                                                        </button>
                                                     </td>
                                                     <td className="px-4 py-3 text-red-600 font-semibold whitespace-nowrap">{c.ownerId?.firstName || "System"}</td>
                                                     <td className="px-4 py-3 whitespace-nowrap">
@@ -280,6 +290,7 @@ export default function ContactsDashboard() {
                                                 onEdit={(contact) => { setSelectedContact(contact); setIsContactModalOpen(true); }}
                                                 onDelete={(contact) => { setSelectedContact(contact); setIsDeleteModalOpen(true); }}
                                                 onView={(contact) => navigate(`/dashboard/contacts/${contact._id}`)}
+                                                onDealsClick={(contact) => { setSelectedContact(contact); setIsDealsModalOpen(true); }}
                                             />
                                         ))
                                     )}
@@ -324,6 +335,11 @@ export default function ContactsDashboard() {
             <ContactDetailsModal
                 isOpen={isDetailsModalOpen}
                 onClose={() => setIsDetailsModalOpen(false)}
+                contact={selectedContact}
+            />
+            <ContactDealsModal
+                isOpen={isDealsModalOpen}
+                onClose={() => setIsDealsModalOpen(false)}
                 contact={selectedContact}
             />
             <DeleteConfirmModal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} onConfirm={handleDeleteContact} itemName={`${selectedContact?.firstName} ${selectedContact?.lastName}`} />

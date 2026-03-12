@@ -13,7 +13,7 @@ const Avatar = ({ name }) => {
     );
 };
 
-export default function ContactCard({ contact, onEdit, onDelete, onView, basePath }) {
+export default function ContactCard({ contact, onEdit, onDelete, onView, onDealsClick, basePath }) {
     const navigate = useNavigate();
 
     return (
@@ -105,9 +105,18 @@ export default function ContactCard({ contact, onEdit, onDelete, onView, basePat
             </div>
 
             <div className="px-5 py-3 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Active Contact</span>
+                <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]"></div>
+                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Active</span>
+                    </div>
+                    <button 
+                        onClick={(e) => { e.stopPropagation(); onDealsClick?.(contact); }}
+                        className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white border border-gray-100 hover:border-red-200 hover:text-red-600 transition-all shadow-sm"
+                    >
+                        <Briefcase size={10} className="text-gray-400 group-hover:text-red-400" />
+                        <span className="text-[9px] font-black uppercase tracking-tighter">Deals: {contact.dealCount || 0}</span>
+                    </button>
                 </div>
                 <div className="flex items-center gap-3">
                     <Mail size={12} className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer" />

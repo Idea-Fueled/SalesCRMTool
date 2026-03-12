@@ -152,13 +152,19 @@ export const getContacts = async (req, res, next) => {
         const skip = (page - 1) * limit;
         const contacts = await Contact.find(filter).populate("ownerId", 'firstName email').populate("companyId", "name industry").sort(sort).skip(skip).limit(Number(limit));
 
+        const { Deal } = await import("../models/dealSchema.js");
+        const contactsWithDealCount = await Promise.all(contacts.map(async (c) => {
+            const count = await Deal.countDocuments({ contactId: c._id, isDeleted: { $ne: true } });
+            return { ...c.toObject(), dealCount: count };
+        }));
+
         const total = await Contact.countDocuments(filter);
 
         return res.status(200).json({
             total,
             page: Number(page),
             totalPages: Math.ceil(total / Number(limit)),
-            data: contacts
+            data: contactsWithDealCount
         })
 
     } catch (error) {

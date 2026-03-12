@@ -645,11 +645,12 @@ export const deleteDeal = async (req, res, next) => {
 export const getDeals = async (req, res, next) => {
     try {
         const { role, id: userId } = req.user;
-        const { name, stage, minValue, maxValue, startDate, endDate, owner, page = 1, limit = 10, sort = "-createdAt" } = req.query;
+        const { name, stage, minValue, maxValue, startDate, endDate, owner, contactId, page = 1, limit = 10, sort = "-createdAt" } = req.query;
 
         let filter = { isDeleted: { $ne: true } }
 
         if (name) filter.name = { $regex: name, $options: "i" };
+        if (contactId) filter.contactId = contactId;
 
         if (stage) {
             filter.stage = stage
