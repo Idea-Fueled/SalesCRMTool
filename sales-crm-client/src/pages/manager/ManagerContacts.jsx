@@ -7,6 +7,7 @@ import ContactModal from "../../components/modals/ContactModal";
 import ContactDetailsModal from "../../components/modals/ContactDetailsModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
 import ContactCard from "../../components/cards/ContactCard";
+import ContactDealsModal from "../../components/modals/ContactDealsModal";
 import { toast } from "react-hot-toast";
 import { Eye } from "lucide-react";
 
@@ -52,6 +53,7 @@ export default function ManagerContacts() {
     // Modal states
     const [isContactModalOpen, setIsContactModalOpen] = useState(false);
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+    const [isDealsModalOpen, setIsDealsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedContact, setSelectedContact] = useState(null);
 
@@ -178,16 +180,16 @@ export default function ManagerContacts() {
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="border-b border-gray-100 bg-gray-50">
-                                    {["Contact", "Job Title", "Company", "Owner", "LinkedIn", "Actions"].map(h => (
+                                    {["Contact", "Job Title", "Company", "Deals", "Owner", "LinkedIn", "Actions"].map(h => (
                                         <th key={h} className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wide whitespace-nowrap">{h}</th>
                                     ))}
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 {loading && contacts.length === 0 ? (
-                                    <tr><td colSpan={5} className="text-center py-10 text-gray-400">Loading contacts...</td></tr>
+                                    <tr><td colSpan={7} className="text-center py-10 text-gray-400">Loading contacts...</td></tr>
                                 ) : contacts.length === 0 ? (
-                                    <tr><td colSpan={5} className="text-center py-20 text-gray-400 font-medium italic">no contacts found</td></tr>
+                                    <tr><td colSpan={7} className="text-center py-20 text-gray-400 font-medium italic">no contacts found</td></tr>
                                 ) : (
                                     contacts.map((c) => (
                                         <tr key={c._id} className="hover:bg-gray-50/50 transition-colors group">
@@ -204,6 +206,14 @@ export default function ManagerContacts() {
                                             <td className="px-4 py-3 text-gray-600">{c.jobTitle || "—"}</td>
                                             <td className="px-4 py-3">
                                                 <span className="text-xs px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 font-medium">{c.companyId?.name || c.companyName || "—"}</span>
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap">
+                                                <button 
+                                                    onClick={() => { setSelectedContact(c); setIsDealsModalOpen(true); }}
+                                                    className="px-2 py-1 rounded-md bg-gray-50 text-gray-600 hover:bg-red-50 hover:text-red-600 border border-gray-100 hover:border-red-200 transition-all text-[10px] font-black uppercase tracking-widest"
+                                                >
+                                                    Deals: {c.dealCount || 0}
+                                                </button>
                                             </td>
                                             <td className="px-4 py-3 text-red-600 font-bold">{c.ownerId?.firstName || "Unknown"}</td>
                                             <td className="px-4 py-3 whitespace-nowrap">
@@ -258,6 +268,7 @@ export default function ManagerContacts() {
                                         onEdit={(contact) => { setSelectedContact(contact); setIsContactModalOpen(true); }}
                                         onDelete={(contact) => { setSelectedContact(contact); setIsDeleteModalOpen(true); }}
                                         onView={(contact) => navigate(`/manager/contacts/${contact._id}`)}
+                                        onDealsClick={(contact) => { setSelectedContact(contact); setIsDealsModalOpen(true); }}
                                     />
                                 ))
                             )}

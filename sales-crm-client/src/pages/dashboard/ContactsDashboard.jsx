@@ -212,9 +212,9 @@ export default function ContactsDashboard() {
                                     </thead>
                                     <tbody className="divide-y divide-gray-50">
                                         {loading && contacts.length === 0 ? (
-                                            <tr><td colSpan={5} className="text-center py-10 text-gray-400">Loading contacts...</td></tr>
+                                            <tr><td colSpan={6} className="text-center py-10 text-gray-400">Loading contacts...</td></tr>
                                         ) : contacts.length === 0 ? (
-                                            <tr><td colSpan={5} className="text-center py-20 text-gray-400 font-medium italic">no contacts found</td></tr>
+                                            <tr><td colSpan={6} className="text-center py-20 text-gray-400 font-medium italic">no contacts found</td></tr>
                                         ) : (
                                             contacts.map((c) => (
                                                 <tr key={c._id} className="hover:bg-gray-50/50 transition-colors group">
