@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Search, Briefcase, Building2, ContactRound, X, Loader2 } from "lucide-react";
+import { Search, Briefcase, Building2, ContactRound, X, Loader2, MessageSquare, Clock } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { getDeals } from "../../API/services/dealService";
 import { getContacts } from "../../API/services/contactService";
@@ -18,17 +18,37 @@ export default function GlobalSearch({ isOpen, onClose }) {
     const [query, setQuery] = useState("");
     const [loading, setLoading] = useState(false);
     const [results, setResults] = useState({ deals: [], contacts: [], companies: [] });
+    const [selectedIndex, setSelectedIndex] = useState(-1);
     const inputRef = useRef(null);
     const debounceRef = useRef(null);
+
+    // Flatten results for keyboard navigation
+    const flatResults = useMemo(() => {
+        return [
+            ...results.deals.map(d => ({ ...d, type: 'deal' })),
+            ...results.contacts.map(c => ({ ...c, type: 'contact' })),
+            ...results.companies.map(co => ({ ...co, type: 'company' }))
+        ];
+    }, [results]);
 
     // Auto-focus on open
     useEffect(() => {
         if (isOpen) {
             setQuery("");
             setResults({ deals: [], contacts: [], companies: [] });
+            setSelectedIndex(-1);
             setTimeout(() => inputRef.current?.focus(), 50);
         }
     }, [isOpen]);
+
+    // Reset selected index when query or results change
+    useEffect(() => {
+        if (flatResults.length > 0) {
+            setSelectedIndex(0);
+        } else {
+            setSelectedIndex(-1);
+        }
+    }, [flatResults]);
 
     // ESC to close
     useEffect(() => {
@@ -66,21 +86,44 @@ export default function GlobalSearch({ isOpen, onClose }) {
         return () => clearTimeout(debounceRef.current);
     }, [query]);
 
-    const total = results.deals.length + results.contacts.length + results.companies.length;
+    const handleNavigate = useCallback((item) => {
+        const getBasePath = () => {
+            if (!user) return "/dashboard";
+            if (user.role === "admin") return "/dashboard";
+            if (user.role === "sales_manager") return "/manager";
+            if (user.role === "sales_rep") return "/rep";
+            return "/dashboard";
+        };
+        const basePath = getBasePath();
+        let path = "";
+        if (item.type === 'deal') path = `${basePath}/deals/${item._id}`;
+        else if (item.type === 'contact') path = `${basePath}/contacts/${item._id}`;
+        else if (item.type === 'company') path = `${basePath}/companies/${item._id}`;
+        
+        if (path) {
+            navigate(path);
+            onClose();
+        }
+    }, [user, navigate, onClose]);
+
+    const handleKeyDown = (e) => {
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            setSelectedIndex(prev => (prev < flatResults.length - 1 ? prev + 1 : prev));
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            setSelectedIndex(prev => (prev > 0 ? prev - 1 : prev));
+        } else if (e.key === "Enter") {
+            if (selectedIndex >= 0 && selectedIndex < flatResults.length) {
+                handleNavigate(flatResults[selectedIndex]);
+            }
+        }
+    };
+
+    const total = flatResults.length;
     const hasResults = total > 0;
 
     if (!isOpen) return null;
-
-    const getBasePath = () => {
-        if (!user) return "/dashboard";
-        if (user.role === "admin") return "/dashboard";
-        if (user.role === "sales_manager") return "/manager";
-        if (user.role === "sales_rep") return "/rep";
-        return "/dashboard";
-    };
-
-    const basePath = getBasePath();
-
 
     return (
         <div
@@ -103,6 +146,7 @@ export default function GlobalSearch({ isOpen, onClose }) {
                         type="text"
                         value={query}
                         onChange={e => setQuery(e.target.value)}
+                        onKeyDown={handleKeyDown}
                         placeholder="Search deals, contacts, companies..."
                         className="flex-1 text-sm text-gray-800 bg-transparent outline-none placeholder-gray-400"
                     />
@@ -139,31 +183,30 @@ export default function GlobalSearch({ isOpen, onClose }) {
                                 <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Deals</span>
                                 <span className="ml-auto text-xs text-gray-400">{results.deals.length} result{results.deals.length > 1 ? "s" : ""}</span>
                             </div>
-                            {results.deals.map(d => (
-                                <button
-                                    key={d._id}
-                                    type="button"
-                                    className="w-full text-left block px-4 py-3 hover:bg-red-50 cursor-pointer border-b border-gray-50 transition-colors relative z-[1001] pointer-events-auto"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        const path = `${basePath}/deals/${d._id}`;
-                                        navigate(path);
-                                        onClose();
-                                    }}
-                                >
-                                    <div className="flex items-center justify-between gap-3">
-                                        <div className="min-w-0 text-left">
-                                            <p className="text-sm font-medium text-gray-800 truncate">{d.name}</p>
-                                            <p className="text-xs text-gray-400 mt-0.5">{d.companyId?.name || "No company"}</p>
+                            {results.deals.map((d, i) => {
+                                const index = i;
+                                const isSelected = selectedIndex === index;
+                                return (
+                                    <button
+                                        key={d._id}
+                                        type="button"
+                                        className={`w-full text-left block px-4 py-3 cursor-pointer border-b border-gray-50 transition-colors relative z-[1001] pointer-events-auto ${isSelected ? 'bg-red-50 border-red-100' : 'hover:bg-gray-50'}`}
+                                        onClick={() => handleNavigate({ ...d, type: 'deal' })}
+                                        onMouseEnter={() => setSelectedIndex(index)}
+                                    >
+                                        <div className="flex items-center justify-between gap-3">
+                                            <div className="min-w-0 text-left">
+                                                <p className={`text-sm font-medium truncate ${isSelected ? 'text-red-700' : 'text-gray-800'}`}>{d.name}</p>
+                                                <p className="text-xs text-gray-400 mt-0.5">{d.companyId?.name || "No company"}</p>
+                                            </div>
+                                            <div className="flex-shrink-0 flex items-center gap-2">
+                                                <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${stageBadge[d.stage] || "bg-gray-100 text-gray-600"}`}>{d.stage}</span>
+                                                <span className="text-xs font-semibold text-gray-700">${d.value?.toLocaleString()}</span>
+                                            </div>
                                         </div>
-                                        <div className="flex-shrink-0 flex items-center gap-2">
-                                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${stageBadge[d.stage] || "bg-gray-100 text-gray-600"}`}>{d.stage}</span>
-                                            <span className="text-xs font-semibold text-gray-700">${d.value?.toLocaleString()}</span>
-                                        </div>
-                                    </div>
-                                </button>
-                            ))}
+                                    </button>
+                                );
+                            })}
                         </div>
                     )}
 
@@ -175,30 +218,29 @@ export default function GlobalSearch({ isOpen, onClose }) {
                                 <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Contacts</span>
                                 <span className="ml-auto text-xs text-gray-400">{results.contacts.length} result{results.contacts.length > 1 ? "s" : ""}</span>
                             </div>
-                            {results.contacts.map(c => (
-                                <button
-                                    key={c._id}
-                                    type="button"
-                                    className="w-full text-left block px-4 py-3 hover:bg-red-50 cursor-pointer border-b border-gray-50 transition-colors relative z-[1001] pointer-events-auto"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        const path = `${basePath}/contacts/${c._id}`;
-                                        navigate(path);
-                                        onClose();
-                                    }}
-                                >
-                                    <div className="flex items-center gap-3 text-left">
-                                        <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                                            {`${c.firstName?.[0] || ""}${c.lastName?.[0] || ""}`.toUpperCase()}
+                            {results.contacts.map((c, i) => {
+                                const index = results.deals.length + i;
+                                const isSelected = selectedIndex === index;
+                                return (
+                                    <button
+                                        key={c._id}
+                                        type="button"
+                                        className={`w-full text-left block px-4 py-3 cursor-pointer border-b border-gray-50 transition-colors relative z-[1001] pointer-events-auto ${isSelected ? 'bg-red-50 border-red-100' : 'hover:bg-gray-50'}`}
+                                        onClick={() => handleNavigate({ ...c, type: 'contact' })}
+                                        onMouseEnter={() => setSelectedIndex(index)}
+                                    >
+                                        <div className="flex items-center gap-3 text-left">
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 transition-colors ${isSelected ? 'bg-red-600' : 'bg-red-500'}`}>
+                                                {`${c.firstName?.[0] || ""}${c.lastName?.[0] || ""}`.toUpperCase()}
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <p className={`text-sm font-medium truncate ${isSelected ? 'text-red-700' : 'text-gray-800'}`}>{c.firstName} {c.lastName}</p>
+                                                <p className="text-xs text-gray-400 mt-0.5">{c.jobTitle || c.email || "—"} · {c.companyId?.name || "No company"}</p>
+                                            </div>
                                         </div>
-                                        <div className="min-w-0 flex-1">
-                                            <p className="text-sm font-medium text-gray-800 truncate">{c.firstName} {c.lastName}</p>
-                                            <p className="text-xs text-gray-400 mt-0.5">{c.jobTitle || c.email || "—"} · {c.companyId?.name || "No company"}</p>
-                                        </div>
-                                    </div>
-                                </button>
-                            ))}
+                                    </button>
+                                );
+                            })}
                         </div>
                     )}
 
@@ -210,37 +252,46 @@ export default function GlobalSearch({ isOpen, onClose }) {
                                 <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Companies</span>
                                 <span className="ml-auto text-xs text-gray-400">{results.companies.length} result{results.companies.length > 1 ? "s" : ""}</span>
                             </div>
-                            {results.companies.map(co => (
-                                <button
-                                    key={co._id}
-                                    type="button"
-                                    className="w-full text-left block px-4 py-3 hover:bg-red-50 cursor-pointer border-b border-gray-50 transition-colors relative z-[1001] pointer-events-auto"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        const path = `${basePath}/companies/${co._id}`;
-                                        navigate(path);
-                                        onClose();
-                                    }}
-                                >
-                                    <div className="flex items-center justify-between gap-3 text-left">
-                                        <div className="min-w-0">
-                                            <p className="text-sm font-medium text-gray-800 truncate">{co.name}</p>
-                                            <p className="text-xs text-gray-400 mt-0.5">{co.industry || "—"} · {co.size || "—"}</p>
+                            {results.companies.map((co, i) => {
+                                const index = results.deals.length + results.contacts.length + i;
+                                const isSelected = selectedIndex === index;
+                                return (
+                                    <button
+                                        key={co._id}
+                                        type="button"
+                                        className={`w-full text-left block px-4 py-3 cursor-pointer border-b border-gray-50 transition-colors relative z-[1001] pointer-events-auto ${isSelected ? 'bg-red-50 border-red-100' : 'hover:bg-gray-50'}`}
+                                        onClick={() => handleNavigate({ ...co, type: 'company' })}
+                                        onMouseEnter={() => setSelectedIndex(index)}
+                                    >
+                                        <div className="flex items-center justify-between gap-3 text-left">
+                                            <div className="min-w-0">
+                                                <p className={`text-sm font-medium truncate ${isSelected ? 'text-red-700' : 'text-gray-800'}`}>{co.name}</p>
+                                                <p className="text-xs text-gray-400 mt-0.5">{co.industry || "—"} · {co.size || "—"}</p>
+                                            </div>
+                                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold flex-shrink-0 ${co.status === "Active" ? "bg-green-100 text-green-700" : co.status === "Prospect" ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-500"}`}>{co.status || "—"}</span>
                                         </div>
-                                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold flex-shrink-0 ${co.status === "Active" ? "bg-green-100 text-green-700" : co.status === "Prospect" ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-500"}`}>{co.status || "—"}</span>
-                                    </div>
-                                </button>
-                            ))}
+                                    </button>
+                                );
+                            })}
                         </div>
                     )}
                 </div>
 
                 {/* Footer hint */}
-                <div className="px-4 py-2.5 border-t border-gray-100 flex items-center gap-4 text-[11px] text-gray-400">
-                    <span>Press <kbd className="font-mono bg-gray-100 px-1 py-0.5 rounded">↑↓</kbd> to navigate</span>
-                    <span>Press <kbd className="font-mono bg-gray-100 px-1 py-0.5 rounded">ESC</kbd> to close</span>
-                    <span className="ml-auto">{hasResults ? `${total} result${total > 1 ? "s" : ""}` : ""}</span>
+                <div className="px-4 py-2.5 border-t border-gray-100 flex items-center gap-4 text-[11px] text-gray-400 bg-white relative z-[1002]">
+                    <div className="flex items-center gap-1.5 font-medium">
+                        <kbd className="font-mono bg-gray-50 border border-gray-100 px-1 py-0.5 rounded shadow-sm text-gray-500">↑↓</kbd> 
+                        <span>to navigate</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 font-medium">
+                        <kbd className="font-mono bg-gray-50 border border-gray-100 px-1 py-0.5 rounded shadow-sm text-gray-500">ENTER</kbd> 
+                        <span>to select</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 font-medium">
+                        <kbd className="font-mono bg-gray-50 border border-gray-100 px-1 py-0.5 rounded shadow-sm text-gray-500">ESC</kbd> 
+                        <span>to close</span>
+                    </div>
+                    <span className="ml-auto font-bold text-red-500/80">{hasResults ? `${total} result${total > 1 ? "s" : ""}` : ""}</span>
                 </div>
             </div>
         </div>
