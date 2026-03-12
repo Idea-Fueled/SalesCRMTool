@@ -119,43 +119,24 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
                             onChange={e => set("jobTitle", e.target.value)} placeholder="Sales Director" />
                     </div>
                     <div className="space-y-1 relative">
-                        <label className="text-xs font-semibold text-gray-500 uppercase">Company Name *</label>
-                        <input type="text" className={inputClass("companyName")}
-                            value={formData.companyName}
-                            onFocus={() => setShowCompanySuggest(true)}
-                            onBlur={() => setShowCompanySuggest(false)}
+                        <label className="text-xs font-semibold text-gray-500 uppercase">Company *</label>
+                        <select
+                            className={inputClass("companyId")}
+                            value={formData.companyId}
                             onChange={e => {
-                                const val = e.target.value;
-                                set("companyName", val);
-                                set("companyId", ""); // Reset ID when typing
-                                setShowCompanySuggest(true);
+                                const selectedId = e.target.value;
+                                const comp = companies.find(c => c._id === selectedId);
+                                set("companyId", selectedId);
+                                set("companyName", comp?.name || "");
                             }}
-                            placeholder="e.g. Acme Corp" />
-                        
-                        {/* Searchable Dropdown */}
-                        {showCompanySuggest && companies.some(c => c.name && c.name.toLowerCase().includes(formData.companyName.toLowerCase())) && (
-                            <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
-                                {companies
-                                    .filter(c => c.name && c.name.toLowerCase().includes(formData.companyName.toLowerCase()))
-                                    .map(comp => (
-                                        <button
-                                            key={comp._id}
-                                            type="button"
-                                            className="w-full text-left px-3 py-2 text-xs hover:bg-red-50 transition-colors border-b border-gray-50 last:border-0"
-                                            onMouseDown={(e) => {
-                                                e.preventDefault(); // Prevent onBlur from firing on the input
-                                                set("companyName", comp.name);
-                                                set("companyId", comp._id);
-                                                setShowCompanySuggest(false);
-                                            }}
-                                        >
-                                            <div className="font-bold text-gray-800">{comp.name}</div>
-                                            <div className="text-[10px] text-gray-400">{comp.industry || "General Industry"}</div>
-                                        </button>
-                                    ))
-                                }
-                            </div>
-                        )}
+                        >
+                            <option value="">— Select Company —</option>
+                            {companies.map(comp => (
+                                <option key={comp._id} value={comp._id}>
+                                    {comp.name}
+                                </option>
+                            ))}
+                        </select>
                         {errors.companyName && <p className="text-red-500 text-xs">{errors.companyName}</p>}
                     </div>
                 </div>

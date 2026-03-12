@@ -143,95 +143,54 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
                 {/* Company + Contact */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1 relative">
-                        <label className="text-xs font-semibold text-gray-500 uppercase">Company Name *</label>
-                        <input type="text" className={inputClass("companyName")}
-                            value={formData.companyName}
-                            onFocus={() => setShowCompanySuggest(true)}
-                            onBlur={() => setShowCompanySuggest(false)}
+                        <label className="text-xs font-semibold text-gray-500 uppercase">Company *</label>
+                        <select
+                            className={inputClass("companyId")}
+                            value={formData.companyId}
                             onChange={e => {
-                                const val = e.target.value;
-                                set("companyName", val);
-                                set("companyId", "");
-                                setShowCompanySuggest(true);
+                                const selectedId = e.target.value;
+                                const comp = companies.find(c => c._id === selectedId);
+                                set("companyId", selectedId);
+                                set("companyName", comp?.name || "");
                             }}
-                            placeholder="e.g. Acme Corp" />
-                        
-                        {/* Searchable Company Dropdown */}
-                        {showCompanySuggest && companies && companies.some(c => c.name && c.name.toLowerCase().includes(formData.companyName.toLowerCase())) && (
-                            <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
-                                {companies
-                                    .filter(c => c.name && c.name.toLowerCase().includes(formData.companyName.toLowerCase()))
-                                    .map(comp => (
-                                        <button
-                                            key={comp._id}
-                                            type="button"
-                                            className="w-full text-left px-3 py-2 text-xs hover:bg-red-50 transition-colors border-b border-gray-50 last:border-0"
-                                            onMouseDown={(e) => {
-                                                e.preventDefault(); // Prevent onBlur from firing on the input
-                                                set("companyName", comp.name);
-                                                set("companyId", comp._id);
-                                                setShowCompanySuggest(false);
-                                            }}
-                                        >
-                                            <div className="font-bold text-gray-800">{comp.name}</div>
-                                            <div className="text-[10px] text-gray-400">{comp.industry || "General Industry"}</div>
-                                        </button>
-                                    ))
-                                }
-                            </div>
-                        )}
+                        >
+                            <option value="">— Select Company —</option>
+                            {(companies || []).map(comp => (
+                                <option key={comp._id} value={comp._id}>
+                                    {comp.name}
+                                </option>
+                            ))}
+                        </select>
                         {errors.companyName && <p className="text-red-500 text-xs">{errors.companyName}</p>}
                     </div>
                     <div className="space-y-1 relative">
-                        <label className="text-xs font-semibold text-gray-500 uppercase">Contact Name *</label>
-                        <input type="text" className={inputClass("contactName")}
-                            value={formData.contactName}
-                            onFocus={() => setShowContactSuggest(true)}
-                            onBlur={() => setShowContactSuggest(false)}
+                        <label className="text-xs font-semibold text-gray-500 uppercase">Contact *</label>
+                        <select
+                            className={inputClass("contactId")}
+                            value={formData.contactId}
+                            disabled={!formData.companyId}
                             onChange={e => {
-                                const val = e.target.value;
-                                set("contactName", val);
-                                set("contactId", "");
-                                setShowContactSuggest(true);
+                                const selectedId = e.target.value;
+                                const cont = filteredContacts.find(c => c._id === selectedId);
+                                set("contactId", selectedId);
+                                set("contactName", cont ? `${cont.firstName} ${cont.lastName}`.trim() : "");
                             }}
-                            placeholder={formData.companyId ? "Select contact..." : "Select company first"} />
-                            
-                        {/* Searchable Contact Dropdown */}
-                        {showContactSuggest && (
-                            <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
-                                {!formData.companyId ? (
-                                    <div className="px-3 py-4 text-center text-xs text-gray-400 italic">
-                                        Please select a company first to see contacts.
-                                    </div>
-                                ) : filteredContacts.length === 0 ? (
-                                    <div className="px-3 py-4 text-center text-xs text-gray-400 italic">
-                                        No contacts found for this company.
-                                    </div>
-                                ) : (
-                                    filteredContacts
-                                        .filter(c => `${c.firstName || ''} ${c.lastName || ''}`.trim().toLowerCase().includes(formData.contactName.toLowerCase()))
-                                        .map(cont => {
-                                            const fullName = `${cont.firstName || ''} ${cont.lastName || ''}`.trim();
-                                            return (
-                                                <button
-                                                    key={cont._id}
-                                                    type="button"
-                                                    className="w-full text-left px-3 py-2 text-xs hover:bg-red-50 transition-colors border-b border-gray-50 last:border-0"
-                                                    onMouseDown={(e) => {
-                                                        e.preventDefault(); // Prevent onBlur from firing on the input
-                                                        set("contactName", fullName);
-                                                        set("contactId", cont._id);
-                                                        setShowContactSuggest(false);
-                                                    }}
-                                                >
-                                                    <div className="font-bold text-gray-800">{fullName}</div>
-                                                    <div className="text-[10px] text-gray-400">{cont.jobTitle || "Professional"}</div>
-                                                </button>
-                                            )
-                                        })
-                                )}
-                            </div>
-                        )}
+                        >
+                            {!formData.companyId ? (
+                                <option value="">Select company first</option>
+                            ) : filteredContacts.length === 0 ? (
+                                <option value="">No contacts found</option>
+                            ) : (
+                                <>
+                                    <option value="">— Select Contact —</option>
+                                    {filteredContacts.map(cont => (
+                                        <option key={cont._id} value={cont._id}>
+                                            {cont.firstName} {cont.lastName}
+                                        </option>
+                                    ))}
+                                </>
+                            )}
+                        </select>
                         {errors.contactName && <p className="text-red-500 text-xs">{errors.contactName}</p>}
                     </div>
                 </div>
