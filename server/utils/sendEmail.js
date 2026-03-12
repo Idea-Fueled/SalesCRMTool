@@ -1,56 +1,37 @@
-import nodemailer from 'nodemailer';
+import sgMail from '@sendgrid/mail';
 
 /**
- * Send an email using NodeMailer
+ * Send an email using SendGrid API
  */
 export const sendEmail = async (to, subject, html) => {
     try {
-        console.log(`[sendEmail] Attempting to send email to: ${to} (via NodeMailer)`);
+        console.log(`[sendEmail] Attempting to send email to: ${to} (via SendGrid API)`);
 
-        const emailUser = process.env.EMAIL_USER;
-        const emailPass = process.env.EMAIL_PASS;
+        const apiKey = process.env.SENDGRID_API_KEY;
+        const senderEmail = process.env.SENDGRID_SENDER_EMAIL;
 
-        if (!emailUser || !emailPass) {
+        if (!apiKey || !senderEmail) {
             const missing = [];
-            if (!emailUser) missing.push("EMAIL_USER");
-            if (!emailPass) missing.push("EMAIL_PASS");
+            if (!apiKey) missing.push("SENDGRID_API_KEY");
+            if (!senderEmail) missing.push("SENDGRID_SENDER_EMAIL");
             console.error(`[sendEmail] MISSING environment variables: ${missing.join(", ")}`);
             throw new Error(`Email configuration is incomplete. Missing: ${missing.join(", ")}`);
         }
 
-        // Attempting Port 587 (STARTTLS) as an alternative to the blocked Port 465
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 587,
-            secure: false, // false for 587 (STARTTLS)
-            auth: {
-                user: emailUser,
-                pass: emailPass
-            },
-            tls: {
-                rejectUnauthorized: false,
-                minVersion: 'TLSv1.2'
-            }
-        });
+        sgMail.setApiKey(apiKey.trim());
 
-        const mailOptions = {
-            from: `"mbdConsulting" <${emailUser}>`,
+        const msg = {
             to,
+            from: senderEmail, // Must be verified in SendGrid
             subject,
-            html
+            html,
         };
 
-        console.log(`[sendEmail] Sending via smtp.gmail.com on port 587...`);
-        const info = await transporter.sendMail(mailOptions);
-        console.log("✅ Email sent successfully via NodeMailer: %s", info.messageId);
-        return info;
+        const response = await sgMail.send(msg);
+        console.log("✅ Email sent successfully via SendGrid: %s", response[0]?.headers?.['x-message-id'] || "Success");
+        return response;
     } catch (error) {
-        console.error("❌ NodeMailer Error Details:", {
-            message: error.message,
-            code: error.code,
-            command: error.command,
-            responseCode: error.responseCode
-        });
+        console.error("❌ SendGrid Error Details:", error.response?.body || error.message);
         throw new Error(`Failed to send email: ${error.message}`);
     }
 }
