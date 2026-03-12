@@ -5,7 +5,7 @@ import { requireRole } from "../middlewares/roleMiddleware.js";
 
 const router = express.Router();
 
-// Only Admins can view audit logs
-router.get("/", protect, requireRole("admin"), getAuditLogs);
+// Only Admins, Managers and Reps can view audit logs
+router.get("/", protect, requireRole("admin", "sales_manager", "sales_rep"), getAuditLogs);
 
 export default router;
