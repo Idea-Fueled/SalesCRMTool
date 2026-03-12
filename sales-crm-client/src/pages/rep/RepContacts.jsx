@@ -284,6 +284,11 @@ export default function RepContacts() {
                 onClose={() => setIsDetailsModalOpen(false)}
                 contact={selectedContact}
             />
+            <ContactDealsModal
+                isOpen={isDealsModalOpen}
+                onClose={() => setIsDealsModalOpen(false)}
+                contact={selectedContact}
+            />
 
             <DeleteConfirmModal
                 isOpen={isDeleteModalOpen}
