@@ -32,6 +32,15 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
     const [showContactSuggest, setShowContactSuggest] = useState(false);
     const [showStageDropdown, setShowStageDropdown] = useState(false);
 
+    // Derived: Filtered contacts based on selected company
+    const filteredContacts = React.useMemo(() => {
+        if (!formData.companyId) return contacts || [];
+        return (contacts || []).filter(c => {
+            const contactCompanyId = c.companyId?._id || c.companyId;
+            return contactCompanyId === formData.companyId;
+        });
+    }, [formData.companyId, contacts]);
+
     useEffect(() => {
         if (deal) {
             setFormData({
@@ -58,7 +67,23 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
     }, [deal, isOpen]);
 
     const set = (field, value) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
+        setFormData(prev => {
+            const newData = { ...prev, [field]: value };
+            
+            // If company changes, validate and potentially clear contact
+            if (field === "companyId") {
+                const currentContactId = prev.contactId;
+                if (currentContactId && value) {
+                    const contactObj = contacts.find(c => c._id === currentContactId);
+                    const contactCompanyId = contactObj?.companyId?._id || contactObj?.companyId;
+                    if (contactCompanyId !== value) {
+                        newData.contactId = "";
+                        newData.contactName = "";
+                    }
+                }
+            }
+            return newData;
+        });
         if (errors[field]) setErrors(prev => ({ ...prev, [field]: "" }));
     };
 
@@ -169,37 +194,42 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
                                 set("contactId", "");
                                 setShowContactSuggest(true);
                             }}
-                            placeholder="e.g. Jane Smith" />
+                            placeholder={formData.companyId ? "Select contact..." : "Select company first"} />
                             
                         {/* Searchable Contact Dropdown */}
-                        {showContactSuggest && contacts && contacts.some(c => `${c.firstName || ''} ${c.lastName || ''}`.trim().toLowerCase().includes(formData.contactName.toLowerCase())) && (
+                        {showContactSuggest && (
                             <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
-                                {contacts
-                                    .filter(c => `${c.firstName || ''} ${c.lastName || ''}`.trim().toLowerCase().includes(formData.contactName.toLowerCase()))
-                                    .map(cont => {
-                                        const fullName = `${cont.firstName || ''} ${cont.lastName || ''}`.trim();
-                                        return (
-                                            <button
-                                                key={cont._id}
-                                                type="button"
-                                                className="w-full text-left px-3 py-2 text-xs hover:bg-red-50 transition-colors border-b border-gray-50 last:border-0"
-                                                onMouseDown={(e) => {
-                                                    e.preventDefault(); // Prevent onBlur from firing on the input
-                                                    set("contactName", fullName);
-                                                    set("contactId", cont._id);
-                                                    if(cont.companyId && !formData.companyId) { // Auto-fill company if not set
-                                                        set("companyId", cont.companyId._id || cont.companyId);
-                                                        set("companyName", cont.companyId.name || cont.companyName || "");
-                                                    }
-                                                    setShowContactSuggest(false);
-                                                }}
-                                            >
-                                                <div className="font-bold text-gray-800">{fullName}</div>
-                                                <div className="text-[10px] text-gray-400">{cont.jobTitle || "Professional"}</div>
-                                            </button>
-                                        )
-                                    })
-                                }
+                                {!formData.companyId ? (
+                                    <div className="px-3 py-4 text-center text-xs text-gray-400 italic">
+                                        Please select a company first to see contacts.
+                                    </div>
+                                ) : filteredContacts.length === 0 ? (
+                                    <div className="px-3 py-4 text-center text-xs text-gray-400 italic">
+                                        No contacts found for this company.
+                                    </div>
+                                ) : (
+                                    filteredContacts
+                                        .filter(c => `${c.firstName || ''} ${c.lastName || ''}`.trim().toLowerCase().includes(formData.contactName.toLowerCase()))
+                                        .map(cont => {
+                                            const fullName = `${cont.firstName || ''} ${cont.lastName || ''}`.trim();
+                                            return (
+                                                <button
+                                                    key={cont._id}
+                                                    type="button"
+                                                    className="w-full text-left px-3 py-2 text-xs hover:bg-red-50 transition-colors border-b border-gray-50 last:border-0"
+                                                    onMouseDown={(e) => {
+                                                        e.preventDefault(); // Prevent onBlur from firing on the input
+                                                        set("contactName", fullName);
+                                                        set("contactId", cont._id);
+                                                        setShowContactSuggest(false);
+                                                    }}
+                                                >
+                                                    <div className="font-bold text-gray-800">{fullName}</div>
+                                                    <div className="text-[10px] text-gray-400">{cont.jobTitle || "Professional"}</div>
+                                                </button>
+                                            )
+                                        })
+                                )}
                             </div>
                         )}
                         {errors.contactName && <p className="text-red-500 text-xs">{errors.contactName}</p>}
