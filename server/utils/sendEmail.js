@@ -18,17 +18,18 @@ export const sendEmail = async (to, subject, html) => {
             throw new Error(`Email configuration is incomplete. Missing: ${missing.join(", ")}`);
         }
 
-        // Using explicit SMTP configuration for better reliability on cloud platforms
+        // Attempting Port 587 (STARTTLS) as an alternative to the blocked Port 465
         const transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
-            port: 465,
-            secure: true, // true for 465, false for 587
+            port: 587,
+            secure: false, // false for 587 (STARTTLS)
             auth: {
                 user: emailUser,
                 pass: emailPass
             },
             tls: {
-                rejectUnauthorized: false // Helps in some restricted environments
+                rejectUnauthorized: false,
+                minVersion: 'TLSv1.2'
             }
         });
 
@@ -39,7 +40,7 @@ export const sendEmail = async (to, subject, html) => {
             html
         };
 
-        console.log(`[sendEmail] Sending via smtp.gmail.com...`);
+        console.log(`[sendEmail] Sending via smtp.gmail.com on port 587...`);
         const info = await transporter.sendMail(mailOptions);
         console.log("✅ Email sent successfully via NodeMailer: %s", info.messageId);
         return info;
