@@ -82,6 +82,15 @@ export const createDeal = async (req, res, next) => {
         const deal = await Deal.create(dealData);
         res.status(201).json({ message: "Deal created successfully!", data: deal });
 
+        // Sync Company and Contact ownership to the deal owner
+        if (deal.ownerId && (sanitizedCompanyId || sanitizedContactId)) {
+            const syncOwnership = async () => {
+                if (sanitizedCompanyId) await Company.findByIdAndUpdate(sanitizedCompanyId, { ownerId: deal.ownerId });
+                if (sanitizedContactId) await Contact.findByIdAndUpdate(sanitizedContactId, { ownerId: deal.ownerId });
+            };
+            syncOwnership().catch(err => console.error("Ownership sync error:", err));
+        }
+
         // Log deal creation
         await logAction({
             entityType: "Deal",
@@ -92,7 +101,7 @@ export const createDeal = async (req, res, next) => {
             req
         });
 
-        // Create Notification
+        // Create Notifications
         const owner = await User.findById(deal.ownerId);
         const creatorName = `${req.user.firstName} ${req.user.lastName || ""}`.trim();
         const ownerFullName = `${owner?.firstName || ""} ${owner?.lastName || ""}`.trim();
@@ -101,6 +110,7 @@ export const createDeal = async (req, res, next) => {
             ? `Deal "${deal.name}" has been created by ${creatorName}.`
             : `Deal "${deal.name}" has been created by ${creatorName} and assigned to ${ownerFullName}.`;
 
+        // Notify Assignee
         const notification = await Notification.create({
             recipientId: deal.ownerId,
             senderId: userId,
@@ -111,6 +121,20 @@ export const createDeal = async (req, res, next) => {
             teamId: owner?.managerId || (role === "sales_manager" ? userId : null)
         });
         emitNotification(notification);
+
+        // Notify Assignee's Manager if exists
+        if (owner && owner.managerId && owner.managerId.toString() !== userId) {
+            const managerNotification = await Notification.create({
+                recipientId: owner.managerId,
+                senderId: userId,
+                entityId: deal._id,
+                entityType: "Deal",
+                type: "deal_created",
+                message: `New Deal Assigned: "${deal.name}" has been assigned to your team member ${ownerFullName} by ${creatorName}.`,
+                teamId: owner.managerId
+            });
+            emitNotification(managerNotification);
+        }
 
         return;
 
@@ -308,19 +332,43 @@ export const updateDealInformation = async (req, res, next) => {
             req
         });
 
-        // Notification for reassignment
+        // Notification and Ownership Sync for reassignment
         if (req.body.ownerId && req.body.ownerId !== deal.ownerId.toString()) {
             const newOwner = await User.findById(req.body.ownerId);
+            const creatorName = `${req.user.firstName} ${req.user.lastName || ""}`.trim();
+
+            // Sync Company and Contact ownership to the NEW owner
+            const syncOwnership = async () => {
+                if (deal.companyId) await Company.findByIdAndUpdate(deal.companyId, { ownerId: req.body.ownerId });
+                if (deal.contactId) await Contact.findByIdAndUpdate(deal.contactId, { ownerId: req.body.ownerId });
+            };
+            syncOwnership().catch(err => console.error("Ownership sync error on reassignment:", err));
+
+            // Notify Assignee
             const notification = await Notification.create({
                 recipientId: req.body.ownerId,
                 senderId: userId,
                 entityId: deal._id,
                 entityType: "Deal",
                 type: "deal_reassigned",
-                message: `Deal "${deal.name}" has been reassigned to ${reassignedToName}.`,
+                message: `Deal "${deal.name}" has been reassigned to you by ${creatorName}.`,
                 teamId: newOwner?.managerId || null
             });
             emitNotification(notification);
+
+            // Notify Assignee's Manager if exists
+            if (newOwner && newOwner.managerId && newOwner.managerId.toString() !== userId) {
+                const managerNotification = await Notification.create({
+                    recipientId: newOwner.managerId,
+                    senderId: userId,
+                    entityId: deal._id,
+                    entityType: "Deal",
+                    type: "deal_reassigned",
+                    message: `Deal Reassigned: "${deal.name}" has been reassigned to your team member ${reassignedToName} by ${creatorName}.`,
+                    teamId: newOwner.managerId
+                });
+                emitNotification(managerNotification);
+            }
         } else if (req.body.stage && req.body.stage !== deal.stage) {
             // Notification for stage change
             const owner = await User.findById(deal.ownerId);
