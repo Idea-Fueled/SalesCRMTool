@@ -18,11 +18,17 @@ export const sendEmail = async (to, subject, html) => {
             throw new Error(`Email configuration is incomplete. Missing: ${missing.join(", ")}`);
         }
 
+        // Using explicit SMTP configuration for better reliability on cloud platforms
         const transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true, // true for 465, false for 587
             auth: {
                 user: emailUser,
                 pass: emailPass
+            },
+            tls: {
+                rejectUnauthorized: false // Helps in some restricted environments
             }
         });
 
@@ -33,11 +39,17 @@ export const sendEmail = async (to, subject, html) => {
             html
         };
 
+        console.log(`[sendEmail] Sending via smtp.gmail.com...`);
         const info = await transporter.sendMail(mailOptions);
         console.log("✅ Email sent successfully via NodeMailer: %s", info.messageId);
         return info;
     } catch (error) {
-        console.error("❌ Error in sendEmail utility:", error);
+        console.error("❌ NodeMailer Error Details:", {
+            message: error.message,
+            code: error.code,
+            command: error.command,
+            responseCode: error.responseCode
+        });
         throw new Error(`Failed to send email: ${error.message}`);
     }
 }
