@@ -425,9 +425,6 @@ export default function DealDetails() {
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-h-[450px]">
                         <div className="px-6 h-14 border-b border-gray-50 flex items-center justify-between">
                             <h3 className="text-sm font-bold text-gray-900 tracking-tight">Remarks</h3>
-                            <div className="flex items-center gap-2 text-[10px] font-medium text-gray-400 bg-gray-50/50 px-2.5 py-1 rounded-full border border-gray-100">
-                                <MessageSquare size={12} /> History
-                            </div>
                         </div>
 
                         <div className="p-6 space-y-6">

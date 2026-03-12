@@ -331,9 +331,6 @@ export default function ContactDetails() {
                                 >
                                     <RotateCw size={12} />
                                 </button>
-                                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-50 px-2.5 py-1 rounded-full">
-                                    <Clock size={12} className="text-red-400" /> Latest Update
-                                </div>
                             </div>
                         </div>
 

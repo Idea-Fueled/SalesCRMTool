@@ -364,9 +364,6 @@ export default function CompanyDetails() {
                                 >
                                     <RotateCw size={12} />
                                 </button>
-                                <div className="flex items-center gap-2 text-[10px] font-medium text-gray-400 bg-gray-50/50 px-2.5 py-1 rounded-full border border-gray-100">
-                                    <MessageSquare size={12} /> History
-                                </div>
                             </div>
                         </div>
 
