@@ -430,7 +430,7 @@ export default function DealDetails() {
                             </div>
                         </div>
 
-                        <div className="p-8 space-y-8">
+                        <div className="p-6 space-y-6">
                             {/* Narratives/Notes */}
                             <div className="space-y-4">
                                 <div className="space-y-4 max-h-[500px] overflow-y-auto px-1">
@@ -477,63 +477,59 @@ export default function DealDetails() {
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="text-center py-10 bg-gray-50/30 rounded-xl border border-dashed border-gray-200">
-                                            <MessageSquare size={24} className="mx-auto text-gray-300 mb-2 opacity-20" />
-                                            <p className="text-xs font-medium text-gray-400 uppercase tracking-widest italic">No remarks yet</p>
+                                        <div className="text-center py-6 bg-gray-50/20 rounded-xl border border-dashed border-gray-100">
+                                            <MessageSquare size={18} className="mx-auto text-gray-300 mb-1.5 opacity-20" />
+                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em] italic">No remarks yet</p>
                                         </div>
                                     )}
                                 </div>
                                 
                                 {/* Add Remark Input */}
-                                <div className="mt-6 pt-6 border-t border-gray-100 flex flex-col gap-4 no-print">
-                                    <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                                        <MessageSquare size={10} /> Remarks
-                                    </div>
+                                <div className="mt-4 pt-4 border-t border-gray-100 flex flex-col gap-3 no-print">
                                     <textarea
                                         value={newRemark}
                                         onChange={(e) => setNewRemark(e.target.value)}
                                         placeholder="Add a remark..."
-                                        className="w-full min-h-[100px] p-4 text-sm bg-gray-50/50 border border-gray-100 rounded-xl focus:ring-4 focus:ring-red-50 focus:border-red-300 focus:bg-white transition-all resize-none font-medium text-gray-700 shadow-inner"
+                                        className="w-full min-h-[45px] p-3 text-[13px] bg-gray-50/50 border border-gray-100 rounded-xl focus:ring-4 focus:ring-red-50 focus:border-red-300 focus:bg-white transition-all resize-none font-medium text-gray-700 shadow-inner"
                                     />
                                     
-                                    {/* Remark File Upload */}
-                                    <div className="flex flex-wrap gap-2">
-                                        {remarkFiles.map((file, idx) => (
-                                            <div key={idx} className="flex items-center gap-2 bg-red-50 px-2 py-1 rounded-lg border border-red-100 text-[10px] font-semibold text-red-700">
-                                                <span className="max-w-[150px] truncate">{file.name}</span>
-                                                <button
-                                                    onClick={() => setRemarkFiles(prev => prev.filter((_, i) => i !== idx))}
-                                                    className="hover:text-red-900"
-                                                >
-                                                    <X size={12} />
-                                                </button>
-                                            </div>
-                                        ))}
-                                        <label className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-[11px] font-bold text-gray-500 hover:border-red-400 hover:text-red-600 cursor-pointer transition-all shadow-sm active:scale-95 group">
-                                            <Paperclip size={14} className="group-hover:rotate-12 transition-transform" />
-                                            <span>{remarkFiles.length > 0 ? "Add More" : "Attach File"}</span>
-                                            <input
-                                                type="file"
-                                                multiple
-                                                className="hidden"
-                                                onChange={(e) => {
-                                                    const files = Array.from(e.target.files);
-                                                    setRemarkFiles(prev => [...prev, ...files]);
-                                                }}
-                                            />
-                                        </label>
-                                    </div>
+                                    <div className="flex items-center justify-between mt-1">
+                                        <div className="flex flex-wrap gap-2">
+                                            {remarkFiles.map((file, idx) => (
+                                                <div key={idx} className="flex items-center gap-2 bg-red-50 px-2 py-1 rounded-lg border border-red-100 text-[9px] font-bold text-red-600">
+                                                    <span className="max-w-[120px] truncate">{file.name}</span>
+                                                    <button
+                                                        onClick={() => setRemarkFiles(prev => prev.filter((_, i) => i !== idx))}
+                                                        className="hover:text-red-900"
+                                                    >
+                                                        <X size={10} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                            <label className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-bold text-gray-500 hover:border-red-400 hover:text-red-600 cursor-pointer transition-all shadow-sm active:scale-95 group">
+                                                <Paperclip size={12} className="group-hover:rotate-12 transition-transform" />
+                                                <span>{remarkFiles.length > 0 ? "Add More" : "Attach"}</span>
+                                                <input
+                                                    type="file"
+                                                    multiple
+                                                    className="hidden"
+                                                    onChange={(e) => {
+                                                        const files = Array.from(e.target.files);
+                                                        setRemarkFiles(prev => [...prev, ...files]);
+                                                    }}
+                                                />
+                                            </label>
+                                        </div>
 
-                                    <div className="flex justify-end">
                                         <button
                                             onClick={handleAddRemark}
                                             disabled={savingRemark || (!newRemark.trim() && remarkFiles.length === 0)}
-                                            className="px-6 py-2.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-md shadow-red-100 transition-all disabled:opacity-50 flex items-center gap-2 active:scale-95"
+                                            className="px-5 py-2 text-[11px] font-black text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-md shadow-red-100 transition-all disabled:opacity-50 flex items-center gap-2 active:scale-95"
                                         >
                                             {savingRemark ? (
-                                                <><Loader2 size={14} className="animate-spin" /> Sharing...</>
+                                                <><Loader2 size={12} className="animate-spin" /> ...</>
                                             ) : (
-                                                <><MessageSquare size={14} /> Post Remark</>
+                                                <><MessageSquare size={12} /> Post</>
                                             )}
                                         </button>
                                     </div>
