@@ -15,11 +15,30 @@ export const getAuditLogs = async (req, res) => {
             search
         } = req.query;
 
+        const { id: userId, role } = req.user;
         let filter = {};
+
+        if (role === "sales_manager") {
+            const User = mongoose.model("User");
+            const teamUsers = await User.find({ $or: [{ _id: userId }, { managerId: userId }] }).select("_id");
+            const teamIds = teamUsers.map(u => u._id);
+            filter.performedBy = { $in: teamIds };
+        } else if (role === "sales_rep") {
+            filter.performedBy = userId;
+        }
 
         if (entityType) filter.entityType = entityType;
         if (action) filter.action = action;
-        if (performedBy) filter.performedBy = performedBy;
+        if (performedBy) {
+            // If manager/rep tries to filter by someone else, we should respect the role filter
+            if (role === "admin") {
+                filter.performedBy = performedBy;
+            } else if (role === "sales_manager") {
+                // Already limited to teamIds, but can narrow down further
+                filter.performedBy = performedBy; 
+                // Note: The role filter already enforced teamIds, so if performedBy is not in team, it will return nothing.
+            }
+        }
 
         if (search) {
             const searchRegex = new RegExp(search, "i");

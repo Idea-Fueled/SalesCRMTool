@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
     LayoutDashboard, Briefcase, Building2, ContactRound, Users2,
-    Bell, Search, Menu, LogOut
+    Bell, Search, Menu, LogOut, History
 } from "lucide-react";
 import Logo from "./Logo";
 import { useAuth } from "../context/AuthContext";
@@ -97,6 +97,7 @@ export default function SalesManagerLayout() {
                         <div className="space-y-1">
                             <SidebarLink to="/manager/dashboard" icon={LayoutDashboard} label="Dashboard" onClick={closeSidebarOnMobile} />
                             <SidebarLink to="/manager/team" icon={Users2} label="My Team" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/manager/audit-logs" icon={History} label="Audit History" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
                     <div>

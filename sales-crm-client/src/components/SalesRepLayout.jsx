@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
     LayoutDashboard, Briefcase, Building2, ContactRound,
-    Bell, Search, Menu, LogOut
+    Bell, Search, Menu, LogOut, History
 } from "lucide-react";
 import Logo from "./Logo";
 import { useAuth } from "../context/AuthContext";
@@ -99,6 +99,7 @@ const SalesRepLayout = () => {
                             <SidebarLink to="/rep/deals" icon={Briefcase} label="My Deals" onClick={closeSidebarOnMobile} />
                             <SidebarLink to="/rep/companies" icon={Building2} label="My Companies" onClick={closeSidebarOnMobile} />
                             <SidebarLink to="/rep/contacts" icon={ContactRound} label="My Contacts" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/rep/audit-logs" icon={History} label="Audit History" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
                 </nav>
