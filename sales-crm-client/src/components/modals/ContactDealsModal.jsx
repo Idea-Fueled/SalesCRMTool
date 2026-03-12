@@ -43,6 +43,9 @@ export default function ContactDealsModal({ isOpen, onClose, contact }) {
         return stages[stage] || 'bg-gray-100 text-gray-600';
     };
 
+    const basePath = window.location.pathname.startsWith('/rep') ? '/rep' :
+        window.location.pathname.startsWith('/manager') ? '/manager' : '/dashboard';
+
     return (
         <Modal
             isOpen={isOpen}
@@ -66,7 +69,7 @@ export default function ContactDealsModal({ isOpen, onClose, contact }) {
                                 key={deal._id}
                                 onClick={() => {
                                     onClose();
-                                    navigate(`/dashboard/deals/${deal._id}`);
+                                    navigate(`${basePath}/deals/${deal._id}`);
                                 }}
                                 className="group p-4 bg-gray-50 hover:bg-red-50 border border-gray-100 hover:border-red-200 rounded-xl transition-all cursor-pointer flex flex-col gap-3"
                             >
