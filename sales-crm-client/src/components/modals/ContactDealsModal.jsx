@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "./Modal";
-import { getDeals } from "../../API/services/dealService";
+import { getDeals } from "../../../API/services/dealService";
 import { ExternalLink, Loader2, DollarSign, Calendar } from "lucide-react";
 import { toast } from "react-hot-toast";
 
