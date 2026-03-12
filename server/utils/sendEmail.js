@@ -1,62 +1,43 @@
-import fetch from 'node-fetch';
+import nodemailer from 'nodemailer';
 
 /**
- * Send an email using Brevo (Sendinblue) API
- * This bypasses Render's SMTP port restrictions.
+ * Send an email using NodeMailer
  */
 export const sendEmail = async (to, subject, html) => {
     try {
-        console.log(`[sendEmail] Attempting to send email to: ${to} (via Brevo API)`);
+        console.log(`[sendEmail] Attempting to send email to: ${to} (via NodeMailer)`);
 
-        const brevoApiKey = process.env.BREVO_API_KEY;
-        const senderEmail = process.env.BREVO_SENDER_EMAIL;
+        const emailUser = process.env.EMAIL_USER;
+        const emailPass = process.env.EMAIL_PASS;
 
-        if (!brevoApiKey || !senderEmail) {
+        if (!emailUser || !emailPass) {
             const missing = [];
-            if (!brevoApiKey) missing.push("BREVO_API_KEY");
-            if (!senderEmail) missing.push("BREVO_SENDER_EMAIL");
+            if (!emailUser) missing.push("EMAIL_USER");
+            if (!emailPass) missing.push("EMAIL_PASS");
             console.error(`[sendEmail] MISSING environment variables: ${missing.join(", ")}`);
             throw new Error(`Email configuration is incomplete. Missing: ${missing.join(", ")}`);
         }
 
-        if (brevoApiKey) {
-            const trimmedKey = brevoApiKey.trim();
-            console.log(`[sendEmail] API Key starts with 'xkeysib-'? ${trimmedKey.startsWith('xkeysib-')}`);
-            console.log(`[sendEmail] API Key length: ${trimmedKey.length}`);
-            console.log(`[sendEmail] API Key first 10 characters: ${trimmedKey.substring(0, 10)}...`);
-        }
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: emailUser,
+                pass: emailPass
+            }
+        });
 
-        const url = "https://api.brevo.com/v3/smtp/email";
-        const options = {
-            method: "POST",
-            headers: {
-                "accept": "application/json",
-                "api-key": brevoApiKey.trim(),
-                "content-type": "application/json"
-            },
-            body: JSON.stringify({
-                sender: {
-                    name: "mbdConsulting",
-                    email: senderEmail
-                },
-                to: [{ email: to }],
-                subject: subject,
-                htmlContent: html
-            })
+        const mailOptions = {
+            from: `"mbdConsulting" <${emailUser}>`,
+            to,
+            subject,
+            html
         };
 
-        const response = await fetch(url, options);
-        const result = await response.json();
-
-        if (response.ok) {
-            console.log("✅ Email sent successfully via Brevo: %s", result.messageId || "Success");
-            return result;
-        } else {
-            console.error("❌ Brevo API Error:", result);
-            throw new Error(`Brevo API failed: ${result.message || JSON.stringify(result)}`);
-        }
+        const info = await transporter.sendMail(mailOptions);
+        console.log("✅ Email sent successfully via NodeMailer: %s", info.messageId);
+        return info;
     } catch (error) {
         console.error("❌ Error in sendEmail utility:", error);
         throw new Error(`Failed to send email: ${error.message}`);
     }
-}
+}
