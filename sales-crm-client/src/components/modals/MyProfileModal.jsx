@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import Modal from "./Modal";
 import { Mail, Shield, User as UserIcon, Calendar, Clock, CheckCircle, XCircle, Camera, Loader2 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import API from "../../../API/Interceptor";
+import API from "../../API/Interceptor";
 import { toast } from "react-hot-toast";
 
 export default function MyProfileModal({ isOpen, onClose }) {

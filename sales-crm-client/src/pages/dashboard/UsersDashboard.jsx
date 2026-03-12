@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Users2, ShieldCheck, Briefcase, UserCheck, Edit2, Plus, X, Search, Trash2, Eye, ArrowLeft, ChevronRight, LayoutGrid, LayoutList, FolderSync } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import UserCard from "../../components/cards/UserCard";
-import { getTeamUsers, deactivateUser, activateUser, bulkReassignRecords, softDeleteUser, resendInvitation as apiResendInvitation } from "../../../API/services/userService";
+import { getTeamUsers, deactivateUser, activateUser, bulkReassignRecords, softDeleteUser, resendInvitation as apiResendInvitation } from "../../API/services/userService";
 import UserModal from "../../components/modals/UserModal";
 import UserDetailsModal from "../../components/modals/UserDetailsModal";
 import DeactivateModal from "../../components/modals/DeactivateModal";

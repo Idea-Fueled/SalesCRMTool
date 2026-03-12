@@ -4,9 +4,9 @@ import {
     Calendar, AlertCircle, ChevronRight, Search, Clock
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { getArchivedDeals, restoreDeal } from "../../../API/services/dealService";
-import { getArchivedContacts, restoreContact } from "../../../API/services/contactService";
-import { getArchivedCompanies, restoreCompany } from "../../../API/services/companyService";
+import { getArchivedDeals, restoreDeal } from "../../API/services/dealService";
+import { getArchivedContacts, restoreContact } from "../../API/services/contactService";
+import { getArchivedCompanies, restoreCompany } from "../../API/services/companyService";
 import { toast } from "react-hot-toast";
 
 const formatCurrency = (amount) => {

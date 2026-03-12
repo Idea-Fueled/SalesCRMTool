@@ -3,8 +3,8 @@ import {
     Briefcase, CheckCircle2, DollarSign, Building2, ChevronDown, ChevronRight
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { getDeals } from "../../../API/services/dealService";
-import { getCompanies } from "../../../API/services/companyService";
+import { getDeals } from "../../API/services/dealService";
+import { getCompanies } from "../../API/services/companyService";
 import CompanyDetailsModal from "../../components/modals/CompanyDetailsModal";
 import DealDetailsModal from "../../components/modals/DealDetailsModal";
 import { toast } from "react-hot-toast";

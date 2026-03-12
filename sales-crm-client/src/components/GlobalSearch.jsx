@@ -2,9 +2,9 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import { useNavigate, Link } from "react-router-dom";
 import { Search, Briefcase, Building2, ContactRound, X, Loader2, MessageSquare, Clock } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import { getDeals } from "../../API/services/dealService";
-import { getContacts } from "../../API/services/contactService";
-import { getCompanies } from "../../API/services/companyService";
+import { getDeals } from "../API/services/dealService";
+import { getContacts } from "../API/services/contactService";
+import { getCompanies } from "../API/services/companyService";
 
 const stageBadge = {
     Lead: "bg-red-50 text-red-600 border border-red-100", Qualified: "bg-orange-100 text-orange-700",

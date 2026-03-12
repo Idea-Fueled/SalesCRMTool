@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Users, Building2, MapPin, Mail, Phone, ExternalLink, Plus, Edit2, Trash2, Search, Linkedin, ChevronRight, LayoutGrid, LayoutList } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { getContacts, createContact, updateContact, deleteContact } from "../../../API/services/contactService";
-import { getCompanies } from "../../../API/services/companyService";
+import { getContacts, createContact, updateContact, deleteContact } from "../../API/services/contactService";
+import { getCompanies } from "../../API/services/companyService";
 import ContactModal from "../../components/modals/ContactModal";
 import ContactDetailsModal from "../../components/modals/ContactDetailsModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";

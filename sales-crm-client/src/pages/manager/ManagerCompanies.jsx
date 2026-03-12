@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Building2, CheckCircle2, Eye, XCircle, Plus, Edit2, Trash2, Search, ChevronRight, LayoutList, LayoutGrid } from "lucide-react";
 import { Link } from "react-router-dom";
-import { getCompanies, createCompany, updateCompany, deleteCompany, changeCompanyOwnership } from "../../../API/services/companyService";
+import { getCompanies, createCompany, updateCompany, deleteCompany, changeCompanyOwnership } from "../../API/services/companyService";
 import CompanyCard from "../../components/cards/CompanyCard";
 import CompanyModal from "../../components/modals/CompanyModal";
 import CompanyDetailsModal from "../../components/modals/CompanyDetailsModal";

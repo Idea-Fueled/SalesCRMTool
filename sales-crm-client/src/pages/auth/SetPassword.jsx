@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
-import { setupPassword } from "../../../API/services/userService";
+import { setupPassword } from "../../API/services/userService";
 import { toast } from "react-hot-toast";
 import { Lock, CheckCircle, ArrowRight, ShieldCheck, Mail } from "lucide-react";
 

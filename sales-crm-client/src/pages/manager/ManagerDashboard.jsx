@@ -3,9 +3,9 @@ import {
     Users2, Briefcase, CheckCircle2, DollarSign, ChevronDown, ChevronRight
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { getDeals } from "../../../API/services/dealService";
-import { getCompanies } from "../../../API/services/companyService";
-import { getTeamUsers } from "../../../API/services/userService";
+import { getDeals } from "../../API/services/dealService";
+import { getCompanies } from "../../API/services/companyService";
+import { getTeamUsers } from "../../API/services/userService";
 import CompanyDetailsModal from "../../components/modals/CompanyDetailsModal";
 import { toast } from "react-hot-toast";
 import { Eye } from "lucide-react";

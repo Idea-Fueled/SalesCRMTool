@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { History, Search, Filter, ArrowUpDown, ChevronLeft, ChevronRight, User, Briefcase, Building2, ContactRound, Shield, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { getAuditLogs } from "../../../API/services/auditLogService";
+import { getAuditLogs } from "../../API/services/auditLogService";
 import { toast } from "react-hot-toast";
 
 const Card = ({ children, className = "" }) => (

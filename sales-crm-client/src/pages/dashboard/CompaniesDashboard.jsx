@@ -5,8 +5,8 @@ import {
     LayoutGrid, LayoutList, Mail, Phone, MapPin, Star, MoreVertical, ExternalLink
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { getCompanies, createCompany, updateCompany, deleteCompany } from "../../../API/services/companyService";
-import { getTeamUsers } from "../../../API/services/userService";
+import { getCompanies, createCompany, updateCompany, deleteCompany } from "../../API/services/companyService";
+import { getTeamUsers } from "../../API/services/userService";
 import { useAuth } from "../../context/AuthContext";
 import CompanyCard from "../../components/cards/CompanyCard";
 import CompanyModal from "../../components/modals/CompanyModal";

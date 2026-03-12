@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { getCompanyById, updateCompany, deleteCompany, addRemark as addCompanyRemark } from "../../../API/services/companyService";
-import { getTeamUsers } from "../../../API/services/userService";
+import { getCompanyById, updateCompany, deleteCompany, addRemark as addCompanyRemark } from "../../API/services/companyService";
+import { getTeamUsers } from "../../API/services/userService";
 import { useAuth } from "../../context/AuthContext";
 import CompanyModal from "../../components/modals/CompanyModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";

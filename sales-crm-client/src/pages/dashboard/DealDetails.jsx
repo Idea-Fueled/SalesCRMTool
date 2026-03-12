@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { getDealById, updateDeal, deleteDeal, addRemark } from "../../../API/services/dealService";
-import { getCompanies } from "../../../API/services/companyService";
-import { getContacts } from "../../../API/services/contactService";
-import { getTeamUsers } from "../../../API/services/userService";
+import { getDealById, updateDeal, deleteDeal, addRemark } from "../../API/services/dealService";
+import { getCompanies } from "../../API/services/companyService";
+import { getContacts } from "../../API/services/contactService";
+import { getTeamUsers } from "../../API/services/userService";
 import { useAuth } from "../../context/AuthContext";
 import DealModal from "../../components/modals/DealModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";

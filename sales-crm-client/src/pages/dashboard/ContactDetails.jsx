@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { getContactById, updateContact, deleteContact, addRemark as addContactRemark } from "../../../API/services/contactService";
-import { getTeamUsers } from "../../../API/services/userService";
+import { getContactById, updateContact, deleteContact, addRemark as addContactRemark } from "../../API/services/contactService";
+import { getTeamUsers } from "../../API/services/userService";
 import { useAuth } from "../../context/AuthContext";
 import ContactModal from "../../components/modals/ContactModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";

@@ -5,10 +5,10 @@ import {
     ChevronDown, Plus, Edit2, Trash2,
     ChevronRight, LayoutList, LayoutGrid, Kanban, Eye
 } from "lucide-react";
-import { getDeals, createDeal, updateDeal, deleteDeal, updateDealStage } from "../../../API/services/dealService";
-import { getCompanies } from "../../../API/services/companyService";
-import { getContacts } from "../../../API/services/contactService";
-import { getTeamUsers } from "../../../API/services/userService";
+import { getDeals, createDeal, updateDeal, deleteDeal, updateDealStage } from "../../API/services/dealService";
+import { getCompanies } from "../../API/services/companyService";
+import { getContacts } from "../../API/services/contactService";
+import { getTeamUsers } from "../../API/services/userService";
 import { useAuth } from "../../context/AuthContext";
 import KanbanBoard from "../../components/KanbanBoard";
 import DealCard from "../../components/cards/DealCard";

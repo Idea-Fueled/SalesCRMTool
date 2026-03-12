@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Trash2, RotateCcw, User, ArrowLeft, ChevronRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { getDeletedUsers, restoreUser } from "../../../API/services/userService";
+import { getDeletedUsers, restoreUser } from "../../API/services/userService";
 import { toast } from "react-hot-toast";
 
 const roleBadge = {

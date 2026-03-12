@@ -8,10 +8,10 @@ import {
 import { Link } from "react-router-dom";
 import KanbanBoard from "../../components/KanbanBoard";
 import DealCard from "../../components/cards/DealCard";
-import { getDeals, createDeal, updateDeal, deleteDeal, updateDealStage } from "../../../API/services/dealService";
-import { getCompanies } from "../../../API/services/companyService";
-import { getContacts } from "../../../API/services/contactService";
-import { getTeamUsers } from "../../../API/services/userService";
+import { getDeals, createDeal, updateDeal, deleteDeal, updateDealStage } from "../../API/services/dealService";
+import { getCompanies } from "../../API/services/companyService";
+import { getContacts } from "../../API/services/contactService";
+import { getTeamUsers } from "../../API/services/userService";
 import { useAuth } from "../../context/AuthContext";
 import DealModal from "../../components/modals/DealModal";
 import DealDetailsModal from "../../components/modals/DealDetailsModal";

@@ -5,9 +5,9 @@ import {
     LayoutGrid, LayoutList
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { getContacts, createContact, updateContact, deleteContact } from "../../../API/services/contactService";
-import { getCompanies } from "../../../API/services/companyService";
-import { getTeamUsers } from "../../../API/services/userService";
+import { getContacts, createContact, updateContact, deleteContact } from "../../API/services/contactService";
+import { getCompanies } from "../../API/services/companyService";
+import { getTeamUsers } from "../../API/services/userService";
 import { useAuth } from "../../context/AuthContext";
 import ContactModal from "../../components/modals/ContactModal";
 import ContactDetailsModal from "../../components/modals/ContactDetailsModal";

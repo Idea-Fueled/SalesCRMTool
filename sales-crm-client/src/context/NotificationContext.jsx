@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import io from "socket.io-client";
 import { useAuth } from "./AuthContext";
-import API from "../../API/Interceptor";
+import API from "../API/Interceptor";
 import { toast } from "react-hot-toast";
 
 const NotificationContext = createContext();

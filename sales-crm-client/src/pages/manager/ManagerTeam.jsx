@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Users2, Search, Plus, Eye, LayoutList, LayoutGrid, CheckCircle2, XCircle, UserCheck, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { getTeamUsers, deactivateUser, activateUser } from "../../../API/services/userService";
+import { getTeamUsers, deactivateUser, activateUser } from "../../API/services/userService";
 import UserModal from "../../components/modals/UserModal";
 import UserDetailsModal from "../../components/modals/UserDetailsModal";
 import DeactivateModal from "../../components/modals/DeactivateModal";

@@ -3,7 +3,7 @@ import Logo from "../../components/Logo";
 import { Link, useNavigate } from "react-router-dom";
 import loginBg from "../../assets/login-bg.jpg";
 import { useAuth } from "../../context/AuthContext";
-import API from "../../../API/Interceptor";
+import API from "../../API/Interceptor";
 import toast from "react-hot-toast";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

@@ -6,10 +6,10 @@ import {
     CircleDashed, CheckCircle2, XCircle
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { getDeals } from "../../../API/services/dealService";
-import { getCompanies } from "../../../API/services/companyService";
-import { getContacts } from "../../../API/services/contactService";
-import { getTeamUsers } from "../../../API/services/userService";
+import { getDeals } from "../../API/services/dealService";
+import { getCompanies } from "../../API/services/companyService";
+import { getContacts } from "../../API/services/contactService";
+import { getTeamUsers } from "../../API/services/userService";
 import { toast } from "react-hot-toast";
 import DashboardDetailModal from "../../components/modals/DashboardDetailModal";
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
-import { createUser, updateUser, adminResetPassword } from "../../../API/services/userService";
+import { createUser, updateUser, adminResetPassword } from "../../API/services/userService";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 

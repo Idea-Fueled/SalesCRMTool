@@ -3,7 +3,7 @@ import Logo from "../../components/Logo";
 import { Link, useNavigate } from "react-router-dom";
 import forgotBg from "../../assets/forgot-bg.jpg";
 import toast from "react-hot-toast";
-import { forgotPassword } from "../../../API/services/userService";
+import { forgotPassword } from "../../API/services/userService";
 
 const AlertIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

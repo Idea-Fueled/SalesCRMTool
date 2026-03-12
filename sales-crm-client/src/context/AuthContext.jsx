@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
-import API from "../../API/Interceptor";
+import API from "../API/Interceptor";
 import { toast } from "react-hot-toast";
 
 const AuthContext = createContext();
