@@ -151,13 +151,14 @@ export const registerUser = async (req, res, next) => {
         })
 
         if (isInvitation) {
-            // Send email in background to prevent hanging the UI
-            console.log(`[registerUser] Triggering background ${user.isSetupComplete ? 'Welcome' : 'Invitation'} email for: ${email}`);
-            sendEmail(email, user.isSetupComplete ? "Welcome to mbdConsulting" : "Account Setup Invitation", message).then(() => {
-                console.log(`[registerUser] Background email SENT to: ${email}`);
-            }).catch(err => {
-                console.error("❌ Background Email Error:", err);
-            });
+            try {
+                console.log(`[registerUser] Sending ${user.isSetupComplete ? 'Welcome' : 'Invitation'} email to: ${email}`);
+                await sendEmail(email, user.isSetupComplete ? "Welcome to mbdConsulting" : "Account Setup Invitation", message);
+                console.log(`[registerUser] Email SENT successfully to: ${email}`);
+            } catch (err) {
+                console.error("❌ Email Delivery Error (Registration):", err);
+                // We still returned 201 above, but logging the error helps debug
+            }
         }
 
         // Log registration
@@ -888,12 +889,13 @@ export const forgotPassword = async (req, res, next) => {
 
         console.log("Constructed Reset URL:", resetUrl);
 
-        res.status(200).json({ message: "Reset link sent to your email!" });
-
-        // Send email in background to prevent hanging the UI
-        sendEmail(user.email, "Password Reset Request", message).catch(err => {
-            console.error("❌ Background Email Error (Forgot Password):", err);
-        });
+        try {
+            await sendEmail(user.email, "Password Reset Request", message);
+            res.status(200).json({ message: "Reset link sent to your email!" });
+        } catch (err) {
+            console.error("❌ Email Delivery Error (Forgot Password):", err);
+            return res.status(500).json({ message: "Error sending reset link. Please try again later." });
+        }
     } catch (error) {
         return res.status(500).json({
             message: error.message || "Server error!"
