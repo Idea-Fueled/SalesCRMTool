@@ -125,11 +125,28 @@ export const getContacts = async (req, res, next) => {
         if (role === "sales_manager") {
             const teamUsers = await User.find({ $or: [{ _id: id }, { managerId: id }] }).select("_id");
             const teamIds = teamUsers.map(user => user._id.toString());
-            filter.ownerId = { $in: teamIds }
+            
+            // Get contacts linked to team's deals
+            const { Deal } = await import("../models/dealSchema.js");
+            const teamDeals = await Deal.find({ ownerId: { $in: teamIds }, isDeleted: { $ne: true } }).select("contactId");
+            const dealContactIds = teamDeals.map(d => d.contactId).filter(id => id);
+
+            filter.$or = [
+                { ownerId: { $in: teamIds } },
+                { _id: { $in: dealContactIds } }
+            ];
         }
 
         if (role === "sales_rep") {
-            filter.ownerId = id;
+            // Get contacts linked to rep's deals
+            const { Deal } = await import("../models/dealSchema.js");
+            const myDeals = await Deal.find({ ownerId: id, isDeleted: { $ne: true } }).select("contactId");
+            const dealContactIds = myDeals.map(d => d.contactId).filter(id => id);
+
+            filter.$or = [
+                { ownerId: id },
+                { _id: { $in: dealContactIds } }
+            ];
         }
 
         const skip = (page - 1) * limit;

@@ -93,11 +93,28 @@ export const getCompanies = async (req, res) => {
             }).select("_id");
 
             const teamIds = teamUsers.map(u => u._id);
-            filter.ownerId = { $in: teamIds };
+            
+            // Get companies linked to team's deals
+            const { Deal } = await import("../models/dealSchema.js");
+            const teamDeals = await Deal.find({ ownerId: { $in: teamIds }, isDeleted: { $ne: true } }).select("companyId");
+            const dealCompanyIds = teamDeals.map(d => d.companyId).filter(id => id);
+
+            filter.$or = [
+                { ownerId: { $in: teamIds } },
+                { _id: { $in: dealCompanyIds } }
+            ];
         }
 
         if (role === "sales_rep") {
-            filter.ownerId = id;
+            // Get companies linked to rep's deals
+            const { Deal } = await import("../models/dealSchema.js");
+            const myDeals = await Deal.find({ ownerId: id, isDeleted: { $ne: true } }).select("companyId");
+            const dealCompanyIds = myDeals.map(d => d.companyId).filter(id => id);
+
+            filter.$or = [
+                { ownerId: id },
+                { _id: { $in: dealCompanyIds } }
+            ];
         }
 
 
