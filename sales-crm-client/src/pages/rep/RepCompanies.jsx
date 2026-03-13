@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Building2, CheckCircle2, Eye, XCircle, Plus, Edit2, Trash2, Search, ChevronRight } from "lucide-react";
+import { Building2, CheckCircle2, Eye, XCircle, Plus, Edit2, Trash2, Search, ChevronRight, LayoutGrid, LayoutList } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getCompanies, createCompany, updateCompany, deleteCompany } from "../../API/services/companyService";
 import CompanyModal from "../../components/modals/CompanyModal";
 import CompanyDetailsModal from "../../components/modals/CompanyDetailsModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
+import CompanyCard from "../../components/cards/CompanyCard";
 import { toast } from "react-hot-toast";
 
 const Card = ({ children, className = "" }) => (
@@ -38,6 +39,7 @@ export default function RepCompanies() {
     const [companies, setCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
+    const [viewMode, setViewMode] = useState("grid");
 
     // Modal states
     const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
@@ -133,7 +135,25 @@ export default function RepCompanies() {
 
             <Card>
                 <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-                    <h3 className="font-semibold text-gray-800 text-base">All Companies</h3>
+                    <div className="flex items-center gap-3">
+                        <h3 className="font-semibold text-gray-800 text-base">All Companies</h3>
+                        <div className="flex items-center bg-gray-100 p-1 rounded-lg">
+                            <button
+                                onClick={() => setViewMode("list")}
+                                title="List View"
+                                className={`p-1.5 rounded-md transition flex items-center justify-center ${viewMode === "list" ? "bg-white text-red-600 shadow-sm" : "text-gray-400 hover:text-gray-600"}`}
+                            >
+                                <LayoutList size={18} />
+                            </button>
+                            <button
+                                onClick={() => setViewMode("grid")}
+                                title="Grid View"
+                                className={`p-1.5 rounded-md transition flex items-center justify-center ${viewMode === "grid" ? "bg-white text-red-600 shadow-sm" : "text-gray-400 hover:text-gray-600"}`}
+                            >
+                                <LayoutGrid size={18} />
+                            </button>
+                        </div>
+                    </div>
                     <div className="relative">
                         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                         <input type="text" placeholder="Search company..."
@@ -141,63 +161,85 @@ export default function RepCompanies() {
                             className="w-full sm:w-64 text-sm border border-gray-200 rounded-lg pl-9 pr-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-red-400 bg-gray-50/50" />
                     </div>
                 </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                        <thead>
-                            <tr className="border-b border-gray-100 bg-gray-50">
-                                {["Company", "Industry", "Size", "Status", "Revenue Range", "Actions"].map(h => (
-                                    <th key={h} className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wide whitespace-nowrap">{h}</th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-50">
+                <div className="p-4 min-h-[300px]">
+                    {viewMode === "list" ? (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="border-b border-gray-100 bg-gray-50">
+                                        {["Company", "Industry", "Size", "Status", "Revenue Range", "Actions"].map(h => (
+                                            <th key={h} className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wide whitespace-nowrap">{h}</th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50">
+                                    {loading && companies.length === 0 ? (
+                                        <tr><td colSpan={6} className="text-center py-10 text-gray-400">Loading companies...</td></tr>
+                                    ) : companies.length === 0 ? (
+                                        <tr><td colSpan={6} className="text-center py-20 text-gray-400 font-medium italic">no companies found</td></tr>
+                                    ) : (
+                                        companies.map((c) => (
+                                            <tr key={c._id} className="hover:bg-gray-50/50 transition-colors group">
+                                                <td className="px-4 py-3 font-medium text-gray-800 cursor-pointer hover:text-red-600 transition-colors"
+                                                    onClick={() => navigate(`/rep/companies/${c._id}`)}>
+                                                    {c.name}
+                                                </td>
+                                                <td className="px-4 py-3 text-gray-600">{c.industry || "—"}</td>
+                                                <td className="px-4 py-3 text-gray-600">{c.size || "—"}</td>
+                                                <td className="px-4 py-3">
+                                                    <span className={`text-[11px] px-2.5 py-1 rounded-full font-bold ${statusBg[c.status] || "bg-gray-100 text-gray-600"}`}>{c.status}</span>
+                                                </td>
+                                                <td className="px-4 py-3 text-gray-600 font-medium">{formatCurrency(c.revenueRange)}</td>
+                                                <td className="px-4 py-3">
+                                                    <div className="flex items-center gap-2">
+                                                        <button
+                                                            onClick={() => navigate(`/rep/companies/${c._id}`)}
+                                                            title="View details"
+                                                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                                                        >
+                                                            <Eye size={16} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => { setSelectedCompany(c); setIsCompanyModalOpen(true); }}
+                                                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                                                        >
+                                                            <Edit2 size={16} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => { setSelectedCompany(c); setIsDeleteModalOpen(true); }}
+                                                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {loading && companies.length === 0 ? (
-                                <tr><td colSpan={6} className="text-center py-10 text-gray-400">Loading companies...</td></tr>
+                                <div className="col-span-full text-center py-10 text-gray-400">Loading companies...</div>
                             ) : companies.length === 0 ? (
-                                <tr><td colSpan={6} className="text-center py-20 text-gray-400 font-medium italic">no companies found</td></tr>
+                                <div className="col-span-full text-center py-20 text-gray-400 font-medium italic uppercase tracking-widest text-xs">no companies found</div>
                             ) : (
                                 companies.map((c) => (
-                                    <tr key={c._id} className="hover:bg-gray-50/50 transition-colors group">
-                                        <td className="px-4 py-3 font-medium text-gray-800 cursor-pointer hover:text-red-600 transition-colors"
-                                            onClick={() => navigate(`/rep/companies/${c._id}`)}>
-                                            {c.name}
-                                        </td>
-                                        <td className="px-4 py-3 text-gray-600">{c.industry || "—"}</td>
-                                        <td className="px-4 py-3 text-gray-600">{c.size || "—"}</td>
-                                        <td className="px-4 py-3">
-                                            <span className={`text-[11px] px-2.5 py-1 rounded-full font-bold ${statusBg[c.status] || "bg-gray-100 text-gray-600"}`}>{c.status}</span>
-                                        </td>
-                                        <td className="px-4 py-3 text-gray-600 font-medium">{formatCurrency(c.revenueRange)}</td>
-                                        <td className="px-4 py-3">
-                                            <div className="flex items-center gap-2">
-                                                <button
-                                                    onClick={() => navigate(`/rep/companies/${c._id}`)}
-                                                    title="View details"
-                                                    className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
-                                                >
-                                                    <Eye size={16} />
-                                                </button>
-                                                <button
-                                                    onClick={() => { setSelectedCompany(c); setIsCompanyModalOpen(true); }}
-                                                    className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
-                                                >
-                                                    <Edit2 size={16} />
-                                                </button>
-                                                <button
-                                                    onClick={() => { setSelectedCompany(c); setIsDeleteModalOpen(true); }}
-                                                    className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    <CompanyCard
+                                        key={c._id}
+                                        company={c}
+                                        onEdit={(company) => { setSelectedCompany(company); setIsCompanyModalOpen(true); }}
+                                        onDelete={(company) => { setSelectedCompany(company); setIsDeleteModalOpen(true); }}
+                                        onView={(company) => navigate(`/rep/companies/${company._id}`)}
+                                    />
                                 ))
                             )}
-                        </tbody>
-                    </table>
+                        </div>
+                    )}
                 </div>
-                <div className="px-5 py-3 border-t border-gray-50 bg-gray-50 rounded-b-xl">
+                <div className="px-5 py-3 border-t border-gray-100 bg-gray-50/50 rounded-b-xl">
                     <p className="text-xs text-gray-400">You can only manage companies you own. For ownership changes, contact your manager.</p>
                 </div>
             </Card>
