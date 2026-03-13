@@ -6,6 +6,7 @@ import { logAction } from "../utils/auditLogger.js";
 import { Notification } from "../models/notificationSchema.js";
 import { emitNotification } from "../utils/socket.js";
 import { uploadToCloudinary } from "../middlewares/uploadMiddleware.js";
+import { sendHierarchyNotification } from "../services/notificationService.js";
 
 export const createDeal = async (req, res, next) => {
     try {
@@ -101,40 +102,32 @@ export const createDeal = async (req, res, next) => {
             req
         });
 
-        // Create Notifications
-        const owner = await User.findById(deal.ownerId);
-        const creatorName = `${req.user.firstName} ${req.user.lastName || ""}`.trim();
-        const ownerFullName = `${owner?.firstName || ""} ${owner?.lastName || ""}`.trim();
-        
-        const notificationMessage = deal.ownerId.toString() === userId
-            ? `Deal "${deal.name}" has been created by ${creatorName}.`
-            : `Deal "${deal.name}" has been created by ${creatorName} and assigned to ${ownerFullName}.`;
-
-        // Notify Assignee
-        const notification = await Notification.create({
-            recipientId: deal.ownerId,
-            senderId: userId,
+        // Create Notifications via Hierarchy Service
+        await sendHierarchyNotification({
+            actorId: userId,
             entityId: deal._id,
             entityType: "Deal",
-            type: "deal_created",
-            message: notificationMessage,
-            teamId: owner?.managerId || (role === "sales_manager" ? userId : null)
+            entityName: deal.name,
+            action: "CREATE"
         });
-        emitNotification(notification);
 
-        // Notify Assignee's Manager if exists
-        if (owner && owner.managerId && owner.managerId.toString() !== userId) {
-            const managerNotification = await Notification.create({
-                recipientId: owner.managerId,
+        // Notify Assignee ONLY if it's someone else (not the hierarchy which is for managers/admins)
+        if (deal.ownerId.toString() !== userId) {
+             const owner = await User.findById(deal.ownerId);
+             const creatorName = `${req.user.firstName} ${req.user.lastName || ""}`.trim();
+             const notification = await Notification.create({
+                recipientId: deal.ownerId,
                 senderId: userId,
                 entityId: deal._id,
                 entityType: "Deal",
                 type: "deal_created",
-                message: `New Deal Assigned: "${deal.name}" has been assigned to your team member ${ownerFullName} by ${creatorName}.`,
-                teamId: owner.managerId
+                message: `Deal "${deal.name}" has been created by ${creatorName} and assigned to you.`,
+                teamId: owner?.managerId || null
             });
-            emitNotification(managerNotification);
+            emitNotification(notification);
         }
+
+        return;
 
         return;
 
@@ -369,19 +362,30 @@ export const updateDealInformation = async (req, res, next) => {
                 });
                 emitNotification(managerNotification);
             }
-        } else if (req.body.stage && req.body.stage !== deal.stage) {
             // Notification for stage change
-            const owner = await User.findById(deal.ownerId);
-            const notification = await Notification.create({
-                recipientId: deal.ownerId,
-                senderId: userId,
+            await sendHierarchyNotification({
+                actorId: userId,
                 entityId: deal._id,
                 entityType: "Deal",
-                type: "deal_updated",
-                message: `Deal "${deal.name}" stage updated to ${req.body.stage}.`,
-                teamId: owner?.managerId || null
+                entityName: deal.name,
+                action: "UPDATE",
+                customMessage: `Deal "${deal.name}" stage updated to ${req.body.stage} by ${req.user.firstName} ${req.user.lastName || ""}.`
             });
-            emitNotification(notification);
+
+            // Notify Owner if actor is not the owner
+            if (deal.ownerId.toString() !== userId) {
+                const owner = await User.findById(deal.ownerId);
+                const notification = await Notification.create({
+                    recipientId: deal.ownerId,
+                    senderId: userId,
+                    entityId: deal._id,
+                    entityType: "Deal",
+                    type: "deal_updated",
+                    message: `Deal "${deal.name}" stage updated to ${req.body.stage}.`,
+                    teamId: owner?.managerId || null
+                });
+                emitNotification(notification);
+            }
         }
 
         return;
@@ -475,18 +479,30 @@ export const moveDealStage = async (req, res, next) => {
             req
         });
 
-        // Create Notification
-        const owner = await User.findById(deal.ownerId);
-        const notification = await Notification.create({
-            recipientId: deal.ownerId,
-            senderId: userId,
+        // Create Hierarchical Notification
+        await sendHierarchyNotification({
+            actorId: userId,
             entityId: deal._id,
             entityType: "Deal",
-            type: "deal_updated",
-            message: `Deal "${deal.name}" moved to ${newStage}.`,
-            teamId: owner?.managerId || null
+            entityName: deal.name,
+            action: "UPDATE",
+            customMessage: `Deal "${deal.name}" moved to ${newStage} by ${req.user.firstName} ${req.user.lastName || ""}.`
         });
-        emitNotification(notification);
+
+        // Notify Owner if actor is not owner
+        if (deal.ownerId.toString() !== userId) {
+            const owner = await User.findById(deal.ownerId);
+            const notification = await Notification.create({
+                recipientId: deal.ownerId,
+                senderId: userId,
+                entityId: deal._id,
+                entityType: "Deal",
+                type: "deal_updated",
+                message: `Deal "${deal.name}" moved to ${newStage}.`,
+                teamId: owner?.managerId || null
+            });
+            emitNotification(notification);
+        }
 
         return;
 
@@ -633,6 +649,16 @@ export const deleteDeal = async (req, res, next) => {
             details: { message: `Deal "${deal.name}" moved to trash.`, oldValues: deal },
             req
         });
+
+        // Hierarchical Notification
+        await sendHierarchyNotification({
+            actorId: userId,
+            entityId: id,
+            entityType: "Deal",
+            entityName: deal.name,
+            action: "DELETE"
+        });
+
         return;
 
     } catch (error) {

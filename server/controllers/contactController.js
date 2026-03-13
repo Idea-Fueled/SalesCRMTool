@@ -3,6 +3,7 @@ import { Contact } from "../models/contactSchema.js";
 import User from "../models/userSchema.js";
 import { logAction } from "../utils/auditLogger.js";
 import { uploadToCloudinary } from "../middlewares/uploadMiddleware.js";
+import { sendHierarchyNotification } from "../services/notificationService.js";
 
 export const createContact = async (req, res, next) => {
     try {
@@ -90,6 +91,16 @@ export const createContact = async (req, res, next) => {
             details: { newValues: contact },
             req
         });
+
+        // Hierarchical Notification
+        await sendHierarchyNotification({
+            actorId: id,
+            entityId: contact._id,
+            entityType: "Contact",
+            entityName: `${contact.firstName} ${contact.lastName}`,
+            action: "CREATE"
+        });
+
         return;
 
     } catch (error) {
@@ -285,6 +296,16 @@ export const updateContact = async (req, res, next) => {
             },
             req
         });
+
+        // Hierarchical Notification
+        await sendHierarchyNotification({
+            actorId: userId,
+            entityId: id,
+            entityType: "Contact",
+            entityName: `${contact.firstName} ${contact.lastName}`,
+            action: "UPDATE"
+        });
+
         return;
 
     } catch (error) {
@@ -346,6 +367,16 @@ export const deleteContact = async (req, res, next) => {
             details: { message: `Contact "${contact.firstName} ${contact.lastName}" moved to trash.`, oldValues: contact },
             req
         });
+
+        // Hierarchical Notification
+        await sendHierarchyNotification({
+            actorId: userId,
+            entityId: id,
+            entityType: "Contact",
+            entityName: `${contact.firstName} ${contact.lastName}`,
+            action: "DELETE"
+        });
+
         return;
 
     } catch (error) {

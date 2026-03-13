@@ -2,6 +2,7 @@ import { Company } from "../models/companySchema.js";
 import User from "../models/userSchema.js";
 import { logAction } from "../utils/auditLogger.js";
 import { uploadToCloudinary } from "../middlewares/uploadMiddleware.js";
+import { sendHierarchyNotification } from "../services/notificationService.js";
 
 export const createCompany = async (req, res) => {
     try {
@@ -67,6 +68,16 @@ export const createCompany = async (req, res) => {
             details: { newValues: company },
             req
         });
+
+        // Hierarchical Notification
+        await sendHierarchyNotification({
+            actorId: req.user.id,
+            entityId: company._id,
+            entityType: "Company",
+            entityName: company.name,
+            action: "CREATE"
+        });
+
         return;
 
     } catch (error) {
@@ -248,6 +259,16 @@ export const updateCompany = async (req, res) => {
             details: { newValues: req.body },
             req
         });
+
+        // Hierarchical Notification
+        await sendHierarchyNotification({
+            actorId: userId,
+            entityId: id,
+            entityType: "Company",
+            entityName: company.name,
+            action: "UPDATE"
+        });
+
         return;
 
     } catch (error) {
@@ -312,6 +333,16 @@ export const deleteCompany = async (req, res) => {
             details: { message: `Company "${company.name}" moved to trash.`, oldValues: company },
             req
         });
+
+        // Hierarchical Notification
+        await sendHierarchyNotification({
+            actorId: userId,
+            entityId: id,
+            entityType: "Company",
+            entityName: company.name,
+            action: "DELETE"
+        });
+
         return;
 
     } catch (error) {
