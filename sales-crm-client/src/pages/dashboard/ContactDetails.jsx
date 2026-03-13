@@ -297,15 +297,40 @@ export default function ContactDetails() {
                                 )}
                             </div>
                             
-                            {/* Notes displayed in Contact Channels */}
-                            <div className="space-y-1 pt-2 border-t border-gray-50">
-                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
-                                    <FileText size={10} className="text-gray-400" /> Interaction Notes
-                                </label>
+                                {/* Interaction Notes */}
                                 <div className="p-4 bg-gray-50/50 rounded-xl border border-gray-100 text-[13px] text-gray-800 leading-relaxed whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto">
                                     {contact.notes ? contact.notes : <span className="text-gray-400 italic">No notes yet. Add a remark from the right panel.</span>}
                                 </div>
                             </div>
+
+                            {/* Digital Assets moved here */}
+                            {contact.attachments && contact.attachments.length > 0 && (
+                                <div className="space-y-3 pt-4 border-t border-gray-50">
+                                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                                        <Layers size={10} className="text-red-500" /> Digital Assets
+                                    </label>
+                                    <div className="grid grid-cols-1 gap-2">
+                                        {contact.attachments.map((file, idx) => (
+                                            <a
+                                                key={`main-${idx}`}
+                                                href={formatFileUrl(file.url)}
+                                                download={file.fileName}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="group flex items-center gap-3 p-2 bg-white border border-gray-100 rounded-xl hover:border-red-400 hover:shadow-sm transition-all duration-300"
+                                            >
+                                                <div className="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
+                                                    <FileText size={14} />
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="text-[11px] font-bold text-gray-900 truncate">{file.fileName}</p>
+                                                </div>
+                                                <Download size={12} className="text-gray-300 group-hover:text-red-600 transition-colors" />
+                                            </a>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -370,27 +395,21 @@ export default function ContactDetails() {
                                                     {remark.text}
                                                 </div>
                                                 {remark.files && remark.files.length > 0 && (
-                                                    <div className="mt-4 pt-3 border-t border-gray-100 flex flex-col gap-2">
-                                                        <span className="text-[10px] font-bold text-gray-400 flex items-center gap-1.5">
-                                                            <Paperclip size={10} /> ATTACHED FILES ({remark.files.length})
-                                                        </span>
-                                                        <div className="flex flex-wrap gap-2">
-                                                            {remark.files.map((file, fIdx) => (
-                                                                <a
-                                                                    key={fIdx}
-                                                                    href={formatFileUrl(file.url)}
-                                                                    download={file.fileName}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-medium text-gray-500 hover:border-red-400 hover:text-red-600 transition-all shadow-sm"
-                                                                >
-                                                                    <div className="w-6 h-6 rounded-lg bg-red-50 flex items-center justify-center text-red-500">
-                                                                        <Download size={12} />
-                                                                    </div>
-                                                                    <span>{file.fileName}</span>
-                                                                </a>
-                                                            ))}
-                                                        </div>
+                                                    <div className="mt-2 flex flex-wrap gap-2">
+                                                        {remark.files.map((file, fIdx) => (
+                                                            <a
+                                                                key={fIdx}
+                                                                href={formatFileUrl(file.url)}
+                                                                download={file.fileName}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="flex items-center gap-2 px-2 py-1 bg-white border border-gray-100 rounded-lg text-[10px] font-medium text-gray-500 hover:border-red-400 hover:text-red-600 transition-all shadow-sm"
+                                                            >
+                                                                <Paperclip size={10} className="text-gray-400" />
+                                                                <span className="max-w-[150px] truncate">{file.fileName}</span>
+                                                                <Download size={10} className="text-gray-300" />
+                                                            </a>
+                                                        ))}
                                                     </div>
                                                 )}
                                             </div>
@@ -453,82 +472,10 @@ export default function ContactDetails() {
                                     </div>
                                 </div>
                             </div>
-
-                        </div>
-                    </div>
-
-                    {/* Digital Assets & Documentation */}
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-h-[200px] mt-8">
-                        <div className="px-6 h-14 border-b border-gray-50 flex items-center justify-between">
-                            <h3 className="text-sm font-bold text-gray-900 tracking-tight flex items-center gap-2">
-                                <Layers size={14} className="text-red-500" /> Digital Assets
-                            </h3>
-                            <span className="px-3 py-1 bg-gray-50 text-[10px] font-bold text-gray-500 rounded-full border border-gray-100 uppercase tracking-tighter">
-                                {((contact.attachments?.length || 0) + (contact.remarks?.reduce((acc, r) => acc + (r.files?.length || 0), 0) || 0))} Files
-                            </span>
-                        </div>
-                        
-                        <div className="p-8">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {/* Main Contact Attachments */}
-                                {contact.attachments && contact.attachments.length > 0 && contact.attachments.map((file, idx) => (
-                                    <a
-                                        key={`main-${idx}`}
-                                        href={formatFileUrl(file.url)}
-                                        download={file.fileName}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="group flex items-center gap-3 p-4 bg-white border border-gray-100 rounded-2xl hover:border-red-400 hover:shadow-md transition-all duration-300 active:scale-95"
-                                    >
-                                        <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
-                                            <FileText size={18} />
-                                        </div>
-                                        <div className="min-w-0 flex-1">
-                                            <p className="text-xs font-bold text-gray-900 truncate mb-0.5">{file.fileName}</p>
-                                            <p className="text-[9px] font-medium text-gray-400 uppercase tracking-tighter flex items-center gap-1">
-                                                <Calendar size={8} /> {formatDate(file.uploadedAt)}
-                                            </p>
-                                        </div>
-                                        <Download size={14} className="text-gray-300 group-hover:text-red-600 transition-colors" />
-                                    </a>
-                                ))}
-                                
-                                {/* Remark-level Attachments */}
-                                {contact.remarks && contact.remarks.some(r => r.files && r.files.length > 0) && 
-                                    contact.remarks.flatMap((r, rIdx) => (r.files || []).map((file, fIdx) => (
-                                        <a
-                                            key={`rem-${rIdx}-${fIdx}`}
-                                            href={formatFileUrl(file.url)}
-                                            download={file.fileName}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="group flex items-center gap-3 p-4 bg-gray-50/30 border border-gray-100 rounded-2xl hover:border-red-400 hover:bg-white hover:shadow-md transition-all duration-300 active:scale-95"
-                                        >
-                                            <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-red-600 group-hover:text-white transition-colors">
-                                                <Paperclip size={18} />
-                                            </div>
-                                            <div className="min-w-0 flex-1">
-                                                <p className="text-xs font-bold text-gray-900 truncate mb-0.5">{file.fileName}</p>
-                                                <p className="text-[9px] font-medium text-red-400 uppercase tracking-tighter flex items-center gap-1">
-                                                    <MessageSquare size={8} /> Linked to Intel
-                                                </p>
-                                            </div>
-                                            <Download size={14} className="text-gray-300 group-hover:text-red-600 transition-colors" />
-                                        </a>
-                                    )))
-                                }
-                            </div>
-                            
-                            {(!contact.attachments || contact.attachments.length === 0) && (!contact.remarks || !contact.remarks.some(r => r.files && r.files.length > 0)) && (
-                                <div className="py-12 bg-gray-50/50 rounded-xl border border-dashed border-gray-200 text-center">
-                                    <Layers size={32} className="mx-auto text-gray-300 mb-3 opacity-30" />
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest italic">No files available</p>
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>
-            </div>
+
 
             {/* Sticky Meta Footer */}
             <div className="flex items-center justify-between pt-6 border-t border-gray-100 text-[10px] font-bold text-gray-400 uppercase tracking-widest">

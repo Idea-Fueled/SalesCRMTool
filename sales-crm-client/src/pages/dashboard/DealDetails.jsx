@@ -320,6 +320,35 @@ export default function DealDetails() {
                                     {deal.notes ? deal.notes : <span className="text-gray-400 italic">No notes yet. Add a remark from the right panel.</span>}
                                 </div>
                             </div>
+
+                            {/* Digital Assets moved here */}
+                            {deal.attachments && deal.attachments.length > 0 && (
+                                <div className="space-y-3 pt-4 border-t border-gray-50">
+                                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                                        <Layers size={10} className="text-red-500" /> Digital Assets
+                                    </label>
+                                    <div className="grid grid-cols-1 gap-2">
+                                        {deal.attachments.map((file, idx) => (
+                                            <a
+                                                key={`main-${idx}`}
+                                                href={formatFileUrl(file.url)}
+                                                download={file.fileName}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="group flex items-center gap-3 p-2 bg-white border border-gray-100 rounded-xl hover:border-red-400 hover:shadow-sm transition-all duration-300"
+                                            >
+                                                <div className="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
+                                                    <FileText size={14} />
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="text-[11px] font-bold text-gray-900 truncate">{file.fileName}</p>
+                                                </div>
+                                                <Download size={12} className="text-gray-300 group-hover:text-red-600 transition-colors" />
+                                            </a>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -447,27 +476,21 @@ export default function DealDetails() {
                                                     {remark.text}
                                                 </div>
                                                 {remark.files && remark.files.length > 0 && (
-                                                    <div className="mt-4 pt-3 border-t border-gray-100 flex flex-col gap-2">
-                                                        <span className="text-[10px] font-bold text-gray-400 flex items-center gap-1.5">
-                                                            <Paperclip size={10} /> ATTACHED FILES ({remark.files.length})
-                                                        </span>
-                                                        <div className="flex flex-wrap gap-2">
-                                                            {remark.files.map((file, fIdx) => (
-                                                                <a
-                                                                    key={fIdx}
-                                                                    href={formatFileUrl(file.url, file.fileType)}
-                                                                    download={file.fileName}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-medium text-gray-600 hover:text-red-600 hover:border-red-400 transition-all shadow-sm"
-                                                                >
-                                                                    <div className="w-6 h-6 rounded-lg bg-red-50 flex items-center justify-center text-red-500">
-                                                                        <Download size={12} />
-                                                                    </div>
-                                                                    <span>{file.fileName}</span>
-                                                                </a>
-                                                            ))}
-                                                        </div>
+                                                    <div className="mt-2 flex flex-wrap gap-2">
+                                                        {remark.files.map((file, fIdx) => (
+                                                            <a
+                                                                key={fIdx}
+                                                                href={formatFileUrl(file.url, file.fileType)}
+                                                                download={file.fileName}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="flex items-center gap-2 px-2 py-1 bg-white border border-gray-100 rounded-lg text-[10px] font-medium text-gray-600 hover:text-red-600 hover:border-red-400 transition-all shadow-sm"
+                                                            >
+                                                                <Paperclip size={10} className="text-gray-400" />
+                                                                <span className="max-w-[150px] truncate">{file.fileName}</span>
+                                                                <Download size={10} className="text-gray-300" />
+                                                            </a>
+                                                        ))}
                                                     </div>
                                                 )}
                                             </div>
@@ -534,14 +557,13 @@ export default function DealDetails() {
 
                             {/* Technical & Digital Assets Unified Section */}
                             <div className="pt-8 border-t border-gray-100">
-                                <div className={`grid gap-8 ${currentUser?.role === 'admin' ? 'grid-cols-1 lg:grid-cols-12' : 'grid-cols-1'}`}>
                                     {/* System Metadata - Admin Visibility Only */}
                                     {currentUser?.role === 'admin' && (
-                                        <div className="lg:col-span-5 space-y-4">
+                                        <div className="w-full space-y-4">
                                             <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
                                                 <Info size={14} className="text-blue-500" /> System Metadata
                                             </h3>
-                                            <div className="grid grid-cols-1 gap-3">
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                 <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50/50 border border-gray-100">
                                                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Object ID</span>
                                                     <span className="text-[10px] font-mono font-bold text-gray-500">{deal._id}</span>
@@ -553,76 +575,6 @@ export default function DealDetails() {
                                             </div>
                                         </div>
                                     )}
-
-                                    {/* Digital Assets Section */}
-                                    <div className={`${currentUser?.role === 'admin' ? 'lg:col-span-7' : 'col-span-1'} space-y-4`}>
-                                        <div className="flex items-center justify-between mb-2">
-                                            <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2">
-                                                <Layers size={14} className="text-red-500" /> Digital Assets
-                                            </h3>
-                                            <span className="px-3 py-1 bg-gray-50 text-[10px] font-bold text-gray-500 rounded-full border border-gray-100 uppercase tracking-tighter">
-                                                {((deal.attachments?.length || 0) + (deal.remarks?.reduce((acc, r) => acc + (r.files?.length || 0), 0) || 0))} Files
-                                            </span>
-                                        </div>
-                                        
-                                        <div className={`grid gap-3 ${currentUser?.role === 'admin' ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
-                                            {/* Main Deal Attachments */}
-                                            {deal.attachments && deal.attachments.length > 0 && deal.attachments.map((file, idx) => (
-                                                <a
-                                                    key={`main-${idx}`}
-                                                    href={formatFileUrl(file.url)}
-                                                    download={file.fileName}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="group flex items-center gap-3 p-3.5 bg-white border border-gray-100 rounded-xl hover:border-red-400 hover:shadow-md transition-all duration-300 active:scale-95"
-                                                >
-                                                    <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
-                                                        <FileText size={16} />
-                                                    </div>
-                                                    <div className="min-w-0 flex-1">
-                                                        <p className="text-xs font-bold text-gray-900 truncate">{file.fileName}</p>
-                                                        <p className="text-[8px] font-medium text-gray-400 uppercase tracking-tighter flex items-center gap-1">
-                                                            <Calendar size={8} /> {formatDate(file.uploadedAt)}
-                                                        </p>
-                                                    </div>
-                                                    <Download size={14} className="text-gray-300 group-hover:text-red-600 transition-colors" />
-                                                </a>
-                                            ))}
-                                            
-                                            {/* Remark-level Attachments */}
-                                            {deal.remarks && deal.remarks.some(r => r.files && r.files.length > 0) && 
-                                                deal.remarks.flatMap((r, rIdx) => (r.files || []).map((file, fIdx) => (
-                                                    <a
-                                                        key={`rem-${rIdx}-${fIdx}`}
-                                                        href={formatFileUrl(file.url)}
-                                                        download={file.fileName}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="group flex items-center gap-3 p-3.5 bg-gray-50/30 border border-gray-100 rounded-xl hover:border-red-400 hover:bg-white hover:shadow-md transition-all duration-300 active:scale-95"
-                                                    >
-                                                        <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-red-600 group-hover:text-white transition-colors">
-                                                            <Paperclip size={16} />
-                                                        </div>
-                                                        <div className="min-w-0 flex-1">
-                                                            <p className="text-xs font-bold text-gray-900 truncate">{file.fileName}</p>
-                                                            <p className="text-[8px] font-medium text-red-600 uppercase tracking-tighter flex items-center gap-1">
-                                                                <MessageSquare size={8} /> Linked
-                                                            </p>
-                                                        </div>
-                                                        <Download size={14} className="text-gray-300 group-hover:text-red-600 transition-colors" />
-                                                    </a>
-                                                )))
-                                            }
-                                        </div>
-                                        
-                                        {(!deal.attachments || deal.attachments.length === 0) && (!deal.remarks || !deal.remarks.some(r => r.files && r.files.length > 0)) && (
-                                            <div className="py-8 bg-gray-50/50 rounded-xl border border-dashed border-gray-200 text-center">
-                                                <Layers size={24} className="mx-auto text-gray-300 mb-2 opacity-30" />
-                                                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest italic">No files available</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
