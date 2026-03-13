@@ -9,7 +9,7 @@ import {
     Building2, User, MapPin, Globe, Phone,
     Mail, Briefcase, Calendar, Clock, ArrowLeft,
     ChevronRight, Download, RotateCw, Maximize2,
-    Star, Layers, Users, Target, Info, DollarSign,
+    Layers, Users, Target, Info, DollarSign,
     MoreHorizontal, List, FileText, Paperclip, X,
     Loader2, ExternalLink, MessageSquare, Edit2, Trash2
 } from "lucide-react";

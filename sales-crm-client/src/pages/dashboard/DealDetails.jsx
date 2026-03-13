@@ -11,7 +11,7 @@ import {
     Briefcase, Building2, User, DollarSign,
     Calendar, Clock, Target, Info,
     TrendingUp, ArrowLeft, Tag, Share2, Loader2,
-    Star, RotateCw, Maximize2, Lock, ThumbsUp, Shield,
+    RotateCw, Maximize2, Lock, ThumbsUp, Shield,
     MoreHorizontal, Download, ChevronRight, Layers,
     MapPin, Mail, Phone, FileText, Paperclip, List, History, MessageSquare,
     Edit2, Trash2, X
@@ -205,7 +205,6 @@ export default function DealDetails() {
                     <div>
                         <div className="flex items-center gap-2 mb-1">
                             <h1 className="text-2xl font-black text-gray-900 leading-none">{deal.name}</h1>
-                            <Star size={18} className="text-yellow-400 fill-yellow-400" />
                         </div>
                         <div className="space-y-1.5">
                             <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">

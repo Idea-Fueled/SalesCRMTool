@@ -9,7 +9,7 @@ import {
     User, Mail, Phone, Smartphone, Linkedin,
     Building2, Briefcase, Calendar, Clock,
     ArrowLeft, ChevronRight, Download, RotateCw,
-    Maximize2, Star, Shield, List, History,
+    Maximize2, Shield, List, History,
     MessageSquare, FileText, Paperclip, Loader2, Layers,
     MapPin, Globe, ExternalLink, MoreHorizontal, Edit2, Trash2, X, DollarSign
 } from "lucide-react";
@@ -198,7 +198,6 @@ export default function ContactDetails() {
                     <div>
                         <div className="flex items-center gap-2 mb-1">
                             <h1 className="text-2xl font-black text-gray-900 leading-none">{contact.firstName} {contact.lastName}</h1>
-                            <Star size={18} className="text-yellow-400 fill-yellow-400" />
                         </div>
                         <div className="space-y-1.5">
                             <div className="flex items-center gap-3 mt-1">
