@@ -5,7 +5,7 @@ const getBaseURL = () => {
     if (import.meta.env.MODE === "development") {
         return "http://localhost:8000/api";
     } else {
-        return import.meta.env.VITE_BASE_URL + "/api";
+        return (import.meta.env.VITE_BASE_URL || "").trim() + "/api";
     }
 };
 
