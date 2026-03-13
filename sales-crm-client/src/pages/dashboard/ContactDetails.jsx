@@ -332,7 +332,6 @@ export default function ContactDetails() {
                                 </div>
                             )}
                         </div>
-                    </div>
 
                     {/* Relationship Owner */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -469,12 +468,13 @@ export default function ContactDetails() {
                                                 <><MessageSquare size={12} /> Post</>
                                             )}
                                         </button>
-                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
 
             {/* Sticky Meta Footer */}

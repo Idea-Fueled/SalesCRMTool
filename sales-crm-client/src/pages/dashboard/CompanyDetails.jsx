@@ -302,10 +302,9 @@ export default function CompanyDetails() {
                                 <p className="text-sm font-bold text-gray-900 leading-relaxed">{company.address || "No address on file"}</p>
                             </div>
                             
-                                {/* Operational Notes */}
-                                <div className="p-4 bg-gray-50/50 rounded-xl border border-gray-100 text-[13px] text-gray-800 leading-relaxed whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto">
-                                    {company.notes ? company.notes : <span className="text-gray-400 italic">No notes yet. Add a remark from the right panel.</span>}
-                                </div>
+                            {/* Operational Notes */}
+                            <div className="p-4 bg-gray-50/50 rounded-xl border border-gray-100 text-[13px] text-gray-800 leading-relaxed whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto">
+                                {company.notes ? company.notes : <span className="text-gray-400 italic">No notes yet. Add a remark from the right panel.</span>}
                             </div>
 
                             {/* Digital Assets moved here */}
@@ -500,24 +499,24 @@ export default function CompanyDetails() {
                                             </button>
                                         </div>
                                     </div>
-                                </div>
                             </div>
                         </div>
+                    </div>
 
-
-                            {/* Cross-Linking Stats */}
-                            <div className="pt-8 grid grid-cols-2 gap-4">
-                                <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-50/50 border border-gray-100/50 hover:bg-white transition-all cursor-default">
-                                    <Target size={14} className="text-red-400" />
-                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Target Ops: 0 Open</span>
-                                </div>
-                                <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-50/50 border border-gray-100/50 hover:bg-white transition-all cursor-default">
-                                    <Users size={14} className="text-blue-400" />
-                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Stakeholders Linked</span>
-                                </div>
+                        {/* Cross-Linking Stats */}
+                        <div className="pt-8 grid grid-cols-2 gap-4">
+                            <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-50/50 border border-gray-100/50 hover:bg-white transition-all cursor-default">
+                                <Target size={14} className="text-red-400" />
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Target Ops: 0 Open</span>
+                            </div>
+                            <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-50/50 border border-gray-100/50 hover:bg-white transition-all cursor-default">
+                                <Users size={14} className="text-blue-400" />
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Stakeholders Linked</span>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
             {/* Sticky Meta Footer */}
             <div className="flex items-center justify-between pt-6 border-t border-gray-100 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
