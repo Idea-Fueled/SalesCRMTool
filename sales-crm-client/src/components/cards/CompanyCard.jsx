@@ -1,5 +1,6 @@
 import React from "react";
 import { Building2, Star, MoreVertical, Eye, Edit2, Trash2, Phone, MapPin, Mail, ExternalLink } from "lucide-react";
+import { truncateName } from "../../utils/stringUtils";
 
 const statusBg = {
     Active: "bg-green-100 text-green-700",
@@ -20,8 +21,8 @@ const CompanyCard = ({ company, onEdit, onDelete, onView }) => {
                             <Building2 size={24} />
                         </div>
                         <div className="flex-1 min-w-0 pt-1">
-                            <h3 className="font-bold text-gray-800 group-hover:text-red-600 transition-colors uppercase text-xs tracking-wide truncate">
-                                {company.name}
+                            <h3 className="font-bold text-gray-800 group-hover:text-red-600 transition-colors uppercase text-xs tracking-wide">
+                                {truncateName(company.name)}
                             </h3>
                         </div>
                     </div>

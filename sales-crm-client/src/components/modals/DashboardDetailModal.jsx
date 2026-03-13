@@ -1,6 +1,7 @@
 import React from "react";
 import Modal from "./Modal";
 import { Briefcase, Building2, Users, DollarSign } from "lucide-react";
+import { truncateName } from "../../utils/stringUtils";
 
 export default function DashboardDetailModal({ isOpen, onClose, category, data }) {
     const titles = {
@@ -34,7 +35,7 @@ export default function DashboardDetailModal({ isOpen, onClose, category, data }
                         {data.map((deal) => (
                             <div key={deal._id} className="p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
                                 <div className="flex justify-between items-start mb-2">
-                                    <h4 className="font-bold text-gray-900">{deal.name}</h4>
+                                    <h4 className="font-bold text-gray-900 uppercase text-[11px] tracking-wide">{truncateName(deal.name)}</h4>
                                     <span className="text-sm font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-lg">
                                         ${deal.value?.toLocaleString()}
                                     </span>
@@ -59,7 +60,7 @@ export default function DashboardDetailModal({ isOpen, onClose, category, data }
                         {data.map((company) => (
                             <div key={company._id} className="p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors flex items-center justify-between">
                                 <div>
-                                    <h4 className="font-bold text-gray-900">{company.name}</h4>
+                                    <h4 className="font-bold text-gray-900 uppercase text-[11px] tracking-wide">{truncateName(company.name)}</h4>
                                     <p className="text-xs text-gray-500 mt-1">{company.industry || "No Industry specified"}</p>
                                 </div>
                                 <Building2 size={20} className="text-gray-300" />

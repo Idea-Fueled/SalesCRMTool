@@ -1,5 +1,6 @@
 import React from "react";
 import { Briefcase, DollarSign, TrendingUp, Calendar, MoreVertical, Eye, Edit2, Trash2, Building2, User } from "lucide-react";
+import { truncateName } from "../../utils/stringUtils";
 
 const stageBadge = {
     Lead: "bg-red-50 text-red-600 border border-red-100",
@@ -23,8 +24,8 @@ const DealCard = ({ deal, onEdit, onDelete, onView }) => {
                             <Briefcase size={24} />
                         </div>
                         <div className="flex-1 min-w-0">
-                            <h3 className="font-bold text-gray-800 group-hover:text-red-600 transition-colors uppercase text-xs tracking-wide truncate">
-                                {deal.name}
+                            <h3 className="font-bold text-gray-800 group-hover:text-red-600 transition-colors uppercase text-xs tracking-wide">
+                                {truncateName(deal.name)}
                             </h3>
                             <div className="flex items-center gap-1.5 mt-1.5 overflow-hidden">
                                 <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase truncate ${stageBadge[deal.stage] || "bg-gray-100 text-gray-600"}`}>

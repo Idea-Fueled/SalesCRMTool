@@ -1,6 +1,7 @@
 import React from 'react';
 import { Mail, Phone, Linkedin, ExternalLink, Eye, Edit2, Trash2, Building2, MoreVertical, MapPin, Briefcase } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { truncateName } from '../../utils/stringUtils';
 
 const Avatar = ({ name }) => {
     if (!name) return null;
@@ -26,8 +27,8 @@ export default function ContactCard({ contact, onEdit, onDelete, onView, onDeals
                     <div className="flex gap-4 flex-1 min-w-0">
                         <Avatar name={`${contact.firstName} ${contact.lastName}`} />
                         <div className="flex-1 min-w-0 pt-1">
-                            <h3 className="font-bold text-gray-900 group-hover:text-red-600 transition-colors uppercase text-xs tracking-wide truncate">
-                                {contact.firstName} {contact.lastName}
+                            <h3 className="font-bold text-gray-900 group-hover:text-red-600 transition-colors uppercase text-xs tracking-wide">
+                                {truncateName(`${contact.firstName} ${contact.lastName}`)}
                             </h3>
                             <div className="flex items-center gap-1.5 mt-1 text-gray-400 overflow-hidden">
                                 <Briefcase size={12} className="text-gray-300 flex-shrink-0" />
