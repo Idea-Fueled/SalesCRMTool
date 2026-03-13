@@ -409,6 +409,17 @@ export const changeOwnership = async (req, res) => {
             },
             req
         });
+
+        // Hierarchical Notification
+        await sendHierarchyNotification({
+            actorId: userId,
+            entityId: id,
+            entityType: "Company",
+            entityName: company.name,
+            action: "UPDATE",
+            customMessage: `Company "${company.name}" ownership changed to ${newOwner ? `${newOwner.firstName} ${newOwner.lastName}` : newOwnerId} by ${req.user.firstName}.`
+        });
+
         return;
 
     } catch (error) {

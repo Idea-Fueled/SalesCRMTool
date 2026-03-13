@@ -247,6 +247,8 @@ export const updateDealInformation = async (req, res, next) => {
             }
         }
 
+        const oldStage = deal?.stage;
+
         if (req.body.ownerId !== undefined && req.body.ownerId !== deal.ownerId.toString()) {
             if (role === "sales_rep") {
                 return res.status(403).json({ message: "Sales representatives cannot reassign deals!" });
@@ -361,31 +363,37 @@ export const updateDealInformation = async (req, res, next) => {
                     teamId: newOwner.managerId
                 });
                 emitNotification(managerNotification);
-            }
-            // Notification for stage change
-            await sendHierarchyNotification({
-                actorId: userId,
+        }
+        }
+
+        // Create Hierarchical Notification (covers ALL edits)
+        let hierarchyMsg = null;
+        if (req.body.stage && req.body.stage !== oldStage) {
+            hierarchyMsg = `Deal "${deal.name}" stage updated to ${req.body.stage} by ${req.user.firstName} ${req.user.lastName || ""}.`;
+        }
+        
+        await sendHierarchyNotification({
+            actorId: userId,
+            entityId: deal._id,
+            entityType: "Deal",
+            entityName: deal.name,
+            action: "UPDATE",
+            customMessage: hierarchyMsg
+        });
+
+        // Notify Owner if actor is not the owner (regardless of hierarchy)
+        if (deal.ownerId.toString() !== userId) {
+            const owner = await User.findById(deal.ownerId);
+            const notification = await Notification.create({
+                recipientId: deal.ownerId,
+                senderId: userId,
                 entityId: deal._id,
                 entityType: "Deal",
-                entityName: deal.name,
-                action: "UPDATE",
-                customMessage: `Deal "${deal.name}" stage updated to ${req.body.stage} by ${req.user.firstName} ${req.user.lastName || ""}.`
+                type: "deal_updated",
+                message: hierarchyMsg || `Deal "${deal.name}" has been updated by ${req.user.firstName}.`,
+                teamId: owner?.managerId || null
             });
-
-            // Notify Owner if actor is not the owner
-            if (deal.ownerId.toString() !== userId) {
-                const owner = await User.findById(deal.ownerId);
-                const notification = await Notification.create({
-                    recipientId: deal.ownerId,
-                    senderId: userId,
-                    entityId: deal._id,
-                    entityType: "Deal",
-                    type: "deal_updated",
-                    message: `Deal "${deal.name}" stage updated to ${req.body.stage}.`,
-                    teamId: owner?.managerId || null
-                });
-                emitNotification(notification);
-            }
+            emitNotification(notification);
         }
 
         return;
@@ -589,6 +597,17 @@ export const markDealResult = async (req, res, next) => {
             details: { message: `Deal marked as ${result}`, result },
             req
         });
+
+        // Hierarchical Notification
+        await sendHierarchyNotification({
+            actorId: userId,
+            entityId: id,
+            entityType: "Deal",
+            entityName: deal.name,
+            action: "UPDATE",
+            customMessage: `Deal "${deal.name}" marked as ${result} by ${req.user.firstName} ${req.user.lastName || ""}.`
+        });
+
         return;
 
 
