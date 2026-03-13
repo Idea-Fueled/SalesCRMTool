@@ -359,13 +359,13 @@ export default function UsersDashboard() {
                                                                 : "bg-green-50 text-green-700 border border-green-100"
                                                             }`}>
                                                             <span className={`w-1.5 h-1.5 rounded-full ${!u.isActive ? "bg-red-500 animate-pulse" : !u.isSetupComplete ? "bg-amber-500 animate-pulse" : "bg-green-500"}`} />
-                                                            {!u.isActive ? "DEACTIVATED" : !u.isSetupComplete ? "PENDING INVITE" : "ACTIVE"}
+                                                        {!u.isActive ? "DEACTIVATED" : !u.isSetupComplete ? "PENDING INVITE" : "ACTIVE"}
                                                         </span>
-                                                        {u.isActive && !u.isSetupComplete && (
+                                                        {u.isActive && (!u.isSetupComplete || !u.lastLogin) && (
                                                             <button
                                                                 onClick={(e) => { e.stopPropagation(); handleResendInvite(u); }}
                                                                 className="p-1 px-2 text-[10px] font-bold text-amber-600 hover:bg-amber-50 rounded-lg border border-amber-200 transition"
-                                                                title="Resend invitation link"
+                                                                title="Resend invitation link or credential reminder"
                                                             >
                                                                 RESEND
                                                             </button>

@@ -118,6 +118,11 @@ export const registerUser = async (req, res, next) => {
                         <h2 style="color: #e11d48; text-align: center;">Welcome to mbdConsulting</h2>
                         <p>Hello ${firstName},</p>
                         <p>An account has been created for you by your administrator.</p>
+                        <div style="background-color: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #e2e8f0;">
+                            <p style="margin: 0; color: #64748b; font-size: 13px;">Login Credentials:</p>
+                            <p style="margin: 5px 0; font-family: monospace;"><strong>Email:</strong> ${email}</p>
+                            <p style="margin: 5px 0; font-family: monospace;"><strong>Password:</strong> ${password}</p>
+                        </div>
                         <p>You can now log in to your dashboard using the button below.</p>
                         <div style="text-align: center; margin: 30px 0;">
                             <a href="${frontendUrl}/login" style="background-color: #e11d48; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Login Now</a>
@@ -974,40 +979,63 @@ export const resendInvitation = async (req, res) => {
         const user = await User.findById(id);
 
         if (!user) return res.status(404).json({ message: "User not found." });
-        if (user.isSetupComplete) return res.status(400).json({ message: "User has already completed setup." });
-
-        const invitationToken = crypto.randomBytes(32).toString("hex");
-        const invitationExpiry = Date.now() + 3600000; // 1 hour
-
-        user.invitationToken = invitationToken;
-        user.invitationExpiry = invitationExpiry;
-        await user.save();
+        if (user.lastLogin) return res.status(400).json({ message: "User has already logged in and activated their account." });
 
         const frontendUrl = process.env.FRONTEND_URL || req.get("origin") || "http://localhost:5173";
         const logoUrl = `${frontendUrl}/Logo.png`;
-        const setupUrl = `${frontendUrl}/setup-password?token=${invitationToken}`;
+        let message = "";
+        let subject = "";
 
-        const message = `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <img src="${logoUrl}" alt="mbdConsulting Logo" style="height: 50px; width: auto;" />
+        if (!user.isSetupComplete) {
+            const invitationToken = crypto.randomBytes(32).toString("hex");
+            const invitationExpiry = Date.now() + 3600000; // 1 hour
+
+            user.invitationToken = invitationToken;
+            user.invitationExpiry = invitationExpiry;
+            await user.save();
+
+            const setupUrl = `${frontendUrl}/setup-password?token=${invitationToken}`;
+            subject = "Complete Your Account Setup";
+            message = `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <img src="${logoUrl}" alt="mbdConsulting Logo" style="height: 50px; width: auto;" />
+                    </div>
+                    <h2 style="color: #e11d48; text-align: center;">Account Setup Invitation</h2>
+                    <p>Hello ${user.firstName},</p>
+                    <p>An account invitation link has been generated for you. Please click below to set your password.</p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="${setupUrl}" style="background-color: #e11d48; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Set Up Account</a>
+                    </div>
+                    <p>This link is valid for 1 hour.</p>
+                    <p style="word-break: break-all; color: #64748b; font-size: 14px;">${setupUrl}</p>
+                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+                    <p style="font-size: 12px; color: #94a3b8; text-align: center;">&copy; ${new Date().getFullYear()} mbdConsulting. All rights reserved.</p>
                 </div>
-                <h2 style="color: #e11d48; text-align: center;">Account Setup Invitation</h2>
-                <p>Hello ${user.firstName},</p>
-                <p>An account invitation link has been generated for you. Please click below to set your password.</p>
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="${setupUrl}" style="background-color: #e11d48; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Set Up Account</a>
+            `;
+        } else {
+            // Already has a password but hasn't logged in
+            subject = "Welcome to mbdConsulting";
+            message = `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <img src="${logoUrl}" alt="mbdConsulting Logo" style="height: 50px; width: auto;" />
+                    </div>
+                    <h2 style="color: #e11d48; text-align: center;">Welcome to mbdConsulting</h2>
+                    <p>Hello ${user.firstName},</p>
+                    <p>This is a reminder that an account has been created for you by your administrator.</p>
+                    <p>You can log in to your dashboard using the button below. If you've forgotten your password, please use the "Forgot Password" link on the login page.</p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="${frontendUrl}/login" style="background-color: #e11d48; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Login Now</a>
+                    </div>
+                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+                    <p style="font-size: 12px; color: #94a3b8; text-align: center;">&copy; ${new Date().getFullYear()} mbdConsulting. All rights reserved.</p>
                 </div>
-                <p>This link is valid for 1 hour.</p>
-                <p style="word-break: break-all; color: #64748b; font-size: 14px;">${setupUrl}</p>
-                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
-                <p style="font-size: 12px; color: #94a3b8; text-align: center;">&copy; ${new Date().getFullYear()} mbdConsulting. All rights reserved.</p>
-            </div>
-        `;
+            `;
+        }
 
-        await sendEmail(user.email, "Complete Your Account Setup", message);
-
-        res.status(200).json({ message: "Invitation link resent successfully!" });
+        await sendEmail(user.email, subject, message);
+        res.status(200).json({ message: "Reminder email sent successfully!" });
     } catch (error) {
         res.status(500).json({ message: error.message || "Server error resending invitation." });
     }

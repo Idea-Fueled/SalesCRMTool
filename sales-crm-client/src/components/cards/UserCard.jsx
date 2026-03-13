@@ -79,10 +79,11 @@ const UserCard = ({ user, onEdit, onDeactivate, onActivate, onReassign, onDelete
                         <span className={`w-1.5 h-1.5 rounded-full ${!user.isActive ? "bg-red-500 animate-pulse" : !user.isSetupComplete ? "bg-amber-500 animate-pulse" : "bg-green-500"}`} />
                         {!user.isActive ? "DEACTIVATED" : !user.isSetupComplete ? "PENDING INVITE" : "ACTIVE"}
                     </span>
-                    {user.isActive && !user.isSetupComplete && (
+                    {user.isActive && (!user.isSetupComplete || !user.lastLogin) && (
                         <button
                             onClick={(e) => { e.stopPropagation(); onResendInvite(user); }}
                             className="text-[10px] font-bold text-amber-600 hover:underline uppercase"
+                            title="Resend invitation link or credential reminder"
                         >
                             Resend
                         </button>
