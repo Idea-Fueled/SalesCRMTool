@@ -213,7 +213,7 @@ export const loginUser = async (req, res, next) => {
 
         if (!user.password) {
             return res.status(401).json({
-                message: "This account was created via invitation and does not have a password set yet. Please check your email for the setup link or use the 'Forgot Password' option.",
+                message: "Account setup pending. Check your email or use 'Forgot Password'.",
                 code: "PASSWORD_NOT_SET"
             })
         }
