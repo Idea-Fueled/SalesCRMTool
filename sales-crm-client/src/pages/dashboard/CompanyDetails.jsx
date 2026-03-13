@@ -381,7 +381,7 @@ export default function CompanyDetails() {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-h-[400px]">
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <div className="px-6 h-14 border-b border-gray-50 flex items-center justify-between">
                             <h3 className="text-sm font-bold text-gray-900 tracking-tight">Remarks</h3>
                             <div className="flex items-center gap-2">
