@@ -297,7 +297,11 @@ export default function ContactDetails() {
                                 )}
                             </div>
                             
-                                {/* Interaction Notes */}
+                            {/* Interaction Notes displayed in Primary Info */}
+                            <div className="space-y-1 pt-2 border-t border-gray-50">
+                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
+                                    <FileText size={10} className="text-gray-400" /> Interaction Notes
+                                </label>
                                 <div className="p-4 bg-gray-50/50 rounded-xl border border-gray-100 text-[13px] text-gray-800 leading-relaxed whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto">
                                     {contact.notes ? contact.notes : <span className="text-gray-400 italic">No notes yet. Add a remark from the right panel.</span>}
                                 </div>
@@ -332,6 +336,7 @@ export default function ContactDetails() {
                                 </div>
                             )}
                         </div>
+                    </div>
 
                     {/* Relationship Owner */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -468,13 +473,13 @@ export default function ContactDetails() {
                                                 <><MessageSquare size={12} /> Post</>
                                             )}
                                         </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
 
             {/* Sticky Meta Footer */}

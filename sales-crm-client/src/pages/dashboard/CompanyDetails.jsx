@@ -303,8 +303,13 @@ export default function CompanyDetails() {
                             </div>
                             
                             {/* Operational Notes */}
-                            <div className="p-4 bg-gray-50/50 rounded-xl border border-gray-100 text-[13px] text-gray-800 leading-relaxed whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto">
-                                {company.notes ? company.notes : <span className="text-gray-400 italic">No notes yet. Add a remark from the right panel.</span>}
+                            <div className="space-y-1 pt-2 border-t border-gray-50">
+                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
+                                    <FileText size={10} className="text-gray-400" /> Operational Notes
+                                </label>
+                                <div className="p-4 bg-gray-50/50 rounded-xl border border-gray-100 text-[13px] text-gray-800 leading-relaxed whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto">
+                                    {company.notes ? company.notes : <span className="text-gray-400 italic">No notes yet. Add a remark from the right panel.</span>}
+                                </div>
                             </div>
 
                             {/* Digital Assets moved here */}
@@ -514,9 +519,9 @@ export default function CompanyDetails() {
                                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Stakeholders Linked</span>
                             </div>
                         </div>
-                    </div>
                 </div>
             </div>
+        </div>
 
             {/* Sticky Meta Footer */}
             <div className="flex items-center justify-between pt-6 border-t border-gray-100 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
