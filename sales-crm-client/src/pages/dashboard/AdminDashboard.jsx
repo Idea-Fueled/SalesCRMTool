@@ -56,6 +56,8 @@ export default function AdminDashboard() {
     const [modalConfig, setModalConfig] = useState({ isOpen: false, category: null, data: [] });
     const [selectedMonth, setSelectedMonth] = useState("");
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+    const [activeBar, setActiveBar] = useState(null);
+    const [activePipelineBar, setActivePipelineBar] = useState(null);
     const navigate = useNavigate();
 
     const fetchStats = async () => {
@@ -273,19 +275,27 @@ export default function AdminDashboard() {
                     <div className="h-64 flex items-end gap-3 px-2">
                         {stats.revenueChart.map((m, i) => {
                             const h = (m.value / maxChartValue) * 100;
+                            const isActive = activeBar === i;
                             return (
-                                <div key={i} className="flex-1 h-full flex flex-col items-center gap-3 group">
+                                <div 
+                                    key={i} 
+                                    className="flex-1 h-full flex flex-col items-center gap-3 group cursor-pointer"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setActiveBar(isActive ? null : i);
+                                    }}
+                                >
                                     <div className="flex-1 w-full flex items-end">
                                         <div
-                                            className="w-full bg-red-500 group-hover:bg-red-600 transition-all duration-300 rounded-t-lg relative"
+                                            className={`w-full ${isActive ? 'bg-red-600' : 'bg-red-500'} group-hover:bg-red-600 transition-all duration-300 rounded-t-lg relative`}
                                             style={{ height: `${Math.max(h, 5)}%` }}
                                         >
-                                            <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                                            <div className={`absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded transition-opacity whitespace-nowrap z-10 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
                                                 ${m.value.toLocaleString()}
                                             </div>
                                         </div>
                                     </div>
-                                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                                    <span className={`text-[11px] font-bold uppercase tracking-wider transition-colors ${isActive ? 'text-red-600' : 'text-gray-400 font-bold'}`}>
                                         {m.name}
                                     </span>
                                 </div>
@@ -398,14 +408,27 @@ export default function AdminDashboard() {
                         {pipelineStats.map((stat, i) => {
                             const heightPercent = pipelineTotalDeals > 0 ? Math.max((stat.count / pipelineTotalDeals) * 100, 10) : 0;
                             if (heightPercent === 0) return null;
+                            const isActive = activePipelineBar === i;
                             return (
                                 <div 
                                     key={i} 
-                                    className={`${stat.color} flex-1 rounded-t-md transition-all duration-500 hover:opacity-80 relative group cursor-pointer`}
+                                    className={`${stat.color} flex-1 rounded-t-md transition-all duration-500 hover:opacity-80 relative group cursor-pointer ${isActive ? 'ring-2 ring-offset-2 ring-gray-200' : ''}`}
                                     style={{ height: `${heightPercent}%` }}
-                                    onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: stats.dealList.filter(d => d.stage === stat.name) })}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (window.innerWidth < 1024) {
+                                            if (isActive) {
+                                                setModalConfig({ isOpen: true, category: 'deals', data: stats.dealList.filter(d => d.stage === stat.name) });
+                                                setActivePipelineBar(null);
+                                            } else {
+                                                setActivePipelineBar(i);
+                                            }
+                                        } else {
+                                            setModalConfig({ isOpen: true, category: 'deals', data: stats.dealList.filter(d => d.stage === stat.name) });
+                                        }
+                                    }}
                                 >
-                                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
+                                    <div className={`absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded transition-opacity whitespace-nowrap z-10 pointer-events-none ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
                                         {stat.count} Deals
                                     </div>
                                 </div>
