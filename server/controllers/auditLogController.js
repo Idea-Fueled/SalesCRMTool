@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import AuditLog from "../models/auditLogSchema.js";
+import User from "../models/userSchema.js";
 
 export const getAuditLogs = async (req, res) => {
     try {
@@ -19,7 +20,6 @@ export const getAuditLogs = async (req, res) => {
         let filter = {};
 
         if (role === "sales_manager") {
-            const User = mongoose.model("User");
             const teamUsers = await User.find({ $or: [{ _id: userId }, { managerId: userId }] }).select("_id");
             const teamIds = teamUsers.map(u => u._id);
             // Managers see logs performed by their team OR logs where team members are targets
@@ -48,7 +48,7 @@ export const getAuditLogs = async (req, res) => {
             const searchRegex = new RegExp(search, "i");
 
             // Find users matching search for performedBy or targetUserId
-            const matchingUsers = await mongoose.model("User").find({
+            const matchingUsers = await User.find({
                 $or: [
                     { firstName: searchRegex },
                     { lastName: searchRegex },

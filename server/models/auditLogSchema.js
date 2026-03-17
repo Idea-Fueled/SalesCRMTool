@@ -25,9 +25,18 @@ const auditLogSchema = new mongoose.Schema(
                 "PASSWORD_CHANGE",
             ],
         },
+        performedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
         targetUserId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
+        },
+        details: {
+            type: mongoose.Schema.Types.Mixed,
+            default: {}
         },
         ipAddress: { type: String },
         userAgent: { type: String },
