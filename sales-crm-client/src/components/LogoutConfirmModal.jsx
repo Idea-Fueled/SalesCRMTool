@@ -5,7 +5,7 @@ export default function LogoutConfirmModal({ isOpen, onClose, onConfirm }) {
     if (!isOpen) return null;
     return (
         <div
-            className="fixed inset-0 z-[60] flex items-center justify-center px-4"
+            className="fixed inset-0 z-[100] flex items-center justify-center px-4"
             style={{ background: "rgba(15,15,25,0.45)", backdropFilter: "blur(4px)" }}
             onClick={onClose}
         >

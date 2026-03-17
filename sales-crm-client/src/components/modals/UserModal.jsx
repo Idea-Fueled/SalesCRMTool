@@ -5,7 +5,7 @@ import { toast } from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 
 const ModalOverlay = ({ children, onClose }) => (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4"
+    <div className="fixed inset-0 z-[100] flex items-center justify-center px-4"
         style={{ background: "rgba(15,15,25,0.5)", backdropFilter: "blur(4px)" }}
         onClick={onClose}>
         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md" onClick={e => e.stopPropagation()}>
