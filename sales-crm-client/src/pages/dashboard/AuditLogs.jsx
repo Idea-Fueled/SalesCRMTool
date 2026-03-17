@@ -82,8 +82,10 @@ export default function AuditLogs() {
         
         return (
             <div className="flex items-center gap-3">
-                <div className={`w-8 h-8 rounded-full ${isCurrent ? 'bg-red-600' : 'bg-gray-100'} text-white flex items-center justify-center font-bold text-xs overflow-hidden shadow-sm`}>
-                    {log.performedBy ? (
+                <div className={`w-8 h-8 rounded-full ${isCurrent ? 'bg-red-600' : 'bg-gray-100'} text-white flex items-center justify-center font-bold text-xs overflow-hidden shadow-sm border-2 ${isCurrent ? 'border-red-400' : 'border-white'}`}>
+                    {log.performedBy?.profilePicture ? (
+                        <img src={log.performedBy.profilePicture} alt="Performer" className="w-full h-full object-cover" />
+                    ) : log.performedBy ? (
                         <span className={isCurrent ? 'text-white' : 'text-red-500'}>
                             {log.performedBy?.firstName?.[0]}{log.performedBy?.lastName?.[0]}
                         </span>
@@ -231,8 +233,12 @@ export default function AuditLogs() {
                                         <td className="px-5 py-4 whitespace-nowrap">
                                             {log.targetUserId ? (
                                                 <div className="flex items-center gap-2">
-                                                    <div className={`w-6 h-6 rounded-full ${currentUser?.id === log.targetUserId._id ? 'bg-red-500' : 'bg-gray-100'} flex items-center justify-center text-[10px] font-bold text-white`}>
-                                                        {log.targetUserId.firstName?.[0]}
+                                                    <div className={`w-6 h-6 rounded-full ${currentUser?.id === log.targetUserId._id ? 'bg-red-500' : 'bg-gray-100'} flex items-center justify-center text-[10px] font-bold text-white overflow-hidden border border-white shadow-sm`}>
+                                                        {log.targetUserId.profilePicture ? (
+                                                            <img src={log.targetUserId.profilePicture} alt="Target" className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            log.targetUserId.firstName?.[0]
+                                                        )}
                                                     </div>
                                                     <span className={`text-xs font-semibold ${currentUser?.id === log.targetUserId._id ? 'text-red-500' : 'text-gray-700'}`}>
                                                         {currentUser?.id === log.targetUserId._id ? "You" : `${log.targetUserId.firstName} ${log.targetUserId.lastName || ""}`}

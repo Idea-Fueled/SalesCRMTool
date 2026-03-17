@@ -370,8 +370,12 @@ export default function DealDetails() {
                         </div>
                         <div className="p-4">
                             <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
-                                <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-sm ring-1 ring-red-100">
-                                    {deal.ownerId?.firstName?.[0]}{deal.ownerId?.lastName?.[0]}
+                                <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-sm ring-1 ring-red-100 overflow-hidden">
+                                    {deal.ownerId?.profilePicture ? (
+                                        <img src={deal.ownerId.profilePicture} alt="Owner" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <>{deal.ownerId?.firstName?.[0]}{deal.ownerId?.lastName?.[0]}</>
+                                    )}
                                 </div>
                                 <div>
                                     <p className="text-sm font-black text-gray-900 leading-none">{deal.ownerId?.firstName} {deal.ownerId?.lastName || ""}</p>
@@ -493,8 +497,12 @@ export default function DealDetails() {
                                             <div key={i} className="p-4 bg-gray-50/30 rounded-xl border border-gray-100">
                                                 <div className="flex items-start justify-between mb-2">
                                                     <div className="flex items-center gap-2">
-                                                        <div className="w-6 h-6 rounded-full bg-red-50 flex items-center justify-center text-[10px] font-bold text-red-600 border border-red-100">
-                                                            {remark.authorName?.[0] || 'U'}
+                                                        <div className="w-6 h-6 rounded-full bg-red-50 flex items-center justify-center text-[10px] font-bold text-red-600 border border-red-100 overflow-hidden">
+                                                            {remark.authorId?.profilePicture || remark.profilePicture ? (
+                                                                <img src={remark.authorId?.profilePicture || remark.profilePicture} alt="Author" className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                remark.authorName?.[0] || 'U'
+                                                            )}
                                                         </div>
                                                         <span className="text-[11px] font-semibold text-gray-500">
                                                             {remark.authorName || "Unknown"} <span className="text-gray-300 mx-1">•</span> {formatDate(remark.createdAt, true)}
