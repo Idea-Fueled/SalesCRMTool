@@ -55,7 +55,7 @@ const SessionTimeoutManager = ({ children }) => {
         }, REFRESH_INTERVAL);
 
         // Event listeners for user activity
-        const events = ["mousedown", "mousemove", "keypress", "scroll", "touchstart"];
+        const events = ["mousedown", "mousemove", "keydown", "scroll", "touchstart"];
         events.forEach(event => document.addEventListener(event, handleActivity));
 
         return () => {
