@@ -4,6 +4,8 @@ import Modal from "./Modal";
 import { getDeals } from "../../API/services/dealService";
 import { Loader2, DollarSign, Calendar } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { isDealOverdue } from "../../utils/dateUtils";
+import { Clock } from "lucide-react";
 
 export default function ContactDealsModal({ isOpen, onClose, contact }) {
     const navigate = useNavigate();
@@ -82,6 +84,11 @@ export default function ContactDealsModal({ isOpen, onClose, contact }) {
                                             <span className={`text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter ${getStageColor(deal.stage)}`}>
                                                 {deal.stage}
                                             </span>
+                                            {isDealOverdue(deal) && (
+                                                <span className="text-[9px] px-1.5 py-0.5 bg-red-600 text-white rounded font-black uppercase tracking-tighter animate-pulse flex items-center gap-1">
+                                                    <Clock size={8} /> Overdue
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

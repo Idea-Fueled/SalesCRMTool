@@ -17,6 +17,7 @@ import KanbanBoard from "../../components/KanbanBoard";
 import DealModal from "../../components/modals/DealModal";
 import ContactDetailsModal from "../../components/modals/ContactDetailsModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
+import { isDealOverdue } from "../../utils/dateUtils";
 import { toast } from "react-hot-toast";
 
 const Select = ({ options, value, onChange }) => (

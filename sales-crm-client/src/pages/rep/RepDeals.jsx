@@ -15,6 +15,7 @@ import DealCard from "../../components/cards/DealCard";
 import DealModal from "../../components/modals/DealModal";
 import ContactDetailsModal from "../../components/modals/ContactDetailsModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
+import { isDealOverdue } from "../../utils/dateUtils";
 import { toast } from "react-hot-toast";
 
 const Select = ({ options, value, onChange }) => (
@@ -299,7 +300,12 @@ export default function RepDeals() {
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3 font-semibold text-gray-800 whitespace-nowrap">${d.value?.toLocaleString()}</td>
-                                            <td className="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">{d.expectedCloseDate ? new Date(d.expectedCloseDate).toLocaleDateString() : "—"}</td>
+                                            <td className={`px-4 py-3 text-xs whitespace-nowrap font-bold ${isDealOverdue(d) ? 'text-red-600' : 'text-gray-500'}`}>
+                                                <div className="flex items-center gap-1.5">
+                                                    {d.expectedCloseDate ? new Date(d.expectedCloseDate).toLocaleDateString() : "—"}
+                                                    {isDealOverdue(d) && <span className="text-[10px] bg-red-50 text-red-600 px-1.5 py-0.5 rounded font-black uppercase tracking-tighter">Overdue</span>}
+                                                </div>
+                                            </td>
                                             <td className="px-4 py-3 whitespace-nowrap">
                                                 <div className="flex items-center gap-2">
                                                     <button

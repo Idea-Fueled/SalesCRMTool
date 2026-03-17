@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { exportToPDF } from "../../utils/pdfExport";
+import { isDealOverdue } from "../../utils/dateUtils";
 
 const pipelineStages = [
     { id: "Lead", label: "Lead" },
@@ -205,6 +206,11 @@ export default function DealDetails() {
                     <div className="min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                             <h1 className="text-2xl font-black text-gray-900 leading-none">{deal.name}</h1>
+                            {isDealOverdue(deal) && (
+                                <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-black bg-red-600 text-white uppercase tracking-tighter animate-pulse shadow-sm shadow-red-100">
+                                    <Clock size={10} /> Overdue for Closing
+                                </span>
+                            )}
                         </div>
                         <div className="space-y-1.5">
                             <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
@@ -302,7 +308,12 @@ export default function DealDetails() {
                                 <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
                                     <Calendar size={10} className="text-red-400" /> Expected Close
                                 </label>
-                                <p className="text-sm font-bold text-gray-900">{formatDate(deal.expectedCloseDate)}</p>
+                                <div className="flex items-center gap-2">
+                                    <p className={`text-sm font-bold ${isDealOverdue(deal) ? "text-red-600" : "text-gray-900"}`}>{formatDate(deal.expectedCloseDate)}</p>
+                                    {isDealOverdue(deal) && (
+                                        <span className="text-[9px] font-black text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-100 uppercase animate-pulse">Action Required</span>
+                                    )}
+                                </div>
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">

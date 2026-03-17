@@ -1,6 +1,8 @@
 import React from "react";
 import { Briefcase, DollarSign, TrendingUp, Calendar, MoreVertical, Eye, Edit2, Trash2, Building2, User } from "lucide-react";
 import { truncateName } from "../../utils/stringUtils";
+import { isDealOverdue } from "../../utils/dateUtils";
+import { Clock } from "lucide-react";
 
 const stageBadge = {
     Lead: "bg-red-50 text-red-600 border border-red-100",
@@ -31,6 +33,11 @@ const DealCard = ({ deal, onEdit, onDelete, onView }) => {
                                 <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase truncate ${stageBadge[deal.stage] || "bg-gray-100 text-gray-600"}`}>
                                     {deal.stage}
                                 </span>
+                                {isDealOverdue(deal) && (
+                                    <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-black bg-red-600 text-white uppercase tracking-tighter animate-pulse flex-shrink-0">
+                                        <Clock size={10} /> Overdue
+                                    </span>
+                                )}
                             </div>
                         </div>
                     </div>
