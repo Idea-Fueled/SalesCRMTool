@@ -113,7 +113,6 @@ export default function DealDetailsModal({ isOpen, onClose, deal }) {
                                         </div>
                                         <span className="text-sm font-bold text-gray-700 truncate">{deal.companyId?.name || deal.companyName}</span>
                                     </div>
-                                    <ArrowRight size={14} className="text-gray-300" />
                                 </div>
                                 <div className="flex items-center justify-between p-2.5 bg-white border border-gray-100 rounded-xl shadow-sm">
                                     <div className="flex items-center gap-2 overflow-hidden">
@@ -122,7 +121,6 @@ export default function DealDetailsModal({ isOpen, onClose, deal }) {
                                         </div>
                                         <span className="text-sm font-bold text-gray-700 truncate">{deal.contactId ? `${deal.contactId.firstName || ""} ${deal.contactId.lastName || ""}`.trim() : (deal.contactName || "No Contact")}</span>
                                     </div>
-                                    <ArrowRight size={14} className="text-gray-300" />
                                 </div>
                             </div>
                         </section>
