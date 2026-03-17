@@ -3,7 +3,7 @@ import React from "react";
 const ConfirmDialog = ({ isOpen, onClose, onConfirm, title, message, confirmLabel = "Confirm", confirmColor = "bg-red-600 hover:bg-red-700" }) => {
     if (!isOpen) return null;
     return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center px-4"
+        <div className="fixed inset-0 z-[100] flex items-center justify-center px-4"
             style={{ background: "rgba(15,15,25,0.45)", backdropFilter: "blur(4px)" }}
             onClick={onClose}>
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 flex flex-col items-center text-center"
