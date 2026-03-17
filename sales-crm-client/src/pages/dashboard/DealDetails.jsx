@@ -421,40 +421,67 @@ export default function DealDetails() {
                 <div className="lg:col-span-8 space-y-8">
                     {/* Pipeline Status */}
                     <div className="space-y-4">
-                        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Symmetric Pipeline Status</h3>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+                        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                             <Layers size={12} className="text-gray-300" />
+                             Symmetric Pipeline Status
+                        </h3>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-0">
                             {pipelineStages.map((stage, index) => {
                                 const currentStageIndex = pipelineStages.findIndex(s => s.id === deal.stage);
                                 const isPast = index < currentStageIndex;
                                 const isCurrent = deal.stage === stage.id;
+                                
+                                // Color Map for Current State
+                                const activeColors = [
+                                    "bg-blue-600 shadow-blue-100", 
+                                    "bg-amber-400 shadow-amber-100", 
+                                    "bg-orange-600 shadow-orange-100", 
+                                    "bg-pink-600 shadow-pink-100", 
+                                    "bg-green-600 shadow-green-100", 
+                                    "bg-red-600 shadow-red-100"
+                                ];
 
                                 return (
-                                    <div key={stage.id} className="relative group h-10 sm:h-12 w-full">
+                                    <div key={stage.id} className="relative group h-12 sm:h-14 w-full">
                                         <div className={`
-                                            h-full w-full flex items-center justify-center text-[9px] sm:text-[10px] font-black px-2 sm:px-4
-                                            transition-all duration-300 cursor-default uppercase tracking-widest
+                                            h-full w-full flex flex-col items-center justify-center text-[9px] sm:text-[10px] font-black px-2 sm:px-4
+                                            transition-all duration-500 cursor-default uppercase tracking-widest gap-0.5
                                             ${isCurrent
-                                                ? (index === 0 ? "bg-blue-600 text-white" :
-                                                    index === 1 ? "bg-amber-400 text-white" :
-                                                        index === 2 ? "bg-orange-600 text-white" :
-                                                            index === 3 ? "bg-pink-600 text-white" :
-                                                                index === 4 ? "bg-green-600 text-white" :
-                                                                    index === 5 ? "bg-red-600 text-white" :
-                                                                        "bg-gray-200 text-gray-500")
-                                                : isPast ? "bg-gray-800 text-white opacity-40" : "bg-gray-100 text-gray-400"}
+                                                ? `${activeColors[index]} text-white shadow-lg z-20 scale-[1.02] sm:scale-110 sm:rounded-lg`
+                                                : isPast 
+                                                    ? "bg-gray-100 text-gray-400 border-y border-gray-100" 
+                                                    : "bg-gray-50/50 text-gray-300 border-y border-gray-50"}
                                             rounded-lg sm:rounded-none
-                                            ${index === 0 ? "sm:rounded-l-xl" : ""}
-                                            ${index === pipelineStages.length - 1 ? "sm:rounded-r-xl" : ""}
-                                            relative z-10
+                                            ${index === 0 && !isCurrent ? "sm:rounded-l-xl sm:border-l sm:border-gray-100" : ""}
+                                            ${index === pipelineStages.length - 1 && !isCurrent ? "sm:rounded-r-xl sm:border-r sm:border-gray-100" : ""}
+                                            relative
                                         `}
                                             style={{
-                                                clipPath: (window.innerWidth >= 640) ? (index === 0
+                                                clipPath: (window.innerWidth >= 640 && !isCurrent) ? (index === 0
                                                     ? "polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%)"
                                                     : index === pipelineStages.length - 1
                                                         ? "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 10% 50%)"
                                                         : "polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%, 10% 50%)") : "none"
                                             }}>
-                                            {stage.label}
+                                            
+                                            {isPast ? (
+                                                <div className="flex items-center gap-1 text-gray-400">
+                                                    <div className="w-3 h-3 rounded-full bg-green-100 flex items-center justify-center">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                                                    </div>
+                                                    {stage.label}
+                                                </div>
+                                            ) : isCurrent ? (
+                                                <div className="flex flex-col items-center gap-0.5">
+                                                    <span className="flex items-center gap-1.5">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse shadow-[0_0_8px_white]" />
+                                                        {stage.label}
+                                                    </span>
+                                                    <span className="text-[7px] opacity-70 tracking-tighter">Current Status</span>
+                                                </div>
+                                            ) : (
+                                                <span>{stage.label}</span>
+                                            )}
                                         </div>
                                     </div>
                                 );

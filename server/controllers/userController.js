@@ -236,7 +236,7 @@ export const loginUser = async (req, res, next) => {
         })
 
         const lastLogin = new Date();
-        const updatedUser = await User.findByIdAndUpdate(user._id, { lastLogin }, { new: true })
+        const updatedUser = await User.findByIdAndUpdate(user._id, { lastLogin, isSetupComplete: true }, { new: true })
             .populate("managerId", "firstName lastName");
 
         res.status(200).json({
@@ -933,6 +933,7 @@ export const resetPassword = async (req, res, next) => {
         user.password = await generateHash(password);
         user.resetPasswordToken = null;
         user.resetPasswordExpiry = null;
+        user.isSetupComplete = true;
 
         await user.save();
 
