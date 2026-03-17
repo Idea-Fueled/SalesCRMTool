@@ -100,8 +100,8 @@ export const getAuditLogs = async (req, res) => {
 
         // Fetch logs with population
         let logs = await AuditLog.find(filter)
-            .populate("performedBy", "firstName lastName email")
-            .populate("targetUserId", "firstName lastName email")
+            .populate("performedBy", "firstName lastName email profilePicture")
+            .populate("targetUserId", "firstName lastName email profilePicture")
             .populate("entityId", "name firstName lastName email")
             .sort(sort);
 

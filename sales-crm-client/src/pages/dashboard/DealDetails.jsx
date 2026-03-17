@@ -498,8 +498,8 @@ export default function DealDetails() {
                                                 <div className="flex items-start justify-between mb-2">
                                                     <div className="flex items-center gap-2">
                                                         <div className="w-6 h-6 rounded-full bg-red-50 flex items-center justify-center text-[10px] font-bold text-red-600 border border-red-100 overflow-hidden">
-                                                            {remark.authorId?.profilePicture || remark.profilePicture ? (
-                                                                <img src={remark.authorId?.profilePicture || remark.profilePicture} alt="Author" className="w-full h-full object-cover" />
+                                                            {remark.author?.profilePicture ? (
+                                                                <img src={remark.author.profilePicture} alt="Author" className="w-full h-full object-cover" />
                                                             ) : (
                                                                 remark.authorName?.[0] || 'U'
                                                             )}

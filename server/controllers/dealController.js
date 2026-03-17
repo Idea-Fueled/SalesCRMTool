@@ -747,7 +747,7 @@ export const getDeals = async (req, res, next) => {
         //pagination
         const skip = (page - 1) * limit;
         const deals = await Deal.find(filter)
-            .populate("ownerId", "firstName email")
+            .populate("ownerId", "firstName lastName email profilePicture")
             .populate("companyId", "name industry")
             .populate("contactId", "firstName lastName email")
             .populate({
@@ -779,9 +779,13 @@ export const getDealById = async (req, res, next) => {
     try {
         const { id } = req.params;
         const deal = await Deal.findById(id)
-            .populate("ownerId", "firstName lastName email")
+            .populate("ownerId", "firstName lastName email profilePicture")
             .populate("companyId", "name industry size website address phone")
             .populate("contactId", "firstName lastName email jobTitle phone mobile linkedin")
+            .populate({
+                path: 'remarks.author',
+                select: 'firstName lastName email profilePicture'
+            })
             .populate({
                 path: 'stageHistory.changedBy',
                 select: 'firstName lastName email'
