@@ -188,14 +188,14 @@ export default function ContactDetails() {
         window.location.pathname.startsWith('/manager') ? '/manager' : '/dashboard';
 
     return (
-        <div id="exportable-contact-details" className="min-h-screen bg-gray-50/50 p-6 space-y-6 relative">
+        <div id="exportable-contact-details" className="min-h-screen bg-gray-50/50 p-3 sm:p-6 lg:p-8 space-y-6 relative">
             {/* Hero Section */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex items-center justify-between">
-                <div className="flex items-center gap-6">
-                    <div className="w-20 h-20 rounded-full bg-red-600 border-4 border-white shadow-md flex items-center justify-center text-white text-2xl font-black ring-1 ring-red-100 uppercase">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-red-600 border-4 border-white shadow-md flex items-center justify-center text-white text-xl sm:text-2xl font-black ring-1 ring-red-100 uppercase flex-shrink-0">
                         {getInitials(contact.firstName, contact.lastName)}
                     </div>
-                    <div>
+                    <div className="min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                             <h1 className="text-2xl font-black text-gray-900 leading-none">{contact.firstName} {contact.lastName}</h1>
                         </div>
@@ -226,7 +226,7 @@ export default function ContactDetails() {
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-3 no-print">
+                <div className="flex flex-wrap items-center gap-3 no-print lg:border-l lg:border-gray-100 lg:pl-8">
                     {currentUser?.role === 'admin' && (
                         <button
                             onClick={() => exportToPDF('exportable-contact-details', `${contact.firstName}_${contact.lastName}_Details.pdf`)}
@@ -236,18 +236,18 @@ export default function ContactDetails() {
                         </button>
                     )}
                     {canEdit && (
-                        <div className="flex items-center gap-2 ml-2">
+                        <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setIsEditModalOpen(true)}
                                 title="Edit Contact"
-                                className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-sm shadow-red-100 transition-all active:scale-[0.97]"
+                                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-sm shadow-red-100 transition-all active:scale-[0.97]"
                             >
                                 <Edit2 size={13} /> Edit
                             </button>
                             <button
                                 onClick={() => setIsDeleteModalOpen(true)}
                                 title="Delete Contact"
-                                className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 rounded-xl transition-all active:scale-[0.97]"
+                                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 rounded-xl transition-all active:scale-[0.97]"
                             >
                                 <Trash2 size={13} /> Delete
                             </button>
@@ -483,14 +483,14 @@ export default function ContactDetails() {
 
 
             {/* Sticky Meta Footer */}
-            <div className="flex items-center justify-between pt-6 border-t border-gray-100 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                <div className="flex items-center gap-6">
+            <div className="flex flex-col md:flex-row items-center justify-between pt-6 border-t border-gray-100 gap-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
                     <span className="flex items-center gap-1.5"><History size={12} className="text-gray-300" /> Registry: {formatDate(contact.createdAt)}</span>
                     <span className="flex items-center gap-1.5"><Clock size={12} className="text-gray-300" /> Synchronization: {formatDate(contact.updatedAt)}</span>
-                    {currentUser?.role === 'admin' && (
-                        <span className="flex items-center gap-1.5 text-gray-300 border-l border-gray-100 pl-6">Ref: {contact._id}</span>
-                    )}
                 </div>
+                {currentUser?.role === 'admin' && (
+                    <span className="flex items-center gap-1.5 text-gray-300 md:border-l md:border-gray-100 md:pl-6">Ref: {contact._id}</span>
+                )}
             </div>
 
             {/* Modals */}

@@ -195,14 +195,14 @@ export default function DealDetails() {
     }
 
     return (
-        <div id="exportable-deal-details" className="min-h-screen bg-gray-50/50 p-6 space-y-6 relative">
+        <div id="exportable-deal-details" className="min-h-screen bg-gray-50/50 p-3 sm:p-6 lg:p-8 space-y-6 relative">
             {/* Hero Section */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex items-center justify-between">
-                <div className="flex items-center gap-6">
-                    <div className="w-20 h-20 rounded-full bg-orange-100 border-4 border-white shadow-md flex items-center justify-center text-orange-500 text-2xl font-black ring-1 ring-orange-100 uppercase">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-orange-100 border-4 border-white shadow-md flex items-center justify-center text-orange-500 text-xl sm:text-2xl font-black ring-1 ring-orange-100 uppercase flex-shrink-0">
                         {getInitials(deal.name)}
                     </div>
-                    <div>
+                    <div className="min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                             <h1 className="text-2xl font-black text-gray-900 leading-none">{deal.name}</h1>
                         </div>
@@ -226,19 +226,19 @@ export default function DealDetails() {
                                     {deal.contactId?._id ? (
                                         <button
                                             onClick={() => navigate(`${basePath}/contacts/${deal.contactId._id}`)}
-                                            className="hover:underline"
+                                            className="hover:underline truncate"
                                         >
                                             {deal.contactId.firstName} {deal.contactId.lastName}
                                         </button>
                                     ) : (
-                                        <span>{deal.contactName || "No Contact"}</span>
+                                        <span className="truncate">{deal.contactName || "No Contact"}</span>
                                     )}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-3 no-print">
+                <div className="flex flex-wrap items-center gap-3 no-print lg:border-l lg:border-gray-100 lg:pl-8">
                     {currentUser?.role === 'admin' && (
                         <button
                             onClick={() => exportToPDF('exportable-deal-details', `${deal.name}_Details.pdf`)}
@@ -248,20 +248,20 @@ export default function DealDetails() {
                         </button>
                     )}
                     {canEdit && (
-                        <div className="flex items-center gap-2 ml-4">
+                        <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setIsEditModalOpen(true)}
                                 title="Edit Deal"
-                                className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-sm shadow-red-200 transition-all active:scale-[0.97]"
+                                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-sm shadow-red-200 transition-all active:scale-[0.97]"
                             >
-                                <Edit2 size={11} /> Edit
+                                <Edit2 size={13} /> Edit
                             </button>
                             <button
                                 onClick={() => setIsDeleteModalOpen(true)}
                                 title="Delete Deal"
-                                className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 rounded-lg transition-all active:scale-[0.97]"
+                                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 rounded-xl transition-all active:scale-[0.97]"
                             >
-                                <Trash2 size={11} /> Delete
+                                <Trash2 size={13} /> Delete
                             </button>
                         </div>
                     )}
@@ -411,16 +411,16 @@ export default function DealDetails() {
                     {/* Pipeline Status */}
                     <div className="space-y-4">
                         <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Symmetric Pipeline Status</h3>
-                        <div className="flex flex-wrap items-center">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
                             {pipelineStages.map((stage, index) => {
                                 const currentStageIndex = pipelineStages.findIndex(s => s.id === deal.stage);
                                 const isPast = index < currentStageIndex;
                                 const isCurrent = deal.stage === stage.id;
 
                                 return (
-                                    <div key={stage.id} className="flex-1 min-w-[120px] relative group h-12 mb-2 mr-2">
+                                    <div key={stage.id} className="relative group h-10 sm:h-12 w-full">
                                         <div className={`
-                                            h-full w-full flex items-center justify-center text-[10px] font-black px-4
+                                            h-full w-full flex items-center justify-center text-[9px] sm:text-[10px] font-black px-2 sm:px-4
                                             transition-all duration-300 cursor-default uppercase tracking-widest
                                             ${isCurrent
                                                 ? (index === 0 ? "bg-blue-600 text-white" :
@@ -431,16 +431,17 @@ export default function DealDetails() {
                                                                     index === 5 ? "bg-red-600 text-white" :
                                                                         "bg-gray-200 text-gray-500")
                                                 : isPast ? "bg-gray-800 text-white opacity-40" : "bg-gray-100 text-gray-400"}
-                                            ${index === 0 ? "rounded-l-xl" : ""}
-                                            ${index === pipelineStages.length - 1 ? "rounded-r-xl" : ""}
+                                            rounded-lg sm:rounded-none
+                                            ${index === 0 ? "sm:rounded-l-xl" : ""}
+                                            ${index === pipelineStages.length - 1 ? "sm:rounded-r-xl" : ""}
                                             relative z-10
                                         `}
                                             style={{
-                                                clipPath: index === 0
+                                                clipPath: (window.innerWidth >= 640) ? (index === 0
                                                     ? "polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%)"
                                                     : index === pipelineStages.length - 1
                                                         ? "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 10% 50%)"
-                                                        : "polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%, 10% 50%)"
+                                                        : "polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%, 10% 50%)") : "none"
                                             }}>
                                             {stage.label}
                                         </div>
@@ -560,14 +561,14 @@ export default function DealDetails() {
             </div>
 
             {/* Sticky Meta Footer */}
-            <div className="flex items-center justify-between pt-6 border-t border-gray-100 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                <div className="flex items-center gap-6">
+            <div className="flex flex-col md:flex-row items-center justify-between pt-6 border-t border-gray-100 gap-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
                     <span className="flex items-center gap-1.5"><Calendar size={12} className="text-gray-300" /> Origin: {formatDate(deal.createdAt)}</span>
                     <span className="flex items-center gap-1.5"><Clock size={12} className="text-gray-300" /> Latest Sync: {formatDate(deal.updatedAt)}</span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 bg-green-50 px-3 py-1.5 rounded-full border border-green-100/50">
                     <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                    <span>Active Deal Stream</span>
+                    <span className="text-green-700">Active Deal Stream</span>
                 </div>
             </div>
             {/* Edit Deal Modal */}
