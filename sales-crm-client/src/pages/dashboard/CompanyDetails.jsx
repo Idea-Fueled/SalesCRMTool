@@ -508,17 +508,6 @@ export default function CompanyDetails() {
                         </div>
                     </div>
 
-                        {/* Cross-Linking Stats */}
-                        <div className="pt-8 grid grid-cols-2 gap-4">
-                            <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-50/50 border border-gray-100/50 hover:bg-white transition-all cursor-default">
-                                <Target size={14} className="text-red-400" />
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Target Ops: 0 Open</span>
-                            </div>
-                            <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-50/50 border border-gray-100/50 hover:bg-white transition-all cursor-default">
-                                <Users size={14} className="text-blue-400" />
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Stakeholders Linked</span>
-                            </div>
-                        </div>
                 </div>
             </div>
         </div>
