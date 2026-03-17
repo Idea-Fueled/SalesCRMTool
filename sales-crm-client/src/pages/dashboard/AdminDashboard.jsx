@@ -58,6 +58,8 @@ export default function AdminDashboard() {
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
     const [activeBar, setActiveBar] = useState(null);
     const [activePipelineBar, setActivePipelineBar] = useState(null);
+    const [activePickerView, setActivePickerView] = useState("years"); // "years" | "months"
+    const [pickerYear, setPickerYear] = useState(new Date().getFullYear());
     const navigate = useNavigate();
 
     const fetchStats = async () => {
@@ -201,34 +203,73 @@ export default function AdminDashboard() {
                     </button>
 
                     {isDatePickerOpen && (
-                        <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 animate-in fade-in slide-in-from-top-2">
-                            <button
-                                onClick={() => { setSelectedMonth(""); setIsDatePickerOpen(false); }}
-                                className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors ${!selectedMonth ? "text-red-600 bg-red-50/50" : "text-gray-700"}`}
-                            >
-                                All Time
-                            </button>
-                            <button
-                                onClick={() => { setSelectedMonth(getMonthString(0)); setIsDatePickerOpen(false); }}
-                                className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors ${selectedMonth === getMonthString(0) ? "text-red-600 bg-red-50/50" : "text-gray-700"}`}
-                            >
-                                This Month
-                            </button>
-                            <button
-                                onClick={() => { setSelectedMonth(getMonthString(-1)); setIsDatePickerOpen(false); }}
-                                className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors ${selectedMonth === getMonthString(-1) ? "text-red-600 bg-red-50/50" : "text-gray-700"}`}
-                            >
-                                Last Month
-                            </button>
-                            <div className="h-px bg-gray-100 my-1 mx-2" />
-                            <div className="px-3 py-2">
-                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 block px-1">Custom Month</label>
-                                <input
-                                    type="month"
-                                    value={selectedMonth}
-                                    onChange={(e) => { setSelectedMonth(e.target.value); setIsDatePickerOpen(false); }}
-                                    className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-red-500 transition-colors"
-                                />
+                        <div className="absolute top-full left-0 sm:left-auto sm:right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 py-3 animate-in fade-in slide-in-from-top-2 z-[100]">
+                            <div className="px-4 pb-2 mb-2 border-b border-gray-50 flex items-center justify-between">
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                    {activePickerView === "years" ? "Select Year" : `Select Month (${pickerYear})`}
+                                </span>
+                                {activePickerView === "months" && (
+                                    <button 
+                                        onClick={() => setActivePickerView("years")}
+                                        className="text-[10px] font-bold text-red-600 hover:text-red-700 transition-colors flex items-center gap-1"
+                                    >
+                                        <ArrowLeft size={10} /> Back
+                                    </button>
+                                )}
+                            </div>
+
+                            <div className="px-3">
+                                {activePickerView === "years" ? (
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {[new Date().getFullYear(), new Date().getFullYear() - 1, new Date().getFullYear() - 2].map(year => (
+                                            <button
+                                                key={year}
+                                                onClick={() => { setPickerYear(year); setActivePickerView("months"); }}
+                                                className={`py-2 px-3 rounded-xl text-sm font-semibold transition-all ${pickerYear === year ? 'bg-red-50 text-red-700 border border-red-100' : 'hover:bg-gray-50 text-gray-700 border border-transparent'}`}
+                                            >
+                                                {year}
+                                            </button>
+                                        ))}
+                                        <button
+                                            onClick={() => { setSelectedMonth(""); setIsDatePickerOpen(false); }}
+                                            className="col-span-2 mt-1 py-2 px-3 text-xs font-bold text-gray-500 hover:text-red-600 transition-colors"
+                                        >
+                                            View All Time
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-3 gap-1.5">
+                                        {["01","02","03","04","05","06","07","08","09","10","11","12"].map(m => {
+                                            const monthVal = `${pickerYear}-${m}`;
+                                            const monthName = new Date(`${pickerYear}-${m}-01`).toLocaleString('default', { month: 'short' });
+                                            const isSelected = selectedMonth === monthVal;
+                                            return (
+                                                <button
+                                                    key={m}
+                                                    onClick={() => { setSelectedMonth(monthVal); setIsDatePickerOpen(false); setActivePickerView("years"); }}
+                                                    className={`py-2 rounded-lg text-[11px] font-bold transition-all ${isSelected ? 'bg-red-600 text-white shadow-md shadow-red-100' : 'hover:bg-red-50 text-gray-600 hover:text-red-700'}`}
+                                                >
+                                                    {monthName.toUpperCase()}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+                            
+                            <div className="mt-3 pt-2 px-4 border-t border-gray-50 flex items-center justify-between">
+                                <button
+                                    onClick={() => { setSelectedMonth(getMonthString(0)); setIsDatePickerOpen(false); setActivePickerView("years"); }}
+                                    className="text-[10px] font-bold text-gray-400 hover:text-red-600 uppercase tracking-tight transition-colors"
+                                >
+                                    Current
+                                </button>
+                                <button
+                                    onClick={() => setIsDatePickerOpen(false)}
+                                    className="text-[10px] font-bold text-gray-400 hover:text-gray-600 uppercase tracking-tight transition-colors"
+                                >
+                                    Close
+                                </button>
                             </div>
                         </div>
                     )}
