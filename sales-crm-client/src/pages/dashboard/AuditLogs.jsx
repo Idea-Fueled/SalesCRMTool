@@ -231,6 +231,8 @@ export default function AuditLogs() {
                                             </p>
                                         </td>
                                         <td className="px-5 py-4 whitespace-nowrap">
+                                            {log.targetUserId ? (
+                                                <div className="flex items-center gap-2">
                                                     <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center text-[10px] font-bold text-white overflow-hidden border border-white shadow-sm">
                                                         {log.targetUserId.profilePicture ? (
                                                             <img src={log.targetUserId.profilePicture} alt="Target" className="w-full h-full object-cover" />
