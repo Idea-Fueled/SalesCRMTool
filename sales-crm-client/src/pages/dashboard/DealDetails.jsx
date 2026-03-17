@@ -128,7 +128,7 @@ export default function DealDetails() {
     };
 
     const handleAddRemark = async () => {
-        if (!newRemark.trim()) return;
+        if (!newRemark.trim() && remarkFiles.length === 0) return;
         setSavingRemark(true);
         try {
             const formData = new FormData();

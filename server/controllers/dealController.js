@@ -149,8 +149,8 @@ export const addRemark = async (req, res) => {
         const { text } = req.body;
         const { id: userId, firstName, lastName } = req.user;
 
-        if (!text) {
-            return res.status(400).json({ message: "Remark text is required!" });
+        if (!text && (!req.files || req.files.length === 0)) {
+            return res.status(400).json({ message: "Remark text or files are required!" });
         }
 
         const deal = await Deal.findById(id);
