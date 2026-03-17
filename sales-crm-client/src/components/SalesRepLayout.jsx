@@ -69,13 +69,13 @@ const SalesRepLayout = () => {
             {/* Mobile Sidebar Overlay */}
             {sidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm transition-opacity duration-300"
+                    className="fixed inset-0 bg-black/50 z-[60] lg:hidden backdrop-blur-sm transition-opacity duration-300"
                     onClick={() => setSidebarOpen(false)}
                 />
             )}
 
             <aside className={`
-                fixed inset-y-0 left-0 z-50 lg:relative
+                fixed inset-y-0 left-0 z-[70] lg:relative
                 ${sidebarOpen ? "w-64 translate-x-0" : "w-64 -translate-x-full lg:w-0 lg:overflow-hidden"}
                 bg-white border-r border-gray-200 flex flex-col transition-all duration-300 shadow-2xl lg:shadow-none
             `}>
