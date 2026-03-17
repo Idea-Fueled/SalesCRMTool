@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "./Modal";
 import { getDeals } from "../../API/services/dealService";
-import { ExternalLink, Loader2, DollarSign, Calendar } from "lucide-react";
+import { Loader2, DollarSign, Calendar } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 export default function ContactDealsModal({ isOpen, onClose, contact }) {
@@ -84,7 +84,6 @@ export default function ContactDealsModal({ isOpen, onClose, contact }) {
                                             </span>
                                         </div>
                                     </div>
-                                    <ExternalLink size={14} className="text-gray-300 group-hover:text-red-400 transition-colors flex-shrink-0" />
                                 </div>
                                 
                                 <div className="grid grid-cols-2 gap-4 pt-3 border-t border-gray-100/50">
