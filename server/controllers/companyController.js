@@ -117,10 +117,13 @@ export const getCompanies = async (req, res) => {
             const teamDeals = await Deal.find({ ownerId: { $in: teamIds }, isDeleted: { $ne: true } }).select("companyId");
             const dealCompanyIds = teamDeals.map(d => d.companyId).filter(id => id);
 
-            filter.$or = [
-                { ownerId: { $in: teamIds } },
-                { _id: { $in: dealCompanyIds } }
-            ];
+            const visibilityFilter = {
+                $or: [
+                    { ownerId: { $in: teamIds } },
+                    { _id: { $in: dealCompanyIds } }
+                ]
+            };
+            filter = { $and: [filter, visibilityFilter] };
         }
 
         if (role === "sales_rep") {
@@ -129,10 +132,13 @@ export const getCompanies = async (req, res) => {
             const myDeals = await Deal.find({ ownerId: id, isDeleted: { $ne: true } }).select("companyId");
             const dealCompanyIds = myDeals.map(d => d.companyId).filter(id => id);
 
-            filter.$or = [
-                { ownerId: id },
-                { _id: { $in: dealCompanyIds } }
-            ];
+            const visibilityFilter = {
+                $or: [
+                    { ownerId: id },
+                    { _id: { $in: dealCompanyIds } }
+                ]
+            };
+            filter = { $and: [filter, visibilityFilter] };
         }
 
 

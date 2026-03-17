@@ -66,6 +66,7 @@ export default function GlobalSearch({ isOpen, onClose }) {
         clearTimeout(debounceRef.current);
         debounceRef.current = setTimeout(async () => {
             setLoading(true);
+            setResults({ deals: [], contacts: [], companies: [] }); // Clear results immediately
             try {
                 const [dealsRes, contactsRes, companiesRes] = await Promise.all([
                     getDeals({ name: query, limit: 5 }),

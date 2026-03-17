@@ -149,10 +149,13 @@ export const getContacts = async (req, res, next) => {
             const teamDeals = await Deal.find({ ownerId: { $in: teamIds }, isDeleted: { $ne: true } }).select("contactId");
             const dealContactIds = teamDeals.map(d => d.contactId).filter(id => id);
 
-            filter.$or = [
-                { ownerId: { $in: teamIds } },
-                { _id: { $in: dealContactIds } }
-            ];
+            const visibilityFilter = {
+                $or: [
+                    { ownerId: { $in: teamIds } },
+                    { _id: { $in: dealContactIds } }
+                ]
+            };
+            filter = { $and: [filter, visibilityFilter] };
         }
 
         if (role === "sales_rep") {
@@ -161,10 +164,13 @@ export const getContacts = async (req, res, next) => {
             const myDeals = await Deal.find({ ownerId: id, isDeleted: { $ne: true } }).select("contactId");
             const dealContactIds = myDeals.map(d => d.contactId).filter(id => id);
 
-            filter.$or = [
-                { ownerId: id },
-                { _id: { $in: dealContactIds } }
-            ];
+            const visibilityFilter = {
+                $or: [
+                    { ownerId: id },
+                    { _id: { $in: dealContactIds } }
+                ]
+            };
+            filter = { $and: [filter, visibilityFilter] };
         }
 
         const skip = (page - 1) * limit;
