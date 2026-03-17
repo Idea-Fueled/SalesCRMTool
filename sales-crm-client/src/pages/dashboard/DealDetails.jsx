@@ -554,28 +554,6 @@ export default function DealDetails() {
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Technical & Digital Assets Unified Section */}
-                            <div className="pt-8 border-t border-gray-100">
-                                    {/* System Metadata - Admin Visibility Only */}
-                                    {currentUser?.role === 'admin' && (
-                                        <div className="w-full space-y-4">
-                                            <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                                                <Info size={14} className="text-blue-500" /> System Metadata
-                                            </h3>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50/50 border border-gray-100">
-                                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Object ID</span>
-                                                    <span className="text-[10px] font-mono font-bold text-gray-500">{deal._id}</span>
-                                                </div>
-                                                <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50/50 border border-gray-100">
-                                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Schema Sync</span>
-                                                    <span className="text-[10px] font-bold text-green-600/80 uppercase">Synchronized</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-                            </div>
                         </div>
                     </div>
                 </div>
