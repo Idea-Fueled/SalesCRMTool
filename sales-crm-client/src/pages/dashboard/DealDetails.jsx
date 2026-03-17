@@ -419,70 +419,60 @@ export default function DealDetails() {
 
                 {/* Right Column - Pipeline & Interactions */}
                 <div className="lg:col-span-8 space-y-8">
-                    {/* Pipeline Status */}
-                    <div className="space-y-4">
-                        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                             <Layers size={12} className="text-gray-300" />
-                             Symmetric Pipeline Status
-                        </h3>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-0">
+                    {/* Deals Pipeline Status */}
+                    <div className="space-y-5">
+                        <h3 className="text-xl font-bold text-gray-900 tracking-tight">Deals Pipeline Status</h3>
+                        <div className="flex flex-wrap sm:flex-nowrap items-center gap-y-3 sm:gap-x-1">
                             {pipelineStages.map((stage, index) => {
                                 const currentStageIndex = pipelineStages.findIndex(s => s.id === deal.stage);
-                                const isPast = index < currentStageIndex;
                                 const isCurrent = deal.stage === stage.id;
                                 
-                                // Color Map for Current State
-                                const activeColors = [
-                                    "bg-blue-600 shadow-blue-100", 
-                                    "bg-amber-400 shadow-amber-100", 
-                                    "bg-orange-600 shadow-orange-100", 
-                                    "bg-pink-600 shadow-pink-100", 
-                                    "bg-green-600 shadow-green-100", 
-                                    "bg-red-600 shadow-red-100"
+                                let isPast = index < currentStageIndex;
+                                const isSkippedWon = deal.stage === "Closed Lost" && stage.id === "Closed Won";
+                                if (isSkippedWon) {
+                                    isPast = false;
+                                }
+                                
+                                // Precise Color Palette from Reference
+                                const stageColors = [
+                                    "bg-[#2b39cc]", // Blue
+                                    "bg-[#f9b115]", // Yellow
+                                    "bg-[#ec602d]", // Orange
+                                    "bg-[#d63384]", // Pink
+                                    "bg-[#2eb85c]", // Green (standard for Won)
+                                    "bg-[#e55353]"  // Red (standard for Lost)
                                 ];
 
+                                const style = isPast || isCurrent 
+                                    ? stageColors[index] || "bg-gray-400" 
+                                    : "bg-[#e4e6eb] text-gray-900";
+
                                 return (
-                                    <div key={stage.id} className="relative group h-12 sm:h-14 w-full">
-                                        <div className={`
-                                            h-full w-full flex flex-col items-center justify-center text-[9px] sm:text-[10px] font-black px-2 sm:px-4
-                                            transition-all duration-500 cursor-default uppercase tracking-widest gap-0.5
-                                            ${isCurrent
-                                                ? `${activeColors[index]} text-white shadow-lg z-20 scale-[1.02] sm:scale-110 sm:rounded-lg`
-                                                : isPast 
-                                                    ? "bg-gray-100 text-gray-400 border-y border-gray-100" 
-                                                    : "bg-gray-50/50 text-gray-300 border-y border-gray-50"}
-                                            rounded-lg sm:rounded-none
-                                            ${index === 0 && !isCurrent ? "sm:rounded-l-xl sm:border-l sm:border-gray-100" : ""}
-                                            ${index === pipelineStages.length - 1 && !isCurrent ? "sm:rounded-r-xl sm:border-r sm:border-gray-100" : ""}
-                                            relative
+                                    <div 
+                                        key={stage.id} 
+                                        className={`
+                                            relative h-12 flex items-center justify-center
+                                            flex-1 min-w-[120px] sm:min-w-0
+                                            transition-all duration-300 group
+                                            ${style} ${isPast || isCurrent ? "text-white" : "text-gray-900"}
+                                            font-bold text-[11px] sm:text-[13px]
+                                            ${index === 0 ? "rounded-l-lg" : ""}
+                                            ${index === pipelineStages.length - 1 ? "rounded-r-lg" : ""}
+                                            ${isSkippedWon ? "opacity-30" : ""}
                                         `}
-                                            style={{
-                                                clipPath: (window.innerWidth >= 640 && !isCurrent) ? (index === 0
-                                                    ? "polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%)"
+                                        style={{
+                                            clipPath: (window.innerWidth >= 640) ? (
+                                                index === 0 
+                                                    ? "polygon(0% 0%, 95% 0%, 100% 50%, 95% 100%, 0% 100%)"
                                                     : index === pipelineStages.length - 1
-                                                        ? "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 10% 50%)"
-                                                        : "polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%, 10% 50%)") : "none"
-                                            }}>
-                                            
-                                            {isPast ? (
-                                                <div className="flex items-center gap-1 text-gray-400">
-                                                    <div className="w-3 h-3 rounded-full bg-green-100 flex items-center justify-center">
-                                                        <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                                                    </div>
-                                                    {stage.label}
-                                                </div>
-                                            ) : isCurrent ? (
-                                                <div className="flex flex-col items-center gap-0.5">
-                                                    <span className="flex items-center gap-1.5">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse shadow-[0_0_8px_white]" />
-                                                        {stage.label}
-                                                    </span>
-                                                    <span className="text-[7px] opacity-70 tracking-tighter">Current Status</span>
-                                                </div>
-                                            ) : (
-                                                <span>{stage.label}</span>
-                                            )}
-                                        </div>
+                                                        ? "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 5% 50%)"
+                                                        : "polygon(0% 0%, 95% 0%, 100% 50%, 95% 100%, 0% 100%, 5% 50%)"
+                                            ) : "none"
+                                        }}
+                                    >
+                                        <span className="relative z-10 px-4 whitespace-nowrap">
+                                            {stage.label}
+                                        </span>
                                     </div>
                                 );
                             })}
