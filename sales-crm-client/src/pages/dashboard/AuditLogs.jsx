@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { History, Search, Filter, ArrowUpDown, ChevronLeft, ChevronRight, User, Briefcase, Building2, ContactRound, Shield, ArrowLeft } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { History, Search, Filter, ArrowUpDown, ChevronLeft, ChevronRight, User, Briefcase, Building2, ContactRound, Shield, ArrowLeft, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { getAuditLogs } from "../../API/services/auditLogService";
+import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-hot-toast";
 
 const Card = ({ children, className = "" }) => (
@@ -35,7 +36,7 @@ const ActionBadge = ({ action }) => {
 };
 
 export default function AuditLogs() {
-    const navigate = useNavigate();
+    const { user: currentUser } = useAuth();
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [total, setTotal] = useState(0);
@@ -73,6 +74,55 @@ export default function AuditLogs() {
         const { name, value } = e.target;
         setFilters(prev => ({ ...prev, [name]: value }));
         setPage(1);
+    };
+
+    const renderPerformer = (log) => {
+        const isCurrent = currentUser?.id === log.performedBy?._id;
+        const name = log.performedBy ? `${log.performedBy.firstName} ${log.performedBy.lastName || ""}` : "Deleted User";
+        
+        return (
+            <div className="flex items-center gap-3">
+                <div className={`w-8 h-8 rounded-full ${isCurrent ? 'bg-red-600' : 'bg-gray-100'} text-white flex items-center justify-center font-bold text-xs overflow-hidden shadow-sm`}>
+                    {log.performedBy ? (
+                        <span className={isCurrent ? 'text-white' : 'text-red-500'}>
+                            {log.performedBy?.firstName?.[0]}{log.performedBy?.lastName?.[0]}
+                        </span>
+                    ) : (
+                        <User size={16} className="text-gray-400" />
+                    )}
+                </div>
+                <div>
+                    <p className={`font-semibold text-gray-800 leading-none ${isCurrent ? 'text-red-600' : ''}`}>
+                        {isCurrent ? "You" : name}
+                    </p>
+                    <p className="text-[10px] text-gray-400 mt-1">
+                        {log.performedBy?.email || "System/Unknown"}
+                    </p>
+                </div>
+            </div>
+        );
+    };
+
+    const formatLogMessage = (log) => {
+        const isPerformer = currentUser?.id === log.performedBy?._id;
+        const isTarget = currentUser?.id === log.targetUserId?._id;
+        
+        let message = log.details?.message || (log.action === "CREATE" ? `Created new ${log.entityType.toLowerCase()}` : `Modified ${log.entityType.toLowerCase()}`);
+        
+        // Contextual replacements
+        if (isPerformer) {
+            message = message.replace(new RegExp(`^${log.performedBy?.firstName} ${log.performedBy?.lastName}`, 'i'), "You");
+            message = message.replace(/by You/i, "by You"); // redundant but safe
+        }
+
+        if (isTarget) {
+            if (log.targetUserId) {
+                const targetName = `${log.targetUserId.firstName} ${log.targetUserId.lastName || ""}`.trim();
+                message = message.replace(new RegExp(targetName, 'i'), "you");
+            }
+        }
+
+        return message;
     };
 
     return (
@@ -137,7 +187,7 @@ export default function AuditLogs() {
                                 <th className="text-left px-5 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider">Action</th>
                                 <th className="text-left px-5 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider">Entity</th>
                                 <th className="text-left px-5 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider">Details</th>
-                                <th className="text-left px-5 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider">IP Address</th>
+                                <th className="text-left px-5 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider">Recipient</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
@@ -157,25 +207,7 @@ export default function AuditLogs() {
                                             </p>
                                         </td>
                                         <td className="px-5 py-4 whitespace-nowrap">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center font-bold text-xs overflow-hidden">
-                                                    {log.performedBy ? (
-                                                        <span className="text-red-600 bg-red-100 w-full h-full flex items-center justify-center">
-                                                            {log.performedBy?.firstName?.[0]}{log.performedBy?.lastName?.[0]}
-                                                        </span>
-                                                    ) : (
-                                                        <User size={16} />
-                                                    )}
-                                                </div>
-                                                <div>
-                                                    <p className="font-semibold text-gray-800 leading-none">
-                                                        {log.performedBy ? `${log.performedBy.firstName} ${log.performedBy.lastName || ""}` : "Deleted User"}
-                                                    </p>
-                                                    <p className="text-[10px] text-gray-400 mt-1">
-                                                        {log.performedBy?.email || "System/Unknown"}
-                                                    </p>
-                                                </div>
-                                            </div>
+                                            {renderPerformer(log)}
                                         </td>
                                         <td className="px-5 py-4 whitespace-nowrap">
                                             <ActionBadge action={log.action} />
@@ -184,27 +216,31 @@ export default function AuditLogs() {
                                             <div className="flex items-center gap-2 text-gray-800">
                                                 <EntityIcon type={log.entityType} />
                                                 <span className="font-semibold text-xs">
-                                                    {log.entityId?.name ||
+                                                    {log.details?.entityName || log.entityId?.name ||
                                                         (log.entityId?.firstName ? `${log.entityId.firstName} ${log.entityId.lastName || ""}` :
                                                             `Deleted ${log.entityType}`)}
                                                 </span>
                                             </div>
-                                            <p className="text-[9px] font-mono text-gray-400 mt-0.5">{log.entityId?._id || log.entityId || "ID Unknown"}</p>
+                                            <p className="text-[9px] font-mono text-gray-400 mt-0.5">{log.entityId?._id || log.entityId || "—"}</p>
                                         </td>
                                         <td className="px-5 py-4 max-w-xs">
-                                            <p className="text-xs text-gray-600 font-medium">
-                                                {log.details?.message || (log.action === "CREATE" ? `Created new ${log.entityType.toLowerCase()}` : `Modified ${log.entityType.toLowerCase()}`)}
+                                            <p className="text-xs text-gray-600 font-medium leading-relaxed">
+                                                {formatLogMessage(log)}
                                             </p>
-                                            {log.details?.reassignedToName && (
-                                                <p className="text-[10px] text-red-500 font-semibold mt-1 flex items-center gap-1">
-                                                    Target: <span className="bg-red-50 px-1 rounded">{log.details.reassignedToName}</span>
-                                                </p>
-                                            )}
                                         </td>
                                         <td className="px-5 py-4 whitespace-nowrap">
-                                            <span className="text-[10px] font-mono text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
-                                                {log.ipAddress || "—"}
-                                            </span>
+                                            {log.targetUserId ? (
+                                                <div className="flex items-center gap-2">
+                                                    <div className={`w-6 h-6 rounded-full ${currentUser?.id === log.targetUserId._id ? 'bg-red-500' : 'bg-gray-100'} flex items-center justify-center text-[10px] font-bold text-white`}>
+                                                        {log.targetUserId.firstName?.[0]}
+                                                    </div>
+                                                    <span className={`text-xs font-semibold ${currentUser?.id === log.targetUserId._id ? 'text-red-500' : 'text-gray-700'}`}>
+                                                        {currentUser?.id === log.targetUserId._id ? "You" : `${log.targetUserId.firstName} ${log.targetUserId.lastName || ""}`}
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-gray-300">—</span>
+                                            )}
                                         </td>
                                     </tr>
                                 ))

@@ -8,6 +8,7 @@ import AuditLog from "../models/auditLogSchema.js";
  * @param {string} params.entityId - ID of the entity being acted upon
  * @param {string} params.action - "CREATE", "UPDATE", "DELETE", "DEACTIVATE", "REASSIGN", etc.
  * @param {string} params.performedBy - User ID of the performer
+ * @param {string} [params.targetUserId] - User ID of the target recipient (e.g. reassignee)
  * @param {Object} [params.details] - { oldValues, newValues, message }
  * @param {Object} [params.req] - Express request object to capture IP and User Agent
  */
@@ -16,6 +17,7 @@ export const logAction = async ({
     entityId,
     action,
     performedBy,
+    targetUserId,
     details = {},
     req = null
 }) => {
@@ -25,6 +27,7 @@ export const logAction = async ({
             entityId,
             action,
             performedBy,
+            targetUserId,
             details,
         };
 

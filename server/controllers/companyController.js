@@ -65,7 +65,14 @@ export const createCompany = async (req, res) => {
             entityId: company._id,
             action: "CREATE",
             performedBy: req.user.id,
-            details: { newValues: company },
+            targetUserId: company.ownerId?.toString() !== req.user.id.toString() ? company.ownerId : null,
+            details: { 
+                newValues: company,
+                entityName: company.name,
+                message: company.ownerId?.toString() !== req.user.id.toString() 
+                    ? `Company "${company.name}" created and assigned to ownership` 
+                    : `Company "${company.name}" created`
+            },
             req
         });
 
@@ -254,9 +261,14 @@ export const updateCompany = async (req, res) => {
         await logAction({
             entityType: "Company",
             entityId: id,
-            action: "UPDATE",
+            action: req.body.ownerId && req.body.ownerId.toString() !== (company.ownerId?.toString() || "") ? "REASSIGN" : "UPDATE",
             performedBy: userId,
-            details: { newValues: req.body },
+            targetUserId: req.body.ownerId && req.body.ownerId.toString() !== userId.toString() ? req.body.ownerId : null,
+            details: { 
+                newValues: req.body,
+                entityName: company.name,
+                message: req.body.ownerId ? `Company "${company.name}" updated and reassigned` : `Company "${company.name}" updated`
+            },
             req
         });
 
@@ -402,8 +414,10 @@ export const changeOwnership = async (req, res) => {
             entityId: id,
             action: "REASSIGN",
             performedBy: userId,
+            targetUserId: newOwnerId.toString() !== userId.toString() ? newOwnerId : null,
             details: {
-                message: `Company ownership changed to ${newOwner ? `${newOwner.firstName} ${newOwner.lastName}` : newOwnerId}`,
+                message: `Company "${company.name}" ownership changed to ${newOwner ? `${newOwner.firstName} ${newOwner.lastName}` : newOwnerId}`,
+                entityName: company.name,
                 newOwnerId,
                 reassignedToName: newOwner ? `${newOwner.firstName} ${newOwner.lastName}` : null
             },

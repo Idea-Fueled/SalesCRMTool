@@ -385,6 +385,7 @@ export const softDeleteUser = async (req, res, next) => {
             entityId: id,
             action: "DELETE",
             performedBy: currentUserId,
+            targetUserId: newOwnerId && newOwnerId.toString() !== currentUserId.toString() ? newOwnerId : id,
             details: newOwnerId
                 ? { message: `User "${user.firstName} ${user.lastName}" soft-deleted. Records reassigned to ${newOwner.firstName} ${newOwner.lastName}`, targetName: `${user.firstName} ${user.lastName}`, reassignedToName: `${newOwner.firstName} ${newOwner.lastName}` }
                 : { message: `User "${user.firstName} ${user.lastName}" soft-deleted. Records kept with original owner.`, targetName: `${user.firstName} ${user.lastName}`, reassignment: "skipped" },
@@ -590,6 +591,7 @@ export const deactivateUser = async (req, res, next) => {
             entityId: id,
             action: "DEACTIVATE",
             performedBy: currentUserId,
+            targetUserId: newOwnerId && newOwnerId.toString() !== currentUserId.toString() ? newOwnerId : id,
             details: newOwnerId
                 ? {
                     message: `User "${user.firstName} ${user.lastName}" deactivated. Records reassigned to ${newOwner.firstName} ${newOwner.lastName}`,

@@ -88,7 +88,14 @@ export const createContact = async (req, res, next) => {
             entityId: contact._id,
             action: "CREATE",
             performedBy: id,
-            details: { newValues: contact },
+            targetUserId: contact.ownerId?.toString() !== id.toString() ? contact.ownerId : null,
+            details: { 
+                newValues: contact,
+                entityName: `${contact.firstName} ${contact.lastName}`,
+                message: contact.ownerId?.toString() !== id.toString()
+                    ? `Contact "${contact.firstName} ${contact.lastName}" created and assigned to ownership`
+                    : `Contact "${contact.firstName} ${contact.lastName}" created`
+            },
             req
         });
 
@@ -287,11 +294,13 @@ export const updateContact = async (req, res, next) => {
         await logAction({
             entityType: "Contact",
             entityId: id,
-            action: "UPDATE",
+            action: req.body.ownerId && req.body.ownerId.toString() !== (contact.ownerId?.toString() || "") ? "REASSIGN" : "UPDATE",
             performedBy: userId,
+            targetUserId: req.body.ownerId && req.body.ownerId.toString() !== userId.toString() ? req.body.ownerId : null,
             details: {
                 newValues: req.body,
-                message: reassignedToName ? `Contact updated and reassigned to ${reassignedToName}` : `Contact updated`,
+                entityName: `${contact.firstName} ${contact.lastName}`,
+                message: reassignedToName ? `Contact "${contact.firstName} ${contact.lastName}" updated and reassigned to ${reassignedToName}` : `Contact "${contact.firstName} ${contact.lastName}" updated`,
                 reassignedToName
             },
             req

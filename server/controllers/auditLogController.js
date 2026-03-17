@@ -22,28 +22,32 @@ export const getAuditLogs = async (req, res) => {
             const User = mongoose.model("User");
             const teamUsers = await User.find({ $or: [{ _id: userId }, { managerId: userId }] }).select("_id");
             const teamIds = teamUsers.map(u => u._id);
-            filter.performedBy = { $in: teamIds };
+            // Managers see logs performed by their team OR logs where team members are targets
+            filter.$or = [
+                { performedBy: { $in: teamIds } },
+                { targetUserId: { $in: teamIds } }
+            ];
         } else if (role === "sales_rep") {
-            filter.performedBy = userId;
+            // Reps see logs they performed OR logs where they are the target
+            filter.$or = [
+                { performedBy: userId },
+                { targetUserId: userId }
+            ];
         }
 
         if (entityType) filter.entityType = entityType;
         if (action) filter.action = action;
-        if (performedBy) {
-            // If manager/rep tries to filter by someone else, we should respect the role filter
-            if (role === "admin") {
-                filter.performedBy = performedBy;
-            } else if (role === "sales_manager") {
-                // Already limited to teamIds, but can narrow down further
-                filter.performedBy = performedBy; 
-                // Note: The role filter already enforced teamIds, so if performedBy is not in team, it will return nothing.
-            }
+        
+        if (performedBy && role === "admin") {
+            // Admin can override and filter by a specific performer
+            // For managers/reps, the role-based $or filter already restricts them
+            filter.performedBy = performedBy;
         }
 
         if (search) {
             const searchRegex = new RegExp(search, "i");
 
-            // Find users matching search for performedBy
+            // Find users matching search for performedBy or targetUserId
             const matchingUsers = await mongoose.model("User").find({
                 $or: [
                     { firstName: searchRegex },
@@ -54,19 +58,35 @@ export const getAuditLogs = async (req, res) => {
 
             const matchingUserIds = matchingUsers.map(u => u._id);
 
-            filter.$or = [
-                { "details.message": searchRegex },
-                { "details.targetName": searchRegex },
-                { "details.reassignedToName": searchRegex },
-                { "details.fromUserName": searchRegex },
-                { "details.toUserName": searchRegex },
-                { performedBy: { $in: matchingUserIds } }
-            ];
+            const searchFilter = {
+                $or: [
+                    { "details.message": searchRegex },
+                    { "details.targetName": searchRegex },
+                    { "details.reassignedToName": searchRegex },
+                    { "details.fromUserName": searchRegex },
+                    { "details.toUserName": searchRegex },
+                    { performedBy: { $in: matchingUserIds } },
+                    { targetUserId: { $in: matchingUserIds } }
+                ]
+            };
 
             // ObjectId exact matches
             if (search.match(/^[0-9a-fA-F]{24}$/)) {
-                filter.$or.push({ entityId: search });
-                filter.$or.push({ performedBy: search });
+                searchFilter.$or.push({ entityId: search });
+                searchFilter.$or.push({ performedBy: search });
+                searchFilter.$or.push({ targetUserId: search });
+            }
+
+            // Merge with existing role filter
+            if (filter.$or) {
+                // Combine existing role $or with new search $or
+                filter.$and = [
+                    { $or: filter.$or },
+                    searchFilter
+                ];
+                delete filter.$or;
+            } else {
+                filter.$or = searchFilter.$or;
             }
         }
 
@@ -81,6 +101,7 @@ export const getAuditLogs = async (req, res) => {
         // Fetch logs with population
         let logs = await AuditLog.find(filter)
             .populate("performedBy", "firstName lastName email")
+            .populate("targetUserId", "firstName lastName email")
             .populate("entityId", "name firstName lastName email")
             .sort(sort);
 

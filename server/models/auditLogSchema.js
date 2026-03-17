@@ -25,14 +25,9 @@ const auditLogSchema = new mongoose.Schema(
                 "PASSWORD_CHANGE",
             ],
         },
-        performedBy: {
+        targetUserId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: true,
-        },
-        details: {
-            type: mongoose.Schema.Types.Mixed,
-            default: {}
         },
         ipAddress: { type: String },
         userAgent: { type: String },
@@ -43,6 +38,7 @@ const auditLogSchema = new mongoose.Schema(
 // Index for faster queries in Admin Dashboard
 auditLogSchema.index({ entityType: 1, entityId: 1 });
 auditLogSchema.index({ performedBy: 1 });
+auditLogSchema.index({ targetUserId: 1 });
 auditLogSchema.index({ createdAt: -1 });
 
 export default mongoose.model("AuditLog", auditLogSchema);

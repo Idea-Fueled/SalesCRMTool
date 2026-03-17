@@ -98,7 +98,14 @@ export const createDeal = async (req, res, next) => {
             entityId: deal._id,
             action: "CREATE",
             performedBy: userId,
-            details: { newValues: deal },
+            targetUserId: deal.ownerId.toString() !== userId.toString() ? deal.ownerId : null,
+            details: { 
+                newValues: deal,
+                entityName: deal.name,
+                message: deal.ownerId.toString() !== userId.toString() 
+                    ? `Deal "${deal.name}" created and assigned to ownership` 
+                    : `Deal "${deal.name}" created`
+            },
             req
         });
 
@@ -317,11 +324,13 @@ export const updateDealInformation = async (req, res, next) => {
         await logAction({
             entityType: "Deal",
             entityId: id,
-            action: "UPDATE",
+            action: req.body.ownerId && req.body.ownerId.toString() !== deal.ownerId.toString() ? "REASSIGN" : "UPDATE",
             performedBy: userId,
+            targetUserId: req.body.ownerId && req.body.ownerId.toString() !== userId.toString() ? req.body.ownerId : null,
             details: {
                 newValues: req.body,
-                message: reassignedToName ? `Deal updated and reassigned to ${reassignedToName}` : `Deal updated`,
+                entityName: deal.name,
+                message: reassignedToName ? `Deal "${deal.name}" updated and reassigned to ${reassignedToName}` : `Deal "${deal.name}" updated`,
                 reassignedToName
             },
             req
@@ -483,7 +492,12 @@ export const moveDealStage = async (req, res, next) => {
             entityId: id,
             action: "UPDATE",
             performedBy: userId,
-            details: { message: `Stage moved to ${newStage}`, newStage },
+            targetUserId: deal.ownerId.toString() !== userId.toString() ? deal.ownerId : null,
+            details: { 
+                message: `Stage of deal "${deal.name}" moved to ${newStage}`, 
+                newStage,
+                entityName: deal.name
+            },
             req
         });
 
@@ -594,7 +608,12 @@ export const markDealResult = async (req, res, next) => {
             entityId: id,
             action: "UPDATE",
             performedBy: userId,
-            details: { message: `Deal marked as ${result}`, result },
+            targetUserId: deal.ownerId.toString() !== userId.toString() ? deal.ownerId : null,
+            details: { 
+                message: `Deal "${deal.name}" marked as ${result}`, 
+                result,
+                entityName: deal.name
+            },
             req
         });
 
