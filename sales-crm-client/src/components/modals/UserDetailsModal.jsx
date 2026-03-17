@@ -37,8 +37,12 @@ export default function UserDetailsModal({ isOpen, onClose, user }) {
             <div className="space-y-6">
                 {/* Header Information */}
                 <div className="flex items-center gap-5 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                    <div className={`w-16 h-16 rounded-full ${avatarColor} flex items-center justify-center text-white text-xl font-bold border-4 border-white shadow-sm flex-shrink-0`}>
-                        {initials}
+                    <div className={`w-16 h-16 rounded-full ${!user.profilePicture ? avatarColor : 'bg-white'} flex items-center justify-center text-white text-xl font-bold border-4 border-white shadow-sm flex-shrink-0 overflow-hidden`}>
+                        {user.profilePicture ? (
+                            <img src={user.profilePicture} alt="Profile" className="w-full h-full object-cover" />
+                        ) : (
+                            initials
+                        )}
                     </div>
                     <div className="min-w-0">
                         <h2 className="text-xl font-bold text-gray-900 truncate">{`${user.firstName || ""} ${user.lastName || ""}`.trim()}</h2>

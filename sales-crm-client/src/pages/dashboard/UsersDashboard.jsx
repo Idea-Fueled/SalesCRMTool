@@ -19,12 +19,21 @@ const CardHeader = ({ title, children }) => (
         <div className="flex items-center gap-2">{children}</div>
     </div>
 );
-const Avatar = ({ name }) => {
+const Avatar = ({ name, profilePicture }) => {
     if (!name) return null;
     const initials = name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
     const colors = ["bg-red-500", "bg-blue-500", "bg-green-500", "bg-orange-500", "bg-purple-500", "bg-pink-500", "bg-teal-500"];
+    
+    if (profilePicture) {
+        return (
+            <div className="w-9 h-9 rounded-full overflow-hidden shadow-sm flex-shrink-0 border border-gray-100">
+                <img src={profilePicture} alt={name} className="w-full h-full object-cover" />
+            </div>
+        );
+    }
+
     return (
-        <div className={`w-9 h-9 rounded-full ${colors[name.charCodeAt(0) % colors.length]} flex items-center justify-center text-white text-xs font-bold flex-shrink-0`}>
+        <div className={`w-9 h-9 rounded-full ${colors[name.charCodeAt(0) % colors.length]} flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0`}>
             {initials}
         </div>
     );
@@ -333,7 +342,7 @@ export default function UsersDashboard() {
                                             >
                                                 <td className="px-4 py-3 whitespace-nowrap">
                                                     <div className="flex items-center gap-3">
-                                                        <Avatar name={`${u.firstName} ${u.lastName}`} />
+                                                        <Avatar name={`${u.firstName} ${u.lastName}`} profilePicture={u.profilePicture} />
                                                         <div>
                                                             <p className="font-bold text-gray-800 leading-none hover:text-red-600 transition-colors uppercase text-[11px] tracking-wider">{u.firstName} {u.lastName}</p>
                                                             <p className="text-xs text-gray-400 mt-0.5">{u.email}</p>

@@ -15,10 +15,19 @@ const roleIcon = {
 
 const formatRole = (r) => ({ admin: "ADMIN", sales_manager: "SALES MANAGER", sales_rep: "SALES REPRESENTATIVE" }[r] || r?.toUpperCase());
 
-const Avatar = ({ name }) => {
+const Avatar = ({ name, profilePicture }) => {
     if (!name) return null;
     const initials = name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
     const colors = ["bg-red-500", "bg-blue-500", "bg-green-500", "bg-orange-500", "bg-purple-500", "bg-pink-500", "bg-teal-500"];
+    
+    if (profilePicture) {
+        return (
+            <div className="w-12 h-12 rounded-full overflow-hidden shadow-sm flex-shrink-0 border-2 border-white">
+                <img src={profilePicture} alt={name} className="w-full h-full object-cover" />
+            </div>
+        );
+    }
+
     return (
         <div className={`w-12 h-12 rounded-full ${colors[name.charCodeAt(0) % colors.length]} flex items-center justify-center text-white text-sm font-bold shadow-sm flex-shrink-0`}>
             {initials}
@@ -37,7 +46,7 @@ const UserCard = ({ user, onEdit, onDeactivate, onActivate, onReassign, onDelete
             <div className="p-5 flex-1">
                 <div className="flex justify-between items-start mb-4">
                     <div className="flex gap-4">
-                        <Avatar name={`${user.firstName} ${user.lastName}`} />
+                        <Avatar name={`${user.firstName} ${user.lastName}`} profilePicture={user.profilePicture} />
                         <div>
                             <h3 className="font-bold text-gray-900 group-hover:text-red-600 transition-colors uppercase text-xs tracking-wide">
                                 {user.firstName} {user.lastName}
