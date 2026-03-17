@@ -86,8 +86,8 @@ export default function AuditLogs() {
                     {log.performedBy?.profilePicture ? (
                         <img src={log.performedBy.profilePicture} alt="Performer" className="w-full h-full object-cover" />
                     ) : log.performedBy ? (
-                        <span className={isCurrent ? 'text-white' : 'text-red-500'}>
-                            {log.performedBy?.firstName?.[0]}{log.performedBy?.lastName?.[0]}
+                        <span className="text-white">
+                            {log.performedBy.firstName?.[0]}{log.performedBy.lastName?.slice(-1)}
                         </span>
                     ) : (
                         <User size={16} className="text-gray-400" />
@@ -231,13 +231,11 @@ export default function AuditLogs() {
                                             </p>
                                         </td>
                                         <td className="px-5 py-4 whitespace-nowrap">
-                                            {log.targetUserId ? (
-                                                <div className="flex items-center gap-2">
-                                                    <div className={`w-6 h-6 rounded-full ${currentUser?.id === log.targetUserId._id ? 'bg-red-500' : 'bg-gray-100'} flex items-center justify-center text-[10px] font-bold text-white overflow-hidden border border-white shadow-sm`}>
+                                                    <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center text-[10px] font-bold text-white overflow-hidden border border-white shadow-sm">
                                                         {log.targetUserId.profilePicture ? (
                                                             <img src={log.targetUserId.profilePicture} alt="Target" className="w-full h-full object-cover" />
                                                         ) : (
-                                                            log.targetUserId.firstName?.[0]
+                                                            <>{log.targetUserId.firstName?.[0]}{log.targetUserId.lastName?.slice(-1)}</>
                                                         )}
                                                     </div>
                                                     <span className={`text-xs font-semibold ${currentUser?.id === log.targetUserId._id ? 'text-red-500' : 'text-gray-700'}`}>

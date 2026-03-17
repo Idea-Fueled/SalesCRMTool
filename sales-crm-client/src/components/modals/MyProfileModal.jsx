@@ -12,10 +12,10 @@ export default function MyProfileModal({ isOpen, onClose }) {
 
     if (!user) return null;
 
-    const initials = `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase();
+    const initials = `${user.firstName?.[0] || ""}${user.lastName?.slice(-1) || ""}`.toUpperCase();
     
     // Instead of random colors, we'll keep a consistent gradient or fallback color
-    const avatarColor = "bg-gradient-to-br from-red-500 to-orange-400";
+    const avatarColor = "bg-red-600";
 
     const formatRole = (r) => ({
         admin: "ADMIN",

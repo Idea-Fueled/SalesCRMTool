@@ -21,8 +21,10 @@ const CardHeader = ({ title, children }) => (
 );
 const Avatar = ({ name, profilePicture }) => {
     if (!name) return null;
-    const initials = name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
-    const colors = ["bg-red-500", "bg-blue-500", "bg-green-500", "bg-orange-500", "bg-purple-500", "bg-pink-500", "bg-teal-500"];
+    const parts = name.trim().split(" ");
+    const firstName = parts[0];
+    const lastName = parts[parts.length - 1];
+    const initials = `${firstName?.[0] || ""}${lastName?.slice(-1) || ""}`.toUpperCase();
     
     if (profilePicture) {
         return (
@@ -33,7 +35,7 @@ const Avatar = ({ name, profilePicture }) => {
     }
 
     return (
-        <div className={`w-9 h-9 rounded-full ${colors[name.charCodeAt(0) % colors.length]} flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0`}>
+        <div className="w-9 h-9 rounded-full bg-red-600 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
             {initials}
         </div>
     );

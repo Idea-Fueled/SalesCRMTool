@@ -44,7 +44,7 @@ const DashboardLayout = () => {
     const [showLogout, setShowLogout] = useState(false);
     const [profileModalOpen, setProfileModalOpen] = useState(false);
 
-    const initials = user ? `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase() : "A";
+    const initials = user ? `${user.firstName?.[0] || ""}${user.lastName?.slice(-1) || ""}`.toUpperCase() : "A";
 
     // Initial load: set sidebar based on screen width
     useEffect(() => {
@@ -171,7 +171,7 @@ const DashboardLayout = () => {
                             {user?.profilePicture ? (
                                 <img src={user.profilePicture} alt="Profile" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover shadow-sm border-2 border-transparent hover:border-red-200 transition-colors" />
                             ) : (
-                                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-red-500 to-orange-400 flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-sm">{initials}</div>
+                                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-red-600 flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-sm">{initials}</div>
                             )}
                             <span className="absolute bottom-0 right-0 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-green-500 border-2 border-white rounded-full" />
                         </button>

@@ -374,7 +374,7 @@ export default function DealDetails() {
                                     {deal.ownerId?.profilePicture ? (
                                         <img src={deal.ownerId.profilePicture} alt="Owner" className="w-full h-full object-cover" />
                                     ) : (
-                                        <>{deal.ownerId?.firstName?.[0]}{deal.ownerId?.lastName?.[0]}</>
+                                        <>{deal.ownerId?.firstName?.[0]}{deal.ownerId?.lastName?.slice(-1)}</>
                                     )}
                                 </div>
                                 <div>
@@ -497,11 +497,11 @@ export default function DealDetails() {
                                             <div key={i} className="p-4 bg-gray-50/30 rounded-xl border border-gray-100">
                                                 <div className="flex items-start justify-between mb-2">
                                                     <div className="flex items-center gap-2">
-                                                        <div className="w-6 h-6 rounded-full bg-red-50 flex items-center justify-center text-[10px] font-bold text-red-600 border border-red-100 overflow-hidden">
+                                                        <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center text-[10px] font-bold text-white border border-red-500 overflow-hidden">
                                                             {remark.author?.profilePicture ? (
                                                                 <img src={remark.author.profilePicture} alt="Author" className="w-full h-full object-cover" />
                                                             ) : (
-                                                                remark.authorName?.[0] || 'U'
+                                                                <>{remark.author?.firstName?.[0]}{remark.author?.lastName?.slice(-1)}</> || 'U1'
                                                             )}
                                                         </div>
                                                         <span className="text-[11px] font-semibold text-gray-500">
