@@ -74,3 +74,7 @@ export const setupPassword = async (data) => {
 export const resendInvitation = async (id) => {
     return API.post(`/auth/${id}/resend-invitation`);
 };
+// Resend Verification/Invitation by Email (public)
+export const resendVerificationByEmail = async (email) => {
+    return API.post("/auth/resend-verification", { email });
+};

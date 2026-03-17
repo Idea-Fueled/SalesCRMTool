@@ -1048,6 +1048,58 @@ export const resendInvitation = async (req, res) => {
     }
 };
 
+export const resendVerificationByEmail = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) return res.status(400).json({ message: "Email is required." });
+
+        const user = await User.findOne({ email });
+        if (!user) return res.status(404).json({ message: "No account found with this email." });
+
+        // If setup is already complete, they don't need a verification link
+        if (user.isSetupComplete || user.lastLogin) {
+            return res.status(400).json({ message: "This account is already verified. Please log in." });
+        }
+
+        const frontendUrl = process.env.FRONTEND_URL || req.get("origin") || "http://localhost:5173";
+        const logoUrl = `${frontendUrl}/Logo.png`;
+        
+        // Generate new token
+        const invitationToken = crypto.randomBytes(32).toString("hex");
+        const invitationExpiry = Date.now() + 3600000; // 1 hour
+
+        user.invitationToken = invitationToken;
+        user.invitationExpiry = invitationExpiry;
+        await user.save();
+
+        const setupUrl = `${frontendUrl}/setup-password?token=${invitationToken}`;
+        const subject = "Complete Your Account Setup (Resend)";
+        const message = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="${logoUrl}" alt="mbdConsulting Logo" style="height: 50px; width: auto;" />
+                </div>
+                <h2 style="color: #e11d48; text-align: center;">Account Setup Invitation</h2>
+                <p>Hello ${user.firstName},</p>
+                <p>As requested, here is your account invitation link. Please click below to set your password and complete your registration.</p>
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="${setupUrl}" style="background-color: #e11d48; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Set Up Account</a>
+                </div>
+                <p>This link is valid for 1 hour.</p>
+                <p style="word-break: break-all; color: #64748b; font-size: 14px;">${setupUrl}</p>
+                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+                <p style="font-size: 12px; color: #94a3b8; text-align: center;">&copy; ${new Date().getFullYear()} mbdConsulting. All rights reserved.</p>
+            </div>
+        `;
+
+        await sendEmail(user.email, subject, message);
+        res.status(200).json({ message: "Verification link resent successfully!" });
+    } catch (error) {
+        console.error("❌ Error resending verification:", error);
+        res.status(500).json({ message: error.message || "Server error resending verification." });
+    }
+};
+
 export const uploadProfilePicture = async (req, res) => {
     try {
         const { id } = req.user;

@@ -26,6 +26,12 @@ router.put("/profile/picture", protect, upload.single("profilePicture"), uploadP
 router.post("/forgot-password", forgotPassword)
 router.post("/reset-password", resetPassword)
 router.post("/setup-password", setupPassword)
+router.post("/resend-verification", (req, res, next) => {
+    // Import here to avoid circular dependencies if any, though not expected
+    import("../controllers/userController.js").then(module => {
+        module.resendVerificationByEmail(req, res, next);
+    });
+})
 router.post("/:id/resend-invitation", protect, resendInvitation)
 router.get("/admin-test", protect, requireRole("admin"), adminTest)
 router.get("/team", protect, getTeamUsers)

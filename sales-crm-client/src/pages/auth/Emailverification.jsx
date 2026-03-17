@@ -2,12 +2,45 @@ import React from "react";
 import Logo from "../../components/Logo";
 import { Link, useLocation } from "react-router-dom";
 import emailVerificationBg from "../../assets/email-verification-bg.jpg";
+import { resendVerificationByEmail } from "../../API/services/userService";
+import toast, { Toaster } from "react-hot-toast";
+import { useState, useEffect } from "react";
 
 const Emailverification = () => {
     const location = useLocation();
-    const email = location.state?.email || "your email";
+    const email = location.state?.email || "";
+    const [isResending, setIsResending] = useState(false);
+    const [cooldown, setCooldown] = useState(0);
+
+    useEffect(() => {
+        if (cooldown > 0) {
+            const timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [cooldown]);
+
+    const handleResend = async () => {
+        if (!email) {
+            toast.error("User email not found. Please try logging in.");
+            return;
+        }
+        if (cooldown > 0) return;
+
+        setIsResending(true);
+        try {
+            await resendVerificationByEmail(email);
+            toast.success("Verification link sent!");
+            setCooldown(60); // 60 seconds cooldown
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to resend link.");
+        } finally {
+            setIsResending(false);
+        }
+    };
+
     return (
-        <section className="h-screen bg-gray-100 grid grid-cols-1 lg:grid-cols-2">
+        <section className="h-screen bg-gray-100 grid grid-cols-1 lg:grid-cols-2 relative">
+            <Toaster position="top-center" />
 
             <div className="h-screen overflow-y-auto bg-white p-12 flex flex-col">
                 <div className="w-full max-w-md mx-auto flex-1 flex flex-col">
@@ -40,9 +73,13 @@ const Emailverification = () => {
 
                         <p className="text-gray-500 text-sm mb-6">
                             Didn't receive an email?{" "}
-                            <span className="text-red-600 font-semibold cursor-pointer hover:underline">
-                                Resend Link
-                            </span>
+                            <button 
+                                onClick={handleResend}
+                                disabled={isResending || cooldown > 0}
+                                className={`font-semibold cursor-pointer hover:underline outline-none bg-transparent border-none p-0 ${cooldown > 0 ? 'text-gray-400' : 'text-red-600'}`}
+                            >
+                                {isResending ? "Sending..." : cooldown > 0 ? `Resend Link (${cooldown}s)` : "Resend Link"}
+                            </button>
                         </p>
 
                         <Link to="/login" className="w-full">
