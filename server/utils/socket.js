@@ -64,14 +64,6 @@ export const getIO = () => {
 export const emitNotification = (notification) => {
     if (!io) return;
 
-    // 1. Emit to global (Admins)
-    io.to("global").emit("new_notification", notification);
-
-    // 2. Emit to specific team (Manager + Team Members)
-    if (notification.teamId) {
-        io.to(`team_${notification.teamId}`).emit("new_notification", notification);
-    }
-
-    // 3. Emit to recipient specifically (if not already covered)
+    // Emit ONLY to the specific recipient (if not already covered)
     io.to(`user_${notification.recipientId.toString()}`).emit("new_notification", notification);
 };

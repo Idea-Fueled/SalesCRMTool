@@ -46,6 +46,9 @@ export const NotificationProvider = ({ children }) => {
             });
 
             newSocket.on("new_notification", (notification) => {
+                // Safety check: only process if intended for this user
+                if (notification.recipientId.toString() !== user.id.toString()) return;
+
                 setNotifications(prev => [notification, ...prev]);
                 if (!notification.isRead) {
                     setUnreadCount(prev => prev + 1);
