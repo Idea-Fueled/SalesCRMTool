@@ -427,7 +427,7 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Pipeline Statistics Widget */}
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col min-h-[400px]">
+                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col min-h-[400px] md:col-span-2 xl:col-span-1">
                     <div className="flex items-center justify-between mb-8">
                         <div className="flex items-center gap-2">
                             <div className="w-1 h-4 bg-orange-500 rounded-full"></div>
@@ -435,10 +435,10 @@ export default function AdminDashboard() {
                         </div>
                     </div>
                     
-                    <div className="flex flex-wrap gap-4 mb-8">
+                    <div className="grid grid-cols-4 gap-2 mb-8">
                         {pipelineStats.map((stat, i) => (
-                            <div key={i} className="flex flex-col gap-1 min-w-[70px]">
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">{stat.name}</span>
+                            <div key={i} className="flex flex-col gap-1">
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">{stat.name}</span>
                                 <span className="text-xs font-bold text-gray-900">${(stat.value >= 1000 ? (stat.value / 1000).toFixed(1) + 'K' : stat.value)}</span>
                                 <span className="text-[10px] text-gray-500">{stat.count} Deals</span>
                             </div>
