@@ -435,10 +435,10 @@ export default function AdminDashboard() {
                         </div>
                     </div>
                     
-                    <div className="grid grid-cols-4 gap-2 mb-8">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                         {pipelineStats.map((stat, i) => (
                             <div key={i} className="flex flex-col gap-1">
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">{stat.name}</span>
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">{stat.name}</span>
                                 <span className="text-xs font-bold text-gray-900">${(stat.value >= 1000 ? (stat.value / 1000).toFixed(1) + 'K' : stat.value)}</span>
                                 <span className="text-[10px] text-gray-500">{stat.count} Deals</span>
                             </div>
