@@ -62,8 +62,9 @@ export default function RepDeals() {
     const [selectedDeal, setSelectedDeal] = useState(null);
     const [selectedContact, setSelectedContact] = useState(null);
 
-    const fetchData = async () => {
-        setLoading(true);
+    const fetchData = async (options = {}) => {
+        const { isSilent = false } = options;
+        if (!isSilent) setLoading(true);
         try {
             const [dealsRes, companiesRes, contactsRes, usersRes] = await Promise.all([
                 getDeals({ stage: stageFilter === "All Stages" ? undefined : stageFilter }),
@@ -121,7 +122,7 @@ export default function RepDeals() {
         try {
             await updateDealStage(id, newStage);
             toast.success(`Moved to ${newStage}`);
-            fetchData();
+            fetchData({ isSilent: true });
         } catch (error) {
             console.error(error);
             toast.error("Failed to move stage");
@@ -210,6 +211,7 @@ export default function RepDeals() {
                             deals={deals}
                             onEdit={(d) => { setSelectedDeal(d); setIsDealModalOpen(true); }}
                             onDelete={(d) => { setSelectedDeal(d); setIsDeleteModalOpen(true); }}
+                            onMove={handleMoveStage}
                         />
                     )}
                 </div>

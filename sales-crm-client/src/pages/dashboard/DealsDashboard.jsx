@@ -73,8 +73,9 @@ export default function DealsDashboard() {
     const [viewMode, setViewMode] = useState("list"); // "list" | "card" | "kanban"
     const [stageFilter, setStageFilter] = useState("All Stages");
 
-    const fetchData = async () => {
-        setLoading(true);
+    const fetchData = async (options = {}) => {
+        const { isSilent = false } = options;
+        if (!isSilent) setLoading(true);
         try {
             const [dealsRes, companiesRes, contactsRes, usersRes] = await Promise.all([
                 getDeals({ limit: 100 }),
@@ -132,7 +133,7 @@ export default function DealsDashboard() {
         try {
             await updateDealStage(id, newStage);
             toast.success(`Moved to ${newStage}`);
-            fetchData();
+            fetchData({ isSilent: true });
         } catch (error) {
             console.error(error);
             toast.error("Failed to move stage");
@@ -233,6 +234,7 @@ export default function DealsDashboard() {
                             deals={deals}
                             onEdit={(d) => { setSelectedDeal(d); setIsDealModalOpen(true); }}
                             onDelete={(d) => { setSelectedDeal(d); setIsDeleteModalOpen(true); }}
+                            onMove={handleMoveStage}
                         />
                     )}
                 </div>
