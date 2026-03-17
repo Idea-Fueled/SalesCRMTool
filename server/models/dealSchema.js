@@ -94,7 +94,7 @@ const dealSchema = new mongoose.Schema(
 
         remarks: {
             type: [{
-                text: { type: String, required: true },
+                text: { type: String },
                 files: [{
                     url: String,
                     publicId: String,

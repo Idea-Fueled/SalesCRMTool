@@ -45,7 +45,7 @@ const companySchema = new mongoose.Schema(
         },
         remarks: [
             {
-                text: String,
+                text: { type: String },
                 files: [
                     {
                         url: String,
