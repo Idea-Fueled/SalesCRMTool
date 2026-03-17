@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
     Briefcase, Zap, CheckCircle2, DollarSign,
     MoreHorizontal, Plus, Edit2, Trash2,
-    LayoutDashboard, Users, Building2, LayoutList, LayoutGrid, Kanban, Eye, ChevronRight, ChevronDown
+    LayoutDashboard, Users, Building2, LayoutList, LayoutGrid, Kanban, Eye, ChevronRight, ChevronDown, Search
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import KanbanBoard from "../../components/KanbanBoard";
@@ -61,6 +61,7 @@ export default function DealsDashboard() {
     const [contacts, setContacts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [users, setUsers] = useState([]);
+    const [search, setSearch] = useState("");
     const { user: currentUser } = useAuth();
 
     // Modal states
@@ -78,7 +79,7 @@ export default function DealsDashboard() {
         if (!isSilent) setLoading(true);
         try {
             const [dealsRes, companiesRes, contactsRes, usersRes] = await Promise.all([
-                getDeals({ limit: 100 }),
+                getDeals({ limit: 100, name: search || undefined }),
                 getCompanies({ limit: 1000 }),
                 getContacts({ limit: 1000 }),
                 getTeamUsers()
@@ -96,8 +97,11 @@ export default function DealsDashboard() {
     };
 
     useEffect(() => {
-        fetchData();
-    }, []);
+        const timer = setTimeout(() => {
+            fetchData();
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [search]);
 
     const handleSaveDeal = async (formData) => {
         try {
@@ -170,7 +174,18 @@ export default function DealsDashboard() {
                     <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Deals Dashboard</h1>
                     <p className="text-xs sm:text-sm text-gray-400 mt-0.5">Global overview of all sales opportunities</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+                    <div className="relative w-full sm:w-64">
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Search deals..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="w-full text-sm border border-gray-200 rounded-lg pl-9 pr-3 py-2 focus:ring-2 focus:ring-red-400 focus:outline-none bg-gray-50/50 transition-all"
+                        />
+                    </div>
+                    <div className="flex items-center gap-3 w-full sm:w-auto">
                     {/* View toggle */}
                     <div className="flex items-center bg-gray-100 rounded-lg p-1">
                         <button
@@ -213,6 +228,7 @@ export default function DealsDashboard() {
                     </button>
                 </div>
             </div>
+        </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard label="Total Value" value={`$${totalValue >= 1000000 ? `${(totalValue / 1000000).toFixed(2)}M` : `${(totalValue / 1000).toFixed(1)}K`}`} color="bg-red-50 text-red-600" icon={DollarSign} />
