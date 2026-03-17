@@ -538,7 +538,7 @@ export default function DealDetails() {
                                         value={newRemark}
                                         onChange={(e) => setNewRemark(e.target.value)}
                                         placeholder="Add a remark..."
-                                        className="w-full min-h-[45px] p-3 text-[13px] bg-gray-50/50 border border-gray-100 rounded-xl focus:ring-4 focus:ring-red-50 focus:border-red-300 focus:bg-white transition-all resize-none font-medium text-gray-700 shadow-inner"
+                                        className="w-full min-h-[45px] p-3 text-[13px] bg-gray-50/50 border border-red-500 rounded-xl focus:ring-4 focus:ring-red-50 focus:border-red-300 focus:bg-white transition-all resize-none font-medium text-gray-700 shadow-inner"
                                     />
                                     
                                     <div className="flex items-center justify-between mt-1">
