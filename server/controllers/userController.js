@@ -686,6 +686,10 @@ export const adminResetPassword = async (req, res, next) => {
 
         const hashedPass = await generateHash(newPassword);
         user.password = hashedPass;
+        user.isSetupComplete = true;
+        user.invitationToken = null;
+        user.invitationExpiry = null;
+        user.isActive = true;
         await user.save();
 
         res.status(200).json({ message: "User password reset successfully." });
