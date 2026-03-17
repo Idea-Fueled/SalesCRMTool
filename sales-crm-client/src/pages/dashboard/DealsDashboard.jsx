@@ -147,11 +147,21 @@ export default function DealsDashboard() {
     const winRate = Math.round((wonCount / (wonCount + lostCount || 1)) * 100);
 
     // Chart data simulation from real data
-    const stageData = STAGES.map(s => ({
-        stage: s,
-        count: deals.filter(d => d.stage === s).length,
-        color: stageBadge[s].split(' ')[0]
-    }));
+    const stageData = STAGES.map(s => {
+        const darkColors = {
+            Lead: "bg-blue-600",
+            Qualified: "bg-purple-600",
+            Proposal: "bg-amber-500",
+            Negotiation: "bg-orange-500",
+            "Closed Won": "bg-green-600",
+            "Closed Lost": "bg-red-600",
+        };
+        return {
+            stage: s,
+            count: deals.filter(d => d.stage === s).length,
+            color: darkColors[s]
+        };
+    });
 
     return (
         <div className="p-4 sm:p-6 space-y-6 max-w-screen-xl mx-auto">
@@ -282,7 +292,7 @@ export default function DealsDashboard() {
             {/* List View */}
             {viewMode === "list" && (
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-                    <Card className="lg:col-span-3 overflow-hidden h-full flex flex-col">
+                    <Card className="lg:col-span-4 overflow-hidden h-full flex flex-col">
                         <CardHeader title="All Recent Deals">
                             <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition">
                                 <MoreHorizontal size={18} />
@@ -373,32 +383,32 @@ export default function DealsDashboard() {
                         </div>
                     </Card>
 
-                    <Card className="lg:col-span-2 h-full flex flex-col">
+                    <Card className="lg:col-span-1 h-full flex flex-col">
                         <CardHeader title="Deals by Stage" />
-                        <div className="p-5 space-y-4">
+                        <div className="p-5 space-y-4 flex-1 overflow-y-auto custom-scrollbar">
                             {stageData.map(s => {
                                 const total = deals.length || 1;
                                 const pct = Math.round((s.count / total) * 100);
                                 return (
                                     <div key={s.stage}>
-                                        <div className="flex justify-between text-sm mb-1">
-                                            <span className="text-gray-600 font-medium">{s.stage}</span>
-                                            <span className="text-gray-500">{s.count} <span className="text-gray-400 text-xs">({pct}%)</span></span>
+                                        <div className="flex justify-between text-[11px] mb-1.5">
+                                            <span className="text-gray-600 font-semibold truncate flex-1 mr-2">{s.stage}</span>
+                                            <span className="text-gray-400 font-bold">{pct}%</span>
                                         </div>
-                                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                                            <div className={`h-full ${s.color.replace(' text-', ' bg-')} rounded-full transition-all duration-500`} style={{ width: `${pct}%` }} />
+                                        <div className="h-1.5 bg-gray-50 rounded-full overflow-hidden">
+                                            <div className={`h-full ${s.color.replace(' text-', ' bg-')} rounded-full transition-all duration-700`} style={{ width: `${pct}%` }} />
                                         </div>
                                     </div>
                                 );
                             })}
                         </div>
-                        <div className="p-5 border-t border-gray-50 mt-auto">
-                            <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
-                                <span>Win Probability</span>
+                        <div className="p-5 border-t border-gray-50 mt-auto bg-gray-50/30">
+                            <div className="flex items-center justify-between text-[11px] text-gray-500 mb-2">
+                                <span className="font-semibold uppercase tracking-wider">Win Probability</span>
                                 <span className="font-bold text-green-600">{winRate}%</span>
                             </div>
                             <div className="h-1.5 bg-gray-100 rounded-full">
-                                <div className="h-full bg-green-500 rounded-full transition-all duration-500" style={{ width: `${winRate}%` }} />
+                                <div className="h-full bg-green-500 rounded-full transition-all duration-700" style={{ width: `${winRate}%` }} />
                             </div>
                         </div>
                     </Card>
