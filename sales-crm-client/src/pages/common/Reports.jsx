@@ -126,7 +126,7 @@ export default function Reports() {
                         Performance Reports
                     </h1>
                     <p className="text-xs text-gray-500 mt-1">
-                        Activity logs for your {user?.role === 'sales_manager' ? 'team members' : 'personal pipeline'}
+                        {user?.role === 'admin' ? 'Global system performance and activity oversight' : `Activity logs for your ${user?.role === 'sales_manager' ? 'team members' : 'personal pipeline'}`}
                     </p>
                 </div>
 
