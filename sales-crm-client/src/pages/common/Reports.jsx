@@ -11,6 +11,7 @@ import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-hot-toast";
 import { jsPDF } from "jspdf";
 import { toPng } from "html-to-image";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import CollapsibleDealName from "../../components/CollapsibleDealName";
 
 const TabButton = ({ active, label, icon: Icon, onClick }) => (
@@ -90,6 +91,18 @@ export default function Reports() {
         const rolePath = pathParts[1] || (user?.role === "admin" ? "dashboard" : user?.role === "sales_manager" ? "manager" : "rep");
         navigate(`/${rolePath}/${activeTab}/${id}`);
     };
+
+    const getChartData = () => {
+        if (!data || data.length === 0) return [];
+        const counts = {};
+        data.forEach(item => {
+            const status = item.status || item.stage || (activeTab === "contacts" ? (item.jobTitle || "Other") : "Other");
+            counts[status] = (counts[status] || 0) + 1;
+        });
+        return Object.entries(counts).map(([name, value]) => ({ name, value }));
+    };
+
+    const COLORS = ['#ef4444', '#f97316', '#3b82f6', '#10b981', '#6366f1', '#8b5cf6', '#ec4899', '#94a3b8'];
 
     const handleExport = async () => {
         if (!tableRef.current || data.length === 0) return;
@@ -210,6 +223,62 @@ export default function Reports() {
                         onClick={() => { setActiveTab("contacts"); setSearchQuery(""); }} 
                     />
                 </div>
+
+                {/* Chart Section */}
+                {!loading && data.length > 0 && (
+                    <div className="p-6 bg-gray-50/30 border-b border-gray-100 flex flex-col items-center">
+                        <div className="w-full flex flex-col md:flex-row items-center justify-around gap-8">
+                            <div className="w-full h-[220px] max-w-[400px]">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={getChartData()}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={60}
+                                            outerRadius={80}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                        >
+                                            {getChartData().map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip 
+                                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                            itemStyle={{ fontSize: '12px', fontWeight: 'bold' }}
+                                        />
+                                        <Legend verticalAlign="middle" align="right" layout="vertical" iconType="circle" 
+                                            formatter={(value, entry) => <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tight ml-1">{value} ({entry.payload.value})</span>}
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                            <div className="flex-1 max-w-sm">
+                                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Metric Distribution</h4>
+                                <div className="space-y-3">
+                                    {getChartData().map((item, index) => {
+                                        const percentage = Math.round((item.value / data.length) * 100);
+                                        return (
+                                            <div key={item.name} className="space-y-1">
+                                                <div className="flex justify-between text-[10px] font-bold uppercase tracking-tight">
+                                                    <span className="text-gray-500">{item.name}</span>
+                                                    <span className="text-gray-700">{percentage}%</span>
+                                                </div>
+                                                <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                                                    <div 
+                                                        className="h-full rounded-full transition-all duration-1000" 
+                                                        style={{ width: `${percentage}%`, backgroundColor: COLORS[index % COLORS.length] }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <div className="overflow-x-auto min-h-[300px]" ref={tableRef}>
                     <table className="w-full table-fixed text-left text-sm border-separate border-spacing-0">
