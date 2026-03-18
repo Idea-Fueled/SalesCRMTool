@@ -17,6 +17,7 @@ import DealModal from "../../components/modals/DealModal";
 import DealDetailsModal from "../../components/modals/DealDetailsModal";
 import ContactDetailsModal from "../../components/modals/ContactDetailsModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
+import CollapsibleDealName from "../../components/CollapsibleDealName";
 import { toast } from "react-hot-toast";
 
 const Card = ({ children, className = "" }) => (
@@ -167,6 +168,8 @@ export default function DealsDashboard() {
         };
     });
 
+    // (FoldText removed - restored original behavior)
+
     return (
         <div className="p-4 sm:p-6 space-y-6 max-w-screen-xl mx-auto">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
@@ -175,7 +178,7 @@ export default function DealsDashboard() {
                     <p className="text-xs sm:text-sm text-gray-400 mt-0.5">Global overview of all sales opportunities</p>
                 </div>
                 <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-                    <div className="flex items-center gap-3 w-full sm:w-auto">
+                        <div className="flex items-center gap-3 w-full sm:w-auto">
                     {/* View toggle */}
                     <div className="flex items-center bg-gray-100 rounded-lg p-1">
                         <button
@@ -300,17 +303,19 @@ export default function DealsDashboard() {
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
                     <Card className="lg:col-span-4 overflow-hidden h-full flex flex-col">
                         <CardHeader title="All Recent Deals">
-                            <div className="relative w-48 sm:w-64">
-                                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                <input
-                                    type="text"
-                                    placeholder="Search deals..."
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                    className="w-full text-sm border border-gray-100 rounded-lg pl-9 pr-3 py-1.5 focus:ring-2 focus:ring-red-400 focus:outline-none bg-gray-50/50 transition-all font-normal"
-                                />
-                            </div>
-                        </CardHeader>
+                            <div className="flex items-center gap-3">
+                                <div className="relative w-48 sm:w-64">
+                                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                    <input
+                                        type="text"
+                                        placeholder="Search deals..."
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                        className="w-full text-sm border border-gray-100 rounded-lg pl-9 pr-3 py-1.5 focus:ring-2 focus:ring-red-400 focus:outline-none bg-gray-50/50 transition-all font-normal"
+                                    />
+                                </div>
+                                </div>
+                            </CardHeader>
                         <div className="flex-1 flex flex-col min-h-0">
                             <div className="flex-1 overflow-x-auto overflow-y-auto custom-scrollbar">
                                 <table className="w-full text-sm">
@@ -329,9 +334,11 @@ export default function DealsDashboard() {
                                         ) : (
                                             deals.slice(0, 10).map((d) => (
                                                 <tr key={d._id} className="hover:bg-gray-50/50 transition-colors group">
-                                                    <td className="px-4 py-3 font-medium text-gray-800 whitespace-nowrap cursor-pointer hover:text-red-600 transition-colors"
-                                                        onClick={() => navigate(`/dashboard/deals/${d._id}`)}>
-                                                        {d.name}
+                                                    <td className="px-4 py-3 cursor-pointer">
+                                                        <CollapsibleDealName 
+                                                            name={d.name} 
+                                                            onNavigate={() => navigate(`/dashboard/deals/${d._id}`)} 
+                                                        />
                                                     </td>
                                                     <td className="px-4 py-3 text-red-700 font-semibold whitespace-nowrap">{d.ownerId?.firstName || "System"}</td>
                                                     <td className="px-4 py-3 text-gray-500 whitespace-nowrap">

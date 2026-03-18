@@ -16,6 +16,7 @@ import DealModal from "../../components/modals/DealModal";
 import ContactDetailsModal from "../../components/modals/ContactDetailsModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
 import { isDealOverdue } from "../../utils/dateUtils";
+import CollapsibleDealName from "../../components/CollapsibleDealName";
 import { toast } from "react-hot-toast";
 
 const Select = ({ options, value, onChange }) => (
@@ -268,9 +269,11 @@ export default function RepDeals() {
                                 ) : (
                                     deals.map((d) => (
                                         <tr key={d._id} className="hover:bg-gray-50/50 transition-colors group">
-                                            <td className="px-4 py-3 font-medium text-gray-800 whitespace-nowrap cursor-pointer hover:text-red-600 transition-colors"
-                                                onClick={() => navigate(`/rep/deals/${d._id}`)}>
-                                                {d.name}
+                                            <td className="px-4 py-3 cursor-pointer overflow-hidden">
+                                                <CollapsibleDealName 
+                                                    name={d.name} 
+                                                    onNavigate={() => navigate(`/rep/deals/${d._id}`)} 
+                                                />
                                             </td>
                                             <td className="px-4 py-3 text-gray-500 whitespace-nowrap cursor-pointer hover:text-red-600 transition-colors"
                                                 onClick={() => {

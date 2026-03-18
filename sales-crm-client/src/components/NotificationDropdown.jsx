@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Bell, Check, Clock, User, Briefcase, ChevronRight, Trash2, ArrowRightLeft, Shield, AlertTriangle } from "lucide-react";
+import { Bell, Check, Clock, User, Briefcase, ChevronRight, X, ArrowRightLeft, Shield, AlertTriangle } from "lucide-react";
 import { useNotifications } from "../context/NotificationContext";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -143,7 +143,7 @@ const NotificationDropdown = () => {
                                                 className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                                                 title="Delete notification"
                                             >
-                                                <Trash2 size={12} />
+                                                <X size={14} />
                                             </button>
                                         </div>
                                     </div>

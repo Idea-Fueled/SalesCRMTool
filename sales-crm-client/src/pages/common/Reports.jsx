@@ -11,6 +11,7 @@ import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-hot-toast";
 import { jsPDF } from "jspdf";
 import { toPng } from "html-to-image";
+import CollapsibleDealName from "../../components/CollapsibleDealName";
 
 const TabButton = ({ active, label, icon: Icon, onClick }) => (
     <button
@@ -211,14 +212,14 @@ export default function Reports() {
                 </div>
 
                 <div className="overflow-x-auto min-h-[300px]" ref={tableRef}>
-                    <table className="w-full text-left text-sm border-separate border-spacing-0">
+                    <table className="w-full table-fixed text-left text-sm border-separate border-spacing-0">
                         <thead>
                             <tr className="bg-gray-50/40 border-b border-gray-100 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                                <th className="px-6 py-3.5 font-bold">Creation Date</th>
-                                <th className="px-6 py-3.5 font-bold">{activeTab === "contacts" ? "Name" : activeTab === "companies" ? "Company" : "Deal name"}</th>
-                                <th className="px-6 py-3.5 font-bold">{activeTab === "deals" ? "Value" : activeTab === "companies" ? "Industry" : "Title"}</th>
-                                <th className="px-6 py-3.5 font-bold">Owner</th>
-                                <th className="px-6 py-3.5 text-right font-bold">Status</th>
+                                <th className="px-4 py-3.5 font-bold w-1/5">Creation Date</th>
+                                <th className="px-4 py-3.5 font-bold w-1/5">{activeTab === "contacts" ? "Name" : activeTab === "companies" ? "Company" : "Deal name"}</th>
+                                <th className="px-4 py-3.5 font-bold w-1/5">{activeTab === "deals" ? "Value" : activeTab === "companies" ? "Industry" : "Title"}</th>
+                                <th className="px-4 py-3.5 font-bold w-1/5">Owner</th>
+                                <th className="px-4 py-3.5 text-right font-bold w-1/5">Status</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
@@ -244,16 +245,23 @@ export default function Reports() {
                                         onClick={() => handleRowClick(item._id)}
                                         className="hover:bg-gray-50/50 transition-colors cursor-pointer group"
                                     >
-                                        <td className="px-6 py-4 whitespace-nowrap text-gray-400 text-xs font-medium">
+                                        <td className="px-4 py-4 whitespace-nowrap text-gray-400 text-xs font-medium">
                                             {new Date(item.createdAt).toLocaleDateString()}
                                         </td>
-                                        <td className="px-6 py-4 font-semibold text-gray-700 group-hover:text-red-600 transition-colors">
-                                            {activeTab === "contacts" ? `${item.firstName} ${item.lastName}` : item.name}
+                                        <td className="px-4 py-4 font-semibold text-gray-700 group-hover:text-red-600 transition-colors">
+                                            {activeTab === "deals" ? (
+                                                <CollapsibleDealName 
+                                                    name={item.name} 
+                                                    onNavigate={() => handleRowClick(item._id)} 
+                                                />
+                                            ) : (
+                                                activeTab === "contacts" ? `${item.firstName} ${item.lastName}` : item.name
+                                            )}
                                         </td>
-                                        <td className="px-6 py-4 text-gray-600 font-medium">
+                                        <td className="px-4 py-4 text-gray-600 font-medium">
                                             {activeTab === "deals" ? `$${(item.value || 0).toLocaleString()}` : item.industry || item.jobTitle || "—"}
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="px-4 py-4">
                                             <div className="flex items-center gap-2">
                                                 <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center text-[8px] font-bold text-red-600">
                                                     {(item.ownerId?.firstName?.[0] || user?.firstName?.[0] || 'A')}
@@ -263,7 +271,7 @@ export default function Reports() {
                                                 </span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-right">
+                                        <td className="px-4 py-4 text-right">
                                             <span className={`px-2 py-0.5 rounded text-[9px] font-bold border ${
                                                 (item.status === 'Active' || item.stage === 'Closed Won') 
                                                 ? 'bg-green-50 text-green-600 border-green-100' 

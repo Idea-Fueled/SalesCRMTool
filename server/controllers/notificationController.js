@@ -48,8 +48,31 @@ export const markAsRead = async (req, res) => {
 
 export const markAllAsRead = async (req, res) => {
     try {
-        const { id: userId } = req.user;
-        await Notification.updateMany({ recipientId: userId, isRead: false }, { isRead: true });
+        const { id: userId, role } = req.user;
+        let query = {};
+
+        if (role === "admin") {
+            query = { isRead: false };
+        } else if (role === "sales_manager") {
+            const teamUsers = await User.find({ managerId: userId }).select("_id");
+            const teamIds = teamUsers.map(u => u._id);
+            query = {
+                $and: [
+                    { isRead: false },
+                    {
+                        $or: [
+                            { recipientId: userId },
+                            { recipientId: { $in: teamIds } },
+                            { teamId: userId }
+                        ]
+                    }
+                ]
+            };
+        } else {
+            query = { recipientId: userId, isRead: false };
+        }
+
+        await Notification.updateMany(query, { isRead: true });
         res.status(200).json({ message: "All notifications marked as read" });
     } catch (error) {
         res.status(500).json({ message: error.message || "Server error!" });
