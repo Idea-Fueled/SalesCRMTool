@@ -48,6 +48,7 @@ const statusBg = {
 export default function CompaniesDashboard() {
     const navigate = useNavigate();
     const [companies, setCompanies] = useState([]);
+    const [allCompanies, setAllCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [viewMode, setViewMode] = useState("grid");
@@ -63,11 +64,13 @@ export default function CompaniesDashboard() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const [companiesRes, usersRes] = await Promise.all([
+            const [companiesRes, allCompaniesRes, usersRes] = await Promise.all([
                 getCompanies({ name: search || undefined, limit: 100 }),
+                getCompanies({ limit: 1000 }), // Fetch full list for stats
                 getTeamUsers()
             ]);
             setCompanies(companiesRes.data.data);
+            setAllCompanies(allCompaniesRes.data.data);
             setUsers(usersRes.data.data || []);
         } catch (error) {
             console.error(error);
@@ -114,14 +117,15 @@ export default function CompaniesDashboard() {
         }
     };
 
-    // Aggregations
-    const activeCount = companies.filter(c => c.status === "Active").length;
-    const prospectCount = companies.filter(c => c.status === "Prospect").length;
-    const inactiveCount = companies.filter(c => c.status === "Inactive").length;
+    // Aggregations using allCompanies to keep stats global
+    const activeCount = allCompanies.filter(c => c.status === "Active").length;
+    const prospectCount = allCompanies.filter(c => c.status === "Prospect").length;
+    const inactiveCount = allCompanies.filter(c => c.status === "Inactive").length;
+    const totalCount = allCompanies.length;
 
-    // Industries breakdown
+    // Industries breakdown using allCompanies
     const indCount = {};
-    companies.forEach(c => {
+    allCompanies.forEach(c => {
         const i = c.industry || "Unknown";
         indCount[i] = (indCount[i] || 0) + 1;
     });
@@ -146,7 +150,7 @@ export default function CompaniesDashboard() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <StatCard label="Total Companies" value={String(companies.length)} color="bg-red-50 text-red-600" icon={Building2} />
+                <StatCard label="Total Companies" value={String(totalCount)} color="bg-red-50 text-red-600" icon={Building2} />
                 <StatCard label="Active Customers" value={String(activeCount)} color="bg-green-50 text-green-600" icon={CheckCircle2} />
                 <StatCard label="Prospects" value={String(prospectCount)} color="bg-orange-50 text-orange-600" icon={Eye} />
                 <StatCard label="Inactive" value={String(inactiveCount)} color="bg-red-50 text-red-500" icon={XCircle} />
@@ -261,7 +265,7 @@ export default function CompaniesDashboard() {
                     <div className="flex-1 overflow-y-auto custom-scrollbar pr-1">
                         <div className="space-y-4">
                             {industries.length > 0 ? industries.map((ind, i) => {
-                                const total = companies.length || 1;
+                                const total = allCompanies.length || 1;
                                 const pct = Math.round((ind.count / total) * 100);
                                 const colors = ["bg-red-500", "bg-red-400", "bg-orange-500", "bg-rose-500", "bg-red-300"];
                                 return (
