@@ -270,9 +270,11 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
                         <label className="text-xs font-semibold text-gray-500 uppercase">Expected Close *</label>
                         <input
                             type="date"
-                            className={inputClass("expectedCloseDate")}
+                            className={inputClass("expectedCloseDate") + " cursor-pointer"}
                             value={formData.expectedCloseDate}
                             onChange={e => set("expectedCloseDate", e.target.value)}
+                            onKeyDown={(e) => e.preventDefault()}
+                            onClick={(e) => e.target.showPicker?.()}
                             min={new Date().toISOString().split("T")[0]}
                         />
                         {errors.expectedCloseDate && <p className="text-red-500 text-xs">{errors.expectedCloseDate}</p>}
