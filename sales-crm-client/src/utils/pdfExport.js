@@ -24,22 +24,29 @@ export const exportToPDF = async (elementId, filename = 'export.pdf') => {
     const loadingToast = toast.loading("Generating PDF...");
 
     try {
-        // To prevent tiny text on wide screens, we force the element to a specific width 
-        // that scales beautifully to A4. 900px is a sweet spot for A4 layout.
+        // Force overflow visible and hide scrollbars for all children temporarily
+        const style = document.createElement('style');
+        style.innerHTML = `
+            #${elementId} *::-webkit-scrollbar { display: none !important; }
+            #${elementId} * { -ms-overflow-style: none !important; scrollbar-width: none !important; }
+        `;
+        document.head.appendChild(style);
+
         const originalWidth = element.style.width;
         const originalMaxWidth = element.style.maxWidth;
         
-        element.style.width = '900px';
-        element.style.maxWidth = '900px';
+        element.style.width = '1200px'; // Increased width for better A4 fit
+        element.style.maxWidth = '1200px';
 
         // html-to-image's toCanvas handles modern CSS (oklch, oklab) much better
         const canvas = await toCanvas(element, {
             backgroundColor: '#ffffff',
-            pixelRatio: 3, // Increased for higher resolution text
+            pixelRatio: 2, // 2 is usually enough and faster
             skipFonts: false,
         });
 
         // Restore original styles
+        document.head.removeChild(style);
         element.style.width = originalWidth;
         element.style.maxWidth = originalMaxWidth;
 

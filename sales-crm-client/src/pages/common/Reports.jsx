@@ -97,7 +97,15 @@ export default function Reports() {
         const toastId = toast.loading(`Generating ${activeTab} report...`);
         
         try {
+            // Hide scrollbars temporarily
+            const originalOverflow = tableRef.current.style.overflow;
+            tableRef.current.style.overflow = 'visible';
+
             const dataUrl = await toPng(tableRef.current, { backgroundColor: '#ffffff', quality: 1.0 });
+
+            // Restore overflow
+            tableRef.current.style.overflow = originalOverflow;
+
             const pdf = new jsPDF('p', 'mm', 'a4');
             const imgProps = pdf.getImageProperties(dataUrl);
             const pdfWidth = pdf.internal.pageSize.getWidth();
