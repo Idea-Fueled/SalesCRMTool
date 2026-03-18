@@ -237,7 +237,7 @@ export const loginUser = async (req, res, next) => {
 
         const lastLogin = new Date();
         const updatedUser = await User.findByIdAndUpdate(user._id, { lastLogin, isSetupComplete: true }, { new: true })
-            .populate("managerId", "firstName lastName");
+            .populate("managerId", "firstName lastName email");
 
         res.status(200).json({
             message: "User logged in successfully!",
@@ -264,7 +264,7 @@ export const loginUser = async (req, res, next) => {
 
 export const getProfile = async (req, res, next) => {
     try {
-        const user = await User.findById(req.user.id).populate("managerId", "firstName lastName");
+        const user = await User.findById(req.user.id).populate("managerId", "firstName lastName email");
         if (!user) {
             return res.status(404).json({
                 message: "User does not exists!"
@@ -312,17 +312,17 @@ export const getTeamUsers = async (req, res, next) => {
         const role = req.user.role;
 
         if (role === "admin") {
-            const users = await User.find({ isDeleted: { $ne: true } }).populate("managerId", "firstName lastName").select("-password").sort({ createdAt: -1 })
+            const users = await User.find({ isDeleted: { $ne: true } }).populate("managerId", "firstName lastName email").select("-password").sort({ createdAt: -1 })
             return res.json(users)
         }
 
         if (role === "sales_manager") {
-            const users = await User.find({ $or: [{ _id: id }, { managerId: id }], isDeleted: { $ne: true } }).populate("managerId", "firstName lastName").select("-password").sort({ createdAt: -1 })
+            const users = await User.find({ $or: [{ _id: id }, { managerId: id }], isDeleted: { $ne: true } }).populate("managerId", "firstName lastName email").select("-password").sort({ createdAt: -1 })
             return res.json(users)
         }
 
         if (role === "sales_rep") {
-            const users = await User.find({ _id: id, isDeleted: { $ne: true } }).populate("managerId", "firstName lastName").select("-password");
+            const users = await User.find({ _id: id, isDeleted: { $ne: true } }).populate("managerId", "firstName lastName email").select("-password");
             return res.json(users)
         }
 
@@ -401,7 +401,7 @@ export const getDeletedUsers = async (req, res, next) => {
     try {
         const { role } = req.user;
         if (role !== "admin") return res.status(403).json({ message: "Access denied!" });
-        const users = await User.find({ isDeleted: true }).populate("managerId", "firstName lastName").select("-password").sort({ deletedAt: -1 });
+        const users = await User.find({ isDeleted: true }).populate("managerId", "firstName lastName email").select("-password").sort({ deletedAt: -1 });
         res.status(200).json({ data: users });
     } catch (error) {
         return res.status(500).json({ message: error.message || "Server error!" });

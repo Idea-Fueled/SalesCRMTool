@@ -206,8 +206,10 @@ export default function ManagerContacts() {
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3 text-gray-600">{c.jobTitle || "—"}</td>
-                                            <td className="px-4 py-3">
-                                                <span className="text-xs px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 font-medium">{c.companyId?.name || c.companyName || "—"}</span>
+                                            <td className="px-4 py-3 whitespace-nowrap">
+                                                <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold uppercase tracking-wider border border-blue-100">
+                                                    {c.companyId?.name || c.companyName || "—"}
+                                                </span>
                                             </td>
                                             <td className="px-4 py-3 whitespace-nowrap">
                                                 <button 

@@ -85,11 +85,14 @@ export default function UserDetailsModal({ isOpen, onClose, user }) {
                                 <User size={12} className="text-gray-400" />
                                 Reporting To
                             </h4>
-                            <div className="flex flex-col">
+                            <div className="flex flex-col min-w-0">
                                 <span className="text-sm font-semibold text-gray-700 truncate">
                                     {user.managerId ? `${user.managerId.firstName || ""} ${user.managerId.lastName || ""}`.trim() : "No Direct Manager"}
                                 </span>
-                                <span className="text-[11px] text-gray-400 italic">Assigned Supervisor</span>
+                                {user.managerId && user.managerId.email && (
+                                    <span className="text-[11px] font-medium text-gray-500 truncate mt-0.5">{user.managerId.email}</span>
+                                )}
+                                <span className="text-[10px] text-gray-400 italic mt-0.5">Assigned Supervisor</span>
                             </div>
                         </section>
 
