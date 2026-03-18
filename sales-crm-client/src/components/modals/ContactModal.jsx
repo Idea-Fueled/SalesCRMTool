@@ -17,13 +17,23 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
 
     useEffect(() => {
         if (contact) {
+            const rawCompanyId = contact.companyId?._id || contact.companyId || "";
+            const companyIdStr = typeof rawCompanyId === 'string' ? rawCompanyId : (rawCompanyId?._id || rawCompanyId?.toString() || "");
+            
+            // Try to find company name in companies list if not directly on contact
+            let companyName = contact.companyName || contact.companyId?.name || "";
+            if (!companyName && companyIdStr && companies.length > 0) {
+                const found = companies.find(c => (c._id || c.id) === companyIdStr);
+                if (found) companyName = found.name;
+            }
+
             setFormData({
                 firstName: contact.firstName || "",
                 lastName: contact.lastName || "",
                 email: contact.email || "",
                 jobTitle: contact.jobTitle || "",
-                companyId: contact.companyId?._id || contact.companyId || "",
-                companyName: contact.companyName || contact.companyId?.name || "",
+                companyId: companyIdStr,
+                companyName: companyName,
                 phone: contact.phone || "",
                 mobile: contact.mobile || "",
                 linkedin: contact.linkedin || "",
@@ -35,7 +45,7 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
             setFormData({ firstName: "", lastName: "", email: "", jobTitle: "", companyId: "", companyName: "", phone: "", mobile: "", linkedin: "", notes: "", ownerId: "", files: [] });
         }
         setErrors({});
-    }, [contact, isOpen]);
+    }, [contact, isOpen, companies]);
 
     const set = (field, value) => {
         setFormData(prev => ({ ...prev, [field]: value }));
@@ -121,21 +131,30 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
                     <div className="space-y-1 relative">
                         <label className="text-xs font-semibold text-gray-500 uppercase">Company *</label>
                         <select
-                            className={inputClass("companyId")}
+                            className={inputClass("companyId") + (contact ? " bg-gray-50 cursor-not-allowed opacity-75" : "")}
                             value={formData.companyId}
+                            disabled={!!contact}
                             onChange={e => {
                                 const selectedId = e.target.value;
-                                const comp = companies.find(c => c._id === selectedId);
+                                const comp = companies.find(c => (c._id || c.id) === selectedId);
                                 set("companyId", selectedId);
                                 set("companyName", comp?.name || "");
                             }}
                         >
-                            <option value="">— Select Company —</option>
+                            <option value="">
+                                {contact && !formData.companyId && formData.companyName ? formData.companyName : "— Select Company —"}
+                            </option>
                             {companies.map(comp => (
-                                <option key={comp._id} value={comp._id}>
+                                <option key={comp._id || comp.id} value={comp._id || comp.id}>
                                     {comp.name}
                                 </option>
                             ))}
+                            {/* Fallback for current company if not in companies list */}
+                            {contact && formData.companyId && !companies.find(c => (c._id || c.id) === formData.companyId) && (
+                                <option value={formData.companyId}>
+                                    {formData.companyName || "Unknown Company"}
+                                </option>
+                            )}
                         </select>
                         {errors.companyName && <p className="text-red-500 text-xs">{errors.companyName}</p>}
                     </div>
