@@ -19,6 +19,11 @@ const companySchema = new mongoose.Schema(
             type: String,
             trim: true
         },
+        email: {
+            type: String,
+            trim: true,
+            lowercase: true
+        },
         primaryContact: {
             type: String,
             trim: true

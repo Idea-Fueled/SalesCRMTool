@@ -190,7 +190,7 @@ export default function CompaniesDashboard() {
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className="border-b border-gray-100 bg-gray-50">
-                                            {["Company", "Industry", "Owner", "Status", "Actions"].map(h => (
+                                            {["Company", "Industry", "Email", "Owner", "Status", "Actions"].map(h => (
                                                 <th key={h} className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wide whitespace-nowrap">{h}</th>
                                             ))}
                                         </tr>
@@ -208,6 +208,11 @@ export default function CompaniesDashboard() {
                                                         {c.name}
                                                     </td>
                                                     <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{c.industry || "—"}</td>
+                                                    <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
+                                                        {c.email ? (
+                                                            <a href={`mailto:${c.email}`} className="hover:text-red-600 transition-colors">{c.email}</a>
+                                                        ) : "—"}
+                                                    </td>
                                                     <td className="px-4 py-3 text-red-700 font-bold whitespace-nowrap">{c.ownerId?.firstName || "System"}</td>
                                                     <td className="px-4 py-3 whitespace-nowrap">
                                                         <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${statusBg[c.status] || "bg-gray-100 text-gray-600"}`}>{c.status}</span>

@@ -24,6 +24,14 @@ const CompanyCard = ({ company, onEdit, onDelete, onView }) => {
                             <h3 className="font-bold text-gray-800 group-hover:text-red-600 transition-colors uppercase text-xs tracking-wide">
                                 {truncateName(company.name)}
                             </h3>
+                            {company.email && (
+                                <div className="flex items-center gap-1 mt-0.5">
+                                    <Mail size={10} className="text-gray-400 flex-shrink-0" />
+                                    <p className="text-xs text-gray-500 truncate lowercase font-medium">
+                                        {company.email}
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div className="relative group/menu flex-shrink-0">

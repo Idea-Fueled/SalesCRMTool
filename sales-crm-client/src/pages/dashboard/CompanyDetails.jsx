@@ -284,9 +284,15 @@ export default function CompanyDetails() {
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
-                                    <User size={10} className="text-red-400" /> Notes
+                                    <Mail size={10} className="text-red-400" /> Email Address
                                 </label>
-                                <p className="text-sm font-bold text-gray-900">{company.notes || "No notes recorded"}</p>
+                                {company.email ? (
+                                    <a href={`mailto:${company.email}`} className="text-sm font-bold text-red-600 hover:underline">
+                                        {company.email}
+                                    </a>
+                                ) : (
+                                    <p className="text-sm font-bold text-gray-300 italic">No email on file</p>
+                                )}
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">

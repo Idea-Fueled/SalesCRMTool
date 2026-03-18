@@ -10,7 +10,7 @@ export default function CompanyModal({ isOpen, onClose, company, onSave, userRol
     const urlRegex = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/;
 
     const [formData, setFormData] = useState({
-        name: "", industry: "", size: "", website: "", primaryContact: "",
+        name: "", industry: "", size: "", website: "", email: "", primaryContact: "",
         status: "Prospect", address: "", phone: "", revenueRange: "", notes: "", ownerId: "",
         files: []
     });
@@ -24,6 +24,7 @@ export default function CompanyModal({ isOpen, onClose, company, onSave, userRol
                 industry: company.industry || "",
                 size: company.size || "",
                 website: company.website || "",
+                email: company.email || "",
                 primaryContact: company.primaryContact || "",
                 status: company.status || "Prospect",
                 address: company.address || "",
@@ -34,7 +35,7 @@ export default function CompanyModal({ isOpen, onClose, company, onSave, userRol
                 files: []
             });
         } else {
-            setFormData({ name: "", industry: "", size: "", website: "", primaryContact: "", status: "Prospect", address: "", phone: "", revenueRange: "", notes: "", ownerId: "", files: [] });
+            setFormData({ name: "", industry: "", size: "", website: "", email: "", primaryContact: "", status: "Prospect", address: "", phone: "", revenueRange: "", notes: "", ownerId: "", files: [] });
         }
         setErrors({});
     }, [company, isOpen]);
@@ -46,9 +47,11 @@ export default function CompanyModal({ isOpen, onClose, company, onSave, userRol
 
     const validate = () => {
         const errs = {};
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!formData.name.trim()) errs.name = "Company name is required";
         else if (formData.name.trim().length < 2) errs.name = "Name must be at least 2 characters";
         if (formData.website && !urlRegex.test(formData.website)) errs.website = "Enter a valid website URL";
+        if (formData.email && !emailRegex.test(formData.email)) errs.email = "Enter a valid email address";
         if (formData.phone && !phoneRegex.test(formData.phone)) errs.phone = "Enter a valid phone number";
         return errs;
     };
@@ -137,11 +140,18 @@ export default function CompanyModal({ isOpen, onClose, company, onSave, userRol
                         />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-xs font-semibold text-gray-500 uppercase">Phone</label>
-                        <input type="text" className={inputClass("phone")} value={formData.phone}
-                            onChange={e => set("phone", e.target.value.replace(/[^\d+\s\-()]/g, ''))} placeholder="+1 (555) 123-4567" />
-                        {errors.phone && <p className="text-red-500 text-xs">{errors.phone}</p>}
+                        <label className="text-xs font-semibold text-gray-500 uppercase">Email Address</label>
+                        <input type="email" className={inputClass("email")} value={formData.email}
+                            onChange={e => set("email", e.target.value)} placeholder="contact@acme.com" />
+                        {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
                     </div>
+                </div>
+
+                <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-500 uppercase">Phone</label>
+                    <input type="text" className={inputClass("phone")} value={formData.phone}
+                        onChange={e => set("phone", e.target.value.replace(/[^\d+\s\-()]/g, ''))} placeholder="+1 (555) 123-4567" />
+                    {errors.phone && <p className="text-red-500 text-xs">{errors.phone}</p>}
                 </div>
 
                 <div className="space-y-1">

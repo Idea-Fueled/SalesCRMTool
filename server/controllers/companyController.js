@@ -16,7 +16,8 @@ export const createCompany = async (req, res) => {
             address,
             phone,
             revenueRange,
-            notes
+            notes,
+            email
         } = req.body;
 
         const { role } = req.user;
@@ -38,6 +39,7 @@ export const createCompany = async (req, res) => {
             phone,
             revenueRange,
             notes,
+            email,
             ownerId: (role === "admin" || role === "sales_manager") && req.body.ownerId && req.body.ownerId.trim() !== "" ? req.body.ownerId : req.user.id,
             attachments: []
         };
@@ -226,7 +228,7 @@ export const updateCompany = async (req, res) => {
 
         const fields = [
             "name", "industry", "size", "website", "primaryContact",
-            "status", "address", "phone", "revenueRange", "notes", "remarks", "ownerId"
+            "status", "address", "phone", "revenueRange", "notes", "remarks", "ownerId", "email"
         ];
 
         fields.forEach(field => {
