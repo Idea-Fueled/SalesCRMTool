@@ -130,32 +130,32 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
                     </div>
                     <div className="space-y-1 relative">
                         <label className="text-xs font-semibold text-gray-500 uppercase">Company *</label>
-                        <select
-                            className={inputClass("companyId") + (contact ? " bg-gray-50 cursor-not-allowed opacity-75" : "")}
-                            value={formData.companyId}
-                            disabled={!!contact}
-                            onChange={e => {
-                                const selectedId = e.target.value;
-                                const comp = companies.find(c => (c._id || c.id) === selectedId);
-                                set("companyId", selectedId);
-                                set("companyName", comp?.name || "");
-                            }}
-                        >
-                            <option value="">
-                                {contact && !formData.companyId && formData.companyName ? formData.companyName : "— Select Company —"}
-                            </option>
-                            {companies.map(comp => (
-                                <option key={comp._id || comp.id} value={comp._id || comp.id}>
-                                    {comp.name}
-                                </option>
-                            ))}
-                            {/* Fallback for current company if not in companies list */}
-                            {contact && formData.companyId && !companies.find(c => (c._id || c.id) === formData.companyId) && (
-                                <option value={formData.companyId}>
-                                    {formData.companyName || "Unknown Company"}
-                                </option>
-                            )}
-                        </select>
+                        {contact ? (
+                            <input
+                                type="text"
+                                className={inputClass("companyId") + " bg-gray-100 cursor-not-allowed text-gray-500 font-medium"}
+                                value={formData.companyName || "No Company"}
+                                disabled
+                            />
+                        ) : (
+                            <select
+                                className={inputClass("companyId")}
+                                value={formData.companyId}
+                                onChange={e => {
+                                    const selectedId = e.target.value;
+                                    const comp = companies.find(c => (c._id || c.id) === selectedId);
+                                    set("companyId", selectedId);
+                                    set("companyName", comp?.name || "");
+                                }}
+                            >
+                                <option value="">— Select Company —</option>
+                                {companies.map(comp => (
+                                    <option key={comp._id || comp.id} value={comp._id || comp.id}>
+                                        {comp.name}
+                                    </option>
+                                ))}
+                            </select>
+                        )}
                         {errors.companyName && <p className="text-red-500 text-xs">{errors.companyName}</p>}
                     </div>
                 </div>
