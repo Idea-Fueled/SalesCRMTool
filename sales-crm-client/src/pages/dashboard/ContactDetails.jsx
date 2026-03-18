@@ -158,7 +158,7 @@ export default function ContactDetails() {
 
     const getInitials = (firstName, lastName) => {
         return (
-            (firstName?.[0] || "") + (lastName?.[0] || "")
+            (firstName?.[0] || "") + (lastName?.slice(-1) || "")
         ).toUpperCase() || "C";
     };
 
@@ -345,8 +345,8 @@ export default function ContactDetails() {
                         </div>
                         <div className="p-5">
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 text-[10px] font-bold border-2 border-white shadow-sm ring-1 ring-red-50">
-                                    {contact.ownerId?.firstName?.[0]}{contact.ownerId?.lastName?.[0]}
+                                <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white text-[10px] font-bold border-2 border-white shadow-sm ring-1 ring-red-50">
+                                    {contact.ownerId?.firstName?.[0]}{contact.ownerId?.lastName?.slice(-1)}
                                 </div>
                                 <div>
                                     <p className="text-xs font-bold text-gray-800 leading-none">{contact.ownerId?.firstName} {contact.ownerId?.lastName || ""}</p>
@@ -387,7 +387,7 @@ export default function ContactDetails() {
                                             <div key={idx} className="p-4 bg-gray-50/30 rounded-xl border border-gray-100">
                                                 <div className="flex items-start justify-between mb-2">
                                                     <div className="flex items-center gap-2">
-                                                        <div className="w-6 h-6 rounded-full bg-red-50 flex items-center justify-center text-[10px] font-bold text-red-600 border border-red-100">
+                                                        <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center text-[10px] font-bold text-white border border-red-100">
                                                             {remark.authorName?.[0] || 'U'}
                                                         </div>
                                                         <span className="text-[11px] font-semibold text-gray-500">

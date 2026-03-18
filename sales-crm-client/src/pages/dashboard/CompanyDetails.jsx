@@ -164,10 +164,9 @@ export default function CompanyDetails() {
     const getInitials = (name) => {
         if (!name) return "C";
         const parts = name.trim().split(/\s+/);
-        if (parts.length >= 2) {
-            return (parts[0][0] + parts[1][0]).toUpperCase();
-        }
-        return parts[0].slice(0, 2).toUpperCase();
+        const firstName = parts[0] || "";
+        const lastName = parts[parts.length - 1] || "";
+        return `${firstName?.[0] || ""}${lastName?.slice(-1) || ""}`.toUpperCase();
     };
 
     if (loading) {
@@ -351,7 +350,7 @@ export default function CompanyDetails() {
                         <div className="p-5">
                             <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
                                 <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-sm ring-1 ring-red-100">
-                                    {company.ownerId?.firstName?.[0]}{company.ownerId?.lastName?.[0]}
+                                    {company.ownerId?.firstName?.[0]}{company.ownerId?.lastName?.slice(-1)}
                                 </div>
                                 <div>
                                     <p className="text-sm font-black text-gray-900 leading-none">{company.ownerId?.firstName} {company.ownerId?.lastName || ""}</p>
@@ -409,7 +408,7 @@ export default function CompanyDetails() {
                                             <div key={idx} className="p-4 bg-gray-50/30 rounded-xl border border-gray-100">
                                                 <div className="flex items-start justify-between mb-2">
                                                     <div className="flex items-center gap-2">
-                                                        <div className="w-6 h-6 rounded-full bg-red-50 flex items-center justify-center text-[10px] font-bold text-red-600 border border-red-100">
+                                                        <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center text-[10px] font-bold text-white border border-red-100">
                                                             {remark.authorName?.[0] || 'U'}
                                                         </div>
                                                         <span className="text-[11px] font-semibold text-gray-500">

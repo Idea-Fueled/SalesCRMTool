@@ -33,10 +33,12 @@ const Select = ({ options, value, onChange }) => (
 
 const Avatar = ({ name }) => {
     if (!name) return null;
-    const initials = name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
-    const colors = ["bg-red-500", "bg-orange-500", "bg-red-600", "bg-orange-600", "bg-red-400"];
+    const parts = name.trim().split(/\s+/);
+    const firstName = parts[0] || "";
+    const lastName = parts[parts.length - 1] || "";
+    const initials = `${firstName?.[0] || ""}${lastName?.slice(-1) || ""}`.toUpperCase();
     return (
-        <div className={`w-8 h-8 rounded-full ${colors[name.charCodeAt(0) % colors.length]} flex items-center justify-center text-white text-xs font-bold flex-shrink-0`}>
+        <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
             {initials}
         </div>
     );

@@ -12,9 +12,13 @@ const roleBadge = {
 const formatRole = (r) => ({ admin: "ADMIN", sales_manager: "SALES MANAGER", sales_rep: "SALES REPRESENTATIVE" }[r] || r?.toUpperCase());
 
 function Avatar({ name }) {
-    const initials = name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+    if (!name) return null;
+    const parts = name.trim().split(/\s+/);
+    const firstName = parts[0] || "";
+    const lastName = parts[parts.length - 1] || "";
+    const initials = `${firstName?.[0] || ""}${lastName?.slice(-1) || ""}`.toUpperCase();
     return (
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+        <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
             {initials}
         </div>
     );

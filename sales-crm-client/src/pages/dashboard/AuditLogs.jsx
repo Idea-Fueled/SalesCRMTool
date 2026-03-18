@@ -82,7 +82,7 @@ export default function AuditLogs() {
         
         return (
             <div className="flex items-center gap-3">
-                <div className={`w-8 h-8 rounded-full ${isCurrent ? 'bg-red-600' : 'bg-gray-100'} text-white flex items-center justify-center font-bold text-xs overflow-hidden shadow-sm border-2 ${isCurrent ? 'border-red-400' : 'border-white'}`}>
+                <div className={`w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center font-bold text-xs overflow-hidden shadow-sm border-2 ${isCurrent ? 'border-red-400' : 'border-white'}`}>
                     {log.performedBy?.profilePicture ? (
                         <img src={log.performedBy.profilePicture} alt="Performer" className="w-full h-full object-cover" />
                     ) : log.performedBy ? (
