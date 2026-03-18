@@ -36,6 +36,7 @@ export default function Reports() {
     const [exporting, setExporting] = useState(false);
     const [data, setData] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
     const [dateRange, setDateRange] = useState({
         start: new Date(new Date().setDate(new Date().getDate() - 30)).toISOString().split('T')[0],
         end: new Date().toISOString().split('T')[0]
@@ -48,7 +49,7 @@ export default function Reports() {
                 createdAfter: dateRange.start,
                 createdBefore: new Date(new Date(dateRange.end).setHours(23, 59, 59, 999)).toISOString(),
                 limit: 1000,
-                name: searchQuery || undefined
+                name: debouncedSearch || undefined
             };
 
             let res;
@@ -56,7 +57,7 @@ export default function Reports() {
             else if (activeTab === "companies") res = await getCompanies(params);
             else if (activeTab === "contacts") res = await getContacts(params);
 
-            setData(res.data.data);
+            setData(res?.data?.data || []);
         } catch (error) {
             console.error(error);
             toast.error(`Failed to fetch ${activeTab} report`);
@@ -66,12 +67,19 @@ export default function Reports() {
     };
 
     useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchQuery);
+        }, 300); // More responsive 300ms
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    useEffect(() => {
         fetchData();
-    }, [activeTab, dateRange]);
+    }, [activeTab, dateRange, debouncedSearch]);
 
     const handleSearchSubmit = (e) => {
         e.preventDefault();
-        fetchData();
+        setDebouncedSearch(searchQuery); // Trigger immediate search on Enter
     };
 
     const handleRowClick = (id) => {
@@ -217,8 +225,8 @@ export default function Reports() {
                                 </tr>
                             ) : data.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="py-20 text-center text-gray-400 text-xs font-medium italic">
-                                        No records found for this period.
+                                    <td colSpan={5} className="py-20 text-center text-gray-400 text-xs font-semibold italic">
+                                        {searchQuery ? "Not found" : "No records found for this period."}
                                     </td>
                                 </tr>
                             ) : (
