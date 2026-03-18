@@ -40,9 +40,10 @@ export default function Reports() {
     const [searchQuery, setSearchQuery] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [dateRange, setDateRange] = useState({
-        start: new Date(new Date().setDate(new Date().getDate() - 30)).toISOString().split('T')[0],
+        start: new Date().toISOString().split('T')[0],
         end: new Date().toISOString().split('T')[0]
     });
+    const [rangePreset, setRangePreset] = useState("today");
 
     const fetchData = async () => {
         setLoading(true);
@@ -74,6 +75,42 @@ export default function Reports() {
         }, 300); // More responsive 300ms
         return () => clearTimeout(timer);
     }, [searchQuery]);
+
+    useEffect(() => {
+        const calculateRange = () => {
+            const now = new Date();
+            let start = new Date();
+            let end = new Date();
+
+            switch (rangePreset) {
+                case "today":
+                    start = new Date();
+                    end = new Date();
+                    break;
+                case "thisMonth":
+                    start = new Date(now.getFullYear(), now.getMonth(), 1);
+                    end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                    break;
+                case "lastMonth":
+                    start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                    end = new Date(now.getFullYear(), now.getMonth(), 0);
+                    break;
+                case "custom":
+                    return; // Don't overwrite custom selection
+                default:
+                    break;
+            }
+
+            setDateRange({
+                start: start.toISOString().split('T')[0],
+                end: end.toISOString().split('T')[0]
+            });
+        };
+
+        if (rangePreset !== "custom") {
+            calculateRange();
+        }
+    }, [rangePreset]);
 
     useEffect(() => {
         fetchData();
@@ -173,20 +210,37 @@ export default function Reports() {
                         />
                     </form>
 
+                    {/* Range Preset */}
+                    <select 
+                        value={rangePreset}
+                        onChange={(e) => setRangePreset(e.target.value)}
+                        className="text-xs font-bold text-gray-700 bg-white border border-gray-200 rounded-lg px-3 py-1.5 shadow-sm focus:outline-none focus:ring-1 focus:ring-red-400 transition"
+                    >
+                        <option value="today">Today</option>
+                        <option value="thisMonth">This Month</option>
+                        <option value="lastMonth">Last Month</option>
+                    </select>
+
                     {/* Date Picker */}
-                    <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-1.5 shadow-sm">
+                    <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-2 py-1.5 shadow-sm">
                         <Calendar size={14} className="text-gray-400" />
                         <input 
                             type="date" 
                             value={dateRange.start}
-                            onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
+                            onChange={(e) => {
+                                setDateRange(prev => ({ ...prev, start: e.target.value }));
+                                setRangePreset("custom");
+                            }}
                             className="text-xs font-medium focus:outline-none border-none p-0 w-24 bg-transparent"
                         />
                         <span className="text-gray-300 text-xs">—</span>
                         <input 
                             type="date" 
                             value={dateRange.end}
-                            onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
+                            onChange={(e) => {
+                                setDateRange(prev => ({ ...prev, end: e.target.value }));
+                                setRangePreset("custom");
+                            }}
                             className="text-xs font-medium focus:outline-none border-none p-0 w-24 bg-transparent"
                         />
                     </div>
