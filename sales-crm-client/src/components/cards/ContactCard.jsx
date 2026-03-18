@@ -119,11 +119,6 @@ export default function ContactCard({ contact, onEdit, onDelete, onView, onDeals
                         <span className="text-[9px] font-black uppercase tracking-tighter">Deals: {contact.dealCount || 0}</span>
                     </button>
                 </div>
-                <div className="flex items-center gap-3">
-                    <Mail size={12} className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer" />
-                    <Phone size={12} className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer" />
-                    <ExternalLink size={12} className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer" />
-                </div>
             </div>
         </div>
     );
