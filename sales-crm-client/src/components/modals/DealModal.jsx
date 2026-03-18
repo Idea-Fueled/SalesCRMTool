@@ -11,7 +11,7 @@ const STAGE_COLORS = {
     "Closed Won": "bg-green-600",
     "Closed Lost": "bg-red-600"
 };
-const CURRENCIES = [{ value: "USD", label: "USD ($)" }, { value: "EUR", label: "EUR (€)" }, { value: "INR", label: "INR (₹)" }];
+const CURRENCIES = [{ value: "USD", label: "USD ($)" }];
 const SOURCE_OPTIONS = ["Inbound", "Referral", "Outbound"];
 
 export default function DealModal({ isOpen, onClose, deal, onSave, companies, contacts, freeText = false, userRole, potentialOwners = [], currentUserId }) {
@@ -209,11 +209,10 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
                         {errors.value && <p className="text-red-500 text-xs">{errors.value}</p>}
                     </div>
                     <div className="space-y-1">
-                        <label className="text-xs font-semibold text-gray-500 uppercase">Currency *</label>
-                        <select className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-400 bg-white"
-                            value={formData.currency} onChange={e => set("currency", e.target.value)}>
-                            {CURRENCIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-                        </select>
+                        <label className="text-xs font-semibold text-gray-500 uppercase">Currency</label>
+                        <div className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-600 font-medium">
+                            USD ($)
+                        </div>
                     </div>
                 </div>
 
