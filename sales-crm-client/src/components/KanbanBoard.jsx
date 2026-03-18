@@ -63,7 +63,8 @@ function SortableDealCard({ deal, onEdit, onDelete, isOverlay = false }) {
 
     const style = {
         transform: CSS.Translate.toString(transform),
-        transition,
+        transition: transition || 'transform 200ms cubic-bezier(0.2, 0, 0, 1)',
+        opacity: isDragging ? 0.3 : 1,
     };
 
     const closeDate = deal.expectedCloseDate
@@ -151,7 +152,7 @@ function SortableDealCard({ deal, onEdit, onDelete, isOverlay = false }) {
 }
 
 function KanbanColumn({ stage, deals, onEdit, onDelete }) {
-    const { setNodeRef } = useDroppable({
+    const { setNodeRef, isOver } = useDroppable({
         id: stage,
     });
     const cfg = STAGE_CONFIG[stage];
@@ -160,7 +161,10 @@ function KanbanColumn({ stage, deals, onEdit, onDelete }) {
     return (
         <div 
             ref={setNodeRef}
-            className="flex-shrink-0 w-[300px] flex flex-col bg-gray-50/40 rounded-2xl p-3 h-full"
+            className={`
+                flex-shrink-0 w-[300px] flex flex-col rounded-2xl p-3 h-full transition-colors duration-200
+                ${isOver ? 'bg-red-50/50 ring-2 ring-red-100 ring-inset' : 'bg-gray-50/40'}
+            `}
         >
             {/* Column header */}
             <div className="mb-4">
@@ -186,7 +190,10 @@ function KanbanColumn({ stage, deals, onEdit, onDelete }) {
                     strategy={verticalListSortingStrategy}
                 >
                     {deals.length === 0 ? (
-                        <div className="rounded-xl border-2 border-dashed border-gray-100 h-24 flex flex-col items-center justify-center gap-1 bg-white/50">
+                        <div className={`
+                            rounded-xl border-2 border-dashed h-24 flex flex-col items-center justify-center gap-1 transition-colors
+                            ${isOver ? 'border-red-200 bg-red-50/30' : 'border-gray-100 bg-white/50'}
+                        `}>
                             <p className="text-[10px] text-gray-300 font-bold uppercase tracking-tighter">No deals here</p>
                         </div>
                     ) : (
@@ -208,6 +215,12 @@ function KanbanColumn({ stage, deals, onEdit, onDelete }) {
 export default function KanbanBoard({ deals, onEdit, onDelete, onMove }) {
     const [activeId, setActiveId] = useState(null);
     const [activeDeal, setActiveDeal] = useState(null);
+    const [localDeals, setLocalDeals] = useState(deals);
+
+    // Sync local deals with props when they change (e.g. after a refetch)
+    React.useEffect(() => {
+        setLocalDeals(deals);
+    }, [deals]);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -221,7 +234,7 @@ export default function KanbanBoard({ deals, onEdit, onDelete, onMove }) {
     );
 
     const grouped = STAGES.reduce((acc, stage) => {
-        acc[stage] = deals.filter(d => d.stage === stage);
+        acc[stage] = localDeals.filter(d => d.stage === stage);
         return acc;
     }, {});
 
@@ -229,6 +242,7 @@ export default function KanbanBoard({ deals, onEdit, onDelete, onMove }) {
         const { active } = event;
         setActiveId(active.id);
         setActiveDeal(active.data.current.deal);
+        if (window.navigator.vibrate) window.navigator.vibrate(5);
     };
 
     const handleDragEnd = (event) => {
@@ -246,26 +260,29 @@ export default function KanbanBoard({ deals, onEdit, onDelete, onMove }) {
         let newStage = null;
         
         if (STAGES.includes(overId)) {
-            // Dropped directly on a column
             newStage = overId;
         } else {
-            // Dropped on a card, find its stage via deal data or SortableContext container
             const overData = over.data?.current;
             if (overData?.deal?.stage) {
                 newStage = overData.deal.stage;
             } else if (overData?.sortable?.containerId) {
                 newStage = overData.sortable.containerId;
             } else {
-                // Fallback: search in deals
-                const overDeal = deals.find(d => d._id === overId);
+                const overDeal = localDeals.find(d => d._id === overId);
                 if (overDeal) {
                     newStage = overDeal.stage;
                 }
             }
         }
 
-        const activeDeal = deals.find(d => d._id === activeId);
-        if (activeDeal && newStage && activeDeal.stage !== newStage && STAGES.includes(newStage)) {
+        const draggingDeal = localDeals.find(d => d._id === activeId);
+        if (draggingDeal && newStage && draggingDeal.stage !== newStage && STAGES.includes(newStage)) {
+            // Optimistic update
+            setLocalDeals(prev => prev.map(d => 
+                d._id === activeId ? { ...d, stage: newStage } : d
+            ));
+            
+            // Call prop move
             onMove && onMove(activeId, newStage);
         }
     };
@@ -303,10 +320,12 @@ export default function KanbanBoard({ deals, onEdit, onDelete, onMove }) {
 
             <DragOverlay dropAnimation={dropAnimation}>
                 {activeId ? (
-                    <SortableDealCard 
-                        deal={activeDeal} 
-                        isOverlay={true}
-                    />
+                    <div className="rotate-2 scale-105 transition-transform duration-200">
+                        <SortableDealCard 
+                            deal={activeDeal} 
+                            isOverlay={true}
+                        />
+                    </div>
                 ) : null}
             </DragOverlay>
         </DndContext>

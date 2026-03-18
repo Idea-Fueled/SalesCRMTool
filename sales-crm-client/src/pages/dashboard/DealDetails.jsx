@@ -61,7 +61,7 @@ export default function DealDetails() {
     const [remarkFiles, setRemarkFiles] = useState([]);
     const [savingRemark, setSavingRemark] = useState(false);
 
-    const fetchDealData = async (silent = false) => {
+    const fetchDealData = async (silent = false, showToast = false) => {
         if (!silent) setLoading(true);
         else setIsRefreshing(true);
         try {
@@ -75,6 +75,10 @@ export default function DealDetails() {
             setUsers(usersRes.data || []);
             setCompanies(companiesRes.data.data);
             setContacts(contactsRes.data.data);
+
+            if (showToast) {
+                toast.success("Pipeline Refreshed");
+            }
         } catch (error) {
             console.error(error);
             toast.error("Failed to fetch deal details");
@@ -390,7 +394,7 @@ export default function DealDetails() {
                         <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
                             <h3 className="text-[10px] font-bold">Pipeline Transition Log</h3>
                             <button
-                                onClick={() => fetchDealData(true)}
+                                onClick={() => fetchDealData(true, true)}
                                 disabled={isRefreshing}
                                 className={`text-gray-300 hover:text-red-500 transition-all ${isRefreshing ? "animate-spin text-red-500" : ""}`}
                                 title="Refresh History"
@@ -398,25 +402,27 @@ export default function DealDetails() {
                                 <RotateCw size={12} />
                             </button>
                         </div>
-                        <div className="p-6 space-y-6">
-                            {(!deal.stageHistory || deal.stageHistory.length === 0) ? (
-                                <p className="text-xs text-gray-400 italic text-center py-4">No historical transitions recorded.</p>
-                            ) : (
-                                deal.stageHistory.map((history, idx) => (
-                                    <div key={idx} className="relative pl-6 pb-6 last:pb-0 border-l border-gray-100 last:border-0">
-                                        <div className="absolute left-[-5px] top-0 w-2 h-2 rounded-full bg-red-400 border-2 border-white ring-1 ring-red-100" />
-                                        <div className="space-y-1">
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[11px] font-black text-gray-900 uppercase">{history.stage}</span>
-                                                <span className="text-[9px] font-bold text-gray-400">{formatDate(history.changedAt)}</span>
+                        <div className="max-h-[300px] overflow-y-auto custom-scrollbar py-6 pl-6">
+                            <div className="pr-6 space-y-4">
+                                {(!deal.stageHistory || deal.stageHistory.length === 0) ? (
+                                    <p className="text-xs text-gray-400 italic text-center py-4 pr-6">No historical transitions recorded.</p>
+                                ) : (
+                                    deal.stageHistory.map((history, idx) => (
+                                        <div key={idx} className="relative pl-6 pb-4 last:pb-0 border-l border-gray-100 last:border-0">
+                                            <div className="absolute left-[-5px] top-0 w-2 h-2 rounded-full bg-red-400 border-2 border-white ring-1 ring-red-100" />
+                                            <div className="space-y-1">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-[11px] font-black text-gray-900 uppercase">{history.stage}</span>
+                                                    <span className="text-[9px] font-bold text-gray-400">{formatDate(history.changedAt)}</span>
+                                                </div>
+                                                <p className="text-[10px] text-gray-500 font-medium leading-tight">
+                                                    By {history.changedBy?.firstName ? `${history.changedBy.firstName} ${history.changedBy.lastName || ""}` : (typeof history.changedBy === 'string' ? "System" : "Unknown")}
+                                                </p>
                                             </div>
-                                            <p className="text-[10px] text-gray-500 font-medium">
-                                                By {history.changedBy?.firstName ? `${history.changedBy.firstName} ${history.changedBy.lastName || ""}` : (typeof history.changedBy === 'string' ? "System" : "Unknown")}
-                                            </p>
                                         </div>
-                                    </div>
-                                ))
-                            )}
+                                    ))
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -424,7 +430,7 @@ export default function DealDetails() {
                 {/* Right Column - Pipeline & Interactions */}
                 <div className="lg:col-span-8 space-y-8">
                     {/* Deals Pipeline Status */}
-                    <div className="space-y-5">
+                    <div className={`space-y-5 transition-all duration-500 ${isRefreshing ? "animate-pulse opacity-60" : ""}`}>
                         <h3 className="text-xl font-bold text-gray-900 tracking-tight">Deals Pipeline Status</h3>
                         <div className="flex flex-wrap sm:flex-nowrap items-center gap-y-3 sm:gap-x-1">
                             {pipelineStages.map((stage, index) => {
@@ -433,7 +439,9 @@ export default function DealDetails() {
                                 
                                 let isPast = index < currentStageIndex;
                                 const isSkippedWon = deal.stage === "Closed Lost" && stage.id === "Closed Won";
-                                if (isSkippedWon) {
+                                const isSkippedLost = deal.stage === "Closed Won" && stage.id === "Closed Lost";
+
+                                if (isSkippedWon || isSkippedLost) {
                                     isPast = false;
                                 }
                                 
@@ -462,7 +470,7 @@ export default function DealDetails() {
                                             font-bold text-[11px] sm:text-[13px]
                                             ${index === 0 ? "rounded-l-lg" : ""}
                                             ${index === pipelineStages.length - 1 ? "rounded-r-lg" : ""}
-                                            ${isSkippedWon ? "opacity-30" : ""}
+                                            ${(isSkippedWon || isSkippedLost) ? "opacity-30" : ""}
                                         `}
                                         style={{
                                             clipPath: (window.innerWidth >= 640) ? (
@@ -583,7 +591,7 @@ export default function DealDetails() {
                                             className="px-5 py-2 text-[11px] font-black text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-md shadow-red-100 transition-all disabled:opacity-50 flex items-center gap-2 active:scale-95"
                                         >
                                             {savingRemark ? (
-                                                <><Loader2 size={12} className="animate-spin" /> ...</>
+                                                <Loader2 size={12} className="animate-spin" />
                                             ) : (
                                                 <><MessageSquare size={12} /> Post</>
                                             )}
@@ -596,17 +604,6 @@ export default function DealDetails() {
                 </div>
             </div>
 
-            {/* Sticky Meta Footer */}
-            <div className="flex flex-col md:flex-row items-center justify-between pt-6 border-t border-gray-100 gap-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-                    <span className="flex items-center gap-1.5"><Calendar size={12} className="text-gray-300" /> Origin: {formatDate(deal.createdAt)}</span>
-                    <span className="flex items-center gap-1.5"><Clock size={12} className="text-gray-300" /> Latest Sync: {formatDate(deal.updatedAt)}</span>
-                </div>
-                <div className="flex items-center gap-2 bg-green-50 px-3 py-1.5 rounded-full border border-green-100/50">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                    <span className="text-green-700">Active Deal Stream</span>
-                </div>
-            </div>
             {/* Edit Deal Modal */}
             <DealModal
                 isOpen={isEditModalOpen}

@@ -121,7 +121,7 @@ export const getContacts = async (req, res, next) => {
     try {
 
         const { id, role } = req.user;
-        const { name, company, jobTitle, page = 1, limit = 10, sort = "-createdAt" } = req.query;
+        const { name, company, jobTitle, createdAfter, createdBefore, page = 1, limit = 10, sort = "-createdAt" } = req.query;
 
         let filter = { isDeleted: { $ne: true } };
         if (name) {
@@ -138,6 +138,12 @@ export const getContacts = async (req, res, next) => {
             if (companyDocs) {
                 filter.companyId = companyDocs._id
             }
+        }
+
+        if (createdAfter || createdBefore) {
+            filter.createdAt = {};
+            if (createdAfter) filter.createdAt.$gte = new Date(createdAfter);
+            if (createdBefore) filter.createdAt.$lte = new Date(createdBefore);
         }
 
         if (role === "sales_manager") {

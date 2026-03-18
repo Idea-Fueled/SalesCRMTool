@@ -709,7 +709,7 @@ export const deleteDeal = async (req, res, next) => {
 export const getDeals = async (req, res, next) => {
     try {
         const { role, id: userId } = req.user;
-        const { name, stage, minValue, maxValue, startDate, endDate, owner, contactId, page = 1, limit = 10, sort = "-createdAt" } = req.query;
+        const { name, stage, minValue, maxValue, startDate, endDate, createdAfter, createdBefore, owner, contactId, page = 1, limit = 10, sort = "-createdAt" } = req.query;
 
         let filter = { isDeleted: { $ne: true } }
 
@@ -729,6 +729,11 @@ export const getDeals = async (req, res, next) => {
             filter.expectedCloseDate = {};
             if (startDate) filter.expectedCloseDate.$gte = new Date(startDate);
             if (endDate) filter.expectedCloseDate.$lte = new Date(endDate);
+        }
+        if (createdAfter || createdBefore) {
+            filter.createdAt = {};
+            if (createdAfter) filter.createdAt.$gte = new Date(createdAfter);
+            if (createdBefore) filter.createdAt.$lte = new Date(createdBefore);
         }
 
         if (owner && role === "admin") {

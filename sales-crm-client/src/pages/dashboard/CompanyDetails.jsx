@@ -496,7 +496,7 @@ export default function CompanyDetails() {
                                                 className="px-5 py-2 text-[11px] font-black text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-md shadow-red-100 transition-all disabled:opacity-50 flex items-center gap-2 active:scale-95"
                                             >
                                                 {savingRemark ? (
-                                                    <><Loader2 size={12} className="animate-spin" /> ...</>
+                                                    <Loader2 size={12} className="animate-spin" />
                                                 ) : (
                                                     <><MessageSquare size={12} /> Post</>
                                                 )}
@@ -511,16 +511,6 @@ export default function CompanyDetails() {
             </div>
         </div>
 
-            {/* Sticky Meta Footer */}
-            <div className="flex flex-col md:flex-row items-center justify-between pt-6 border-t border-gray-100 gap-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-                    <span className="flex items-center gap-1.5"><Calendar size={12} className="text-gray-300" /> Registry Datestamp: {formatDate(company.createdAt)}</span>
-                    <span className="flex items-center gap-1.5"><Clock size={12} className="text-gray-300" /> Last System Update: {formatDate(company.updatedAt)}</span>
-                </div>
-                {currentUser?.role === 'admin' && (
-                    <span className="flex items-center gap-1.5 text-gray-300 md:border-l md:border-gray-100 md:pl-6">Ref-ID: {company._id}</span>
-                )}
-            </div>
 
             {/* Modals */}
             <CompanyModal

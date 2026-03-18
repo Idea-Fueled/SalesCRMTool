@@ -41,6 +41,7 @@ import RepDashboard from "./pages/rep/RepDashboard";
 import RepDeals from "./pages/rep/RepDeals";
 import RepCompanies from "./pages/rep/RepCompanies";
 import RepContacts from "./pages/rep/RepContacts";
+import Reports from "./pages/common/Reports";
 
 const RootRedirect = () => {
   const { user, loading } = useAuth();
@@ -108,6 +109,7 @@ const router = createBrowserRouter([
       { path: "companies", element: <ManagerCompanies /> },
       { path: "contacts", element: <ManagerContacts /> },
       { path: "audit-logs", element: <AuditLogs /> },
+      { path: "reports", element: <Reports /> },
       { path: "deals/:id", element: <DealDetails /> },
       { path: "companies/:id", element: <CompanyDetails /> },
       { path: "contacts/:id", element: <ContactDetails /> },
@@ -128,6 +130,7 @@ const router = createBrowserRouter([
       { path: "companies", element: <RepCompanies /> },
       { path: "contacts", element: <RepContacts /> },
       { path: "audit-logs", element: <AuditLogs /> },
+      { path: "reports", element: <Reports /> },
       { path: "deals/:id", element: <DealDetails /> },
       { path: "companies/:id", element: <CompanyDetails /> },
       { path: "contacts/:id", element: <ContactDetails /> },

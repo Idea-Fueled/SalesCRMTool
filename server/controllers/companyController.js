@@ -97,13 +97,19 @@ export const createCompany = async (req, res) => {
 export const getCompanies = async (req, res) => {
     try {
         const { id, role } = req.user;
-        const { name, industry, status, page = 1, limit = 10, sort = "-createdAt" } = req.query;
+        const { name, industry, status, createdAfter, createdBefore, page = 1, limit = 10, sort = "-createdAt" } = req.query;
 
         let filter = { isDeleted: { $ne: true } };
 
         if (name) filter.name = { $regex: name, $options: "i" };
         if (industry) filter.industry = industry;
         if (status) filter.status = status;
+
+        if (createdAfter || createdBefore) {
+            filter.createdAt = {};
+            if (createdAfter) filter.createdAt.$gte = new Date(createdAfter);
+            if (createdBefore) filter.createdAt.$lte = new Date(createdBefore);
+        }
 
         if (role === "sales_manager") {
             const teamUsers = await User.find({
