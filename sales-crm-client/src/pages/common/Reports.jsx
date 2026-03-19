@@ -3,7 +3,7 @@ import {
     LayoutDashboard, Building2, ContactRound, Briefcase, 
     Search, Calendar, Filter, ChevronDown, Download
 } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { getDeals } from "../../API/services/dealService";
 import { getCompanies } from "../../API/services/companyService";
 import { getContacts } from "../../API/services/contactService";
@@ -33,17 +33,18 @@ export default function Reports() {
     const navigate = useNavigate();
     const location = useLocation();
     const tableRef = useRef(null);
-    const [activeTab, setActiveTab] = useState("deals");
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "deals");
     const [loading, setLoading] = useState(true);
     const [exporting, setExporting] = useState(false);
     const [data, setData] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [dateRange, setDateRange] = useState({
-        start: new Date().toISOString().split('T')[0],
-        end: new Date().toISOString().split('T')[0]
+        start: searchParams.get("start") || new Date().toISOString().split('T')[0],
+        end: searchParams.get("end") || new Date().toISOString().split('T')[0]
     });
-    const [rangePreset, setRangePreset] = useState("today");
+    const [rangePreset, setRangePreset] = useState(searchParams.get("preset") || "today");
 
     const fetchData = async () => {
         setLoading(true);
@@ -113,8 +114,16 @@ export default function Reports() {
     }, [rangePreset]);
 
     useEffect(() => {
+        const params = {
+            tab: activeTab,
+            preset: rangePreset,
+            start: dateRange.start,
+            end: dateRange.end
+        };
+        // Update URL to persist filter state
+        setSearchParams(params, { replace: true });
         fetchData();
-    }, [activeTab, dateRange, debouncedSearch]);
+    }, [activeTab, dateRange, debouncedSearch, rangePreset]);
 
     const handleSearchSubmit = (e) => {
         e.preventDefault();
