@@ -19,7 +19,8 @@ const contactSchema = new mongoose.Schema({
     },
     jobTitle: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     companyId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -28,7 +29,8 @@ const contactSchema = new mongoose.Schema({
     },
     companyName: {
         type: String,
-        trim: true
+        trim: true,
+        required: true
     },
     ownerId: {
         type: mongoose.Schema.Types.ObjectId,

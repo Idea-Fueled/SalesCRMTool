@@ -60,6 +60,7 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
         else if (formData.lastName.trim().length < 2) errs.lastName = "Last name must be at least 2 characters";
         if (!formData.email.trim()) errs.email = "Email is required";
         else if (!emailRegex.test(formData.email.trim())) errs.email = "Enter a valid email address";
+        if (!formData.jobTitle.trim()) errs.jobTitle = "Job title is required";
         if (!formData.companyName.trim()) errs.companyName = "Company name is required";
         if (formData.phone && !phoneRegex.test(formData.phone)) errs.phone = "Enter a valid phone number";
         if (formData.mobile && !phoneRegex.test(formData.mobile)) errs.mobile = "Enter a valid mobile number";
@@ -124,9 +125,10 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                        <label className="text-xs font-semibold text-gray-500 uppercase">Job Title</label>
+                        <label className="text-xs font-semibold text-gray-500 uppercase">Job Title *</label>
                         <input type="text" className={inputClass("jobTitle")} value={formData.jobTitle}
                             onChange={e => set("jobTitle", e.target.value)} placeholder="Sales Director" />
+                        {errors.jobTitle && <p className="text-red-500 text-xs">{errors.jobTitle}</p>}
                     </div>
                     <div className="space-y-1 relative">
                         <label className="text-xs font-semibold text-gray-500 uppercase">Company *</label>
