@@ -14,6 +14,7 @@ import { jsPDF } from "jspdf";
 import { toPng } from "html-to-image";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import CollapsibleDealName from "../../components/CollapsibleDealName";
+import UserDetailsModal from "../../components/modals/UserDetailsModal";
 
 const TabButton = ({ active, label, icon: Icon, onClick }) => (
     <button
@@ -48,6 +49,8 @@ export default function Reports() {
     });
     const [rangePreset, setRangePreset] = useState(searchParams.get("preset") || "today");
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [isUserModalOpen, setIsUserModalOpen] = useState(false);
     const filterRef = useRef(null);
 
     const fetchData = async (signal) => {
@@ -502,14 +505,20 @@ export default function Reports() {
                                         <td className="px-4 py-4 text-gray-600 font-medium">
                                             {activeTab === "deals" ? `$${(item.value || 0).toLocaleString()}` : item.industry || item.jobTitle || "—"}
                                         </td>
-                                        <td className="px-4 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full overflow-hidden bg-red-100 flex items-center justify-center">
+                                        <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
+                                            <div 
+                                                className="flex items-center gap-3 cursor-pointer hover:bg-red-50 p-1.5 -m-1.5 rounded-xl transition-all duration-200 group/owner"
+                                                onClick={() => {
+                                                    setSelectedUser(item.ownerId || user);
+                                                    setIsUserModalOpen(true);
+                                                }}
+                                            >
+                                                <div className="w-8 h-8 rounded-full overflow-hidden bg-red-100 flex items-center justify-center ring-2 ring-white group-hover/owner:ring-red-100 transition-all shadow-sm">
                                                     {item.ownerId?.profilePicture ? (
                                                         <img
                                                             src={item.ownerId.profilePicture}
                                                             alt={`${item.ownerId.firstName || user?.firstName || ''} profile`}
-                                                            className="w-full h-full object-cover"
+                                                            className="w-full h-full object-cover transition-transform group-hover/owner:scale-110"
                                                         />
                                                     ) : (
                                                         <span className="text-[10px] font-bold text-red-600">
@@ -517,8 +526,8 @@ export default function Reports() {
                                                         </span>
                                                     )}
                                                 </div>
-                                                <span className="font-medium text-gray-500 text-xs truncate max-w-[140px]">
-                                                    {item.ownerId?.firstName || user?.firstName}
+                                                <span className="font-bold text-gray-700 text-xs truncate max-w-[140px] group-hover/owner:text-red-600 transition-colors underline decoration-transparent group-hover/owner:decoration-red-200 decoration-2 underline-offset-4">
+                                                    {`${item.ownerId?.firstName || ""} ${item.ownerId?.lastName || ""}`.trim() || user?.firstName}
                                                 </span>
                                             </div>
                                         </td>
@@ -544,6 +553,11 @@ export default function Reports() {
                     </p>
                 </div>
             </div>
+            <UserDetailsModal 
+                isOpen={isUserModalOpen} 
+                onClose={() => setIsUserModalOpen(false)} 
+                user={selectedUser} 
+            />
         </div>
     );
 }
