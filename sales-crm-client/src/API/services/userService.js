@@ -5,6 +5,11 @@ export const getTeamUsers = async () => {
     return API.get("/auth/team");
 };
 
+// Get single user by ID
+export const getUserById = async (id) => {
+    return API.get(`/auth/${id}`);
+};
+
 // Create a new user (admin only)
 export const createUser = async (userData) => {
     return API.post("/auth/register", userData);

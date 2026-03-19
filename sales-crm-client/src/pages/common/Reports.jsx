@@ -9,6 +9,7 @@ import { getDeals } from "../../API/services/dealService";
 import { getCompanies } from "../../API/services/companyService";
 import { getContacts } from "../../API/services/contactService";
 import { useAuth } from "../../context/AuthContext";
+import { getUserById } from "../../API/services/userService";
 import { toast } from "react-hot-toast";
 import { jsPDF } from "jspdf";
 import { toPng } from "html-to-image";
@@ -51,6 +52,7 @@ export default function Reports() {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+    const [fetchingUser, setFetchingUser] = useState(false);
     const filterRef = useRef(null);
 
     const fetchData = async (signal) => {
@@ -171,6 +173,25 @@ export default function Reports() {
     const handleSearchSubmit = (e) => {
         e.preventDefault();
         setDebouncedSearch(searchQuery); // Trigger immediate search on Enter
+    };
+
+    const handleOwnerClick = async (owner) => {
+        if (!owner?._id) return;
+        
+        // If we already have the ID, try to fetch full details
+        setFetchingUser(true);
+        try {
+            const res = await getUserById(owner._id);
+            setSelectedUser(res.data.data);
+            setIsUserModalOpen(true);
+        } catch (error) {
+            console.error("Failed to fetch user details:", error);
+            // Fallback to basic info if fetch fails
+            setSelectedUser(owner);
+            setIsUserModalOpen(true);
+        } finally {
+            setFetchingUser(false);
+        }
     };
 
     const handleRowClick = (id) => {
@@ -507,11 +528,8 @@ export default function Reports() {
                                         </td>
                                         <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
                                             <div 
-                                                className="flex items-center gap-3 cursor-pointer hover:bg-red-50 p-1.5 -m-1.5 rounded-xl transition-all duration-200 group/owner"
-                                                onClick={() => {
-                                                    setSelectedUser(item.ownerId || user);
-                                                    setIsUserModalOpen(true);
-                                                }}
+                                                className={`flex items-center gap-3 cursor-pointer hover:bg-red-50 p-1.5 -m-1.5 rounded-xl transition-all duration-200 group/owner ${fetchingUser ? "animate-pulse opacity-70" : ""}`}
+                                                onClick={() => !fetchingUser && handleOwnerClick(item.ownerId || user)}
                                             >
                                                 <div className="w-8 h-8 rounded-full overflow-hidden bg-red-100 flex items-center justify-center ring-2 ring-white group-hover/owner:ring-red-100 transition-all shadow-sm">
                                                     {item.ownerId?.profilePicture ? (
@@ -527,7 +545,7 @@ export default function Reports() {
                                                     )}
                                                 </div>
                                                 <span className="font-bold text-gray-700 text-xs truncate max-w-[140px] group-hover/owner:text-red-600 transition-colors underline decoration-transparent group-hover/owner:decoration-red-200 decoration-2 underline-offset-4">
-                                                    {`${item.ownerId?.firstName || ""} ${item.ownerId?.lastName || ""}`.trim() || user?.firstName}
+                                                    {fetchingUser ? "Loading..." : `${item.ownerId?.firstName || ""} ${item.ownerId?.lastName || ""}`.trim() || user?.firstName}
                                                 </span>
                                             </div>
                                         </td>

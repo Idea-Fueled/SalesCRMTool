@@ -305,6 +305,19 @@ export const adminTest = async (req, res, next) => {
     }
 }
 
+export const getUserById = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const user = await User.findById(id).populate("managerId", "firstName lastName email").select("-password");
+        if (!user) {
+            return res.status(404).json({ message: "User not found!" });
+        }
+        res.status(200).json({ data: user });
+    } catch (error) {
+        return res.status(500).json({ message: error.message || "Server error!" });
+    }
+}
+
 export const getTeamUsers = async (req, res, next) => {
     try {
 

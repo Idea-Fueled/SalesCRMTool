@@ -1,5 +1,5 @@
 import express from "express"
-import { adminTest, activateUser, adminResetPassword, bulkReassignRecords, changePassword, deactivateUser, forgotPassword, getProfile, getTeamUsers, loginUser, logoutUser, registerUser, resetPassword, updateUser, softDeleteUser, getDeletedUsers, restoreUser, setupPassword, resendInvitation, uploadProfilePicture } from "../controllers/userController.js"
+import { adminTest, activateUser, adminResetPassword, bulkReassignRecords, changePassword, deactivateUser, forgotPassword, getProfile, getUserById, getTeamUsers, loginUser, logoutUser, registerUser, resetPassword, updateUser, softDeleteUser, getDeletedUsers, restoreUser, setupPassword, resendInvitation, uploadProfilePicture } from "../controllers/userController.js"
 import { protect } from "../middlewares/authMiddleware.js"
 import { requireRole } from "../middlewares/roleMiddleware.js"
 import { upload } from "../middlewares/uploadMiddleware.js"
@@ -35,6 +35,7 @@ router.post("/resend-verification", (req, res, next) => {
 router.post("/:id/resend-invitation", protect, resendInvitation)
 router.get("/admin-test", protect, requireRole("admin"), adminTest)
 router.get("/team", protect, getTeamUsers)
+router.get("/:id", protect, getUserById)
 router.put("/:id", protect, updateUser)
 router.patch("/:id/deactivate", protect, deactivateUser)
 router.patch("/:id/activate", protect, activateUser)
