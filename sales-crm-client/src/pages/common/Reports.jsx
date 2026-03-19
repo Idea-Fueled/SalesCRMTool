@@ -527,27 +527,27 @@ export default function Reports() {
                                             {activeTab === "deals" ? `$${(item.value || 0).toLocaleString()}` : item.industry || item.jobTitle || "—"}
                                         </td>
                                         <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
-                                            <div 
-                                                className={`flex items-center gap-3 cursor-pointer hover:bg-red-50 p-1.5 -m-1.5 rounded-xl transition-all duration-200 group/owner ${fetchingUser ? "animate-pulse opacity-70" : ""}`}
-                                                onClick={() => !fetchingUser && handleOwnerClick(item.ownerId || user)}
-                                            >
-                                                <div className="w-8 h-8 rounded-full overflow-hidden bg-red-100 flex items-center justify-center ring-2 ring-white group-hover/owner:ring-red-100 transition-all shadow-sm">
-                                                    {item.ownerId?.profilePicture ? (
-                                                        <img
-                                                            src={item.ownerId.profilePicture}
-                                                            alt={`${item.ownerId.firstName || user?.firstName || ''} profile`}
-                                                            className="w-full h-full object-cover transition-transform group-hover/owner:scale-110"
-                                                        />
-                                                    ) : (
-                                                        <span className="text-[10px] font-bold text-red-600">
-                                                            {(item.ownerId?.firstName?.[0] || user?.firstName?.[0] || 'A')}
-                                                        </span>
-                                                    )}
+                                                <div 
+                                                    className={`flex items-center gap-3 cursor-pointer hover:bg-red-50 p-1.5 -m-1.5 rounded-xl transition-all duration-200 group/owner ${fetchingUser ? "animate-pulse opacity-70" : ""}`}
+                                                    onClick={() => !fetchingUser && handleOwnerClick(typeof item.ownerId === 'object' ? item.ownerId : { _id: item.ownerId })}
+                                                >
+                                                    <div className="w-8 h-8 rounded-full overflow-hidden bg-red-100 flex items-center justify-center ring-2 ring-white group-hover/owner:ring-red-100 transition-all shadow-sm">
+                                                        {item.ownerId?.profilePicture ? (
+                                                            <img
+                                                                src={item.ownerId.profilePicture}
+                                                                alt={`${item.ownerId.firstName || ''} profile`}
+                                                                className="w-full h-full object-cover transition-transform group-hover/owner:scale-110"
+                                                            />
+                                                        ) : (
+                                                            <span className="text-[10px] font-bold text-red-600">
+                                                                {item.ownerId?.firstName?.[0] || 'U'}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <span className="font-bold text-gray-700 text-xs truncate max-w-[140px] group-hover/owner:text-red-600 transition-colors underline decoration-transparent group-hover/owner:decoration-red-200 decoration-2 underline-offset-4">
+                                                        {fetchingUser ? "Loading..." : (item.ownerId?.firstName ? `${item.ownerId.firstName} ${item.ownerId.lastName || ""}`.trim() : "Unassigned")}
+                                                    </span>
                                                 </div>
-                                                <span className="font-bold text-gray-700 text-xs truncate max-w-[140px] group-hover/owner:text-red-600 transition-colors underline decoration-transparent group-hover/owner:decoration-red-200 decoration-2 underline-offset-4">
-                                                    {fetchingUser ? "Loading..." : `${item.ownerId?.firstName || ""} ${item.ownerId?.lastName || ""}`.trim() || user?.firstName}
-                                                </span>
-                                            </div>
                                         </td>
                                         <td className="px-4 py-4 text-right">
                                             <span className={`px-2 py-0.5 rounded text-[9px] font-bold border ${

@@ -154,7 +154,7 @@ export const getCompanies = async (req, res) => {
         const skip = (page - 1) * limit;
 
         const companies = await Company.find(filter)
-            .populate("ownerId", "firstName email")
+            .populate("ownerId", "firstName lastName email profilePicture")
             .sort(sort)
             .skip(skip)
             .limit(Number(limit));

@@ -180,7 +180,12 @@ export const getContacts = async (req, res, next) => {
         }
 
         const skip = (page - 1) * limit;
-        const contacts = await Contact.find(filter).populate("ownerId", 'firstName email').populate("companyId", "name industry").sort(sort).skip(skip).limit(Number(limit));
+        const contacts = await Contact.find(filter)
+            .populate("ownerId", "firstName lastName email profilePicture")
+            .populate("companyId", "name industry")
+            .sort(sort)
+            .skip(skip)
+            .limit(Number(limit));
 
         const { Deal } = await import("../models/dealSchema.js");
         const contactsWithDealCount = await Promise.all(contacts.map(async (c) => {
