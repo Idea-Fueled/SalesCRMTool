@@ -415,7 +415,9 @@ export default function Reports() {
                                 </ResponsiveContainer>
                             </div>
                             <div className="flex-1 max-w-sm">
-                                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Metric Distribution</h4>
+                                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
+                                    {activeTab === "contacts" ? "Job Title Distribution" : "Metric Distribution"}
+                                </h4>
                                 <div className="space-y-3">
                                     {getChartData().map((item, index) => {
                                         const percentage = Math.round((item.value / data.length) * 100);
