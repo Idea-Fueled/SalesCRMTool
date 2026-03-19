@@ -49,6 +49,7 @@ export default function AdminDashboard() {
         pendingUsers: 0,
         stagnantDeals: 0,
         dealList: [],
+        activeDealList: [],
         companyList: [],
         userList: []
     });
@@ -89,6 +90,9 @@ export default function AdminDashboard() {
             const filteredCompanies = companyData.filter(c => isMatch(c.createdAt));
             const filteredUsers = userData.filter(u => isMatch(u.createdAt));
 
+            // Only deals that are not closed count as active
+            const activeDeals = filteredDeals.filter(d => !d.stage?.startsWith('Closed'));
+
             const totalValue = filteredDeals.reduce((sum, d) => sum + (d.value || 0), 0);
 
             // Group by month for chart (last 6 months trailing from selected month or today)
@@ -116,7 +120,7 @@ export default function AdminDashboard() {
             });
 
             setStats({
-                deals: filteredDeals.length,
+                deals: activeDeals.length,
                 companies: filteredCompanies.length,
                 contacts: contactsRes.data.total || 0, // contacts not explicitly filtered here yet per plan but fine
                 users: filteredUsers.length,
@@ -125,6 +129,7 @@ export default function AdminDashboard() {
                 pendingUsers: userData.filter(u => !u.isSetupComplete)?.length || 0,
                 stagnantDeals: dealsData.filter(d => d.stage === 'Negotiation' && new Date(d.updatedAt) < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length || 0,
                 dealList: filteredDeals,
+                activeDealList: activeDeals,
                 companyList: filteredCompanies,
                 userList: filteredUsers
             });
@@ -289,7 +294,7 @@ export default function AdminDashboard() {
                     value={stats.deals}
                     icon={Briefcase}
                     color="bg-orange-50 text-orange-600"
-                    onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: stats.dealList.filter(d => !d.stage.startsWith('Closed')) })}
+                    onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: stats.activeDealList || [] })}
                 />
                 <OverviewStat
                     label="Total Companies"
