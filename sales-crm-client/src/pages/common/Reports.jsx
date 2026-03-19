@@ -482,11 +482,21 @@ export default function Reports() {
                                             {activeTab === "deals" ? `$${(item.value || 0).toLocaleString()}` : item.industry || item.jobTitle || "—"}
                                         </td>
                                         <td className="px-4 py-4">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center text-[8px] font-bold text-red-600">
-                                                    {(item.ownerId?.firstName?.[0] || user?.firstName?.[0] || 'A')}
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full overflow-hidden bg-red-100 flex items-center justify-center">
+                                                    {item.ownerId?.profilePicture ? (
+                                                        <img
+                                                            src={item.ownerId.profilePicture}
+                                                            alt={`${item.ownerId.firstName || user?.firstName || ''} profile`}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <span className="text-[10px] font-bold text-red-600">
+                                                            {(item.ownerId?.firstName?.[0] || user?.firstName?.[0] || 'A')}
+                                                        </span>
+                                                    )}
                                                 </div>
-                                                <span className="font-medium text-gray-500 text-xs truncate max-w-[100px]">
+                                                <span className="font-medium text-gray-500 text-xs truncate max-w-[140px]">
                                                     {item.ownerId?.firstName || user?.firstName}
                                                 </span>
                                             </div>
