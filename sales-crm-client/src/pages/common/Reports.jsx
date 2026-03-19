@@ -97,6 +97,17 @@ export default function Reports() {
                     start = new Date();
                     end = new Date();
                     break;
+                case "yesterday":
+                    start = new Date(now);
+                    start.setDate(now.getDate() - 1);
+                    end = new Date(now);
+                    end.setDate(now.getDate() - 1);
+                    break;
+                case "weekly":
+                    start = new Date(now);
+                    start.setDate(now.getDate() - 7);
+                    end = new Date(now);
+                    break;
                 case "thisMonth":
                     start = new Date(now.getFullYear(), now.getMonth(), 1);
                     end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
@@ -250,6 +261,8 @@ export default function Reports() {
                                 {rangePreset === 'custom' 
                                     ? `${dateRange.start.split('-').reverse().join('-')} — ${dateRange.end.split('-').reverse().join('-')}` 
                                     : rangePreset === "today" ? "Today" 
+                                    : rangePreset === "yesterday" ? "Yesterday"
+                                    : rangePreset === "weekly" ? "Last 7 Days"
                                     : rangePreset === "thisMonth" ? "This Month" 
                                     : "Last Month"
                                 }
@@ -263,16 +276,18 @@ export default function Reports() {
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Quick Presets</span>
                                     </div>
-                                    <div className="grid grid-cols-3 gap-2">
+                                    <div className="grid grid-cols-2 gap-2">
                                         {[
                                             { id: 'today', label: 'Today' },
+                                            { id: 'yesterday', label: 'Yesterday' },
+                                            { id: 'weekly', label: 'Last 7 Days' },
                                             { id: 'thisMonth', label: 'This Month' },
                                             { id: 'lastMonth', label: 'Last Month' }
                                         ].map(preset => (
                                             <button
                                                 key={preset.id}
                                                 onClick={() => { setRangePreset(preset.id); setIsFilterOpen(false); }}
-                                                className={`px-2 py-2 rounded-xl text-[10px] font-bold border transition-all ${
+                                                className={`px-3 py-2 rounded-xl text-[10px] font-bold border transition-all ${
                                                     rangePreset === preset.id 
                                                     ? 'bg-red-50 border-red-200 text-red-600' 
                                                     : 'bg-gray-50/50 border-gray-100 text-gray-500 hover:bg-white hover:border-gray-300'
