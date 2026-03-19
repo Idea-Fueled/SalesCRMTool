@@ -366,7 +366,11 @@ export const softDeleteUser = async (req, res, next) => {
         user.deletedAt = new Date();
         await user.save();
 
-        res.status(200).json({ message: msg });
+        const responseMsg = newOwner
+            ? `User "${user.firstName} ${user.lastName}" soft-deleted. Records reassigned to ${newOwner.firstName} ${newOwner.lastName}.`
+            : `User "${user.firstName} ${user.lastName}" soft-deleted. Records kept with original owner.`;
+
+        res.status(200).json({ message: responseMsg });
 
         // Hierarchy Notification
         if (newOwnerId) {
