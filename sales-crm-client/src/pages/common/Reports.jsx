@@ -34,6 +34,7 @@ export default function Reports() {
     const navigate = useNavigate();
     const location = useLocation();
     const tableRef = useRef(null);
+    const fetchToastId = useRef(null);
     const [searchParams, setSearchParams] = useSearchParams();
     const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "deals");
     const [loading, setLoading] = useState(true);
@@ -50,6 +51,12 @@ export default function Reports() {
     const filterRef = useRef(null);
 
     const fetchData = async (signal) => {
+        // Clear any stale error toast when starting a new fetch
+        if (fetchToastId.current) {
+            toast.dismiss(fetchToastId.current);
+            fetchToastId.current = null;
+        }
+
         setLoading(true);
         try {
             const params = {
@@ -75,7 +82,7 @@ export default function Reports() {
             // Ignore cancellation errors caused by rapid tab switching / component unmount
             if (error.name === 'AbortError' || axios.isCancel?.(error) || error.code === 'ERR_CANCELED') return;
             console.error(error);
-            toast.error(`Failed to fetch ${activeTab} report`);
+            fetchToastId.current = toast.error(`Failed to fetch ${activeTab} report`);
         } finally {
             setLoading(false);
         }
