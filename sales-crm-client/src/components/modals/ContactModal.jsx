@@ -135,13 +135,13 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
                         {contact ? (
                             <input
                                 type="text"
-                                className={inputClass("companyId") + " bg-gray-100 cursor-not-allowed text-gray-500 font-medium"}
+                                className={inputClass("companyName") + " bg-gray-100 cursor-not-allowed text-gray-500 font-medium"}
                                 value={formData.companyName || "No Company"}
                                 disabled
                             />
                         ) : (
                             <select
-                                className={inputClass("companyId")}
+                                className={inputClass("companyName")}
                                 value={formData.companyId}
                                 onChange={e => {
                                     const selectedId = e.target.value;
