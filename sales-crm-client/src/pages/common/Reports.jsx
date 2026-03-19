@@ -4,6 +4,7 @@ import {
     Search, Calendar, Filter, ChevronDown, Download, RotateCw
 } from "lucide-react";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
+import axios from "axios";
 import { getDeals } from "../../API/services/dealService";
 import { getCompanies } from "../../API/services/companyService";
 import { getContacts } from "../../API/services/contactService";
@@ -71,7 +72,8 @@ export default function Reports() {
             
             setData(res?.data?.data || []);
         } catch (error) {
-            if (error.name === 'AbortError') return;
+            // Ignore cancellation errors caused by rapid tab switching / component unmount
+            if (error.name === 'AbortError' || axios.isCancel?.(error) || error.code === 'ERR_CANCELED') return;
             console.error(error);
             toast.error(`Failed to fetch ${activeTab} report`);
         } finally {
