@@ -445,7 +445,7 @@ export default function Reports() {
                 <div className="overflow-x-auto min-h-[300px]" ref={tableRef}>
                     <table className="w-full table-fixed text-left text-sm border-separate border-spacing-0">
                         <thead>
-                            <tr className="bg-orange-50/30 border-b border-gray-100 text-[13px] font-bold text-gray-800 uppercase tracking-wider">
+                            <tr className="bg-[#FFF9E5] border-b border-gray-100 text-[13px] font-bold text-gray-800 uppercase tracking-wider">
                                 <th className="px-4 py-3.5 font-bold w-1/5">Creation Date</th>
                                 <th className="px-4 py-3.5 font-bold w-1/5">{activeTab === "contacts" ? "Name" : activeTab === "companies" ? "Company" : "Deal name"}</th>
                                 <th className="px-4 py-3.5 font-bold w-1/5">{activeTab === "deals" ? "Value" : activeTab === "companies" ? "Industry" : "Title"}</th>
