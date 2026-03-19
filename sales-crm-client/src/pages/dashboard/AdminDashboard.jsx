@@ -13,7 +13,6 @@ import { getTeamUsers } from "../../API/services/userService";
 import { toast } from "react-hot-toast";
 import DashboardDetailModal from "../../components/modals/DashboardDetailModal";
 import { truncateName } from "../../utils/stringUtils";
-import CollapsibleDealName from "../../components/CollapsibleDealName";
 
 const OverviewStat = ({ label, value, icon: IconComp, color, onClick }) => (
     <div
@@ -145,10 +144,6 @@ export default function AdminDashboard() {
     useEffect(() => {
         fetchStats();
     }, [selectedMonth]);
-    
-    const handleDealClick = (id) => {
-        navigate(`/dashboard/deals/${id}`);
-    };
 
     const maxChartValue = Math.max(...stats.revenueChart.map(m => m.value), 1000);
 
@@ -432,13 +427,10 @@ export default function AdminDashboard() {
                                     <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center font-bold text-gray-400 shadow-sm border border-gray-100 group-hover:bg-red-50 group-hover:text-red-500 group-hover:border-red-100 transition-colors">
                                         {index + 1}
                                     </div>
-                                    <div>
-                                        <div className="text-[11px] tracking-wide uppercase">
-                                            <CollapsibleDealName 
-                                                name={getDealDisplayName(deal)} 
-                                                onNavigate={() => handleDealClick(deal._id)}
-                                            />
-                                        </div>
+                                    <div className="flex-1">
+                                        <p className="text-[11px] font-bold text-gray-900 transition-colors uppercase tracking-wide whitespace-normal leading-tight">
+                                            {getDealDisplayName(deal)}
+                                        </p>
                                         <p className="text-xs text-gray-500 line-clamp-1">{deal.companyName || deal.companyId?.name || "Unknown Company"}</p>
                                     </div>
                                 </div>
