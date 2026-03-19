@@ -13,6 +13,7 @@ import { getTeamUsers } from "../../API/services/userService";
 import { toast } from "react-hot-toast";
 import DashboardDetailModal from "../../components/modals/DashboardDetailModal";
 import { truncateName } from "../../utils/stringUtils";
+import CollapsibleDealName from "../../components/CollapsibleDealName";
 
 const OverviewStat = ({ label, value, icon: IconComp, color, onClick }) => (
     <div
@@ -144,6 +145,10 @@ export default function AdminDashboard() {
     useEffect(() => {
         fetchStats();
     }, [selectedMonth]);
+    
+    const handleDealClick = (id) => {
+        navigate(`/dashboard/deals/${id}`);
+    };
 
     const maxChartValue = Math.max(...stats.revenueChart.map(m => m.value), 1000);
 
@@ -428,9 +433,12 @@ export default function AdminDashboard() {
                                         {index + 1}
                                     </div>
                                     <div>
-                                        <p className="text-sm font-bold text-gray-900 group-hover:text-red-600 transition-colors uppercase text-[11px] tracking-wide">
-                                            {truncateName(getDealDisplayName(deal))}
-                                        </p>
+                                        <div className="text-[11px] tracking-wide uppercase">
+                                            <CollapsibleDealName 
+                                                name={getDealDisplayName(deal)} 
+                                                onNavigate={() => handleDealClick(deal._id)}
+                                            />
+                                        </div>
                                         <p className="text-xs text-gray-500 line-clamp-1">{deal.companyName || deal.companyId?.name || "Unknown Company"}</p>
                                     </div>
                                 </div>

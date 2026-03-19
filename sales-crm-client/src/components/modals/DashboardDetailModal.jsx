@@ -2,8 +2,11 @@ import React from "react";
 import Modal from "./Modal";
 import { Briefcase, Building2, Users, DollarSign } from "lucide-react";
 import { truncateName } from "../../utils/stringUtils";
+import { useNavigate } from "react-router-dom";
+import CollapsibleDealName from "../CollapsibleDealName";
 
 export default function DashboardDetailModal({ isOpen, onClose, category, data }) {
+    const navigate = useNavigate();
     const getDealOwnerFullName = (deal) =>
         `${deal?.ownerId?.firstName || ""} ${deal?.ownerId?.lastName || ""}`.trim();
 
@@ -47,9 +50,15 @@ export default function DashboardDetailModal({ isOpen, onClose, category, data }
                         {data.map((deal) => (
                             <div key={deal._id} className="p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
                                 <div className="flex justify-between items-start mb-2">
-                                    <h4 className="font-bold text-gray-900 uppercase text-[11px] tracking-wide">
-                                        {truncateName(getDealDisplayName(deal))}
-                                    </h4>
+                                    <div className="font-bold text-gray-900 uppercase text-[11px] tracking-wide">
+                                        <CollapsibleDealName 
+                                            name={getDealDisplayName(deal)} 
+                                            onNavigate={() => {
+                                                navigate(`/dashboard/deals/${deal._id}`);
+                                                onClose();
+                                            }}
+                                        />
+                                    </div>
                                     <span className="text-sm font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-lg">
                                         ${deal.value?.toLocaleString()}
                                     </span>
