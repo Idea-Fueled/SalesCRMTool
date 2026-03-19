@@ -732,9 +732,29 @@ export const getDeals = async (req, res, next) => {
             if (endDate) filter.expectedCloseDate.$lte = new Date(endDate);
         }
         if (createdAfter || createdBefore) {
-            filter.createdAt = {};
-            if (createdAfter) filter.createdAt.$gte = new Date(createdAfter);
-            if (createdBefore) filter.createdAt.$lte = new Date(createdBefore);
+            const startStr = createdAfter || "1970-01-01";
+            const endStr = createdBefore || new Date().toISOString();
+            
+            // Re-map simple filter to $or logic to capture both NEW deals and WON/LOST activity
+            filter.$or = [
+                {
+                    createdAt: {
+                        $gte: new Date(startStr),
+                        $lte: new Date(endStr)
+                    }
+                },
+                {
+                    stageHistory: {
+                        $elemMatch: {
+                            stage: { $in: ["Closed Won", "Closed Lost"] },
+                            changedAt: {
+                                $gte: new Date(startStr),
+                                $lte: new Date(endStr)
+                            }
+                        }
+                    }
+                }
+            ];
         }
 
         if (owner && role === "admin") {

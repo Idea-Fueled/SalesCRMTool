@@ -571,6 +571,10 @@ export const deactivateUser = async (req, res, next) => {
             console.warn("[deactivateUser] Socket emit failed (non-critical):", socketErr.message);
         }
 
+        const responseMsg = newOwner
+            ? `User "${user.firstName} ${user.lastName}" deactivated. Records reassigned to ${newOwner.firstName} ${newOwner.lastName}.`
+            : `User "${user.firstName} ${user.lastName}" deactivated. Records kept with original owner.`;
+
         res.status(200).json({ message: responseMsg });
 
         // Hierarchy Notification
