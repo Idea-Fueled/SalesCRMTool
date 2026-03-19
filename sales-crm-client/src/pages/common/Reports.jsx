@@ -344,7 +344,7 @@ export default function Reports() {
 
                     <button 
                         onClick={() => { fetchData(); setIsFilterOpen(false); }}
-                        className="bg-gray-800 text-white p-2 rounded-lg hover:bg-black transition shadow-sm active:scale-95"
+                        className="bg-red-600 text-white p-2 rounded-lg hover:bg-red-700 transition shadow-sm active:scale-95"
                         title="Reload"
                     >
                         <RotateCw size={16} className={loading ? "animate-spin" : ""} />
