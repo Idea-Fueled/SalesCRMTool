@@ -98,7 +98,6 @@ export default function SalesManagerLayout() {
                             <SidebarLink to="/manager/dashboard" icon={LayoutDashboard} label="Dashboard" onClick={closeSidebarOnMobile} />
                             <SidebarLink to="/manager/team" icon={Users2} label="My Team" onClick={closeSidebarOnMobile} />
                             <SidebarLink to="/manager/reports" icon={BarChart3} label="Team Reports" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/manager/audit-logs" icon={History} label="Audit History" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
                     <div>
@@ -107,6 +106,12 @@ export default function SalesManagerLayout() {
                             <SidebarLink to="/manager/deals" icon={Briefcase} label="Team Deals" onClick={closeSidebarOnMobile} />
                             <SidebarLink to="/manager/companies" icon={Building2} label="Team Companies" onClick={closeSidebarOnMobile} />
                             <SidebarLink to="/manager/contacts" icon={ContactRound} label="Team Contacts" onClick={closeSidebarOnMobile} />
+                        </div>
+                    </div>
+                    <div>
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest px-2 mb-2">Technical</p>
+                        <div className="space-y-1">
+                            <SidebarLink to="/manager/audit-logs" icon={History} label="Audit History" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
                 </nav>

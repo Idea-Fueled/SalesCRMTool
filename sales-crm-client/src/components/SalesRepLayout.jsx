@@ -100,6 +100,11 @@ const SalesRepLayout = () => {
                             <SidebarLink to="/rep/companies" icon={Building2} label="My Companies" onClick={closeSidebarOnMobile} />
                             <SidebarLink to="/rep/contacts" icon={ContactRound} label="My Contacts" onClick={closeSidebarOnMobile} />
                             <SidebarLink to="/rep/reports" icon={BarChart3} label="My Reports" onClick={closeSidebarOnMobile} />
+                        </div>
+                    </div>
+                    <div>
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest px-2 mb-2">Technical</p>
+                        <div className="space-y-1">
                             <SidebarLink to="/rep/audit-logs" icon={History} label="Audit History" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
