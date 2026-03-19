@@ -358,6 +358,16 @@ export default function Reports() {
                     >
                         <RotateCw size={16} className={loading ? "animate-spin" : ""} />
                     </button>
+
+                    {/* Export PDF Button shifted upward */}
+                    <button 
+                        onClick={handleExport}
+                        disabled={data.length === 0 || exporting}
+                        className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-bold shadow-md shadow-red-100 hover:bg-red-700 hover:shadow-lg hover:-translate-y-0.5 transition-all active:scale-95 disabled:opacity-40 disabled:pointer-events-none group ml-auto md:ml-0"
+                    >
+                        <Download size={14} className={exporting ? "animate-bounce" : "group-hover:translate-y-0.5 transition-transform"} />
+                        {exporting ? "Generating..." : "Export PDF"}
+                    </button>
                 </div>
             </div>
 
@@ -528,18 +538,10 @@ export default function Reports() {
                     </table>
                 </div>
                 
-                <div className="bg-white p-4 border-t border-gray-100 flex items-center justify-between">
+                <div className="bg-white p-4 border-t border-gray-100">
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                         Total {activeTab}: {data.length}
                     </p>
-                    <button 
-                        onClick={handleExport}
-                        disabled={data.length === 0 || exporting}
-                        className="flex items-center gap-1.5 text-[10px] font-bold text-red-500 hover:text-red-600 uppercase tracking-widest disabled:opacity-30 transition-opacity"
-                    >
-                        <Download size={12} className={exporting ? "animate-bounce" : ""} />
-                        {exporting ? "Generating..." : "Export PDF"}
-                    </button>
                 </div>
             </div>
         </div>
