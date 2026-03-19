@@ -32,6 +32,9 @@ export const notifyReassignment = async ({
         // Add Managers
         if (oldOwner.managerId) recipients.add(oldOwner.managerId.toString());
         if (newOwner.managerId) recipients.add(newOwner.managerId.toString());
+        
+        // Remove actor from recipients if they are one of the parties (self-notification is redundant)
+        recipients.delete(actorId.toString());
 
         const defaultMessage = `${actorName} reassigned data from ${oldOwnerName} to ${newOwnerName}.`;
         const notificationMessage = customMessage || defaultMessage;
