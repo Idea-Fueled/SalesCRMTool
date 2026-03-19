@@ -177,7 +177,7 @@ export default function Reports() {
             
             pdf.setFontSize(10);
             pdf.setTextColor(107, 114, 128); // Gray-500
-            pdf.text(`Periode: ${dateRange.start} to ${dateRange.end}`, 15, 28);
+            pdf.text(`Period: ${dateRange.start} to ${dateRange.end}`, 15, 28);
             pdf.text(`Generated on: ${new Date().toLocaleString()}`, 15, 33);
             
             pdf.addImage(dataUrl, 'PNG', 10, 40, pdfWidth - 20, pdfHeight - 20);
