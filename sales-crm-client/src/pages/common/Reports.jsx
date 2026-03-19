@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { 
     LayoutDashboard, Building2, ContactRound, Briefcase, 
-    Search, Calendar, Filter, ChevronDown, Download
+    Search, Calendar, Filter, ChevronDown, Download, RotateCw
 } from "lucide-react";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { getDeals } from "../../API/services/dealService";
@@ -45,8 +45,10 @@ export default function Reports() {
         end: searchParams.get("end") || new Date().toISOString().split('T')[0]
     });
     const [rangePreset, setRangePreset] = useState(searchParams.get("preset") || "today");
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const filterRef = useRef(null);
 
-    const fetchData = async () => {
+    const fetchData = async (signal) => {
         setLoading(true);
         try {
             const params = {
@@ -57,12 +59,19 @@ export default function Reports() {
             };
 
             let res;
-            if (activeTab === "deals") res = await getDeals(params);
-            else if (activeTab === "companies") res = await getCompanies(params);
-            else if (activeTab === "contacts") res = await getContacts(params);
+            // Pass signal to avoid racing conditions
+            // const options = { params, signal }; // This line is no longer needed as signal is passed directly
+            
+            if (activeTab === "deals") res = await getDeals(params, signal);
+            else if (activeTab === "companies") res = await getCompanies(params, signal);
+            else if (activeTab === "contacts") res = await getContacts(params, signal);
 
+            // Double check signal has not been aborted
+            if (signal && signal.aborted) return;
+            
             setData(res?.data?.data || []);
         } catch (error) {
+            if (error.name === 'AbortError') return;
             console.error(error);
             toast.error(`Failed to fetch ${activeTab} report`);
         } finally {
@@ -114,6 +123,8 @@ export default function Reports() {
     }, [rangePreset]);
 
     useEffect(() => {
+        const controller = new AbortController();
+        
         const params = {
             tab: activeTab,
             preset: rangePreset,
@@ -122,7 +133,16 @@ export default function Reports() {
         };
         // Update URL to persist filter state
         setSearchParams(params, { replace: true });
-        fetchData();
+        
+        // Use a small timeout to let calculateRange finish if rangePreset just changed
+        const timer = setTimeout(() => {
+            fetchData(controller.signal);
+        }, 50);
+
+        return () => {
+            controller.abort();
+            clearTimeout(timer);
+        };
     }, [activeTab, dateRange, debouncedSearch, rangePreset]);
 
     const handleSearchSubmit = (e) => {
@@ -219,47 +239,100 @@ export default function Reports() {
                         />
                     </form>
 
-                    {/* Range Preset */}
-                    <select 
-                        value={rangePreset}
-                        onChange={(e) => setRangePreset(e.target.value)}
-                        className="text-xs font-bold text-gray-700 bg-white border border-gray-200 rounded-lg px-3 py-1.5 shadow-sm focus:outline-none focus:ring-1 focus:ring-red-400 transition"
-                    >
-                        <option value="today">Today</option>
-                        <option value="thisMonth">This Month</option>
-                        <option value="lastMonth">Last Month</option>
-                    </select>
+                    {/* Single Combined Filter Dropdown */}
+                    <div className="relative" ref={filterRef}>
+                        <button 
+                            onClick={() => setIsFilterOpen(!isFilterOpen)}
+                            className="flex items-center gap-2.5 text-xs font-bold text-gray-700 bg-white border border-gray-200 rounded-lg px-4 py-1.5 shadow-sm hover:border-red-400 hover:shadow-md transition-all active:scale-95"
+                        >
+                            <Calendar size={14} className="text-red-500" />
+                            <span className="max-w-[150px] truncate">
+                                {rangePreset === 'custom' 
+                                    ? `${dateRange.start.split('-').reverse().join('-')} — ${dateRange.end.split('-').reverse().join('-')}` 
+                                    : rangePreset === "today" ? "Today" 
+                                    : rangePreset === "thisMonth" ? "This Month" 
+                                    : "Last Month"
+                                }
+                            </span>
+                            <ChevronDown size={14} className={`text-gray-400 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
+                        </button>
 
-                    {/* Date Picker */}
-                    <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-2 py-1.5 shadow-sm">
-                        <Calendar size={14} className="text-gray-400" />
-                        <input 
-                            type="date" 
-                            value={dateRange.start}
-                            onChange={(e) => {
-                                setDateRange(prev => ({ ...prev, start: e.target.value }));
-                                setRangePreset("custom");
-                            }}
-                            className="text-xs font-medium focus:outline-none border-none p-0 w-24 bg-transparent"
-                        />
-                        <span className="text-gray-300 text-xs">—</span>
-                        <input 
-                            type="date" 
-                            value={dateRange.end}
-                            onChange={(e) => {
-                                setDateRange(prev => ({ ...prev, end: e.target.value }));
-                                setRangePreset("custom");
-                            }}
-                            className="text-xs font-medium focus:outline-none border-none p-0 w-24 bg-transparent"
-                        />
+                        {isFilterOpen && (
+                            <div className="absolute right-0 mt-2 p-5 bg-white border border-gray-100 rounded-2xl shadow-2xl z-50 min-w-[280px] animate-in fade-in zoom-in duration-200">
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Quick Presets</span>
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {[
+                                            { id: 'today', label: 'Today' },
+                                            { id: 'thisMonth', label: 'This Month' },
+                                            { id: 'lastMonth', label: 'Last Month' }
+                                        ].map(preset => (
+                                            <button
+                                                key={preset.id}
+                                                onClick={() => { setRangePreset(preset.id); setIsFilterOpen(false); }}
+                                                className={`px-2 py-2 rounded-xl text-[10px] font-bold border transition-all ${
+                                                    rangePreset === preset.id 
+                                                    ? 'bg-red-50 border-red-200 text-red-600' 
+                                                    : 'bg-gray-50/50 border-gray-100 text-gray-500 hover:bg-white hover:border-gray-300'
+                                                }`}
+                                            >
+                                                {preset.label}
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    <div className="pt-4 border-t border-gray-50 space-y-3">
+                                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1 flex items-center gap-2">
+                                            Custom Range <span className="h-[1px] flex-1 bg-gray-50"></span>
+                                        </span>
+                                        
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="space-y-1">
+                                                <label className="text-[9px] font-bold text-gray-400 px-1">START DATE</label>
+                                                <input 
+                                                    type="date" 
+                                                    value={dateRange.start}
+                                                    onChange={(e) => {
+                                                        setDateRange(prev => ({ ...prev, start: e.target.value }));
+                                                        setRangePreset("custom");
+                                                    }}
+                                                    className="w-full text-[10px] font-bold p-2 bg-gray-50 border border-transparent rounded-lg focus:bg-white focus:border-red-200 transition-all outline-none"
+                                                />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <label className="text-[9px] font-bold text-gray-400 px-1">END DATE</label>
+                                                <input 
+                                                    type="date" 
+                                                    value={dateRange.end}
+                                                    onChange={(e) => {
+                                                        setDateRange(prev => ({ ...prev, end: e.target.value }));
+                                                        setRangePreset("custom");
+                                                    }}
+                                                    className="w-full text-[10px] font-bold p-2 bg-gray-50 border border-transparent rounded-lg focus:bg-white focus:border-red-200 transition-all outline-none"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <button 
+                                            onClick={() => { fetchData(); setIsFilterOpen(false); }}
+                                            className="w-full py-2.5 bg-red-600 text-white rounded-xl text-[11px] font-black shadow-lg shadow-red-100/50 hover:bg-red-700 transition active:scale-95 flex items-center justify-center gap-2"
+                                        >
+                                            Apply Filter
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <button 
-                        onClick={fetchData}
-                        className="bg-gray-800 text-white p-2 rounded-lg hover:bg-black transition shadow-sm"
+                        onClick={() => { fetchData(); setIsFilterOpen(false); }}
+                        className="bg-gray-800 text-white p-2 rounded-lg hover:bg-black transition shadow-sm active:scale-95"
                         title="Reload"
                     >
-                        <Filter size={16} />
+                        <RotateCw size={16} className={loading ? "animate-spin" : ""} />
                     </button>
                 </div>
             </div>

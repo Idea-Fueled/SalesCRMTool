@@ -2,7 +2,7 @@ import { Company } from "../models/companySchema.js";
 import { Contact } from "../models/contactSchema.js";
 import User from "../models/userSchema.js";
 import { logAction } from "../utils/auditLogger.js";
-import { uploadToCloudinary } from "../middlewares/uploadMiddleware.js";
+import { uploadToCloudinary, deleteFromCloudinary } from "../middlewares/uploadMiddleware.js";
 import { sendHierarchyNotification } from "../services/notificationService.js";
 
 export const createContact = async (req, res, next) => {
@@ -487,6 +487,103 @@ export const restoreContact = async (req, res) => {
     }
 };
 
+export const deleteRemarkFile = async (req, res) => {
+    try {
+        const { id, remarkId, fileId } = req.params;
+        const { id: userId, role } = req.user;
+
+        const contact = await Contact.findById(id);
+        if (!contact) return res.status(404).json({ message: "Contact not found!" });
+
+        const remark = contact.remarks.id(remarkId);
+        if (!remark) return res.status(404).json({ message: "Remark not found!" });
+
+        // Security check
+        if (remark.author.toString() !== userId.toString() && role !== "admin") {
+            return res.status(403).json({ message: "You can only delete your own files!" });
+        }
+
+        const file = remark.files.id(fileId);
+        if (!file) return res.status(404).json({ message: "File not found!" });
+
+        // Delete from Cloudinary
+        if (file.publicId) {
+            import("../middlewares/uploadMiddleware.js").then(m => m.deleteFromCloudinary(file.publicId));
+        }
+
+        remark.files.pull(fileId);
+        await contact.save();
+
+        res.status(200).json({ message: "File deleted successfully!" });
+    } catch (error) {
+        res.status(500).json({ message: error.message || "Server error!" });
+    }
+};
+
+export const deleteAttachment = async (req, res) => {
+    try {
+        const { id, fileId } = req.params;
+        const { id: userId, role } = req.user;
+
+        const contact = await Contact.findById(id);
+        if (!contact) return res.status(404).json({ message: "Contact not found!" });
+
+        const file = contact.attachments.id(fileId);
+        if (!file) return res.status(404).json({ message: "File not found!" });
+
+        // Security check
+        if (file.uploadedBy.toString() !== userId.toString() && role !== "admin") {
+            return res.status(403).json({ message: "You can only delete your own files!" });
+        }
+
+        // Delete from Cloudinary
+        if (file.publicId) {
+            import("../middlewares/uploadMiddleware.js").then(m => m.deleteFromCloudinary(file.publicId));
+        }
+
+        contact.attachments.pull(fileId);
+        await contact.save();
+
+        res.status(200).json({ message: "Attachment deleted successfully!" });
+    } catch (error) {
+        res.status(500).json({ message: error.message || "Server error!" });
+    }
+};
+
+export const deleteRemark = async (req, res) => {
+    try {
+        const { id, remarkId } = req.params;
+        const { id: userId, role } = req.user;
+
+        const contact = await Contact.findById(id);
+        if (!contact) return res.status(404).json({ message: "Contact not found!" });
+
+        const remark = contact.remarks.id(remarkId);
+        if (!remark) return res.status(404).json({ message: "Remark not found!" });
+
+        // Security check
+        if (remark.author.toString() !== userId.toString() && role !== "admin") {
+            return res.status(403).json({ message: "You can only delete your own remarks!" });
+        }
+
+        // Cleanup Cloudinary files before removing remark
+        if (remark.files && remark.files.length > 0) {
+            for (const file of remark.files) {
+                if (file.publicId) {
+                    await deleteFromCloudinary(file.publicId);
+                }
+            }
+        }
+
+        contact.remarks.pull(remarkId);
+        await contact.save();
+
+        res.status(200).json({ message: "Remark deleted successfully!" });
+    } catch (error) {
+        res.status(500).json({ message: error.message || "Server error!" });
+    }
+};
+
 export const addRemark = async (req, res) => {
     try {
         const { id } = req.params;
@@ -520,7 +617,8 @@ export const addRemark = async (req, res) => {
         contact.remarks.push(newRemark);
         await contact.save();
 
-        res.status(200).json({ message: "Remark added successfully!", data: newRemark });
+        const savedRemark = contact.remarks[contact.remarks.length - 1];
+        res.status(200).json({ message: "Remark added successfully!", data: savedRemark });
 
         // Log action
         await logAction({

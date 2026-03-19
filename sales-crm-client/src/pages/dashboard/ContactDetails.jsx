@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { getContactById, updateContact, deleteContact, addRemark as addContactRemark } from "../../API/services/contactService";
+import { getContactById, updateContact, addRemark as addContactRemark, deleteContact, getArchivedContacts, restoreContact, deleteRemarkFile, deleteAttachment, deleteRemark } from "../../API/services/contactService";
 import { getTeamUsers } from "../../API/services/userService";
 import { useAuth } from "../../context/AuthContext";
 import ContactModal from "../../components/modals/ContactModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
+import FileDeleteModal from "../../components/modals/FileDeleteModal";
 import {
     User, Mail, Phone, Smartphone, Linkedin,
     Building2, Briefcase, Calendar, Clock,
@@ -25,6 +26,8 @@ const lifecycleStages = [
     { id: "Active", label: "Active" }
 ];
 
+
+
 const formatDate = (date, includeTime = false) => {
     if (!date) return "Not Set";
     const options = {
@@ -39,19 +42,45 @@ const formatDate = (date, includeTime = false) => {
     return new Date(date).toLocaleString("en-IN", options);
 };
 
-const formatFileUrl = (url) => {
-    if (!url) return "";
-    if (url.toLowerCase().endsWith('.pdf') || 
-        url.toLowerCase().endsWith('.doc') || 
-        url.toLowerCase().endsWith('.docx') || 
-        url.toLowerCase().endsWith('.xls') || 
-        url.toLowerCase().endsWith('.xlsx') ||
-        url.toLowerCase().endsWith('.zip')) {
-        if (url.includes('/upload/')) {
-            return url.replace('/upload/', '/upload/fl_attachment/');
-        }
+const getDownloadUrl = (url, fileName) => {
+    if (!url || !url.includes("cloudinary.com")) return url || "#";
+    
+    const isPdf = fileName?.toLowerCase().endsWith('.pdf') || url.toLowerCase().endsWith('.pdf');
+    // Sanitize: letters, numbers, _ or - only (no spaces), preserve extension
+    const safeName = fileName ? fileName.replace(/[^\w.-]+/g, '_') : (isPdf ? 'document.pdf' : 'file');
+    
+    // For downloads, enforce fl_attachment with the specific filename
+    let clean = url.replace(/\/fl_attachment[^/]*\//, '/').replace(/\/f_pdf[^/]*\//, '/');
+    
+    if (clean.includes('/upload/')) {
+        return clean.replace('/upload/', `/upload/fl_attachment:${safeName}/`);
     }
-    return url;
+    return clean;
+};
+
+const formatFileUrl = (url, fileType) => {
+    if (!url) return "#";
+    
+    const isPdf = url.toLowerCase().endsWith('.pdf') || fileType === "application/pdf";
+    const isOfficeDoc = url.toLowerCase().endsWith('.doc') || 
+                       url.toLowerCase().endsWith('.docx') || 
+                       url.toLowerCase().endsWith('.xls') || 
+                       url.toLowerCase().endsWith('.xlsx');
+
+    // Always remove force-download/format flags for viewing
+    let openingUrl = url.replace(/\/fl_attachment[^/]*\//, '/').replace(/\/f_pdf[^/]*\//, '/');
+
+    if (isPdf) {
+        // New tab opening logic for PDFs
+        return openingUrl;
+    }
+
+    if (isOfficeDoc) {
+        // Use Google Docs Viewer for Office documents
+        return `https://docs.google.com/viewer?url=${encodeURIComponent(openingUrl)}&embedded=true`;
+    }
+    
+    return openingUrl;
 };
 
 export default function ContactDetails() {
@@ -65,6 +94,8 @@ export default function ContactDetails() {
     // Modals & State
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isFileDeleteModalOpen, setIsFileDeleteModalOpen] = useState(false);
+    const [assetToDelete, setAssetToDelete] = useState(null);
     const [newRemark, setNewRemark] = useState("");
     const [remarkFiles, setRemarkFiles] = useState([]);
     const [savingRemark, setSavingRemark] = useState(false);
@@ -130,6 +161,42 @@ export default function ContactDetails() {
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to update contact");
             throw error;
+        }
+    };
+
+    const prepareDeleteRemark = (remarkId) => {
+        setAssetToDelete({ type: 'remark', remarkId });
+        setIsFileDeleteModalOpen(true);
+    };
+
+    const prepareDeleteRemarkFile = (remarkId, fileId, fileName) => {
+        setAssetToDelete({ type: 'remarkFile', remarkId, fileId, fileName });
+        setIsFileDeleteModalOpen(true);
+    };
+
+    const prepareDeleteAttachment = (fileId, fileName) => {
+        setAssetToDelete({ type: 'attachment', fileId, fileName });
+        setIsFileDeleteModalOpen(true);
+    };
+
+    const handleConfirmAssetDelete = async () => {
+        if (!assetToDelete) return;
+        try {
+            if (assetToDelete.type === 'remarkFile') {
+                await deleteRemarkFile(contact._id, assetToDelete.remarkId, assetToDelete.fileId);
+                toast.success("File deleted successfully");
+            } else if (assetToDelete.type === 'remark') {
+                await deleteRemark(contact._id, assetToDelete.remarkId);
+                toast.success("Remark deleted successfully");
+            } else {
+                await deleteAttachment(contact._id, assetToDelete.fileId);
+                toast.success("Attachment deleted successfully");
+            }
+            setIsFileDeleteModalOpen(false);
+            setAssetToDelete(null);
+            fetchContact(true);
+        } catch (err) {
+            toast.error(err.response?.data?.message || "Failed to delete item");
         }
     };
 
@@ -315,22 +382,39 @@ export default function ContactDetails() {
                                     </label>
                                     <div className="grid grid-cols-1 gap-2">
                                         {contact.attachments.map((file, idx) => (
-                                            <a
-                                                key={`main-${idx}`}
-                                                href={formatFileUrl(file.url)}
-                                                download={file.fileName}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="group flex items-center gap-3 p-2 bg-white border border-gray-100 rounded-xl hover:border-red-400 hover:shadow-sm transition-all duration-300"
-                                            >
-                                                <div className="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
-                                                    <FileText size={14} />
-                                                </div>
-                                                <div className="min-w-0 flex-1">
-                                                    <p className="text-[11px] font-bold text-gray-900 truncate">{file.fileName}</p>
-                                                </div>
-                                                <Download size={12} className="text-gray-300 group-hover:text-red-600 transition-colors" />
-                                            </a>
+                                            <div key={`main-${idx}`} className="group flex items-center gap-2">
+                                                <a
+                                                    href={formatFileUrl(file.url, file.fileType)}
+                                                    download={(file.url?.toLowerCase().endsWith('.pdf') || file.fileType === "application/pdf") ? undefined : file.fileName}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex-1 flex items-center gap-3 p-2 bg-white border border-gray-100 rounded-xl hover:border-red-400 hover:shadow-sm transition-all duration-300"
+                                                >
+                                                    <div className="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
+                                                        <FileText size={14} />
+                                                    </div>
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="text-[11px] font-bold text-gray-900 truncate">{file.fileName}</p>
+                                                    </div>
+                                                </a>
+                                                 <a
+                                                    href={getDownloadUrl(file.url, file.fileName)}
+                                                    download={file.fileName}
+                                                    className="p-2 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all"
+                                                    title="Download to system"
+                                                >
+                                                    <Download size={14} />
+                                                </a>
+                                                {(currentUser?.role === 'admin' || (currentUser?._id || currentUser?.id) === file.uploadedBy) && (
+                                                    <button
+                                                        onClick={() => prepareDeleteAttachment(file._id, file.fileName)}
+                                                        className="p-2 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all"
+                                                        title="Delete attachment"
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </button>
+                                                )}
+                                            </div>
                                         ))}
                                     </div>
                                 </div>
@@ -384,16 +468,25 @@ export default function ContactDetails() {
                                 <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                                     {Array.isArray(contact.remarks) && contact.remarks.length > 0 ? (
                                         contact.remarks.map((remark, idx) => (
-                                            <div key={idx} className="p-4 bg-gray-50/30 rounded-xl border border-gray-100">
+                                            <div key={idx} className="group p-4 bg-gray-50/30 rounded-xl border border-gray-100 transition-all hover:bg-white hover:shadow-sm">
                                                 <div className="flex items-start justify-between mb-2">
                                                     <div className="flex items-center gap-2">
                                                         <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center text-[10px] font-bold text-white border border-red-100">
                                                             {remark.authorName?.[0] || 'U'}
                                                         </div>
                                                         <span className="text-[11px] font-semibold text-gray-500">
-                                                            {remark.authorName || "Unknown"} <span className="text-gray-300 mx-1">•</span> {formatDate(remark.createdAt, true)}
+                                                            {remark.authorName || "Unknown"} <span className="text-gray-300 mx-1">•</span> {formatDate(remark.createdAt || new Date(), true)}
                                                         </span>
                                                     </div>
+                                                    {(currentUser?.role === 'admin' || (currentUser?._id || currentUser?.id) === remark.author) && (
+                                                        <button
+                                                            onClick={() => prepareDeleteRemark(remark._id || idx)}
+                                                            className="p-1.5 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                                                            title="Delete remark"
+                                                        >
+                                                            <Trash2 size={12} />
+                                                        </button>
+                                                    )}
                                                 </div>
                                                 <div className="text-[13px] text-gray-700 leading-relaxed font-medium">
                                                     {remark.text}
@@ -401,18 +494,35 @@ export default function ContactDetails() {
                                                 {remark.files && remark.files.length > 0 && (
                                                     <div className="mt-2 flex flex-wrap gap-2">
                                                         {remark.files.map((file, fIdx) => (
-                                                            <a
-                                                                key={fIdx}
-                                                                href={formatFileUrl(file.url)}
-                                                                download={file.fileName}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="flex items-center gap-2 px-2 py-1 bg-white border border-gray-100 rounded-lg text-[10px] font-medium text-gray-500 hover:border-red-400 hover:text-red-600 transition-all shadow-sm"
-                                                            >
-                                                                <Paperclip size={10} className="text-gray-400" />
-                                                                <span className="max-w-[150px] truncate">{file.fileName}</span>
-                                                                <Download size={10} className="text-gray-300" />
-                                                            </a>
+                                                            <div key={fIdx} className="group flex items-center gap-1">
+                                                                <a
+                                                                    href={formatFileUrl(file.url, file.fileType)}
+                                                                    download={(file.url?.toLowerCase().endsWith('.pdf') || file.fileType === "application/pdf") ? undefined : file.fileName}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="flex items-center gap-2 px-2 py-1 bg-white border border-gray-200 rounded-lg text-[10px] font-medium text-gray-500 hover:border-red-400 hover:text-red-600 transition-all shadow-sm"
+                                                                >
+                                                                    <Paperclip size={10} className="text-gray-400" />
+                                                                    <span className="max-w-[150px] truncate">{file.fileName}</span>
+                                                                </a>
+                                                                 <a
+                                                                    href={getDownloadUrl(file.url, file.fileName)}
+                                                                    download={file.fileName}
+                                                                    className="p-1.5 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                                                                    title="Download to system"
+                                                                >
+                                                                    <Download size={12} />
+                                                                </a>
+                                                                {(currentUser?.role === 'admin' || String(currentUser?._id || currentUser?.id) === String(remark.author?._id || remark.author?.id || remark.author)) && (
+                                                                    <button
+                                                                        onClick={() => prepareDeleteRemarkFile(remark._id || idx, file._id, file.fileName)}
+                                                                        className="p-1.5 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                                                                        title="Delete file"
+                                                                    >
+                                                                        <Trash2 size={12} />
+                                                                    </button>
+                                                                )}
+                                                            </div>
                                                         ))}
                                                     </div>
                                                 )}
@@ -492,11 +602,30 @@ export default function ContactDetails() {
                 userRole={currentUser?.role}
                 potentialOwners={users}
             />
+            {/* Delete Confirmation Modal for Full Item */}
             <DeleteConfirmModal
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}
                 onConfirm={handleDeleteContact}
-                itemName={`${contact.firstName} ${contact.lastName}`}
+                itemName={`${contact?.firstName} ${contact?.lastName}`}
+            />
+
+            {/* Specialized Asset Delete Modal */}
+            <FileDeleteModal
+                isOpen={isFileDeleteModalOpen}
+                onClose={() => {
+                    setIsFileDeleteModalOpen(false);
+                    setAssetToDelete(null);
+                }}
+                onConfirm={handleConfirmAssetDelete}
+                message={
+                    assetToDelete?.type === 'remark' 
+                        ? "Are you sure you want to delete this remark? All associated files will also be removed."
+                        : assetToDelete?.type === 'remarkFile'
+                        ? `Are you sure you want to delete "${assetToDelete?.fileName}"?`
+                        : "Are you sure you want to delete this attachment?"
+                }
+                title={assetToDelete?.type === 'remark' ? "Delete Remark" : "Delete Attachment"}
             />
             <ContactDealsModal
                 isOpen={isDealsModalOpen}

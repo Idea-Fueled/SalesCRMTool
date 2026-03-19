@@ -1,7 +1,7 @@
 import API from "../Interceptor";
 
-export const getDeals = async (params = {}) => {
-    return API.get("/deals", { params });
+export const getDeals = async (params = {}, signal) => {
+    return API.get("/deals", { params, signal });
 };
 
 export const createDeal = async (dealData) => {
@@ -39,4 +39,16 @@ export const getArchivedDeals = async () => {
 
 export const restoreDeal = async (id) => {
     return API.patch(`/deals/${id}/restore`);
+};
+
+export const deleteRemarkFile = async (id, remarkId, fileId) => {
+    return API.delete(`/deals/${id}/remarks/${remarkId}/files/${fileId}`);
+};
+
+export const deleteAttachment = async (id, fileId) => {
+    return API.delete(`/deals/${id}/attachments/${fileId}`);
+};
+
+export const deleteRemark = async (id, remarkId) => {
+    return API.delete(`/deals/${id}/remarks/${remarkId}`);
 };

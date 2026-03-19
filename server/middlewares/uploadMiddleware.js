@@ -19,11 +19,20 @@ export const uploadToCloudinary = async (file, folder = "deals") => {
     console.log("Config API Secret:", cloudinary.config().api_secret ? "Present" : "Missing");
 
     return new Promise((resolve, reject) => {
+        const isImage = file.mimetype.startsWith("image/");
+        // Sanitize filename: letters, numbers, _ or - only (no spaces), preserve extension
+        const cleanBaseName = file.originalname.replace(/\.[^/.]+$/, "").replace(/[^\w.-]+/g, '_');
+        const extension = file.originalname.split('.').pop();
+        const timestamp = Math.round(new Date().getTime() / 1000);
+        
+        // As requested: public_id includes the extension for raw files
+        const customPublicId = `${cleanBaseName}_${timestamp}.${extension}`;
+
         const uploadOptions = {
             folder,
-            resource_type: "auto",
-            content_disposition: `attachment; filename="${file.originalname}"`,
-            timestamp: Math.round(new Date().getTime() / 1000)
+            public_id: customPublicId,
+            resource_type: isImage ? "image" : "raw", // Force "raw" for PDFs/docs as requested
+            timestamp: timestamp
         };
 
         const uploadStream = cloudinary.uploader.upload_stream(
@@ -34,12 +43,11 @@ export const uploadToCloudinary = async (file, folder = "deals") => {
                     return reject(error);
                 }
                 
-                // For PDFs and other files, let's ensure the URL has the download flag
+                // For raw files, we don't apply transformations in the standard URL usually,
+                // but fl_attachment can be appended if the URL structure allows it.
+                // However, for raw files on some Cloudinary setups, the secure_url is best used as is.
                 let finalUrl = result.secure_url;
-                if (!result.secure_url.includes("fl_attachment") && !file.mimetype.startsWith("image/")) {
-                    finalUrl = result.secure_url.replace("/upload/", "/upload/fl_attachment/");
-                }
-
+                
                 resolve({
                     url: finalUrl,
                     publicId: result.public_id,

@@ -1,7 +1,7 @@
 import API from "../Interceptor";
 
-export const getCompanies = async (params = {}) => {
-    return API.get("/companies", { params });
+export const getCompanies = async (params = {}, signal) => {
+    return API.get("/companies", { params, signal });
 };
 
 export const createCompany = (data) => API.post("/companies/create", data);
@@ -26,4 +26,16 @@ export const getArchivedCompanies = async () => {
 
 export const restoreCompany = async (id) => {
     return API.patch(`/companies/${id}/restore`);
+};
+
+export const deleteRemarkFile = async (id, remarkId, fileId) => {
+    return API.delete(`/companies/${id}/remarks/${remarkId}/files/${fileId}`);
+};
+
+export const deleteAttachment = async (id, fileId) => {
+    return API.delete(`/companies/${id}/attachments/${fileId}`);
+};
+
+export const deleteRemark = async (id, remarkId) => {
+    return API.delete(`/companies/${id}/remarks/${remarkId}`);
 };

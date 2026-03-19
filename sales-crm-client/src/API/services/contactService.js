@@ -1,7 +1,7 @@
 import API from "../Interceptor";
 
-export const getContacts = async (params = {}) => {
-    return API.get("/contacts", { params });
+export const getContacts = async (params = {}, signal) => {
+    return API.get("/contacts", { params, signal });
 };
 
 export const createContact = (data) => API.post("/contacts/create", data);
@@ -22,4 +22,16 @@ export const getArchivedContacts = async () => {
 
 export const restoreContact = async (id) => {
     return API.patch(`/contacts/restore/${id}`);
+};
+
+export const deleteRemarkFile = async (id, remarkId, fileId) => {
+    return API.delete(`/contacts/${id}/remarks/${remarkId}/files/${fileId}`);
+};
+
+export const deleteAttachment = async (id, fileId) => {
+    return API.delete(`/contacts/${id}/attachments/${fileId}`);
+};
+
+export const deleteRemark = async (id, remarkId) => {
+    return API.delete(`/contacts/${id}/remarks/${remarkId}`);
 };

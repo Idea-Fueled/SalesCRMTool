@@ -1,24 +1,49 @@
 @import "tailwindcss";
 
+/* Global Light Scrollbar */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #e2e8f0 transparent;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
 @layer utilities {
     .custom-scrollbar::-webkit-scrollbar {
-        height: 8px;
-        width: 6px;
+        height: 6px;
+        width: 5px;
     }
 
     .custom-scrollbar::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 10px;
+        background: transparent;
     }
 
     .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
+        background: #e2e8f0;
         border-radius: 10px;
-        border: 2px solid #f1f1f1;
+        border: 1.5px solid white;
     }
 
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #a1a1a1;
+        background: #cbd5e1;
     }
 
     @keyframes fadeIn {
