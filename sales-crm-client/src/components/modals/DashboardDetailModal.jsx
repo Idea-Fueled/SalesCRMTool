@@ -4,6 +4,18 @@ import { Briefcase, Building2, Users, DollarSign } from "lucide-react";
 import { truncateName } from "../../utils/stringUtils";
 
 export default function DashboardDetailModal({ isOpen, onClose, category, data }) {
+    const getDealOwnerFullName = (deal) =>
+        `${deal?.ownerId?.firstName || ""} ${deal?.ownerId?.lastName || ""}`.trim();
+
+    const getDealDisplayName = (deal) => {
+        const raw = (deal?.name || "").trim();
+        const ownerFullName = getDealOwnerFullName(deal);
+        if (/^assigned deal to\b/i.test(raw) && ownerFullName) {
+            return `Assigned deal to ${ownerFullName}`;
+        }
+        return raw;
+    };
+
     const titles = {
         revenue: "Total Revenue Details",
         deals: "Active Deals",
@@ -35,15 +47,29 @@ export default function DashboardDetailModal({ isOpen, onClose, category, data }
                         {data.map((deal) => (
                             <div key={deal._id} className="p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
                                 <div className="flex justify-between items-start mb-2">
-                                    <h4 className="font-bold text-gray-900 uppercase text-[11px] tracking-wide">{truncateName(deal.name)}</h4>
+                                    <h4 className="font-bold text-gray-900 uppercase text-[11px] tracking-wide">
+                                        {truncateName(getDealDisplayName(deal))}
+                                    </h4>
                                     <span className="text-sm font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-lg">
                                         ${deal.value?.toLocaleString()}
                                     </span>
                                 </div>
                                 <div className="grid grid-cols-2 gap-y-2 text-xs text-gray-500">
-                                    <div className="flex items-center gap-1.5">
-                                        <Building2 size={12} />
-                                        {deal.companyId?.name || deal.companyName || "N/A"}
+                                    <div className="flex flex-col gap-1 min-w-0">
+                                        <div className="flex items-center gap-1.5 min-w-0">
+                                            <Users size={12} className="shrink-0" />
+                                            <span className="truncate">
+                                                {(deal.ownerId?.firstName || deal.ownerId?.lastName)
+                                                    ? getDealOwnerFullName(deal)
+                                                    : (deal.ownerName || "Unassigned")}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 min-w-0">
+                                            <Building2 size={12} className="shrink-0" />
+                                            <span className="truncate">
+                                                {deal.companyId?.name || deal.companyName || "N/A"}
+                                            </span>
+                                        </div>
                                     </div>
                                     <div className="flex items-center gap-1.5 justify-end capitalize">
                                         <span className={`w-2 h-2 rounded-full ${deal.stage === 'Closed Won' ? 'bg-green-500' : 'bg-orange-400'}`} />

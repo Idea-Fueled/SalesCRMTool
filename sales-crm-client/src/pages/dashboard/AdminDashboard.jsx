@@ -155,6 +155,18 @@ export default function AdminDashboard() {
 
     // Computations for Detail Widgets
     const topDeals = [...stats.dealList].sort((a, b) => (b.value || 0) - (a.value || 0)).slice(0, 5);
+
+    const getDealOwnerFullName = (deal) =>
+        `${deal?.ownerId?.firstName || ""} ${deal?.ownerId?.lastName || ""}`.trim();
+
+    const getDealDisplayName = (deal) => {
+        const raw = (deal?.name || "").trim();
+        const ownerFullName = getDealOwnerFullName(deal);
+        if (/^assigned deal to\b/i.test(raw) && ownerFullName) {
+            return `Assigned deal to ${ownerFullName}`;
+        }
+        return raw;
+    };
     
     const pipelineStages = [
         { name: 'Lead', color: 'bg-red-500' },
@@ -416,7 +428,9 @@ export default function AdminDashboard() {
                                         {index + 1}
                                     </div>
                                     <div>
-                                        <p className="text-sm font-bold text-gray-900 group-hover:text-red-600 transition-colors uppercase text-[11px] tracking-wide">{truncateName(deal.name)}</p>
+                                        <p className="text-sm font-bold text-gray-900 group-hover:text-red-600 transition-colors uppercase text-[11px] tracking-wide">
+                                            {truncateName(getDealDisplayName(deal))}
+                                        </p>
                                         <p className="text-xs text-gray-500 line-clamp-1">{deal.companyName || deal.companyId?.name || "Unknown Company"}</p>
                                     </div>
                                 </div>
