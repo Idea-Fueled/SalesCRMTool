@@ -208,9 +208,9 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
                         <ChevronDown size={14} className={`text-gray-400 transition-transform ${companyDropdownOpen ? "rotate-180" : ""}`} />
                     </button>
 
-                    {/* Dropdown list */}
+                    {/* Dropdown list - inline (no absolute) to stay inside modal */}
                     {companyDropdownOpen && (
-                        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden max-h-48 flex flex-col" style={{ minWidth: 200 }}>
+                        <div className="w-full mt-1 bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden max-h-44 flex flex-col">
                             <div className="p-2 border-b border-gray-100">
                                 <input
                                     type="text"
