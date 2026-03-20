@@ -237,19 +237,21 @@ export default function AdminDashboard() {
 
                             <div className="px-3">
                                 {activePickerView === "years" ? (
-                                    <div className="grid grid-cols-2 gap-2">
-                                        {[new Date().getFullYear(), new Date().getFullYear() - 1, new Date().getFullYear() - 2].map(year => (
-                                            <button
-                                                key={year}
-                                                onClick={() => { setPickerYear(year); setActivePickerView("months"); }}
-                                                className={`py-2 px-3 rounded-xl text-sm font-semibold transition-all ${pickerYear === year ? 'bg-red-50 text-red-700 border border-red-100' : 'hover:bg-gray-50 text-gray-700 border border-transparent'}`}
-                                            >
-                                                {year}
-                                            </button>
-                                        ))}
+                                    <div className="space-y-3">
+                                        <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+                                            {Array.from({ length: new Date().getFullYear() - 2020 + 1 }, (_, i) => 2020 + i).reverse().map(year => (
+                                                <button
+                                                    key={year}
+                                                    onClick={() => { setPickerYear(year); setActivePickerView("months"); }}
+                                                    className={`py-2 px-3 rounded-xl text-sm font-semibold transition-all ${pickerYear === year ? 'bg-red-50 text-red-700 border border-red-100' : 'hover:bg-gray-50 text-gray-700 border border-transparent'}`}
+                                                >
+                                                    {year}
+                                                </button>
+                                            ))}
+                                        </div>
                                         <button
                                             onClick={() => { setSelectedMonth(""); setIsDatePickerOpen(false); }}
-                                            className="col-span-2 mt-1 py-2 px-3 text-xs font-bold text-gray-500 hover:text-red-600 transition-colors"
+                                            className="w-full py-2 px-3 text-xs font-bold text-gray-400 hover:text-red-600 border border-gray-100 rounded-xl hover:border-red-100 hover:bg-red-50 transition-all uppercase tracking-wide"
                                         >
                                             View All Time
                                         </button>
