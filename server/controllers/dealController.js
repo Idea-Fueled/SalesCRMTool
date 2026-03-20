@@ -53,7 +53,22 @@ export const createDeal = async (req, res, next) => {
             const contact = await Contact.findById(sanitizedContactId);
             if (!contact) return res.status(404).json({ message: "Contact not found!" });
 
-            if (contact.companyId && contact.companyId.toString() !== sanitizedCompanyId) {
+            // Check if contact belongs to this company (support multi-company contacts)
+            const contactBelongsToCompany = (() => {
+                // Legacy single-company check
+                if (contact.companyId && contact.companyId.toString() === sanitizedCompanyId) return true;
+                // Multi-company array check
+                if (contact.companies && contact.companies.length > 0) {
+                    return contact.companies.some(c => {
+                        const cid = c.companyId?._id ? c.companyId._id.toString() : (c.companyId ? c.companyId.toString() : null);
+                        return cid === sanitizedCompanyId;
+                    });
+                }
+                // If contact has no company set at all, allow the deal
+                if (!contact.companyId && (!contact.companies || contact.companies.length === 0)) return true;
+                return false;
+            })();
+            if (!contactBelongsToCompany) {
                 return res.status(400).json({ message: "Contact does not belong to this company!" });
             }
 
