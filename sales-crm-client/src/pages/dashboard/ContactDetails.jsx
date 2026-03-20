@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { exportToPDF } from "../../utils/pdfExport";
+import { downloadFile } from "../../utils/fileUtils";
 import ContactDealsModal from "../../components/modals/ContactDealsModal";
 
 const lifecycleStages = [
@@ -45,6 +46,10 @@ const formatDate = (date, includeTime = false) => {
 const getDownloadUrl = (url, fileName) => {
     if (!url || !url.includes("cloudinary.com")) return url || "#";
     
+    // Check if it's a "raw" resource (no transformations allowed)
+    const isRaw = url.includes("/raw/upload/");
+    if (isRaw) return url;
+
     const isPdf = fileName?.toLowerCase().endsWith('.pdf') || url.toLowerCase().endsWith('.pdf');
     // Sanitize: letters, numbers, _ or - only (no spaces), preserve extension
     const safeName = fileName ? fileName.replace(/[^\w.-]+/g, '_') : (isPdf ? 'document.pdf' : 'file');
@@ -61,6 +66,9 @@ const getDownloadUrl = (url, fileName) => {
 const formatFileUrl = (url, fileType) => {
     if (!url) return "#";
     
+    // Check if it's a "raw" resource
+    if (url.includes("/raw/upload/")) return url;
+
     const isPdf = url.toLowerCase().endsWith('.pdf') || fileType === "application/pdf";
     const isOfficeDoc = url.toLowerCase().endsWith('.doc') || 
                        url.toLowerCase().endsWith('.docx') || 
@@ -68,12 +76,8 @@ const formatFileUrl = (url, fileType) => {
                        url.toLowerCase().endsWith('.xlsx');
 
     // Always remove force-download/format flags for viewing
+    // For PDFs as "image", this ensures they open inline
     let openingUrl = url.replace(/\/fl_attachment[^/]*\//, '/').replace(/\/f_pdf[^/]*\//, '/');
-
-    if (isPdf) {
-        // New tab opening logic for PDFs
-        return openingUrl;
-    }
 
     if (isOfficeDoc) {
         // Use Google Docs Viewer for Office documents
@@ -397,14 +401,13 @@ export default function ContactDetails() {
                                                         <p className="text-[11px] font-bold text-gray-900 truncate">{file.fileName}</p>
                                                     </div>
                                                 </a>
-                                                 <a
-                                                    href={getDownloadUrl(file.url, file.fileName)}
-                                                    download={file.fileName}
-                                                    className="p-2 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all"
+                                                 <button
+                                                    onClick={() => downloadFile(file.url, file.fileName)}
+                                                    className="p-2 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all cursor-pointer"
                                                     title="Download to system"
                                                 >
                                                     <Download size={14} />
-                                                </a>
+                                                </button>
                                                 {(currentUser?.role === 'admin' || (currentUser?._id || currentUser?.id) === file.uploadedBy) && (
                                                     <button
                                                         onClick={() => prepareDeleteAttachment(file._id, file.fileName)}
@@ -505,14 +508,13 @@ export default function ContactDetails() {
                                                                     <Paperclip size={10} className="text-gray-400" />
                                                                     <span className="max-w-[150px] truncate">{file.fileName}</span>
                                                                 </a>
-                                                                 <a
-                                                                    href={getDownloadUrl(file.url, file.fileName)}
-                                                                    download={file.fileName}
-                                                                    className="p-1.5 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                                                                 <button
+                                                                    onClick={() => downloadFile(file.url, file.fileName)}
+                                                                    className="p-1.5 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
                                                                     title="Download to system"
                                                                 >
                                                                     <Download size={12} />
-                                                                </a>
+                                                                </button>
                                                                 {(currentUser?.role === 'admin' || String(currentUser?._id || currentUser?.id) === String(remark.author?._id || remark.author?.id || remark.author)) && (
                                                                     <button
                                                                         onClick={() => prepareDeleteRemarkFile(remark._id || idx, file._id, file.fileName)}

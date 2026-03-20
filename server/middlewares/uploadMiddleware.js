@@ -20,6 +20,8 @@ export const uploadToCloudinary = async (file, folder = "deals") => {
 
     return new Promise((resolve, reject) => {
         const isImage = file.mimetype.startsWith("image/");
+        const isPdf = file.mimetype === "application/pdf" || file.originalname.toLowerCase().endsWith(".pdf");
+        
         // Sanitize filename: letters, numbers, _ or - only (no spaces), preserve extension
         const cleanBaseName = file.originalname.replace(/\.[^/.]+$/, "").replace(/[^\w.-]+/g, '_');
         const extension = file.originalname.split('.').pop();
@@ -31,7 +33,7 @@ export const uploadToCloudinary = async (file, folder = "deals") => {
         const uploadOptions = {
             folder,
             public_id: customPublicId,
-            resource_type: isImage ? "image" : "raw", // Force "raw" for PDFs/docs as requested
+            resource_type: (isImage || isPdf) ? "image" : "raw", // PDFs as image for viewing/transform support
             timestamp: timestamp
         };
 
