@@ -213,6 +213,7 @@ export const getContacts = async (req, res, next) => {
         const contacts = await Contact.find(filter)
             .populate("ownerId", "firstName lastName email profilePicture")
             .populate("companyId", "name industry")
+            .populate("companies.companyId", "name industry")
             .sort(sort)
             .skip(skip)
             .limit(Number(limit));
@@ -470,7 +471,8 @@ export const getContactById = async (req, res, next) => {
         const { id } = req.params;
         const contact = await Contact.findById(id)
             .populate("ownerId", "firstName lastName email")
-            .populate("companyId", "name industry");
+            .populate("companyId", "name industry")
+            .populate("companies.companyId", "name industry");
 
         if (!contact) {
             return res.status(404).json({ message: "Contact not found!" });
