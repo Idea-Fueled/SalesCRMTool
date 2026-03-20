@@ -61,6 +61,7 @@ export default function AdminDashboard() {
     const [activePipelineBar, setActivePipelineBar] = useState(null);
     const [activePickerView, setActivePickerView] = useState("years"); // "years" | "months"
     const [pickerYear, setPickerYear] = useState(new Date().getFullYear());
+    const [showMoreYears, setShowMoreYears] = useState(false);
     const navigate = useNavigate();
 
     const fetchStats = async () => {
@@ -238,8 +239,8 @@ export default function AdminDashboard() {
                             <div className="px-3">
                                 {activePickerView === "years" ? (
                                     <div className="space-y-3">
-                                        <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
-                                            {Array.from({ length: new Date().getFullYear() - 2020 + 1 }, (_, i) => 2020 + i).reverse().map(year => (
+                                        <div className={`grid grid-cols-2 gap-2 pr-1 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent ${showMoreYears ? 'max-h-48 overflow-y-auto' : ''}`}>
+                                            {Array.from({ length: (showMoreYears ? (new Date().getFullYear() - 2020 + 1) : 2) }, (_, i) => (showMoreYears ? 2020 + i : new Date().getFullYear() - 1 + i)).reverse().map(year => (
                                                 <button
                                                     key={year}
                                                     onClick={() => { setPickerYear(year); setActivePickerView("months"); }}
@@ -250,8 +251,15 @@ export default function AdminDashboard() {
                                             ))}
                                         </div>
                                         <button
-                                            onClick={() => { setSelectedMonth(""); setIsDatePickerOpen(false); }}
-                                            className="w-full py-2 px-3 text-xs font-bold text-gray-400 hover:text-red-600 border border-gray-100 rounded-xl hover:border-red-100 hover:bg-red-50 transition-all uppercase tracking-wide"
+                                            onClick={() => { 
+                                                setSelectedMonth(""); 
+                                                if (!showMoreYears) {
+                                                    setShowMoreYears(true);
+                                                } else {
+                                                    setIsDatePickerOpen(false); 
+                                                }
+                                            }}
+                                            className="w-full py-2.5 px-3 text-xs font-bold text-gray-400 hover:text-red-600 border border-gray-100 rounded-xl hover:border-red-100 hover:bg-red-50 transition-all uppercase tracking-wide bg-white shadow-sm active:scale-95"
                                         >
                                             View All Time
                                         </button>
