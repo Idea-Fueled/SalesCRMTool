@@ -167,13 +167,27 @@ export const getCompanies = async (req, res) => {
             .skip(skip)
             .limit(Number(limit));
 
+        const { Deal } = await import("../models/dealSchema.js");
+        const companiesWithDealCount = await Promise.all(companies.map(async (c) => {
+            let dealFilter = { companyId: c._id, isDeleted: { $ne: true } };
+
+            if (role === "sales_rep") {
+                dealFilter.ownerId = id;
+            } else if (role === "sales_manager") {
+                dealFilter.ownerId = { $in: teamIds };
+            }
+
+            const count = await Deal.countDocuments(dealFilter);
+            return { ...c.toObject(), dealCount: count };
+        }));
+
         const total = await Company.countDocuments(filter);
 
         return res.json({
             total,
             page: Number(page),
             totalPages: Math.ceil(total / limit),
-            data: companies
+            data: companiesWithDealCount
         });
 
     } catch (error) {
@@ -468,13 +482,32 @@ export const changeOwnership = async (req, res) => {
 export const getCompanyById = async (req, res) => {
     try {
         const { id } = req.params;
+        const { _id: userId, role } = req.user;
         const company = await Company.findById(id).populate("ownerId", "firstName lastName email");
 
         if (!company) {
             return res.status(404).json({ message: "Company not found!" });
         }
 
-        res.status(200).json({ data: company });
+        const { Deal } = await import("../models/dealSchema.js");
+        let dealFilter = { companyId: company._id, isDeleted: { $ne: true } };
+
+        if (role === "sales_rep") {
+            dealFilter.ownerId = userId;
+        } else if (role === "sales_manager") {
+            const teamUsers = await User.find({ $or: [{ _id: userId }, { managerId: userId }] }).select("_id");
+            const teamIds = teamUsers.map(u => u._id);
+            dealFilter.ownerId = { $in: teamIds };
+        }
+
+        const dealCount = await Deal.countDocuments(dealFilter);
+
+        res.status(200).json({ 
+            data: {
+                ...company.toObject(),
+                dealCount
+            } 
+        });
     } catch (error) {
         res.status(500).json({ message: error.message || "Server error!" });
     }

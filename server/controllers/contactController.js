@@ -146,9 +146,10 @@ export const getContacts = async (req, res, next) => {
             if (createdBefore) filter.createdAt.$lte = new Date(createdBefore);
         }
 
+        let teamIds = [];
         if (role === "sales_manager") {
             const teamUsers = await User.find({ $or: [{ _id: id }, { managerId: id }] }).select("_id");
-            const teamIds = teamUsers.map(u => u._id);
+            teamIds = teamUsers.map(u => u._id);
 
             // Get contacts linked to team's deals
             const { Deal } = await import("../models/dealSchema.js");
@@ -189,7 +190,15 @@ export const getContacts = async (req, res, next) => {
 
         const { Deal } = await import("../models/dealSchema.js");
         const contactsWithDealCount = await Promise.all(contacts.map(async (c) => {
-            const count = await Deal.countDocuments({ contactId: c._id, isDeleted: { $ne: true } });
+            let dealFilter = { contactId: c._id, isDeleted: { $ne: true } };
+            
+            if (role === "sales_rep") {
+                dealFilter.ownerId = id;
+            } else if (role === "sales_manager") {
+                dealFilter.ownerId = { $in: teamIds };
+            }
+
+            const count = await Deal.countDocuments(dealFilter);
             return { ...c.toObject(), dealCount: count };
         }));
 
@@ -423,8 +432,20 @@ export const getContactById = async (req, res, next) => {
             return res.status(404).json({ message: "Contact not found!" });
         }
 
+        const { id: userId, role } = req.user;
         const { Deal } = await import("../models/dealSchema.js");
-        const dealCount = await Deal.countDocuments({ contactId: contact._id, isDeleted: { $ne: true } });
+        
+        let dealFilter = { contactId: contact._id, isDeleted: { $ne: true } };
+
+        if (role === "sales_rep") {
+            dealFilter.ownerId = userId;
+        } else if (role === "sales_manager") {
+            const teamUsers = await User.find({ $or: [{ _id: userId }, { managerId: userId }] }).select("_id");
+            const teamIds = teamUsers.map(u => u._id);
+            dealFilter.ownerId = { $in: teamIds };
+        }
+
+        const dealCount = await Deal.countDocuments(dealFilter);
 
         res.status(200).json({ 
             data: {
