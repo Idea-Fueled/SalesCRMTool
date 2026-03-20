@@ -98,14 +98,22 @@ export const createCompany = async (req, res) => {
 
 export const getCompanies = async (req, res) => {
     try {
-        const { id, role } = req.user;
-        const { name, industry, status, createdAfter, createdBefore, page = 1, limit = 10, sort = "-createdAt" } = req.query;
+        const { _id: id, role } = req.user;
+        const { name, industry, size, status, createdAfter, createdBefore, page = 1, limit = 10, sort = "-createdAt" } = req.query;
 
         let filter = { isDeleted: { $ne: true } };
-
-        if (name) filter.name = { $regex: name, $options: "i" };
-        if (industry) filter.industry = industry;
-        if (status) filter.status = status;
+        if (name) {
+            filter.name = { $regex: name, $options: "i" };
+        }
+        if (industry) {
+            filter.industry = industry;
+        }
+        if (size) {
+            filter.size = size;
+        }
+        if (status) {
+            filter.status = status;
+        }
 
         if (createdAfter || createdBefore) {
             filter.createdAt = {};

@@ -120,7 +120,7 @@ export const createContact = async (req, res, next) => {
 export const getContacts = async (req, res, next) => {
     try {
 
-        const { id, role } = req.user;
+        const { _id: id, role } = req.user;
         const { name, company, jobTitle, createdAfter, createdBefore, page = 1, limit = 10, sort = "-createdAt" } = req.query;
 
         let filter = { isDeleted: { $ne: true } };
@@ -148,8 +148,8 @@ export const getContacts = async (req, res, next) => {
 
         if (role === "sales_manager") {
             const teamUsers = await User.find({ $or: [{ _id: id }, { managerId: id }] }).select("_id");
-            const teamIds = teamUsers.map(user => user._id.toString());
-            
+            const teamIds = teamUsers.map(u => u._id);
+
             // Get contacts linked to team's deals
             const { Deal } = await import("../models/dealSchema.js");
             const teamDeals = await Deal.find({ ownerId: { $in: teamIds }, isDeleted: { $ne: true } }).select("contactId");

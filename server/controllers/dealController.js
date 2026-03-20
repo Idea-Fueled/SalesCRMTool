@@ -762,7 +762,7 @@ export const getDeals = async (req, res, next) => {
         }
         if (role === "sales_manager") {
             const teamUsers = await User.find({ $or: [{ _id: userId }, { managerId: userId }] }).select("_id");
-            const teamIds = teamUsers.map(user => user._id.toString());
+            const teamIds = teamUsers.map(user => user._id);
             filter.ownerId = { $in: teamIds };
         }
 

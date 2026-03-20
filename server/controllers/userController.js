@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import User from "../models/userSchema.js";
 import bcrypt from "bcrypt";
 import { generateToken } from "../utils/authToken.js";
@@ -817,17 +818,24 @@ export const bulkReassignRecords = async (req, res, next) => {
             }
         }
 
-        await Company.updateMany({ ownerId: id }, { ownerId: newOwnerId });
+        // Use ObjectIds for consistency in bulk operations
+        const oldOid = new mongoose.Types.ObjectId(id);
+        const newOid = new mongoose.Types.ObjectId(newOwnerId);
+
+        await Company.updateMany({ ownerId: oldOid }, { ownerId: newOid });
         await Contact.updateMany(
-            { ownerId: id },
-            { ownerId: newOwnerId }
+            { ownerId: oldOid },
+            { ownerId: newOid }
         );
         await Deal.updateMany(
-            { ownerId: id },
-            { ownerId: newOwnerId }
+            { ownerId: oldOid },
+            { ownerId: newOid }
         );
-        // Reassign subordinates
-        await User.updateMany({ managerId: id }, { managerId: newOwnerId });
+
+        // Reassign subordinates ONLY if the new owner is a Manager or Admin
+        if (newUser.role === "sales_manager" || newUser.role === "admin") {
+            await User.updateMany({ managerId: oldOid }, { managerId: newOid });
+        }
 
         // Log the bulk reassignment
         await logAction({
