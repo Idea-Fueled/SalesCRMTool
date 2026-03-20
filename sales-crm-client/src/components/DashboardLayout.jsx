@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import {
     LayoutDashboard, Briefcase, Building2, Users, ContactRound,
     Bell, Search, Menu, LogOut, ChevronDown, History, Trash2, Archive, BarChart3
@@ -12,29 +12,46 @@ import NotificationDropdown from "./NotificationDropdown";
 import MyProfileModal from "./modals/MyProfileModal";
 
 
-const SidebarLink = ({ to, icon: IconComp, label, badge, onClick, end }) => (
-    <NavLink to={to}
-        end={end}
-        onClick={onClick}
-        className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group
-      ${isActive ? "bg-red-600 text-white shadow-md shadow-red-200" : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"}`
-        }>
-        {({ isActive }) => (
-            <>
-                <span className={isActive ? "text-white" : "text-gray-400 group-hover:text-gray-600"}>
-                    <IconComp size={18} />
-                </span>
-                <span className="flex-1">{label}</span>
-                {badge && (
-                    <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${isActive ? "bg-white text-red-600" : "bg-red-100 text-red-600"}`}>
-                        {badge}
-                    </span>
-                )}
-            </>
-        )}
-    </NavLink>
-);
+const SidebarLink = ({ to, icon: IconComp, label, badge, onClick, end }) => {
+    const location = useLocation();
+    
+    // Custom active logic: If "to" has query params, we want exact match on pathname + search
+    const isLinkActive = (isActive) => {
+        if (to.includes('?')) {
+            return location.pathname + location.search === to;
+        }
+        return isActive;
+    };
+
+    return (
+        <NavLink to={to}
+            end={end}
+            onClick={onClick}
+            className={({ isActive }) => {
+                const active = isLinkActive(isActive);
+                return `flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group
+                ${active ? "bg-red-600 text-white shadow-md shadow-red-200" : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"}`;
+            }}
+        >
+            {({ isActive }) => {
+                const active = isLinkActive(isActive);
+                return (
+                    <>
+                        <span className={active ? "text-white" : "text-gray-400 group-hover:text-gray-600"}>
+                            <IconComp size={18} />
+                        </span>
+                        <span className="flex-1">{label}</span>
+                        {badge && (
+                            <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${active ? "bg-white text-red-600" : "bg-red-100 text-red-600"}`}>
+                                {badge}
+                            </span>
+                        )}
+                    </>
+                );
+            }}
+        </NavLink>
+    );
+};
 
 const DashboardLayout = () => {
     const { logout, user } = useAuth();
