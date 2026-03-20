@@ -199,8 +199,8 @@ export default function DealDetails() {
         // For PDFs as "image", this ensures they open inline
         let openingUrl = url.replace(/\/fl_attachment[^/]*\//, '/').replace(/\/f_pdf[^/]*\//, '/');
 
-        if (isOfficeDoc) {
-            // Use Google Docs Viewer for Office documents
+        // Use Google Docs Viewer for PDFs and Office docs for maximum reliability
+        if (isPdf || isOfficeDoc) {
             return `https://docs.google.com/viewer?url=${encodeURIComponent(openingUrl)}&embedded=true`;
         }
         

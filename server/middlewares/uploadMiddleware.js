@@ -18,26 +18,19 @@ export const uploadToCloudinary = async (file, folder = "deals") => {
     console.log("Config API Key:", cloudinary.config().api_key ? "Present" : "Missing");
     console.log("Config API Secret:", cloudinary.config().api_secret ? "Present" : "Missing");
     return new Promise((resolve, reject) => {
-        // Sanitize filename: letters, numbers, _ or - only (no spaces), preserve extension
+        // Sanitize filename: letters, numbers, _ or - only (no spaces), strip extension for public_id
         const cleanBaseName = file.originalname.replace(/\.[^/.]+$/, "").replace(/[^\w.-]+/g, '_');
-        const extension = file.originalname.split('.').pop();
         const timestamp = Math.round(new Date().getTime() / 1000);
         
-        // Handle resource type
-        const isImage = file.mimetype.startsWith("image/");
-        const isVideo = file.mimetype.startsWith("video/");
-        const resourceType = isImage ? "image" : (isVideo ? "video" : "raw");
-
-        // Use extension in public_id ONLY for raw files to avoid double extension for images/videos
-        const customPublicId = resourceType === "raw" 
-            ? `${cleanBaseName}_${timestamp}.${extension}` 
-            : `${cleanBaseName}_${timestamp}`;
-
+        // Use 'auto' to let Cloudinary determine the best bucket (image, video, or raw)
+        // We use_filename and unique_filename to preserve the original metadata structure.
         const uploadOptions = {
             folder,
-            public_id: customPublicId,
-            resource_type: resourceType,
-            timestamp: timestamp
+            public_id: `${cleanBaseName}_${timestamp}`, // No extension here; Cloudinary appends it to URL
+            resource_type: "auto",
+            timestamp: timestamp,
+            use_filename: true,
+            unique_filename: true
         };
 
         const uploadStream = cloudinary.uploader.upload_stream(
