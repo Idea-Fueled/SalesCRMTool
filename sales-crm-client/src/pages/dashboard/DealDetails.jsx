@@ -471,7 +471,6 @@ export default function DealDetails() {
                                 </div>
                                 <div>
                                     <p className="text-sm font-black text-gray-900 leading-none">{deal.ownerId?.firstName} {deal.ownerId?.lastName || ""}</p>
-                                    <p className="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-tighter">Strategic Account Manager</p>
                                 </div>
                             </div>
                         </div>
