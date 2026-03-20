@@ -387,9 +387,9 @@ export default function Reports() {
                     <button 
                         onClick={handleExport}
                         disabled={data.length === 0 || exporting}
-                        className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-bold shadow-md shadow-red-100 hover:bg-red-700 hover:shadow-lg hover:-translate-y-0.5 transition-all active:scale-95 disabled:opacity-40 disabled:pointer-events-none group ml-auto md:ml-0"
+                        className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-bold shadow-md shadow-red-100 disabled:opacity-40 disabled:pointer-events-none ml-auto md:ml-0"
                     >
-                        <Download size={14} className={exporting ? "animate-bounce" : "group-hover:translate-y-0.5 transition-transform"} />
+                        <Download size={14} className={exporting ? "animate-bounce" : ""} />
                         {exporting ? "Generating..." : "Export PDF"}
                     </button>
                 </div>
