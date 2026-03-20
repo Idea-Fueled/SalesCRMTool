@@ -201,6 +201,10 @@ export default function DealDetails() {
 
         // Open PDFs directly in the browser's native viewer
         if (isPdf) {
+            // Force /raw/upload/ pattern for PDFs as requested
+            if (openingUrl.includes("/image/upload/")) {
+                openingUrl = openingUrl.replace("/image/upload/", "/raw/upload/");
+            }
             return openingUrl;
         }
 
