@@ -28,24 +28,29 @@ export const createCompany = async (req, res) => {
             });
         }
 
-        // Prevent duplicates: same name (case-insensitive) OR same email
+        // Prevent duplicates: same name (case-insensitive)
         const nameNormalized = name.trim().toLowerCase();
         const emailNormalized = email && email.trim() !== "" ? email.trim().toLowerCase() : null;
 
-        const duplicateQuery = [
-            { $expr: { $eq: [{ $toLower: "$name" }, nameNormalized] } }
-        ];
-        if (emailNormalized) {
-            duplicateQuery.push({ $expr: { $eq: [{ $toLower: "$email" }, emailNormalized] } });
-        }
-        const existingCompany = await Company.findOne({ $or: duplicateQuery });
-        if (existingCompany) {
-            const reason = existingCompany.name.toLowerCase() === nameNormalized
-                ? `name "${name.trim()}"`
-                : `email "${email.trim()}"`;
+        const sameNameCompany = await Company.findOne({
+            $expr: { $eq: [{ $toLower: "$name" }, nameNormalized] }
+        });
+        if (sameNameCompany) {
             return res.status(409).json({
-                message: `A company with the same ${reason} already exists.`
+                message: `A company named "${name.trim()}" already exists.`
             });
+        }
+
+        // Prevent duplicates: same email
+        if (emailNormalized) {
+            const sameEmailCompany = await Company.findOne({
+                $expr: { $eq: [{ $toLower: "$email" }, emailNormalized] }
+            });
+            if (sameEmailCompany) {
+                return res.status(409).json({
+                    message: `A company with the email "${email.trim()}" already exists.`
+                });
+            }
         }
 
         let companyData = {
