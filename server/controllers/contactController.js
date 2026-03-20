@@ -16,6 +16,14 @@ export const createContact = async (req, res, next) => {
             })
         }
 
+        // Prevent duplicate contacts with the same email address
+        const existingContact = await Contact.findOne({ email: { $regex: new RegExp(`^${email.trim()}$`, 'i') } });
+        if (existingContact) {
+            return res.status(409).json({
+                message: `A contact with the email "${email.trim()}" already exists.`
+            });
+        }
+
         const sanitizedCompanyId = companyId && companyId.trim() !== "" ? companyId : null;
         const sanitizedOwnerId = req.body.ownerId && req.body.ownerId.trim() !== "" ? req.body.ownerId : id;
 
