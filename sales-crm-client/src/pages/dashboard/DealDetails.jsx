@@ -199,13 +199,10 @@ export default function DealDetails() {
         // For PDFs as "image", this ensures they open inline
         let openingUrl = url.replace(/\/fl_attachment[^/]*\//, '/').replace(/\/f_pdf[^/]*\//, '/');
 
-        // Open PDFs directly in the browser's native viewer
+        // Open PDFs directly in the browser's native viewer via proxy
         if (isPdf) {
-            // Force /raw/upload/ pattern for PDFs as requested
-            if (openingUrl.includes("/image/upload/")) {
-                openingUrl = openingUrl.replace("/image/upload/", "/raw/upload/");
-            }
-            return openingUrl;
+            const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://sales-crm-tool-nu.vercel.app/api';
+            return `${apiBaseUrl}/files/view?url=${encodeURIComponent(openingUrl)}`;
         }
 
         // Use Google Docs Viewer for Office docs as browsers can't render them natively

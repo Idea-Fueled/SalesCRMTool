@@ -19,3 +19,25 @@ export const proxyDownload = async (req, res) => {
         res.status(500).json({ message: "Failed to proxy download" });
     }
 };
+
+export const proxyView = async (req, res) => {
+    try {
+        const { url } = req.query;
+        if (!url) return res.status(400).json({ message: "URL is required" });
+
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Failed to fetch from Cloudinary: ${response.statusText}`);
+
+        // Set headers for inline viewing
+        // Forcing application/pdf for PDFs helps browsers open them natively
+        const isPdf = url.toLowerCase().endsWith('.pdf');
+        res.setHeader('Content-Disposition', 'inline');
+        res.setHeader('Content-Type', isPdf ? 'application/pdf' : (response.headers.get('content-type') || 'application/octet-stream'));
+
+        // Streaming for performance
+        response.body.pipe(res);
+    } catch (error) {
+        console.error("Proxy View Error:", error);
+        res.status(500).json({ message: "Failed to proxy view" });
+    }
+};

@@ -1,9 +1,10 @@
 import express from "express";
-import { proxyDownload } from "../controllers/fileController.js";
+import { proxyDownload, proxyView } from "../controllers/fileController.js";
 
 const router = express.Router();
 
-// Publicly accessible download proxy (or you can add middleware to protect it)
+// Publicly accessible proxies
 router.get("/download", proxyDownload);
+router.get("/view", proxyView);
 
 export default router;

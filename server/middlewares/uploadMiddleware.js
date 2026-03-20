@@ -27,7 +27,7 @@ export const uploadToCloudinary = async (file, folder = "deals") => {
         const uploadOptions = {
             folder,
             public_id: `${cleanBaseName}_${timestamp}`, // No extension here; Cloudinary appends it to URL
-            resource_type: file.mimetype === "application/pdf" ? "raw" : "auto",
+            resource_type: "auto",
             timestamp: timestamp,
             use_filename: true,
             unique_filename: true
