@@ -8,9 +8,21 @@ import { emitNotification } from "../utils/socket.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../middlewares/uploadMiddleware.js";
 import { sendHierarchyNotification } from "../services/notificationService.js";
 
+const getProbabilityForStage = (stage) => {
+    const mapping = {
+        "Lead": 20,
+        "Qualified": 40,
+        "Proposal": 60,
+        "Negotiation": 80,
+        "Closed Won": 100,
+        "Closed Lost": 0
+    };
+    return mapping[stage] ?? 20; // Default to 20 if stage not found
+};
+
 export const createDeal = async (req, res, next) => {
     try {
-        const { name, companyId, contactId, companyName, contactName, value, currency, stage, expectedCloseDate, probability, source, notes } = req.body;
+        const { name, companyId, contactId, companyName, contactName, value, currency, stage, expectedCloseDate, source, notes } = req.body;
         const { id: userId, role } = req.user;
 
         // Require name, some company ref, some contact ref, value and date
@@ -21,13 +33,16 @@ export const createDeal = async (req, res, next) => {
         const sanitizedCompanyId = companyId && companyId.trim() !== "" ? companyId : null;
         const sanitizedContactId = contactId && contactId.trim() !== "" ? contactId : null;
         
+        const dealStage = stage || "Lead";
         let dealData = {
             name, value,
             currency: currency || "USD",
-            stage: stage || "Lead",
-            expectedCloseDate, probability, source, notes,
+            stage: dealStage,
+            expectedCloseDate, 
+            probability: getProbabilityForStage(dealStage), 
+            source, notes,
             ownerId: (role === "admin" || role === "sales_manager") && req.body.ownerId ? req.body.ownerId : userId,
-            stageHistory: [{ stage: stage || "Lead", changedBy: userId }],
+            stageHistory: [{ stage: dealStage, changedBy: userId }],
             attachments: []
         };
 
@@ -256,17 +271,22 @@ export const updateDealInformation = async (req, res, next) => {
                 stage: req.body.stage,
                 changedBy: userId
             });
-            if (req.body.stage === "Closed Won") deal.probability = 100;
-            if (req.body.stage === "Closed Lost") deal.probability = 0;
+            deal.probability = getProbabilityForStage(req.body.stage);
         }
 
         if (req.body.contactId && req.body.companyId) {
             const contact = await Contact.findById(req.body.contactId);
 
-            if (!contact || (contact.companyId && contact.companyId.toString() !== req.body.companyId)) {
-                return res.status(400).json({
-                    message: "Contact does not belong to this company!"
-                })
+            if (!contact || (contact.companies && !contact.companies.some(c => c.companyId.toString() === req.body.companyId))) {
+                // If the check above is too strict due to schema differences, we'll stick to a more flexible check
+                const isMember = contact.companyId?.toString() === req.body.companyId || 
+                                 (contact.companies && contact.companies.some(c => c.companyId?.toString() === req.body.companyId));
+                
+                if (!isMember) {
+                    return res.status(400).json({
+                        message: "Contact does not belong to this company!"
+                    })
+                }
             }
         }
 
@@ -287,7 +307,7 @@ export const updateDealInformation = async (req, res, next) => {
 
         const fields = [
             "name", "companyId", "contactId", "value", "currency",
-            "stage", "expectedCloseDate", "probability", "source", "notes", "ownerId"
+            "stage", "expectedCloseDate", "source", "notes", "ownerId"
         ];
 
         fields.forEach(field => {
@@ -489,6 +509,7 @@ export const moveDealStage = async (req, res, next) => {
 
         //update
         deal.stage = newStage;
+        deal.probability = getProbabilityForStage(newStage);
 
         deal.stageHistory.push({
             stage: newStage,
@@ -604,7 +625,7 @@ export const markDealResult = async (req, res, next) => {
         }
 
         deal.stage = result;
-        deal.probability = result === "Closed Won" ? 100 : 0
+        deal.probability = getProbabilityForStage(result);
 
         deal.stageHistory.push({
             stage: result,

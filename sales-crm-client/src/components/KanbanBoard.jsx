@@ -278,8 +278,18 @@ export default function KanbanBoard({ deals, onEdit, onDelete, onMove }) {
         const draggingDeal = localDeals.find(d => d._id === activeId);
         if (draggingDeal && newStage && draggingDeal.stage !== newStage && STAGES.includes(newStage)) {
             // Optimistic update
+            const probMapping = {
+                "Lead": 20,
+                "Qualified": 40,
+                "Proposal": 60,
+                "Negotiation": 80,
+                "Closed Won": 100,
+                "Closed Lost": 0
+            };
+            const newProb = probMapping[newStage] ?? draggingDeal.probability;
+
             setLocalDeals(prev => prev.map(d => 
-                d._id === activeId ? { ...d, stage: newStage } : d
+                d._id === activeId ? { ...d, stage: newStage, probability: newProb } : d
             ));
             
             // Call prop move

@@ -19,7 +19,7 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
         name: "", companyId: "", contactId: "",
         companyName: "", contactName: "",
         value: "", currency: "USD", stage: "Lead",
-        expectedCloseDate: "", probability: 10, source: "", notes: "", ownerId: "",
+        expectedCloseDate: "", source: "", notes: "", ownerId: "",
         files: []
     };
 
@@ -54,7 +54,6 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
                 stage: deal.stage || "Lead",
                 expectedCloseDate: deal.expectedCloseDate
                     ? new Date(deal.expectedCloseDate).toISOString().split("T")[0] : "",
-                probability: deal.probability || 10,
                 source: deal.source || "",
                 notes: deal.notes || "",
                 ownerId: deal.ownerId?._id || deal.ownerId || "",
@@ -95,7 +94,6 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
 
         if (!formData.value || Number(formData.value) <= 0) errs.value = "Enter a valid deal value greater than 0";
         if (!formData.expectedCloseDate) errs.expectedCloseDate = "Expected close date is required";
-        if (formData.probability < 0 || formData.probability > 100) errs.probability = "Probability must be between 0 and 100";
         return errs;
     };
 
@@ -280,16 +278,8 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
                     </div>
                 </div>
 
-                {/* Probability + Source */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                        <label className="text-xs font-semibold text-gray-500 uppercase">Probability (%)</label>
-                        <input type="number" min="0" max="100"
-                            className={inputClass("probability")}
-                            value={formData.probability}
-                            onChange={e => set("probability", e.target.value)} />
-                        {errors.probability && <p className="text-red-500 text-xs">{errors.probability}</p>}
-                    </div>
+                {/* Source + Notes (Full Width) */}
+                <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-1">
                         <label className="text-xs font-semibold text-gray-500 uppercase">Deal Source</label>
                         <select className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-400 bg-white"
