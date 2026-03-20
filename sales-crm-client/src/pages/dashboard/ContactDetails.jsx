@@ -295,23 +295,35 @@ export default function ContactDetails() {
                                 <Building2 size={12} className="text-red-400" />
                                 <div className="flex flex-wrap gap-1">
                                     {(contact.companies && contact.companies.length > 0)
-                                        ? contact.companies.map((comp, i) => (
-                                            <span key={i} className="flex items-center gap-0.5">
+                                        ? contact.companies.map((comp, i) => {
+                                            const cid = comp.companyId?._id
+                                                ? String(comp.companyId._id)
+                                                : comp.companyId ? String(comp.companyId) : null;
+                                            return (
+                                                <span key={i} className="flex items-center gap-0.5">
+                                                    <button
+                                                        onClick={() => cid && navigate(`${basePath}/companies/${cid}`)}
+                                                        className={`font-bold ${cid ? "hover:underline cursor-pointer" : "cursor-default"}`}
+                                                    >
+                                                        {comp.companyName}
+                                                    </button>
+                                                    {i < contact.companies.length - 1 && <span className="text-gray-300">,</span>}
+                                                </span>
+                                            );
+                                        })
+                                        : (() => {
+                                            const cid = contact.companyId?._id
+                                                ? String(contact.companyId._id)
+                                                : contact.companyId ? String(contact.companyId) : null;
+                                            return (
                                                 <button
-                                                    onClick={() => (comp.companyId?._id || comp.companyId) && navigate(`/dashboard/companies/${comp.companyId?._id || comp.companyId}`)}
-                                                    className="hover:underline font-bold"
+                                                    onClick={() => cid && navigate(`${basePath}/companies/${cid}`)}
+                                                    className={`font-bold ${cid ? "hover:underline cursor-pointer" : "cursor-default"}`}
                                                 >
-                                                    {comp.companyName}
+                                                    {contact.companyId?.name || contact.companyName || "No Company"}
                                                 </button>
-                                                {i < contact.companies.length - 1 && <span className="text-gray-300">,</span>}
-                                            </span>
-                                        ))
-                                        : <button
-                                            onClick={() => contact.companyId?._id && navigate(`/dashboard/companies/${contact.companyId._id}`)}
-                                            className="hover:underline font-bold"
-                                        >
-                                            {contact.companyId?.name || contact.companyName || "No Company"}
-                                        </button>}
+                                            );
+                                        })()}
                                 </div>
                             </div>
                         </div>
