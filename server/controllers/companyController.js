@@ -29,15 +29,18 @@ export const createCompany = async (req, res) => {
         }
 
         // Prevent duplicates: same name (case-insensitive) OR same email
+        const nameNormalized = name.trim().toLowerCase();
+        const emailNormalized = email && email.trim() !== "" ? email.trim().toLowerCase() : null;
+
         const duplicateQuery = [
-            { name: { $regex: new RegExp(`^${name.trim()}$`, 'i') } }
+            { $expr: { $eq: [{ $toLower: "$name" }, nameNormalized] } }
         ];
-        if (email && email.trim() !== "") {
-            duplicateQuery.push({ email: { $regex: new RegExp(`^${email.trim()}$`, 'i') } });
+        if (emailNormalized) {
+            duplicateQuery.push({ $expr: { $eq: [{ $toLower: "$email" }, emailNormalized] } });
         }
         const existingCompany = await Company.findOne({ $or: duplicateQuery });
         if (existingCompany) {
-            const reason = existingCompany.name.toLowerCase() === name.trim().toLowerCase()
+            const reason = existingCompany.name.toLowerCase() === nameNormalized
                 ? `name "${name.trim()}"`
                 : `email "${email.trim()}"`;
             return res.status(409).json({

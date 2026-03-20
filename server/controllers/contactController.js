@@ -17,7 +17,10 @@ export const createContact = async (req, res, next) => {
         }
 
         // Prevent duplicate contacts with the same email address
-        const existingContact = await Contact.findOne({ email: { $regex: new RegExp(`^${email.trim()}$`, 'i') } });
+        const emailNormalized = email.trim().toLowerCase();
+        const existingContact = await Contact.findOne({
+            $expr: { $eq: [{ $toLower: "$email" }, emailNormalized] }
+        });
         if (existingContact) {
             return res.status(409).json({
                 message: `A contact with the email "${email.trim()}" already exists.`
