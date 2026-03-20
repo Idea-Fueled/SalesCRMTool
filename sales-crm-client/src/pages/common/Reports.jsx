@@ -31,6 +31,14 @@ const TabButton = ({ active, label, icon: Icon, onClick }) => (
     </button>
 );
 
+// Returns date string in local timezone as YYYY-MM-DD (avoids UTC offset shifting the date)
+const localDateStr = (date) => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+};
+
 export default function Reports() {
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -45,8 +53,8 @@ export default function Reports() {
     const [searchQuery, setSearchQuery] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [dateRange, setDateRange] = useState({
-        start: searchParams.get("start") || new Date().toISOString().split('T')[0],
-        end: searchParams.get("end") || new Date().toISOString().split('T')[0]
+        start: searchParams.get("start") || localDateStr(new Date()),
+        end: searchParams.get("end") || localDateStr(new Date())
     });
     const [rangePreset, setRangePreset] = useState(searchParams.get("preset") || "today");
     const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -64,9 +72,13 @@ export default function Reports() {
 
         setLoading(true);
         try {
+            // Build start/end of day in UTC from local YYYY-MM-DD strings
+            // new Date("2026-03-20T00:00:00") → treated as local time by JS, correct!
+            const startLocal = new Date(`${dateRange.start}T00:00:00`);
+            const endLocal = new Date(`${dateRange.end}T23:59:59`);
             const params = {
-                createdAfter: dateRange.start,
-                createdBefore: new Date(new Date(dateRange.end).setHours(23, 59, 59, 999)).toISOString(),
+                createdAfter: startLocal.toISOString(),
+                createdBefore: endLocal.toISOString(),
                 limit: 1000,
                 name: debouncedSearch || undefined
             };
@@ -137,8 +149,8 @@ export default function Reports() {
             }
 
             setDateRange({
-                start: start.toISOString().split('T')[0],
-                end: end.toISOString().split('T')[0]
+                start: localDateStr(start),
+                end: localDateStr(end)
             });
         };
 
