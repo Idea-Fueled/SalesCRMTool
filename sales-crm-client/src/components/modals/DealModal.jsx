@@ -353,6 +353,7 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
                                 onChange={(e) => {
                                     const newFiles = Array.from(e.target.files);
                                     set("files", [...formData.files, ...newFiles]);
+                                    e.target.value = null;
                                 }}
                             />
                         </label>

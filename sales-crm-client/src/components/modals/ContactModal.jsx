@@ -218,6 +218,7 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
                                 onChange={(e) => {
                                     const newFiles = Array.from(e.target.files);
                                     set("files", [...formData.files, ...newFiles]);
+                                    e.target.value = null;
                                 }}
                             />
                         </label>

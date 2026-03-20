@@ -194,6 +194,7 @@ export default function CompanyModal({ isOpen, onClose, company, onSave, userRol
                                 onChange={(e) => {
                                     const newFiles = Array.from(e.target.files);
                                     set("files", [...formData.files, ...newFiles]);
+                                    e.target.value = null;
                                 }}
                             />
                         </label>
