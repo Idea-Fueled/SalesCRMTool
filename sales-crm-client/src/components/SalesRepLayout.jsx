@@ -14,10 +14,13 @@ import MyProfileModal from "./modals/MyProfileModal";
 const SidebarLink = ({ to, icon: IconComp, label, onClick }) => {
     const location = useLocation();
     
-    // Custom active logic: If "to" has query params, we want exact match on pathname + search
+    // Custom active logic: If "to" has query params, we want exact match on pathname and specific tab param
     const isLinkActive = (isActive) => {
         if (to.includes('?')) {
-            return location.pathname + location.search === to;
+            const [toPath, toQuery] = to.split('?');
+            const toParams = new URLSearchParams(toQuery);
+            const currentParams = new URLSearchParams(location.search);
+            return location.pathname === toPath && currentParams.get('tab') === toParams.get('tab');
         }
         return isActive;
     };
