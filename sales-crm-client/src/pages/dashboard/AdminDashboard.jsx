@@ -501,20 +501,20 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Deals Overview Widget */}
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between min-h-[400px]">
-                    <div className="flex items-center justify-between mb-6">
+                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col space-y-6">
+                    <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <div className="w-1 h-4 bg-indigo-500 rounded-full"></div>
                             <h2 className="text-lg font-bold text-gray-900">Deals Overview</h2>
                         </div>
                     </div>
 
-                    <div className="flex items-baseline gap-2 mb-8">
+                    <div className="flex items-baseline gap-2">
                         <span className="text-4xl font-black text-gray-900">{dealsOverview.total}</span>
                         <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Deals</span>
                     </div>
 
-                    <div className="space-y-4 mb-8">
+                    <div className="space-y-4">
                         <div className="flex items-center justify-between group cursor-pointer hover:bg-gray-50 p-2 -mx-2 rounded-xl transition-colors" onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: stats.dealList.filter(d => d.stage === 'Closed Won') })}>
                             <div className="flex items-center gap-3">
                                 <CheckCircle2 size={16} className="text-green-500 group-hover:scale-110 transition-transform" />
