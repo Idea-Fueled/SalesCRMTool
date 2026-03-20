@@ -184,12 +184,12 @@ export default function AuditLogs() {
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-gray-100 bg-gray-50/50">
-                                <th className="text-left px-5 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider">Timestamp</th>
-                                <th className="text-left px-5 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider">Performer</th>
-                                <th className="text-left px-5 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider">Action</th>
-                                <th className="text-left px-5 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider">Entity</th>
-                                <th className="text-left px-5 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider">Details</th>
-                                <th className="text-left px-5 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider">Recipient</th>
+                                <th className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider whitespace-nowrap">Timestamp</th>
+                                <th className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider">Performer</th>
+                                <th className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider">Action</th>
+                                <th className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider w-36">Entity</th>
+                                <th className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider">Details</th>
+                                <th className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider whitespace-nowrap">Recipient</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
@@ -200,7 +200,7 @@ export default function AuditLogs() {
                             ) : (
                                 logs.map((log) => (
                                     <tr key={log._id} className="hover:bg-gray-50/50 transition-colors">
-                                        <td className="px-5 py-4 whitespace-nowrap">
+                                        <td className="px-4 py-4 whitespace-nowrap">
                                             <p className="text-gray-800 font-medium">
                                                 {new Date(log.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
                                             </p>
@@ -208,24 +208,24 @@ export default function AuditLogs() {
                                                 {new Date(log.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
                                             </p>
                                         </td>
-                                        <td className="px-5 py-4 whitespace-nowrap">
+                                        <td className="px-4 py-4 whitespace-nowrap">
                                             {renderPerformer(log)}
                                         </td>
-                                        <td className="px-5 py-4 whitespace-nowrap">
+                                        <td className="px-4 py-4 whitespace-nowrap">
                                             <ActionBadge action={log.action} />
                                         </td>
-                                        <td className="px-5 py-4 whitespace-nowrap">
+                                        <td className="px-4 py-4 w-36 max-w-[160px]">
                                             <div className="flex items-center gap-2 text-gray-800">
                                                 <EntityIcon type={log.entityType} />
-                                                <span className="font-semibold text-xs">
+                                                <span className="font-semibold text-xs truncate">
                                                     {log.details?.entityName || log.entityId?.name ||
                                                         (log.entityId?.firstName ? `${log.entityId.firstName} ${log.entityId.lastName || ""}` :
                                                             `Deleted ${log.entityType}`)}
                                                 </span>
                                             </div>
-                                            <p className="text-[9px] font-mono text-gray-400 mt-0.5">{log.entityId?._id || log.entityId || "—"}</p>
+                                            <p className="text-[9px] font-mono text-gray-400 mt-0.5 truncate">{log.entityId?._id || log.entityId || "—"}</p>
                                         </td>
-                                        <td className="px-5 py-4 w-56 max-w-xs">
+                                        <td className="px-4 py-4 w-56 max-w-xs">
                                             <p
                                                 className="text-xs text-gray-600 font-medium leading-relaxed line-clamp-2"
                                                 title={formatLogMessage(log)}
@@ -233,7 +233,7 @@ export default function AuditLogs() {
                                                 {formatLogMessage(log)}
                                             </p>
                                         </td>
-                                        <td className="px-5 py-4 whitespace-nowrap">
+                                        <td className="px-4 py-4 whitespace-nowrap">
                                             {log.targetUserId ? (
                                                 <div className="flex items-center gap-2">
                                                     <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center text-[10px] font-bold text-white overflow-hidden border border-white shadow-sm">
