@@ -281,7 +281,7 @@ export default function ManagerDeals() {
                                                 onClick={() => navigate(`/manager/deals/${d._id}`)}>
                                                 {d.name}
                                             </td>
-                                            <td className="px-4 py-3 text-red-600 font-bold whitespace-nowrap">{d.ownerId?.firstName || "Unknown"}</td>
+                                            <td className="px-4 py-3 text-red-600 font-bold whitespace-nowrap">{d.ownerId ? `${d.ownerId.firstName} ${d.ownerId.lastName || ""}`.trim() : "Unknown"}</td>
                                             <td className="px-4 py-3 text-gray-500 whitespace-nowrap cursor-pointer hover:text-red-600 transition-colors"
                                                 onClick={() => {
                                                     if (d.companyId?._id || d.companyId) {
