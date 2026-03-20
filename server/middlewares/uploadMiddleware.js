@@ -18,15 +18,18 @@ export const uploadToCloudinary = async (file, folder = "deals") => {
     console.log("Config API Key:", cloudinary.config().api_key ? "Present" : "Missing");
     console.log("Config API Secret:", cloudinary.config().api_secret ? "Present" : "Missing");
     return new Promise((resolve, reject) => {
-        // Sanitize filename: letters, numbers, _ or - only (no spaces), strip extension for public_id
+        // Sanitize filename: letters, numbers, _ or - only (no spaces), strip extension for most files, but preserve for PDF for reliable metadata
+        const extension = file.originalname.split('.').pop();
         const cleanBaseName = file.originalname.replace(/\.[^/.]+$/, "").replace(/[^\w.-]+/g, '_');
         const timestamp = Math.round(new Date().getTime() / 1000);
         
         // Use 'auto' to let Cloudinary determine the best bucket (image, video, or raw)
-        // We use_filename and unique_filename to preserve the original metadata structure.
+        // For PDFs, we explicitly include the extension in the public_id to force correct MIME type detection.
+        const isPdf = file.mimetype === "application/pdf" || extension.toLowerCase() === 'pdf';
+        
         const uploadOptions = {
             folder,
-            public_id: `${cleanBaseName}_${timestamp}`, // No extension here; Cloudinary appends it to URL
+            public_id: isPdf ? `${cleanBaseName}_${timestamp}.${extension}` : `${cleanBaseName}_${timestamp}`,
             resource_type: "auto",
             timestamp: timestamp,
             use_filename: true,

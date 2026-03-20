@@ -30,7 +30,8 @@ export const proxyView = async (req, res) => {
 
         // Set headers for inline viewing
         // Forcing application/pdf for PDFs helps browsers open them natively
-        const isPdf = url.toLowerCase().endsWith('.pdf');
+        // We strip query params before checking extension to make it more robust
+        const isPdf = url.split('?')[0].toLowerCase().endsWith('.pdf');
         res.setHeader('Content-Disposition', 'inline');
         res.setHeader('Content-Type', isPdf ? 'application/pdf' : (response.headers.get('content-type') || 'application/octet-stream'));
 
