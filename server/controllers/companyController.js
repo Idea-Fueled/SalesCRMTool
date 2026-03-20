@@ -28,6 +28,23 @@ export const createCompany = async (req, res) => {
             });
         }
 
+        // Prevent duplicates: same name (case-insensitive) OR same email
+        const duplicateQuery = [
+            { name: { $regex: new RegExp(`^${name.trim()}$`, 'i') } }
+        ];
+        if (email && email.trim() !== "") {
+            duplicateQuery.push({ email: { $regex: new RegExp(`^${email.trim()}$`, 'i') } });
+        }
+        const existingCompany = await Company.findOne({ $or: duplicateQuery });
+        if (existingCompany) {
+            const reason = existingCompany.name.toLowerCase() === name.trim().toLowerCase()
+                ? `name "${name.trim()}"`
+                : `email "${email.trim()}"`;
+            return res.status(409).json({
+                message: `A company with the same ${reason} already exists.`
+            });
+        }
+
         let companyData = {
             name,
             industry,
