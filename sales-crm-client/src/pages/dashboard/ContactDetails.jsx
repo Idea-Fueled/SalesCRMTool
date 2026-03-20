@@ -332,7 +332,7 @@ export default function ContactDetails() {
                 <div className="flex flex-wrap items-center gap-3 no-print lg:border-l lg:border-gray-100 lg:pl-8">
                     {currentUser?.role === 'admin' && (
                         <button
-                            onClick={() => exportToPDF('exportable-contact-details', `${contact.firstName}_${contact.lastName}_Details.pdf`)}
+                            onClick={() => exportToPDF('contact', contact, `${contact.firstName}_${contact.lastName}_Details.pdf`)}
                             className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-gray-700 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl transition-all shadow-sm active:scale-[0.98]"
                         >
                             <Download size={16} className="text-gray-500" /> Export PDF
