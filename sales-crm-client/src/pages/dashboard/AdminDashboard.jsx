@@ -240,7 +240,7 @@ export default function AdminDashboard() {
                                 {activePickerView === "years" ? (
                                     <div className="space-y-3">
                                         <div className={`grid grid-cols-2 gap-2 pr-1 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent ${showMoreYears ? 'max-h-48 overflow-y-auto' : ''}`}>
-                                            {Array.from({ length: (showMoreYears ? (new Date().getFullYear() - 2020 + 1) : 2) }, (_, i) => (showMoreYears ? 2020 + i : new Date().getFullYear() - 1 + i)).reverse().map(year => (
+                                            {Array.from({ length: (showMoreYears ? (new Date().getFullYear() - 2020 + 1) : 1) }, (_, i) => (showMoreYears ? 2020 + i : new Date().getFullYear())).reverse().map(year => (
                                                 <button
                                                     key={year}
                                                     onClick={() => { setPickerYear(year); setActivePickerView("months"); }}
