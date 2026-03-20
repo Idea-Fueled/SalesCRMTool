@@ -225,8 +225,11 @@ export default function AuditLogs() {
                                             </div>
                                             <p className="text-[9px] font-mono text-gray-400 mt-0.5">{log.entityId?._id || log.entityId || "—"}</p>
                                         </td>
-                                        <td className="px-5 py-4 max-w-xs">
-                                            <p className="text-xs text-gray-600 font-medium leading-relaxed">
+                                        <td className="px-5 py-4 w-56 max-w-xs">
+                                            <p
+                                                className="text-xs text-gray-600 font-medium leading-relaxed line-clamp-2"
+                                                title={formatLogMessage(log)}
+                                            >
                                                 {formatLogMessage(log)}
                                             </p>
                                         </td>
