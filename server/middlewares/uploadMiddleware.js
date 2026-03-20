@@ -17,23 +17,26 @@ export const uploadToCloudinary = async (file, folder = "deals") => {
     console.log("Config Cloud Name:", cloudinary.config().cloud_name);
     console.log("Config API Key:", cloudinary.config().api_key ? "Present" : "Missing");
     console.log("Config API Secret:", cloudinary.config().api_secret ? "Present" : "Missing");
-
     return new Promise((resolve, reject) => {
-        const isImage = file.mimetype.startsWith("image/");
-        const isPdf = file.mimetype === "application/pdf" || file.originalname.toLowerCase().endsWith(".pdf");
-        
         // Sanitize filename: letters, numbers, _ or - only (no spaces), preserve extension
         const cleanBaseName = file.originalname.replace(/\.[^/.]+$/, "").replace(/[^\w.-]+/g, '_');
         const extension = file.originalname.split('.').pop();
         const timestamp = Math.round(new Date().getTime() / 1000);
         
-        // As requested: public_id includes the extension for raw files
-        const customPublicId = `${cleanBaseName}_${timestamp}.${extension}`;
+        // Handle resource type
+        const isImage = file.mimetype.startsWith("image/");
+        const isVideo = file.mimetype.startsWith("video/");
+        const resourceType = isImage ? "image" : (isVideo ? "video" : "raw");
+
+        // Use extension in public_id ONLY for raw files to avoid double extension for images/videos
+        const customPublicId = resourceType === "raw" 
+            ? `${cleanBaseName}_${timestamp}.${extension}` 
+            : `${cleanBaseName}_${timestamp}`;
 
         const uploadOptions = {
             folder,
             public_id: customPublicId,
-            resource_type: (isImage || isPdf) ? "image" : "raw", // PDFs as image for viewing/transform support
+            resource_type: resourceType,
             timestamp: timestamp
         };
 
