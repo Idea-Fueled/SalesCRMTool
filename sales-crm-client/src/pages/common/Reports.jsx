@@ -227,46 +227,137 @@ export default function Reports() {
     const COLORS = ['#ef4444', '#f97316', '#3b82f6', '#10b981', '#6366f1', '#8b5cf6', '#ec4899', '#94a3b8'];
 
     const handleExport = async () => {
-        if (!tableRef.current || data.length === 0) return;
-        
+        if (data.length === 0) return;
+
         setExporting(true);
         const toastId = toast.loading(`Generating ${activeTab} report...`);
-        
+
         try {
-            // Hide scrollbars temporarily
-            const originalOverflow = tableRef.current.style.overflow;
-            tableRef.current.style.overflow = 'visible';
-
-            const dataUrl = await toPng(tableRef.current, { backgroundColor: '#ffffff', quality: 1.0 });
-
-            // Restore overflow
-            tableRef.current.style.overflow = originalOverflow;
-
             const pdf = new jsPDF('p', 'mm', 'a4');
-            const imgProps = pdf.getImageProperties(dataUrl);
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-            
-            pdf.setFontSize(18);
-            pdf.setTextColor(239, 68, 68); // Red-500
-            pdf.text(`${activeTab.toUpperCase()} PERFORMANCE REPORT`, 15, 20);
-            
-            pdf.setFontSize(10);
-            pdf.setTextColor(107, 114, 128); // Gray-500
-            pdf.text(`Period: ${dateRange.start} to ${dateRange.end}`, 15, 28);
-            pdf.text(`Generated on: ${new Date().toLocaleString()}`, 15, 33);
-            
-            pdf.addImage(dataUrl, 'PNG', 10, 40, pdfWidth - 20, pdfHeight - 20);
-            pdf.save(`CRM_${activeTab}_Report_${new Date().toISOString().split('T')[0]}.pdf`);
-            
-            toast.success("Report downloaded successfully", { id: toastId });
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const margin = 15;
+            let y = 20;
+
+            // ── Title ──────────────────────────────────────────────
+            pdf.setFontSize(22);
+            pdf.setFont('helvetica', 'bold');
+            pdf.setTextColor(239, 68, 68);
+            pdf.text(`${activeTab.toUpperCase()} PERFORMANCE REPORT`, margin, y);
+            y += 8;
+
+            pdf.setFontSize(9);
+            pdf.setFont('helvetica', 'normal');
+            pdf.setTextColor(107, 114, 128);
+            pdf.text(`Period: ${dateRange.start} to ${dateRange.end}`, margin, y);
+            y += 5;
+            pdf.text(`Generated on: ${new Date().toLocaleString()}`, margin, y);
+            y += 10;
+
+            // ── Horizontal rule ────────────────────────────────────
+            pdf.setDrawColor(229, 231, 235);
+            pdf.setLineWidth(0.4);
+            pdf.line(margin, y, pageWidth - margin, y);
+            y += 8;
+
+            // ── Column definitions per tab ─────────────────────────
+            let columns = [];
+            if (activeTab === 'deals') {
+                columns = [
+                    { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString(), w: 35 },
+                    { header: 'Deal Name',     key: d => d.name || '—',                              w: 55 },
+                    { header: 'Value',         key: d => d.value ? `$${Number(d.value).toLocaleString()}` : '—', w: 30 },
+                    { header: 'Owner',         key: d => d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : (d.ownerName || '—'), w: 40 },
+                    { header: 'Status',        key: d => d.stage || '—',                             w: 31 },
+                ];
+            } else if (activeTab === 'companies') {
+                columns = [
+                    { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString(), w: 35 },
+                    { header: 'Company Name',  key: d => d.name || '—',                              w: 60 },
+                    { header: 'Industry',      key: d => d.industry || '—',                          w: 40 },
+                    { header: 'Status',        key: d => d.status || '—',                            w: 30 },
+                    { header: 'Owner',         key: d => d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : '—', w: 26 },
+                ];
+            } else {
+                columns = [
+                    { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString(), w: 35 },
+                    { header: 'Name',          key: d => `${d.firstName || ''} ${d.lastName || ''}`.trim() || '—', w: 50 },
+                    { header: 'Email',         key: d => d.email || '—',                             w: 60 },
+                    { header: 'Phone',         key: d => d.phone || d.mobile || '—',                 w: 46 },
+                ];
+            }
+
+            // ── Table header row ───────────────────────────────────
+            pdf.setFillColor(254, 249, 235);
+            pdf.rect(margin, y, pageWidth - margin * 2, 9, 'F');
+
+            pdf.setFontSize(8);
+            pdf.setFont('helvetica', 'bold');
+            pdf.setTextColor(100, 100, 100);
+            let x = margin + 2;
+            columns.forEach(col => {
+                pdf.text(col.header.toUpperCase(), x, y + 6);
+                x += col.w;
+            });
+            y += 9;
+
+            pdf.setDrawColor(229, 231, 235);
+            pdf.setLineWidth(0.3);
+            pdf.line(margin, y, pageWidth - margin, y);
+
+            // ── Table rows ─────────────────────────────────────────
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(9);
+
+            data.forEach((item, idx) => {
+                if (y > pageHeight - 25) {
+                    pdf.addPage();
+                    y = 20;
+                }
+
+                // Alternating row background
+                if (idx % 2 === 0) {
+                    pdf.setFillColor(249, 250, 251);
+                    pdf.rect(margin, y, pageWidth - margin * 2, 8, 'F');
+                }
+
+                x = margin + 2;
+                columns.forEach(col => {
+                    const cellText = String(col.key(item) ?? '—');
+                    pdf.setTextColor(55, 65, 81);
+                    // Truncate long text to fit column
+                    const maxChars = Math.floor(col.w / 2.2);
+                    const displayText = cellText.length > maxChars ? cellText.slice(0, maxChars - 1) + '…' : cellText;
+                    pdf.text(displayText, x, y + 5.5);
+                    x += col.w;
+                });
+                y += 8;
+
+                // Row separator
+                pdf.setDrawColor(243, 244, 246);
+                pdf.line(margin, y, pageWidth - margin, y);
+            });
+
+            // ── Footer ─────────────────────────────────────────────
+            const totalPages = pdf.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                pdf.setPage(i);
+                pdf.setFontSize(8);
+                pdf.setTextColor(156, 163, 175);
+                pdf.text(`mbdConsulting CRM  •  Page ${i} of ${totalPages}`, margin, pageHeight - 8);
+                pdf.text(`Total: ${data.length} record${data.length !== 1 ? 's' : ''}`, pageWidth - margin - 30, pageHeight - 8);
+            }
+
+            pdf.save(`CRM_${activeTab}_Report_${dateRange.start}_to_${dateRange.end}.pdf`);
+            toast.success('Report downloaded successfully', { id: toastId });
         } catch (error) {
             console.error(error);
-            toast.error("Failed to generate PDF", { id: toastId });
+            toast.error('Failed to generate PDF', { id: toastId });
         } finally {
             setExporting(false);
         }
     };
+
 
     return (
         <div className="p-4 sm:p-6 max-w-screen-xl mx-auto space-y-6">
