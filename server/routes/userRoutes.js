@@ -35,6 +35,7 @@ router.post("/resend-verification", (req, res, next) => {
 router.post("/:id/resend-invitation", protect, resendInvitation)
 router.get("/admin-test", protect, requireRole("admin"), adminTest)
 router.get("/team", protect, getTeamUsers)
+router.get("/trash", protect, requireRole("admin"), getDeletedUsers)
 router.get("/:id", protect, getUserById)
 router.put("/:id", protect, updateUser)
 router.patch("/:id/deactivate", protect, deactivateUser)
@@ -43,7 +44,6 @@ router.patch("/:id/change-password", protect, changePassword)
 router.patch("/:id/admin-reset-password", protect, requireRole("admin"), adminResetPassword)
 router.patch("/:id/reassign", protect, bulkReassignRecords)
 router.patch("/:id/soft-delete", protect, requireRole("admin"), softDeleteUser)
-router.get("/trash", protect, requireRole("admin"), getDeletedUsers)
 router.patch("/:id/restore", protect, requireRole("admin"), restoreUser)
 
 
