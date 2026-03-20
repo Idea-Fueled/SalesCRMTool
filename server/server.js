@@ -10,6 +10,7 @@ import contactRoutes from "./routes/contactRoutes.js"
 import dealRoutes from "./routes/dealRoutes.js"
 import auditLogRoutes from "./routes/auditLogRoutes.js"
 import notificationRoutes from "./routes/notificationRoutes.js"
+import fileRoutes from "./routes/fileRoutes.js"
 // console.log("MONGO_URI:", process.env.MONGO_URI);
 
 import http from "http";
@@ -70,6 +71,7 @@ app.use("/api/contacts", contactRoutes);
 app.use("/api/deals", dealRoutes);
 app.use("/api/audit-logs", auditLogRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/files", fileRoutes);
 
 // Catch-all route for debugging 404s
 app.use((req, res) => {
