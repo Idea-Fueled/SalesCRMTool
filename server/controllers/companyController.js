@@ -126,6 +126,7 @@ export const getCompanies = async (req, res) => {
         const { _id: id, role } = req.user;
         const { name, industry, size, status, createdAfter, createdBefore, page = 1, limit = 10, sort = "-createdAt" } = req.query;
 
+        let teamIds = []; // declared at outer scope for use in dealCount filter below
         let filter = { isDeleted: { $ne: true } };
         if (name) {
             filter.name = { $regex: name, $options: "i" };
@@ -151,7 +152,7 @@ export const getCompanies = async (req, res) => {
                 $or: [{ _id: id }, { managerId: id }]
             }).select("_id");
 
-            const teamIds = teamUsers.map(u => u._id);
+            teamIds = teamUsers.map(u => u._id); // assign to outer-scope variable
             
             // Get companies linked to team's deals
             const { Deal } = await import("../models/dealSchema.js");
