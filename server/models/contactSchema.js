@@ -30,8 +30,21 @@ const contactSchema = new mongoose.Schema({
     companyName: {
         type: String,
         trim: true,
-        required: true
+        required: false
     },
+    // Multi-company support
+    companies: [
+        {
+            companyId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Company"
+            },
+            companyName: {
+                type: String,
+                trim: true
+            }
+        }
+    ],
     ownerId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",

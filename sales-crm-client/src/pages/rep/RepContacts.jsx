@@ -199,7 +199,9 @@ export default function RepContacts() {
                                             <td className="px-4 py-3 text-gray-600 whitespace-nowrap">{c.jobTitle || "—"}</td>
                                             <td className="px-4 py-3 whitespace-nowrap">
                                                 <span className="text-xs px-2.5 py-1 rounded-full bg-red-50 text-red-700 font-medium border border-red-100">
-                                                    {c.companyId?.name || c.companyName || "—"}
+                                                    {(c.companies && c.companies.length > 0)
+                                                        ? c.companies.map(comp => comp.companyName).join(", ")
+                                                        : (c.companyId?.name || c.companyName || "—")}
                                                 </span>
                                             </td>
                                             <td className="px-4 py-3 whitespace-nowrap">

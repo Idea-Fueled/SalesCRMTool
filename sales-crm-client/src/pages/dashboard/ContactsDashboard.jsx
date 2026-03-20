@@ -228,12 +228,23 @@ export default function ContactsDashboard() {
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td className="px-4 py-3 text-gray-500 font-medium whitespace-nowrap">
-                                                        {c.companyId?._id ? (
-                                                            <button onClick={() => navigate(`/dashboard/companies/${c.companyId._id}`)} className="hover:text-red-600 hover:underline">
-                                                                {c.companyId.name}
-                                                            </button>
-                                                        ) : (c.companyName || "—")}
+                                                    <td className="px-4 py-3 text-gray-500 font-medium">
+                                                        {(c.companies && c.companies.length > 0)
+                                                            ? c.companies.map((comp, i) => (
+                                                                <span key={i}>
+                                                                    {comp.companyId ? (
+                                                                        <button onClick={() => navigate(`/dashboard/companies/${comp.companyId?._id || comp.companyId}`)} className="hover:text-red-600 hover:underline whitespace-nowrap">
+                                                                            {comp.companyName}
+                                                                        </button>
+                                                                    ) : <span className="whitespace-nowrap">{comp.companyName}</span>}
+                                                                    {i < c.companies.length - 1 && <span className="text-gray-300 mx-1">,</span>}
+                                                                </span>
+                                                            ))
+                                                            : c.companyId?._id ? (
+                                                                <button onClick={() => navigate(`/dashboard/companies/${c.companyId._id}`)} className="hover:text-red-600 hover:underline whitespace-nowrap">
+                                                                    {c.companyId.name}
+                                                                </button>
+                                                            ) : (c.companyName || "—")}
                                                     </td>
                                                     <td className="px-4 py-3 whitespace-nowrap">
                                                         <button 

@@ -10,7 +10,24 @@ export const createContact = async (req, res, next) => {
         const { firstName, lastName, email, jobTitle, companyId, companyName, phone, mobile, linkedin, notes } = req.body
         const { id, role } = req.user;
 
-        if (!firstName || !lastName || !email || !jobTitle || (!companyId && !companyName)) {
+        // Parse companies array (multi-company support)
+        let parsedCompanies = [];
+        if (req.body.companies) {
+            try {
+                parsedCompanies = typeof req.body.companies === 'string'
+                    ? JSON.parse(req.body.companies)
+                    : req.body.companies;
+            } catch (e) {
+                parsedCompanies = [];
+            }
+        }
+
+        // Derive primary company from first entry in companies array (or legacy fields)
+        const primaryCompany = parsedCompanies[0] || null;
+        const primaryCompanyId = primaryCompany?.companyId || companyId || null;
+        const primaryCompanyName = primaryCompany?.companyName || companyName || "";
+
+        if (!firstName || !lastName || !email || !jobTitle || (parsedCompanies.length === 0 && !companyId && !companyName)) {
             return res.status(400).json({
                 message: "All required fields must be filled!"
             })
@@ -27,7 +44,7 @@ export const createContact = async (req, res, next) => {
             });
         }
 
-        const sanitizedCompanyId = companyId && companyId.trim() !== "" ? companyId : null;
+        const sanitizedCompanyId = primaryCompanyId && String(primaryCompanyId).trim() !== "" ? primaryCompanyId : null;
         const sanitizedOwnerId = req.body.ownerId && req.body.ownerId.trim() !== "" ? req.body.ownerId : id;
 
         if (sanitizedCompanyId) {
@@ -67,7 +84,8 @@ export const createContact = async (req, res, next) => {
             email,
             jobTitle,
             companyId: sanitizedCompanyId,
-            companyName,
+            companyName: primaryCompanyName,
+            companies: parsedCompanies,
             ownerId: (role === "admin" || role === "sales_manager") ? sanitizedOwnerId : id,
             phone,
             mobile,
@@ -274,6 +292,21 @@ export const updateContact = async (req, res, next) => {
                     return res.status(403).json({ message: "You can only reassign contacts within your team!" });
                 }
             }
+        }
+
+        // Handle companies array update
+        if (req.body.companies !== undefined) {
+            try {
+                const updatedCompanies = typeof req.body.companies === 'string'
+                    ? JSON.parse(req.body.companies)
+                    : req.body.companies;
+                contact.companies = updatedCompanies;
+                // Keep legacy fields in sync
+                if (updatedCompanies.length > 0) {
+                    contact.companyId = updatedCompanies[0].companyId || null;
+                    contact.companyName = updatedCompanies[0].companyName || "";
+                }
+            } catch (e) { /* ignore parse errors */ }
         }
 
         const fields = [

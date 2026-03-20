@@ -1,30 +1,37 @@
-import React, { useState, useEffect } from "react";
-import { Paperclip, X } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { Paperclip, X, Building2, ChevronDown, Check } from "lucide-react";
 import Modal from "./Modal";
 
 export default function ContactModal({ isOpen, onClose, contact, onSave, companies = [], userRole, potentialOwners = [] }) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^[+\d\s\-()]{7,15}$/;
+    const dropdownRef = useRef(null);
 
     const [formData, setFormData] = useState({
         firstName: "", lastName: "", email: "", jobTitle: "",
-        companyId: "", companyName: "", phone: "", mobile: "", linkedin: "", notes: "", ownerId: "",
+        selectedCompanies: [], // [{companyId, companyName}]
+        phone: "", mobile: "", linkedin: "", notes: "", ownerId: "",
         files: []
     });
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
-    const [showCompanySuggest, setShowCompanySuggest] = useState(false);
+    const [companyDropdownOpen, setCompanyDropdownOpen] = useState(false);
+    const [companySearch, setCompanySearch] = useState("");
 
     useEffect(() => {
         if (contact) {
-            const rawCompanyId = contact.companyId?._id || contact.companyId || "";
-            const companyIdStr = typeof rawCompanyId === 'string' ? rawCompanyId : (rawCompanyId?._id || rawCompanyId?.toString() || "");
-            
-            // Try to find company name in companies list if not directly on contact
-            let companyName = contact.companyName || contact.companyId?.name || "";
-            if (!companyName && companyIdStr && companies.length > 0) {
-                const found = companies.find(c => (c._id || c.id) === companyIdStr);
-                if (found) companyName = found.name;
+            // Build selectedCompanies from the contact's companies array or legacy fields
+            let selectedCompanies = [];
+            if (contact.companies && contact.companies.length > 0) {
+                selectedCompanies = contact.companies.map(c => ({
+                    companyId: c.companyId?._id || c.companyId || "",
+                    companyName: c.companyName || c.companyId?.name || ""
+                }));
+            } else if (contact.companyId || contact.companyName) {
+                selectedCompanies = [{
+                    companyId: contact.companyId?._id || contact.companyId || "",
+                    companyName: contact.companyName || contact.companyId?.name || ""
+                }];
             }
 
             setFormData({
@@ -32,8 +39,7 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
                 lastName: contact.lastName || "",
                 email: contact.email || "",
                 jobTitle: contact.jobTitle || "",
-                companyId: companyIdStr,
-                companyName: companyName,
+                selectedCompanies,
                 phone: contact.phone || "",
                 mobile: contact.mobile || "",
                 linkedin: contact.linkedin || "",
@@ -42,15 +48,47 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
                 files: []
             });
         } else {
-            setFormData({ firstName: "", lastName: "", email: "", jobTitle: "", companyId: "", companyName: "", phone: "", mobile: "", linkedin: "", notes: "", ownerId: "", files: [] });
+            setFormData({ firstName: "", lastName: "", email: "", jobTitle: "", selectedCompanies: [], phone: "", mobile: "", linkedin: "", notes: "", ownerId: "", files: [] });
         }
         setErrors({});
+        setCompanySearch("");
+        setCompanyDropdownOpen(false);
     }, [contact, isOpen, companies]);
+
+    // Close dropdown on outside click
+    useEffect(() => {
+        const handleClick = (e) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+                setCompanyDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClick);
+        return () => document.removeEventListener("mousedown", handleClick);
+    }, []);
 
     const set = (field, value) => {
         setFormData(prev => ({ ...prev, [field]: value }));
         if (errors[field]) setErrors(prev => ({ ...prev, [field]: "" }));
     };
+
+    const toggleCompany = (comp) => {
+        const id = comp._id || comp.id;
+        const already = formData.selectedCompanies.find(c => c.companyId === id);
+        if (already) {
+            set("selectedCompanies", formData.selectedCompanies.filter(c => c.companyId !== id));
+        } else {
+            set("selectedCompanies", [...formData.selectedCompanies, { companyId: id, companyName: comp.name }]);
+        }
+        if (errors.selectedCompanies) setErrors(prev => ({ ...prev, selectedCompanies: "" }));
+    };
+
+    const removeCompany = (companyId) => {
+        set("selectedCompanies", formData.selectedCompanies.filter(c => c.companyId !== companyId));
+    };
+
+    const filteredCompanies = companies.filter(c =>
+        c.name.toLowerCase().includes(companySearch.toLowerCase())
+    );
 
     const validate = () => {
         const errs = {};
@@ -61,7 +99,7 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
         if (!formData.email.trim()) errs.email = "Email is required";
         else if (!emailRegex.test(formData.email.trim())) errs.email = "Enter a valid email address";
         if (!formData.jobTitle.trim()) errs.jobTitle = "Job title is required";
-        if (!formData.companyName.trim()) errs.companyName = "Company name is required";
+        if (formData.selectedCompanies.length === 0) errs.selectedCompanies = "At least one company is required";
         if (formData.phone && !phoneRegex.test(formData.phone)) errs.phone = "Enter a valid phone number";
         if (formData.mobile && !phoneRegex.test(formData.mobile)) errs.mobile = "Enter a valid mobile number";
         if (formData.linkedin && !formData.linkedin.includes("linkedin.com")) errs.linkedin = "Enter a valid LinkedIn URL";
@@ -75,13 +113,21 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
         setLoading(true);
         try {
             const dataToSave = new FormData();
-            Object.keys(formData).forEach(key => {
-                if (key === 'files') {
-                    formData.files.forEach(file => dataToSave.append('files', file));
-                } else if (formData[key] !== null && formData[key] !== "") {
+            // Append standard fields
+            ["firstName", "lastName", "email", "jobTitle", "phone", "mobile", "linkedin", "notes", "ownerId"].forEach(key => {
+                if (formData[key] !== null && formData[key] !== "") {
                     dataToSave.append(key, formData[key]);
                 }
             });
+            // Append companies as JSON
+            dataToSave.append("companies", JSON.stringify(formData.selectedCompanies));
+            // For backward compat: also send primary company
+            if (formData.selectedCompanies.length > 0) {
+                dataToSave.append("companyId", formData.selectedCompanies[0].companyId || "");
+                dataToSave.append("companyName", formData.selectedCompanies[0].companyName || "");
+            }
+            // Files
+            formData.files.forEach(file => dataToSave.append("files", file));
             await onSave(dataToSave);
             onClose();
         } catch (error) {
@@ -123,43 +169,80 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
                     {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                        <label className="text-xs font-semibold text-gray-500 uppercase">Job Title *</label>
-                        <input type="text" className={inputClass("jobTitle")} value={formData.jobTitle}
-                            onChange={e => set("jobTitle", e.target.value)} placeholder="Sales Director" />
-                        {errors.jobTitle && <p className="text-red-500 text-xs">{errors.jobTitle}</p>}
-                    </div>
-                    <div className="space-y-1 relative">
-                        <label className="text-xs font-semibold text-gray-500 uppercase">Company *</label>
-                        {contact ? (
-                            <input
-                                type="text"
-                                className={inputClass("companyName") + " bg-gray-100 cursor-not-allowed text-gray-500 font-medium"}
-                                value={formData.companyName || "No Company"}
-                                disabled
-                            />
-                        ) : (
-                            <select
-                                className={inputClass("companyName")}
-                                value={formData.companyId}
-                                onChange={e => {
-                                    const selectedId = e.target.value;
-                                    const comp = companies.find(c => (c._id || c.id) === selectedId);
-                                    set("companyId", selectedId);
-                                    set("companyName", comp?.name || "");
-                                }}
-                            >
-                                <option value="">— Select Company —</option>
-                                {companies.map(comp => (
-                                    <option key={comp._id || comp.id} value={comp._id || comp.id}>
-                                        {comp.name}
-                                    </option>
-                                ))}
-                            </select>
-                        )}
-                        {errors.companyName && <p className="text-red-500 text-xs">{errors.companyName}</p>}
-                    </div>
+                <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-500 uppercase">Job Title *</label>
+                    <input type="text" className={inputClass("jobTitle")} value={formData.jobTitle}
+                        onChange={e => set("jobTitle", e.target.value)} placeholder="Sales Director" />
+                    {errors.jobTitle && <p className="text-red-500 text-xs">{errors.jobTitle}</p>}
+                </div>
+
+                {/* Multi-Company Picker */}
+                <div className="space-y-1" ref={dropdownRef}>
+                    <label className="text-xs font-semibold text-gray-500 uppercase flex items-center gap-1.5">
+                        <Building2 size={12} className="text-gray-400" /> Companies *
+                    </label>
+
+                    {/* Selected company tags */}
+                    {formData.selectedCompanies.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mb-1.5">
+                            {formData.selectedCompanies.map((c) => (
+                                <span key={c.companyId} className="inline-flex items-center gap-1 bg-red-50 text-red-700 border border-red-200 text-[11px] font-semibold px-2 py-0.5 rounded-full">
+                                    {c.companyName}
+                                    <button type="button" onClick={() => removeCompany(c.companyId)} className="hover:text-red-900 transition">
+                                        <X size={10} />
+                                    </button>
+                                </span>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Dropdown trigger */}
+                    <button
+                        type="button"
+                        onClick={() => setCompanyDropdownOpen(prev => !prev)}
+                        className={`w-full flex items-center justify-between px-3 py-2 text-sm border rounded-lg transition bg-white ${errors.selectedCompanies ? "border-red-400 focus:ring-red-200" : "border-gray-200 hover:border-gray-300"}`}
+                    >
+                        <span className="text-gray-400 text-sm">
+                            {formData.selectedCompanies.length === 0 ? "— Select Companies —" : `${formData.selectedCompanies.length} selected`}
+                        </span>
+                        <ChevronDown size={14} className={`text-gray-400 transition-transform ${companyDropdownOpen ? "rotate-180" : ""}`} />
+                    </button>
+
+                    {/* Dropdown list */}
+                    {companyDropdownOpen && (
+                        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden max-h-48 flex flex-col" style={{ minWidth: 200 }}>
+                            <div className="p-2 border-b border-gray-100">
+                                <input
+                                    type="text"
+                                    placeholder="Search companies..."
+                                    value={companySearch}
+                                    onChange={e => setCompanySearch(e.target.value)}
+                                    className="w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-red-300"
+                                    onClick={e => e.stopPropagation()}
+                                />
+                            </div>
+                            <div className="overflow-y-auto flex-1">
+                                {filteredCompanies.length === 0 ? (
+                                    <p className="text-center text-gray-400 text-xs py-4">No companies found</p>
+                                ) : filteredCompanies.map(comp => {
+                                    const cid = comp._id || comp.id;
+                                    const isSelected = formData.selectedCompanies.some(c => c.companyId === cid);
+                                    return (
+                                        <button
+                                            key={cid}
+                                            type="button"
+                                            onClick={() => toggleCompany(comp)}
+                                            className={`w-full flex items-center justify-between px-3 py-2 text-xs font-medium transition-colors hover:bg-gray-50 ${isSelected ? "text-red-600 bg-red-50" : "text-gray-700"}`}
+                                        >
+                                            <span>{comp.name}</span>
+                                            {isSelected && <Check size={12} className="text-red-500 flex-shrink-0" />}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
+                    {errors.selectedCompanies && <p className="text-red-500 text-xs">{errors.selectedCompanies}</p>}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -224,8 +307,6 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
                         </label>
                     </div>
                 </div>
-
-
 
                 <div className="flex gap-3 pt-2">
                     <button type="button" onClick={onClose}

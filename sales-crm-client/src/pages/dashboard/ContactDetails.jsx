@@ -293,12 +293,26 @@ export default function ContactDetails() {
                             </div>
                             <div className="flex items-center gap-2 text-xs text-red-500">
                                 <Building2 size={12} className="text-red-400" />
-                                <button
-                                    onClick={() => contact.companyId?._id && navigate(`/dashboard/companies/${contact.companyId._id}`)}
-                                    className="hover:underline font-bold"
-                                >
-                                    {contact.companyId?.name || contact.companyName || "No Company"}
-                                </button>
+                                <div className="flex flex-wrap gap-1">
+                                    {(contact.companies && contact.companies.length > 0)
+                                        ? contact.companies.map((comp, i) => (
+                                            <span key={i} className="flex items-center gap-0.5">
+                                                <button
+                                                    onClick={() => (comp.companyId?._id || comp.companyId) && navigate(`/dashboard/companies/${comp.companyId?._id || comp.companyId}`)}
+                                                    className="hover:underline font-bold"
+                                                >
+                                                    {comp.companyName}
+                                                </button>
+                                                {i < contact.companies.length - 1 && <span className="text-gray-300">,</span>}
+                                            </span>
+                                        ))
+                                        : <button
+                                            onClick={() => contact.companyId?._id && navigate(`/dashboard/companies/${contact.companyId._id}`)}
+                                            className="hover:underline font-bold"
+                                        >
+                                            {contact.companyId?.name || contact.companyName || "No Company"}
+                                        </button>}
+                                </div>
                             </div>
                         </div>
                     </div>
