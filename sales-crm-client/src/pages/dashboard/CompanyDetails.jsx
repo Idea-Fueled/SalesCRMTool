@@ -599,6 +599,8 @@ export default function CompanyDetails() {
                                                     onChange={(e) => {
                                                         const files = Array.from(e.target.files);
                                                         setRemarkFiles(prev => [...prev, ...files]);
+                                                        // Reset value so duplicate files can be selected again
+                                                        e.target.value = "";
                                                     }}
                                                 />
                                             </label>
