@@ -96,7 +96,9 @@ export default function ArchiveDashboard() {
                             { id: 'deals', label: 'Deals', icon: Briefcase },
                             { id: 'contacts', label: 'Contacts', icon: Users },
                             { id: 'companies', label: 'Companies', icon: Building2 }
-                        ].map(tab => (
+                        ]
+                        .filter(tab => !searchParams.get("tab") || searchParams.get("tab") === tab.id)
+                        .map(tab => (
                             <button
                                 key={tab.id}
                                 onClick={() => { setActiveTab(tab.id); setSearchTerm(""); }}

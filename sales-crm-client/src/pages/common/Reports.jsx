@@ -398,24 +398,30 @@ export default function Reports() {
             {/* Content Section */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="flex border-b border-gray-100 px-2 overflow-x-auto no-scrollbar">
-                    <TabButton 
-                        active={activeTab === "deals"} 
-                        label="Deals" 
-                        icon={Briefcase} 
-                        onClick={() => { setActiveTab("deals"); setSearchQuery(""); }} 
-                    />
-                    <TabButton 
-                        active={activeTab === "companies"} 
-                        label="Companies" 
-                        icon={Building2} 
-                        onClick={() => { setActiveTab("companies"); setSearchQuery(""); }} 
-                    />
-                    <TabButton 
-                        active={activeTab === "contacts"} 
-                        label="Contacts" 
-                        icon={ContactRound} 
-                        onClick={() => { setActiveTab("contacts"); setSearchQuery(""); }} 
-                    />
+                    {(!searchParams.get("tab") || searchParams.get("tab") === "deals") && (
+                        <TabButton 
+                            active={activeTab === "deals"} 
+                            label="Deals" 
+                            icon={Briefcase} 
+                            onClick={() => { setActiveTab("deals"); setSearchQuery(""); }} 
+                        />
+                    )}
+                    {(!searchParams.get("tab") || searchParams.get("tab") === "companies") && (
+                        <TabButton 
+                            active={activeTab === "companies"} 
+                            label="Companies" 
+                            icon={Building2} 
+                            onClick={() => { setActiveTab("companies"); setSearchQuery(""); }} 
+                        />
+                    )}
+                    {(!searchParams.get("tab") || searchParams.get("tab") === "contacts") && (
+                        <TabButton 
+                            active={activeTab === "contacts"} 
+                            label="Contacts" 
+                            icon={ContactRound} 
+                            onClick={() => { setActiveTab("contacts"); setSearchQuery(""); }} 
+                        />
+                    )}
                 </div>
 
                 {/* Chart Section */}
