@@ -422,19 +422,19 @@ export default function AdminDashboard() {
                     </div>
                     <div className="flex-1 overflow-y-auto pr-2 space-y-4">
                         {topDeals.map((deal, index) => (
-                            <div key={deal._id || index} className="flex items-center justify-between group cursor-pointer hover:bg-gray-50 p-2 -mx-2 rounded-xl transition-colors" onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: [deal] })}>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center font-bold text-gray-400 shadow-sm border border-gray-100 group-hover:bg-red-50 group-hover:text-red-500 group-hover:border-red-100 transition-colors">
+                            <div key={deal._id || index} className="flex items-center justify-between group cursor-pointer hover:bg-gray-50 p-3 -mx-2 rounded-xl transition-colors gap-4" onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: [deal] })}>
+                                <div className="flex items-center gap-4 flex-1 min-w-0">
+                                    <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center font-bold text-gray-400 shadow-sm border border-gray-100 group-hover:bg-red-50 group-hover:text-red-500 group-hover:border-red-100 transition-colors flex-shrink-0">
                                         {index + 1}
                                     </div>
-                                    <div className="flex-1">
-                                        <p className="text-[11px] font-bold text-gray-900 transition-colors uppercase tracking-wide whitespace-normal leading-tight">
+                                    <div className="flex-1 min-w-0 pr-2">
+                                        <p className="text-[11px] font-bold text-gray-900 transition-colors uppercase tracking-wide whitespace-normal leading-snug">
                                             {getDealDisplayName(deal)}
                                         </p>
-                                        <p className="text-xs text-gray-500 line-clamp-1">{deal.companyName || deal.companyId?.name || "Unknown Company"}</p>
+                                        <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">{deal.companyName || deal.companyId?.name || "Unknown Company"}</p>
                                     </div>
                                 </div>
-                                <div className="text-sm font-black text-gray-900">
+                                <div className="text-sm font-black text-gray-900 flex-shrink-0">
                                     ${(deal.value || 0).toLocaleString()}
                                 </div>
                             </div>
