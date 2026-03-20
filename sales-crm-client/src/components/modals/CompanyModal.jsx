@@ -200,23 +200,7 @@ export default function CompanyModal({ isOpen, onClose, company, onSave, userRol
                     </div>
                 </div>
 
-                {/* Owner field - visible to Admin/Manager */}
-                {(userRole === "admin" || userRole === "sales_manager") && (
-                    <div className="space-y-1 pt-2 border-t border-gray-100 mt-4">
-                        <label className="text-xs font-semibold text-gray-500 uppercase">Strategic Owner</label>
-                        <select
-                            className={inputClass("ownerId") + " bg-slate-50 border-slate-200"}
-                            value={formData.ownerId}
-                            onChange={e => set("ownerId", e.target.value)}
-                        >
-                            <option value="">Select Owner</option>
-                            {potentialOwners.map(u => (
-                                <option key={u._id} value={u._id}>{u.firstName} {u.lastName} ({u.role === "admin" ? "ADMIN" : u.role === "sales_manager" ? "SALES MANAGER" : u.role === "sales_rep" ? "SALES REPRESENTATIVE" : u.role.replace(/_/g, " ").toUpperCase()})</option>
-                            ))}
-                        </select>
-                        <p className="text-[10px] text-gray-400 italic">Only Admins and Managers can reassign records.</p>
-                    </div>
-                )}
+
 
                 <div className="flex gap-3 pt-2">
                     <button type="button" onClick={onClose}
