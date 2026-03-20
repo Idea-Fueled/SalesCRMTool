@@ -103,28 +103,46 @@ const DashboardLayout = () => {
                     </div>
                 </div>
 
-                <nav className="flex-1 overflow-y-auto scrollbar-hide px-3 py-2 space-y-5">
+                <nav className="flex-1 overflow-y-auto scrollbar-hide px-3 py-2 space-y-6">
                     <div>
-                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest px-2 mb-2">Main Menu</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Main Menu</p>
                         <div className="space-y-1">
                             <SidebarLink to="/dashboard" icon={LayoutDashboard} label="Dashboard" onClick={closeSidebarOnMobile} end={true} />
-                            <SidebarLink to="/dashboard/reports" icon={BarChart3} label="System Reports" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/dashboard/users" icon={Users} label="Users Management" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
+
                     <div>
-                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest px-2 mb-2">CRM</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Deals</p>
                         <div className="space-y-1">
-                            <SidebarLink to="/dashboard/deals" icon={Briefcase} label="Deals" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/dashboard/companies" icon={Building2} label="Companies" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/dashboard/contacts" icon={ContactRound} label="Contacts" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/dashboard/users" icon={Users} label="Users" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/dashboard/archive" icon={Archive} label="Archive" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/dashboard/trash" icon={Trash2} label="Trash" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/dashboard/deals" icon={Briefcase} label="All Deals" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/dashboard/reports?tab=deals" icon={BarChart3} label="Deal Reports" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/dashboard/archive?tab=deals" icon={Archive} label="Archived Deals" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
+
                     <div>
-                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest px-2 mb-2">Technical</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Companies</p>
                         <div className="space-y-1">
+                            <SidebarLink to="/dashboard/companies" icon={Building2} label="All Companies" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/dashboard/reports?tab=companies" icon={BarChart3} label="Company Reports" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/dashboard/archive?tab=companies" icon={Archive} label="Archived Companies" onClick={closeSidebarOnMobile} />
+                        </div>
+                    </div>
+
+                    <div>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Contacts</p>
+                        <div className="space-y-1">
+                            <SidebarLink to="/dashboard/contacts" icon={ContactRound} label="All Contacts" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/dashboard/reports?tab=contacts" icon={BarChart3} label="Contact Reports" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/dashboard/archive?tab=contacts" icon={Archive} label="Archived Contacts" onClick={closeSidebarOnMobile} />
+                        </div>
+                    </div>
+
+                    <div>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Technical</p>
+                        <div className="space-y-1">
+                            <SidebarLink to="/dashboard/trash" icon={Trash2} label="Trash / Bin" onClick={closeSidebarOnMobile} />
                             <SidebarLink to="/dashboard/audit-logs" icon={History} label="Audit History" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>

@@ -3,7 +3,7 @@ import {
     Trash2, RefreshCcw, Briefcase, Building2, Users, 
     Calendar, AlertCircle, ChevronRight, Search, Clock
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { getArchivedDeals, restoreDeal } from "../../API/services/dealService";
 import { getArchivedContacts, restoreContact } from "../../API/services/contactService";
 import { getArchivedCompanies, restoreCompany } from "../../API/services/companyService";
@@ -21,7 +21,8 @@ const formatCurrency = (amount) => {
 
 
 export default function ArchiveDashboard() {
-    const [activeTab, setActiveTab] = useState('deals');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [activeTab, setActiveTab] = useState(searchParams.get("tab") || 'deals');
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
@@ -44,6 +45,13 @@ export default function ArchiveDashboard() {
     };
 
     useEffect(() => {
+        // Sync activeTab with URL params
+        setSearchParams(prev => {
+            const newParams = new URLSearchParams(prev);
+            newParams.set("tab", activeTab);
+            return newParams;
+        }, { replace: true });
+        
         fetchData();
     }, [activeTab]);
 

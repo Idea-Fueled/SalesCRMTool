@@ -93,23 +93,40 @@ export default function SalesManagerLayout() {
 
                 <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-5">
                     <div>
-                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest px-2 mb-2">Overview</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">My Overview</p>
                         <div className="space-y-1">
                             <SidebarLink to="/manager/dashboard" icon={LayoutDashboard} label="Dashboard" onClick={closeSidebarOnMobile} />
                             <SidebarLink to="/manager/team" icon={Users2} label="My Team" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/manager/reports" icon={BarChart3} label="Team Reports" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
                     <div>
-                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest px-2 mb-2">Team CRM</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Deals</p>
                         <div className="space-y-1">
                             <SidebarLink to="/manager/deals" icon={Briefcase} label="Team Deals" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/manager/reports?tab=deals" icon={BarChart3} label="Deal Reports" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/manager/archive?tab=deals" icon={History} label="Archived Deals" onClick={closeSidebarOnMobile} />
+                        </div>
+                    </div>
+
+                    <div>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Companies</p>
+                        <div className="space-y-1">
                             <SidebarLink to="/manager/companies" icon={Building2} label="Team Companies" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/manager/reports?tab=companies" icon={BarChart3} label="Company Reports" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/manager/archive?tab=companies" icon={History} label="Archived Companies" onClick={closeSidebarOnMobile} />
+                        </div>
+                    </div>
+
+                    <div>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Contacts</p>
+                        <div className="space-y-1">
                             <SidebarLink to="/manager/contacts" icon={ContactRound} label="Team Contacts" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/manager/reports?tab=contacts" icon={BarChart3} label="Contact Reports" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/manager/archive?tab=contacts" icon={History} label="Archived Contacts" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
                     <div>
-                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest px-2 mb-2">Technical</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Technical</p>
                         <div className="space-y-1">
                             <SidebarLink to="/manager/audit-logs" icon={History} label="Audit History" onClick={closeSidebarOnMobile} />
                         </div>
