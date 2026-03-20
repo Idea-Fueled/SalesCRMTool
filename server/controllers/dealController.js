@@ -829,10 +829,18 @@ export const getDealById = async (req, res, next) => {
 
 export const getArchivedDeals = async (req, res) => {
     try {
-        const { role } = req.user;
-        if (role !== "admin") return res.status(403).json({ message: "Access denied!" });
+        const { role, id: userId } = req.user;
+        let filter = { isDeleted: true };
 
-        const deals = await Deal.find({ isDeleted: true })
+        if (role === "sales_manager") {
+            const teamUsers = await User.find({ $or: [{ _id: userId }, { managerId: userId }] }).select("_id");
+            const teamIds = teamUsers.map(user => user._id);
+            filter.ownerId = { $in: teamIds };
+        } else if (role === "sales_rep") {
+            filter.ownerId = userId;
+        }
+
+        const deals = await Deal.find(filter)
             .populate("ownerId", "firstName lastName email")
             .populate("companyId", "name")
             .populate("contactId", "firstName lastName")
@@ -848,7 +856,6 @@ export const restoreDeal = async (req, res) => {
     try {
         const { id } = req.params;
         const { role, id: userId } = req.user;
-        if (role !== "admin") return res.status(403).json({ message: "Access denied!" });
 
         const deal = await Deal.findById(id);
         if (!deal) return res.status(404).json({ message: "Deal not found!" });
@@ -862,6 +869,21 @@ export const restoreDeal = async (req, res) => {
 
         if (diffDays > 30) {
             return res.status(400).json({ message: "Restore period expired (30 days max)!" });
+        }
+
+        // Permission check
+        if (role !== "admin") {
+            if (role === "sales_manager") {
+                const teamUsers = await User.find({ $or: [{ _id: userId }, { managerId: userId }] }).select("_id");
+                const teamIds = teamUsers.map(u => u._id.toString());
+                if (!teamIds.includes(deal.ownerId.toString())) {
+                    return res.status(403).json({ message: "Access denied!" });
+                }
+            } else if (role === "sales_rep") {
+                if (deal.ownerId.toString() !== userId) {
+                    return res.status(403).json({ message: "Access denied!" });
+                }
+            }
         }
 
         deal.isDeleted = false;

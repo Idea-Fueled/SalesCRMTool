@@ -460,10 +460,18 @@ export const getContactById = async (req, res, next) => {
 
 export const getArchivedContacts = async (req, res) => {
     try {
-        const { role } = req.user;
-        if (role !== "admin") return res.status(403).json({ message: "Access denied!" });
+        const { role, id: userId } = req.user;
+        let filter = { isDeleted: true };
 
-        const contacts = await Contact.find({ isDeleted: true })
+        if (role === "sales_manager") {
+            const teamUsers = await User.find({ $or: [{ _id: userId }, { managerId: userId }] }).select("_id");
+            const teamIds = teamUsers.map(user => user._id);
+            filter.ownerId = { $in: teamIds };
+        } else if (role === "sales_rep") {
+            filter.ownerId = userId;
+        }
+
+        const contacts = await Contact.find(filter)
             .populate("ownerId", "firstName lastName email")
             .populate("companyId", "name")
             .sort({ deletedAt: -1 });
@@ -478,7 +486,6 @@ export const restoreContact = async (req, res) => {
     try {
         const { id } = req.params;
         const { role, id: userId } = req.user;
-        if (role !== "admin") return res.status(403).json({ message: "Access denied!" });
 
         const contact = await Contact.findById(id);
         if (!contact) return res.status(404).json({ message: "Contact not found!" });
@@ -492,6 +499,21 @@ export const restoreContact = async (req, res) => {
 
         if (diffDays > 30) {
             return res.status(400).json({ message: "Restore period expired (30 days max)!" });
+        }
+
+        // Permission check
+        if (role !== "admin") {
+            if (role === "sales_manager") {
+                const teamUsers = await User.find({ $or: [{ _id: userId }, { managerId: userId }] }).select("_id");
+                const teamIds = teamUsers.map(u => u._id.toString());
+                if (!contact.ownerId || !teamIds.includes(contact.ownerId.toString())) {
+                    return res.status(403).json({ message: "Access denied!" });
+                }
+            } else if (role === "sales_rep") {
+                if (!contact.ownerId || contact.ownerId.toString() !== userId) {
+                    return res.status(403).json({ message: "Access denied!" });
+                }
+            }
         }
 
         contact.isDeleted = false;
