@@ -128,7 +128,14 @@ const DashboardLayout = () => {
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Main Menu</p>
                         <div className="space-y-1">
                             <SidebarLink to="/dashboard" icon={LayoutDashboard} label="Dashboard" onClick={closeSidebarOnMobile} end={true} />
-                            <SidebarLink to="/dashboard/users" icon={Users} label="Users Management" onClick={closeSidebarOnMobile} />
+                        </div>
+                    </div>
+
+                    <div>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Users</p>
+                        <div className="space-y-1">
+                            <SidebarLink to="/dashboard/users" icon={Users} label="Users" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/dashboard/trash" icon={Trash2} label="Trash / Bin" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
 
@@ -162,7 +169,6 @@ const DashboardLayout = () => {
                     <div>
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Technical</p>
                         <div className="space-y-1">
-                            <SidebarLink to="/dashboard/trash" icon={Trash2} label="Trash / Bin" onClick={closeSidebarOnMobile} />
                             <SidebarLink to="/dashboard/audit-logs" icon={History} label="Audit History" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
