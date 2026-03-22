@@ -210,7 +210,7 @@ export default function MyProfileModal({ isOpen, onClose }) {
                     )}
                     <button 
                         onClick={onClose} 
-                        className={`py-2.5 ${user.role === "admin" ? "bg-gray-100 hover:bg-gray-200 text-gray-700 flex-1" : "bg-red-600 hover:bg-red-700 text-white w-full"} rounded-xl font-bold text-sm transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-300 active:scale-[0.98]`}
+                        className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm transition-all shadow-md shadow-red-100 focus:outline-none focus:ring-2 focus:ring-red-400 active:scale-[0.98]"
                     >
                         Close
                     </button>
