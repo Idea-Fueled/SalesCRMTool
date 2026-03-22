@@ -4,10 +4,12 @@ import { Mail, Shield, User as UserIcon, Calendar, Clock, CheckCircle, XCircle, 
 import { useAuth } from "../../context/AuthContext";
 import API from "../../API/Interceptor";
 import { toast } from "react-hot-toast";
+import ChangePasswordModal from "./ChangePasswordModal";
 
 export default function MyProfileModal({ isOpen, onClose }) {
     const { user, fetchProfile } = useAuth();
     const [uploading, setUploading] = useState(false);
+    const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
     const fileInputRef = useRef(null);
 
     if (!user) return null;
@@ -197,12 +199,30 @@ export default function MyProfileModal({ isOpen, onClose }) {
                     </div>
                 </div>
 
-                <div className="flex pt-2">
-                    <button onClick={onClose} className="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm transition-all shadow-md shadow-red-100 focus:outline-none focus:ring-2 focus:ring-red-400 active:scale-[0.98]">
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                    {user.role === "admin" && (
+                        <button 
+                            onClick={() => setIsPasswordModalOpen(true)}
+                            className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm transition-all shadow-md shadow-red-100 focus:outline-none focus:ring-2 focus:ring-red-400 active:scale-[0.98]"
+                        >
+                            Change Password
+                        </button>
+                    )}
+                    <button 
+                        onClick={onClose} 
+                        className={`py-2.5 ${user.role === "admin" ? "bg-gray-100 hover:bg-gray-200 text-gray-700 flex-1" : "bg-red-600 hover:bg-red-700 text-white w-full"} rounded-xl font-bold text-sm transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-300 active:scale-[0.98]`}
+                    >
                         Close
                     </button>
                 </div>
             </div>
+
+            {/* Change Password Modal */}
+            <ChangePasswordModal 
+                isOpen={isPasswordModalOpen} 
+                onClose={() => setIsPasswordModalOpen(false)} 
+                userId={user.id || user._id}
+            />
         </Modal>
     );
 }
