@@ -143,8 +143,8 @@ const DashboardLayout = () => {
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Deals</p>
                         <div className="space-y-1">
                             <SidebarLink to="/dashboard/deals" icon={Briefcase} label="All Deals" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/dashboard/reports?tab=deals" icon={BarChart3} label="Deal Reports" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/dashboard/archive?tab=deals" icon={Archive} label="Archived Deals" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/dashboard/reports?tab=deals" icon={BarChart3} label="Reports" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/dashboard/archive?tab=deals" icon={Archive} label="Archives" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
 
@@ -152,8 +152,8 @@ const DashboardLayout = () => {
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Companies</p>
                         <div className="space-y-1">
                             <SidebarLink to="/dashboard/companies" icon={Building2} label="All Companies" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/dashboard/reports?tab=companies" icon={BarChart3} label="Company Reports" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/dashboard/archive?tab=companies" icon={Archive} label="Archived Companies" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/dashboard/reports?tab=companies" icon={BarChart3} label="Reports" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/dashboard/archive?tab=companies" icon={Archive} label="Archives" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
 
@@ -161,8 +161,8 @@ const DashboardLayout = () => {
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Contacts</p>
                         <div className="space-y-1">
                             <SidebarLink to="/dashboard/contacts" icon={ContactRound} label="All Contacts" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/dashboard/reports?tab=contacts" icon={BarChart3} label="Contact Reports" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/dashboard/archive?tab=contacts" icon={Archive} label="Archived Contacts" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/dashboard/reports?tab=contacts" icon={BarChart3} label="Reports" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/dashboard/archive?tab=contacts" icon={Archive} label="Archives" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
 

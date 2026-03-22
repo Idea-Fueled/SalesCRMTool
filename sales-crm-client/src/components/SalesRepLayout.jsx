@@ -123,8 +123,8 @@ const SalesRepLayout = () => {
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Deals</p>
                         <div className="space-y-1">
                             <SidebarLink to="/rep/deals" icon={Briefcase} label="My Deals" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/rep/reports?tab=deals" icon={BarChart3} label="Deal Reports" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/rep/archive?tab=deals" icon={History} label="Archived Deals" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/rep/reports?tab=deals" icon={BarChart3} label="Reports" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/rep/archive?tab=deals" icon={History} label="Archives" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
 
@@ -132,8 +132,8 @@ const SalesRepLayout = () => {
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Companies</p>
                         <div className="space-y-1">
                             <SidebarLink to="/rep/companies" icon={Building2} label="My Companies" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/rep/reports?tab=companies" icon={BarChart3} label="Company Reports" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/rep/archive?tab=companies" icon={History} label="Archived Companies" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/rep/reports?tab=companies" icon={BarChart3} label="Reports" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/rep/archive?tab=companies" icon={History} label="Archives" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
 
@@ -141,8 +141,8 @@ const SalesRepLayout = () => {
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Contacts</p>
                         <div className="space-y-1">
                             <SidebarLink to="/rep/contacts" icon={ContactRound} label="My Contacts" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/rep/reports?tab=contacts" icon={BarChart3} label="Contact Reports" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/rep/archive?tab=contacts" icon={History} label="Archived Contacts" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/rep/reports?tab=contacts" icon={BarChart3} label="Reports" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/rep/archive?tab=contacts" icon={History} label="Archives" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
                     <div>

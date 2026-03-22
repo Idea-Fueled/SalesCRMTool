@@ -123,8 +123,8 @@ export default function SalesManagerLayout() {
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Deals</p>
                         <div className="space-y-1">
                             <SidebarLink to="/manager/deals" icon={Briefcase} label="Team Deals" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/manager/reports?tab=deals" icon={BarChart3} label="Deal Reports" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/manager/archive?tab=deals" icon={History} label="Archived Deals" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/manager/reports?tab=deals" icon={BarChart3} label="Reports" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/manager/archive?tab=deals" icon={History} label="Archives" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
 
@@ -132,8 +132,8 @@ export default function SalesManagerLayout() {
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Companies</p>
                         <div className="space-y-1">
                             <SidebarLink to="/manager/companies" icon={Building2} label="Team Companies" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/manager/reports?tab=companies" icon={BarChart3} label="Company Reports" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/manager/archive?tab=companies" icon={History} label="Archived Companies" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/manager/reports?tab=companies" icon={BarChart3} label="Reports" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/manager/archive?tab=companies" icon={History} label="Archives" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
 
@@ -141,8 +141,8 @@ export default function SalesManagerLayout() {
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Contacts</p>
                         <div className="space-y-1">
                             <SidebarLink to="/manager/contacts" icon={ContactRound} label="Team Contacts" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/manager/reports?tab=contacts" icon={BarChart3} label="Contact Reports" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/manager/archive?tab=contacts" icon={History} label="Archived Contacts" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/manager/reports?tab=contacts" icon={BarChart3} label="Reports" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/manager/archive?tab=contacts" icon={History} label="Archives" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
                     <div>
