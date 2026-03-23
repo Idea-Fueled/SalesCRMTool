@@ -235,17 +235,24 @@ export default function AuditLogs() {
                                         </td>
                                         <td className="px-4 py-4 whitespace-nowrap">
                                             {log.targetUserId ? (
-                                                <div className="flex items-center gap-2">
-                                                    <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center text-[10px] font-bold text-white overflow-hidden border border-white shadow-sm">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center font-bold text-xs overflow-hidden shadow-sm border-2 border-white">
                                                         {log.targetUserId.profilePicture ? (
                                                             <img src={log.targetUserId.profilePicture} alt="Target" className="w-full h-full object-cover" />
                                                         ) : (
-                                                            <>{log.targetUserId.firstName?.[0]}{log.targetUserId.lastName?.slice(-1)}</>
+                                                            <span className="text-white">
+                                                                {log.targetUserId.firstName?.[0]}{log.targetUserId.lastName?.slice(-1)}
+                                                            </span>
                                                         )}
                                                     </div>
-                                                    <span className={`text-xs font-semibold ${currentUser?.id === log.targetUserId._id ? 'text-red-500' : 'text-gray-700'}`}>
-                                                        {currentUser?.id === log.targetUserId._id ? "You" : `${log.targetUserId.firstName} ${log.targetUserId.lastName || ""}`}
-                                                    </span>
+                                                    <div>
+                                                        <p className={`text-xs font-semibold leading-none ${currentUser?.id === log.targetUserId._id ? 'text-red-600' : 'text-gray-800'}`}>
+                                                            {currentUser?.id === log.targetUserId._id ? "You" : `${log.targetUserId.firstName} ${log.targetUserId.lastName || ""}`}
+                                                        </p>
+                                                        <p className="text-[10px] text-gray-400 mt-1">
+                                                            {log.targetUserId.email || ""}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             ) : (
                                                 <span className="text-gray-300">—</span>
