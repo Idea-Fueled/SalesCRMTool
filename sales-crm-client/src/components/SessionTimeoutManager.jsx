@@ -1,11 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import { Clock, LogOut } from "lucide-react";
 
 const SessionTimeoutManager = ({ children }) => {
     const { user, logout, fetchProfile } = useAuth();
-    const navigate = useNavigate();
     const timeoutRef = useRef(null);
     const refreshIntervalRef = useRef(null);
     const [isExpired, setIsExpired] = useState(false);
@@ -33,7 +31,7 @@ const SessionTimeoutManager = ({ children }) => {
     const handleActualLogout = async () => {
         await logout();
         setIsExpired(false);
-        navigate("/login");
+        window.location.href = "/login";
     };
 
     const handleActivity = () => {
