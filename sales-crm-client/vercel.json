@@ -1,6 +1,10 @@
 {
     "rewrites": [
         {
+            "source": "/api/files/view",
+            "destination": "/api/files/view"
+        },
+        {
             "source": "/api/:path*",
             "destination": "https://sales-crm-backend-r0z9.onrender.com/api/:path*"
         },
