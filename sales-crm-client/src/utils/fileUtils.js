@@ -17,7 +17,10 @@ export const downloadFile = async (url, fileName) => {
     try {
         // Use the backend proxy for downloads to bypass CORS and Cloudinary bucket restrictions.
         // This ensures the custom fileName is applied via Content-Disposition headers.
-        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://sales-crm-tool-nu.vercel.app/api'; 
+        const apiBaseUrl =
+            import.meta.env.MODE === "development"
+                ? "http://localhost:8000/api"
+                : `${(import.meta.env.VITE_BASE_URL || "").trim()}/api`;
         const proxyUrl = `${apiBaseUrl}/files/download?url=${encodeURIComponent(url)}&fileName=${encodeURIComponent(fileName)}`;
 
         // We use window.location.assign because the proxy handles the attachment headers.
@@ -44,5 +47,18 @@ export const viewFile = (url) => {
         toast.error("Invalid file URL");
         return;
     }
+
+    // If the file lives in Cloudinary, use our backend proxy.
+    // This avoids `401 Unauthorized` for private/authenticated Cloudinary assets.
+    if (url.includes("cloudinary.com") || url.includes("res.cloudinary.com")) {
+        const apiBaseUrl =
+            import.meta.env.MODE === "development"
+                ? "http://localhost:8000/api"
+                : `${(import.meta.env.VITE_BASE_URL || "").trim()}/api`;
+        const proxyUrl = `${apiBaseUrl}/files/view?url=${encodeURIComponent(url)}`;
+        window.open(proxyUrl, "_blank", "noopener,noreferrer");
+        return;
+    }
+
     window.open(url, "_blank", "noopener,noreferrer");
 };
