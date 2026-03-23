@@ -527,7 +527,7 @@ export default function UsersDashboard() {
                 onConfirm={confirmSoftDelete}
                 title="Move User to Trash"
                 actionLabel="Move to Trash"
-                actionColor="bg-gray-800 hover:bg-gray-900"
+                actionColor="bg-red-600 hover:bg-red-700"
             />
             <ConfirmDialog
                 isOpen={confirmState.isOpen}

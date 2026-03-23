@@ -64,7 +64,7 @@ export default function DeactivateModal({ isOpen, onClose, user, activeUsers, on
                     {/* Option 1: Reassign */}
                     <label
                         className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${reassignMode === "reassign"
-                            ? "border-red-400 bg-red-50"
+                            ? "border-red-500 bg-red-50 ring-1 ring-red-500"
                             : "border-gray-200 bg-white hover:border-gray-300"
                             }`}
                     >
@@ -87,7 +87,7 @@ export default function DeactivateModal({ isOpen, onClose, user, activeUsers, on
                     {/* Option 2: Keep */}
                     <label
                         className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${reassignMode === "keep"
-                            ? "border-orange-400 bg-orange-50"
+                            ? "border-red-500 bg-red-50 ring-1 ring-red-500"
                             : "border-gray-200 bg-white hover:border-gray-300"
                             }`}
                     >
@@ -97,10 +97,10 @@ export default function DeactivateModal({ isOpen, onClose, user, activeUsers, on
                             value="keep"
                             checked={reassignMode === "keep"}
                             onChange={() => { setReassignMode("keep"); setNewOwnerId(""); }}
-                            className="mt-0.5 accent-orange-600"
+                            className="mt-0.5 accent-red-600"
                         />
                         <div>
-                            <p className={`text-sm font-semibold ${reassignMode === "keep" ? "text-orange-700" : "text-gray-700"}`}>
+                            <p className={`text-sm font-semibold ${reassignMode === "keep" ? "text-red-700" : "text-gray-700"}`}>
                                 Don't reassign — keep data with this user
                             </p>
                             <p className="text-xs text-gray-400 mt-0.5">Records stay under their ownership. Data will be fully accessible again when the user is reactivated.</p>
