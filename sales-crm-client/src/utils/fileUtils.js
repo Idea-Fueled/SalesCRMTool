@@ -33,3 +33,16 @@ export const downloadFile = async (url, fileName) => {
         toast.error("Failed to download file. Please try opening it first.", { id: toastId });
     }
 };
+
+/**
+ * Opens a file in a new tab using window.open.
+ * This is the preferred way for PDFs to avoid iframe/CORS issues.
+ * @param {string} url - The URL of the file to view
+ */
+export const viewFile = (url) => {
+    if (!url || url === "#") {
+        toast.error("Invalid file URL");
+        return;
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+};

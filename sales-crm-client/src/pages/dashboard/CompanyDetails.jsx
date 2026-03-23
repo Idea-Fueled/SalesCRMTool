@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { exportToPDF } from "../../utils/pdfExport";
-import { downloadFile } from "../../utils/fileUtils";
+import { downloadFile, viewFile } from "../../utils/fileUtils";
 
 const companyStatusPipeline = [
     { id: "Prospect", label: "Professional Prospect" },
@@ -83,12 +83,9 @@ const formatFileUrl = (url, fileType) => {
     // For PDFs as "image", this ensures they open inline
     let openingUrl = url.replace(/\/fl_attachment[^/]*\//, '/').replace(/\/f_pdf[^/]*\//, '/');
 
-    // Open PDFs directly if they are 'raw' resources (newly uploaded),
-    // otherwise use the proxy to ensure correct MIME type for older 'image' uploads
+    // Open PDFs directly in a new tab to avoid proxy/CORS issues
     if (isPdf) {
-        if (openingUrl.includes("/raw/upload/")) return openingUrl;
-        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://sales-crm-tool-nu.vercel.app/api';
-        return `${apiBaseUrl}/files/view?url=${encodeURIComponent(openingUrl)}`;
+        return openingUrl;
     }
 
     // Use Google Docs Viewer for Office docs as browsers can't render them natively
@@ -403,20 +400,17 @@ export default function CompanyDetails() {
                                     <div className="grid grid-cols-1 gap-2">
                                         {company.attachments.map((file, idx) => (
                                             <div key={`main-${idx}`} className="group flex items-center gap-2">
-                                                <a
-                                                    href={formatFileUrl(file.url, file.fileType)}
-                                                    download={(file.url?.toLowerCase().endsWith('.pdf') || file.fileType === "application/pdf") ? undefined : file.fileName}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="flex-1 flex items-center gap-3 p-2 bg-white border border-gray-100 rounded-xl hover:border-red-400 hover:shadow-sm transition-all duration-300"
+                                                <button
+                                                    onClick={() => viewFile(formatFileUrl(file.url, file.fileType))}
+                                                    className="flex-1 flex items-center gap-3 p-2 bg-white border border-gray-100 rounded-xl hover:border-red-400 hover:shadow-sm transition-all duration-300 cursor-pointer"
                                                 >
                                                     <div className="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
                                                         <FileText size={14} />
                                                     </div>
-                                                    <div className="min-w-0 flex-1">
+                                                    <div className="min-w-0 flex-1 text-left">
                                                         <p className="text-[11px] font-bold text-gray-900 truncate">{file.fileName}</p>
                                                     </div>
-                                                </a>
+                                                </button>
                                                 <button
                                                     onClick={() => downloadFile(file.url, file.fileName)}
                                                     className="p-2 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all cursor-pointer"
@@ -531,15 +525,13 @@ export default function CompanyDetails() {
                                                     <div className="mt-2 flex flex-wrap gap-2">
                                                         {remark.files.map((file, fIdx) => (
                                                             <div key={fIdx} className="group flex items-center gap-1">
-                                                                 <a
-                                                                    href={formatFileUrl(file.url, file.fileType)}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="flex items-center gap-1.5 px-2 py-1 bg-white border border-gray-100 rounded-lg text-[9px] font-bold text-gray-500 hover:border-red-400 hover:text-red-600 transition-all shadow-sm"
-                                                                >
-                                                                    <Paperclip size={10} />
-                                                                    <span className="max-w-[80px] truncate">{file.fileName}</span>
-                                                                </a>
+                                                                 <button
+                                                                     onClick={() => viewFile(formatFileUrl(file.url, file.fileType))}
+                                                                     className="flex items-center gap-1.5 px-2 py-1 bg-white border border-gray-100 rounded-lg text-[9px] font-bold text-gray-500 hover:border-red-400 hover:text-red-600 transition-all shadow-sm cursor-pointer"
+                                                                 >
+                                                                     <Paperclip size={10} />
+                                                                     <span className="max-w-[80px] truncate">{file.fileName}</span>
+                                                                 </button>
                                                                  <button
                                                                     onClick={() => downloadFile(file.url, file.fileName)}
                                                                     className="p-1 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
