@@ -11,6 +11,17 @@ const roleBadge = {
 };
 const formatRole = (r) => ({ admin: "ADMIN", sales_manager: "SALES MANAGER", sales_rep: "SALES REPRESENTATIVE" }[r] || r?.toUpperCase());
 
+const getRestorationStatus = (deletedAt) => {
+    if (!deletedAt) return { isExpired: false, daysLeft: null };
+    const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
+    const expiryDate = new Date(new Date(deletedAt).getTime() + thirtyDaysInMs);
+    const now = new Date();
+    const diff = expiryDate - now;
+    if (diff <= 0) return { isExpired: true, daysLeft: 0 };
+    const daysLeft = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    return { isExpired: false, daysLeft };
+};
+
 function Avatar({ name }) {
     if (!name) return null;
     const parts = name.trim().split(/\s+/);
@@ -114,46 +125,64 @@ export default function TrashDashboard() {
                                     </td>
                                 </tr>
                             ) : (
-                                deletedUsers.map((u) => (
-                                    <tr key={u._id} className="hover:bg-red-50/30 transition-colors bg-red-50/10">
-                                        <td className="px-4 py-3 whitespace-nowrap">
-                                            <div className="flex items-center gap-3">
-                                                <Avatar name={`${u.firstName} ${u.lastName}`} />
-                                                <div>
-                                                    <p className="font-medium text-gray-700 leading-none">
-                                                        {u.firstName} {u.lastName}
-                                                    </p>
-                                                    <p className="text-xs text-gray-400 mt-0.5">{u.email}</p>
+                                deletedUsers.map((u) => {
+                                    const { isExpired, daysLeft } = getRestorationStatus(u.deletedAt);
+                                    return (
+                                        <tr key={u._id} className={`transition-colors ${isExpired ? 'bg-gray-50/50 grayscale-[0.5] opacity-80' : 'hover:bg-red-50/30 bg-red-50/10'}`}>
+                                            <td className="px-4 py-3 whitespace-nowrap">
+                                                <div className="flex items-center gap-3">
+                                                    <Avatar name={`${u.firstName} ${u.lastName}`} />
+                                                    <div>
+                                                        <p className="font-medium text-gray-700 leading-none">
+                                                            {u.firstName} {u.lastName}
+                                                        </p>
+                                                        <p className="text-xs text-gray-400 mt-0.5">{u.email}</p>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-4 py-3 whitespace-nowrap">
-                                            <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${roleBadge[u.role] || "bg-gray-100 text-gray-600"}`}>
-                                                {formatRole(u.role)}
-                                            </span>
-                                        </td>
-                                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-nowrap">
-                                            {u.managerId
-                                                ? `${u.managerId.firstName} ${u.managerId.lastName}`
-                                                : "—"}
-                                        </td>
-                                        <td className="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">
-                                            {u.deletedAt
-                                                ? new Date(u.deletedAt).toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
-                                                : "—"}
-                                        </td>
-                                        <td className="px-4 py-3 whitespace-nowrap">
-                                            <button
-                                                onClick={() => handleRestore(u)}
-                                                disabled={restoringId === u._id}
-                                                className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-semibold border border-green-200 text-green-700 hover:bg-green-50 transition disabled:opacity-50"
-                                            >
-                                                <RotateCcw size={13} className={restoringId === u._id ? "animate-spin" : ""} />
-                                                {restoringId === u._id ? "Restoring..." : "Restore"}
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap">
+                                                <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${roleBadge[u.role] || "bg-gray-100 text-gray-600"}`}>
+                                                    {formatRole(u.role)}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-3 text-gray-500 text-sm whitespace-nowrap">
+                                                {u.managerId
+                                                    ? `${u.managerId.firstName} ${u.managerId.lastName}`
+                                                    : "—"}
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap">
+                                                <div className="flex flex-col">
+                                                    <p className="text-gray-600 text-[11px] font-medium">
+                                                        {u.deletedAt
+                                                            ? new Date(u.deletedAt).toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+                                                            : "—"}
+                                                    </p>
+                                                    {u.deletedAt && (
+                                                        <span className={`text-[10px] mt-0.5 font-bold uppercase tracking-tight ${isExpired ? 'text-gray-400' : 'text-red-500'}`}>
+                                                            {isExpired ? "Restoration Expired" : `Expires in ${daysLeft} ${daysLeft === 1 ? 'day' : 'days'}`}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap">
+                                                {!isExpired ? (
+                                                    <button
+                                                        onClick={() => handleRestore(u)}
+                                                        disabled={restoringId === u._id}
+                                                        className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-semibold border border-green-200 text-green-700 hover:bg-green-50 transition shadow-sm active:scale-95 disabled:opacity-50 disabled:scale-100"
+                                                    >
+                                                        <RotateCcw size={13} className={restoringId === u._id ? "animate-spin" : ""} />
+                                                        {restoringId === u._id ? "Restoring..." : "Restore"}
+                                                    </button>
+                                                ) : (
+                                                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-gray-400 px-3 py-1.5 bg-gray-100 rounded-lg border border-gray-200 uppercase tracking-wide">
+                                                        Permanently Deleted
+                                                    </span>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    );
+                                })
                             )}
                         </tbody>
                     </table>

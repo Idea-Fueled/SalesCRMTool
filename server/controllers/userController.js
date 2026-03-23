@@ -435,6 +435,17 @@ export const restoreUser = async (req, res, next) => {
         const user = await User.findById(id);
         if (!user) return res.status(404).json({ message: "User not found!" });
 
+        // Restoration Window Check (30 days)
+        if (user.deletedAt) {
+            const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
+            const timePassed = Date.now() - new Date(user.deletedAt).getTime();
+            if (timePassed > thirtyDaysInMs) {
+                return res.status(400).json({ 
+                    message: "Restoration window has expired. Users can only be restored within 30 days of deletion." 
+                });
+            }
+        }
+
         user.isDeleted = false;
         user.deletedAt = null;
         user.isActive = true;
