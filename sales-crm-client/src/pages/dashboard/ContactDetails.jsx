@@ -424,7 +424,7 @@ export default function ContactDetails() {
                                             <div key={`main-${idx}`} className="group flex items-center gap-2">
                                                 <button
                                                     onClick={() => viewFile(formatFileUrl(file.url, file.fileType))}
-                                                    className="flex-1 flex items-center gap-3 p-2 bg-white border border-gray-100 rounded-xl hover:border-red-400 hover:shadow-sm transition-all duration-300 cursor-pointer"
+                                                    className="min-w-0 flex-1 flex items-center gap-3 p-2 bg-white border border-gray-100 rounded-xl hover:border-red-400 hover:shadow-sm transition-all duration-300 cursor-pointer"
                                                 >
                                                     <div className="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
                                                         <FileText size={14} />
