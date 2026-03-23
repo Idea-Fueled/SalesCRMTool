@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import { createUser, updateUser, adminResetPassword } from "../../API/services/userService";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
+import ChangePasswordModal from "./ChangePasswordModal";
 
 const ModalOverlay = ({ children, onClose }) => (
     <div className="fixed inset-0 z-[100] flex items-center justify-center px-4"
@@ -42,6 +43,7 @@ export default function UserModal({ isOpen, onClose, user, managers = [], onSave
     const [adminNewPassword, setAdminNewPassword] = useState("");
     const [errors, setErrors] = useState({});
     const [saving, setSaving] = useState(false);
+    const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -145,101 +147,125 @@ export default function UserModal({ isOpen, onClose, user, managers = [], onSave
     if (!isOpen) return null;
 
     return (
-        <ModalOverlay onClose={onClose}>
-            <ModalHeader title={getTitle()} onClose={onClose} />
-            <form onSubmit={handleSubmit} noValidate className="px-6 py-5 space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label className="block text-xs font-semibold text-gray-600 mb-1">First Name *</label>
-                        <input name="firstName" value={form.firstName} onChange={handleChange}
-                            className={inputClass(errors.firstName)} placeholder="Jane" />
-                        {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
-                    </div>
-                    <div>
-                        <label className="block text-xs font-semibold text-gray-600 mb-1">Last Name *</label>
-                        <input name="lastName" value={form.lastName} onChange={handleChange}
-                            className={inputClass(errors.lastName)} placeholder="Smith" />
-                        {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
-                    </div>
-                </div>
-                <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1">Email *</label>
-                    <input type="email" name="email" value={form.email} onChange={handleChange}
-                        className={inputClass(errors.email)} placeholder="jane@company.com" />
-                    {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
-                </div>
-                {!isEdit && (
-                    <div>
-                        <label className="block text-xs font-semibold text-gray-600 mb-1">Password (Optional)</label>
-                        <input type="password" name="password" value={form.password} onChange={handleChange}
-                            className={inputClass(errors.password)} placeholder="Leave blank to send invitation email" />
-                        {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
-                        <p className="text-[10px] text-gray-400 mt-1 italic">
-                            If omitted, the user will receive a link via email to set their own password.
-                        </p>
-                    </div>
-                )}
-                <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1">Role *</label>
-                    {restrictedRole ? (
-                        <div className="text-sm font-medium text-gray-800 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200">
-                            {restrictedRole === "sales_rep" ? "SALES REPRESENTATIVE" : restrictedRole.replace(/_/g, " ").toUpperCase()}
+        <>
+            <ModalOverlay onClose={onClose}>
+                <ModalHeader title={getTitle()} onClose={onClose} />
+                <form onSubmit={handleSubmit} noValidate className="px-6 py-5 space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-600 mb-1">First Name *</label>
+                            <input name="firstName" value={form.firstName} onChange={handleChange}
+                                className={inputClass(errors.firstName)} placeholder="Jane" />
+                            {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
                         </div>
-                    ) : (
-                        <select name="role" value={form.role} onChange={handleChange} className={inputClass(false)}>
-                            <option value="admin">ADMIN</option>
-                            <option value="sales_manager">SALES MANAGER</option>
-                            <option value="sales_rep">SALES REPRESENTATIVE</option>
-                        </select>
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-600 mb-1">Last Name *</label>
+                            <input name="lastName" value={form.lastName} onChange={handleChange}
+                                className={inputClass(errors.lastName)} placeholder="Smith" />
+                            {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-xs font-semibold text-gray-600 mb-1">Email *</label>
+                        <input type="email" name="email" value={form.email} onChange={handleChange}
+                            className={inputClass(errors.email)} placeholder="jane@company.com" />
+                        {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                    </div>
+                    {!isEdit && (
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-600 mb-1">Password (Optional)</label>
+                            <input type="password" name="password" value={form.password} onChange={handleChange}
+                                className={inputClass(errors.password)} placeholder="Leave blank to send invitation email" />
+                            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+                            <p className="text-[10px] text-gray-400 mt-1 italic">
+                                If omitted, the user will receive a link via email to set their own password.
+                            </p>
+                        </div>
                     )}
-                </div>
-                {form.role === "sales_rep" && !fixedManagerId && (
                     <div>
-                        <label className="block text-xs font-semibold text-gray-600 mb-1">Reports To (Manager)</label>
-                        <select name="managerId" value={form.managerId} onChange={handleChange} className={inputClass(false)}>
-                            <option value="">— No Manager —</option>
-                            {managers.map(m => (
-                                <option key={m._id} value={m._id}>{m.firstName} {m.lastName}</option>
-                            ))}
-                        </select>
+                        <label className="block text-xs font-semibold text-gray-600 mb-1">Role *</label>
+                        {restrictedRole || (isEdit && user?.role === "admin") ? (
+                            <div className="text-sm font-medium text-gray-800 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200">
+                                {(restrictedRole || user.role)?.replace(/_/g, " ").toUpperCase()}
+                            </div>
+                        ) : (
+                            <select name="role" value={form.role} onChange={handleChange} className={inputClass(false)}>
+                                <option value="admin">ADMIN</option>
+                                <option value="sales_manager">SALES MANAGER</option>
+                                <option value="sales_rep">SALES REPRESENTATIVE</option>
+                            </select>
+                        )}
                     </div>
-                )}
-                {isEdit && isAdmin && (
-                    <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl space-y-3">
-                        <div className="flex items-center justify-between">
-                            <label className="text-xs font-bold text-gray-700 uppercase">Reset User Password</label>
-                            <span className="text-[10px] text-gray-400 font-medium">ADMIN ONLY</span>
+                    {form.role === "sales_rep" && !fixedManagerId && (
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-600 mb-1">Reports To (Manager)</label>
+                            <select name="managerId" value={form.managerId} onChange={handleChange} className={inputClass(false)}>
+                                <option value="">— No Manager —</option>
+                                {managers.map(m => (
+                                    <option key={m._id} value={m._id}>{m.firstName} {m.lastName}</option>
+                                ))}
+                            </select>
                         </div>
-                        <div className="flex gap-2">
-                            <input
-                                type="text"
-                                value={adminNewPassword}
-                                onChange={e => setAdminNewPassword(e.target.value)}
-                                className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-red-400 bg-white"
-                                placeholder="Enter temporary password"
-                            />
-                            <button
-                                type="button"
-                                onClick={handleAdminResetPassword}
-                                disabled={saving}
-                                className="px-3 py-1.5 bg-red-600 text-white text-xs font-bold rounded-lg hover:bg-red-700 transition disabled:opacity-50 shadow-sm shadow-red-100"
-                            >
-                                Reset
-                            </button>
-                        </div>
-                        <p className="text-[10px] text-gray-400 italic">User will not be notified; please share it with them.</p>
+                    )}
+                    {isEdit && isAdmin && (
+                        user?.role === "admin" ? (
+                            <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-between">
+                                <div className="flex flex-col">
+                                    <label className="text-xs font-bold text-gray-700 uppercase">Password Management</label>
+                                    <p className="text-[10px] text-gray-400 mt-0.5 italic">Requires current password</p>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsPasswordModalOpen(true)}
+                                    className="px-4 py-2 bg-red-600 text-white text-xs font-bold rounded-lg hover:bg-red-700 transition shadow-sm shadow-red-100 active:scale-[0.98]"
+                                >
+                                    Change Password
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <label className="text-xs font-bold text-gray-700 uppercase">Reset User Password</label>
+                                    <span className="text-[10px] text-gray-400 font-medium">ADMIN ONLY</span>
+                                </div>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={adminNewPassword}
+                                        onChange={e => setAdminNewPassword(e.target.value)}
+                                        className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-red-400 bg-white"
+                                        placeholder="Enter temporary password"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={handleAdminResetPassword}
+                                        disabled={saving}
+                                        className="px-3 py-1.5 bg-red-600 text-white text-xs font-bold rounded-lg hover:bg-red-700 transition disabled:opacity-50 shadow-sm shadow-red-100"
+                                    >
+                                        Reset
+                                    </button>
+                                </div>
+                                <p className="text-[10px] text-gray-400 italic">User will not be notified; please share it with them.</p>
+                            </div>
+                        )
+                    )}
+                    <div className="flex gap-3 pt-2">
+                        <button type="button" onClick={onClose} className="flex-1 px-4 py-2 border border-gray-200 text-sm font-semibold rounded-lg text-gray-600 hover:bg-gray-50">
+                            Cancel
+                        </button>
+                        <button type="submit" disabled={saving}
+                            className="flex-1 px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 disabled:opacity-60 transition">
+                            {saving ? "Saving..." : isEdit ? "Save Changes" : (restrictedRole === "sales_rep" ? "Create Representative" : "Create User")}
+                        </button>
                     </div>
-                )}
-                <div className="flex gap-3 pt-2">
-                    <button type="button" onClick={onClose} className="flex-1 px-4 py-2 border border-gray-200 text-sm font-semibold rounded-lg text-gray-600 hover:bg-gray-50">
-                        Cancel
-                    </button>
-                    <button type="submit" disabled={saving}
-                        className="flex-1 px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 disabled:opacity-60 transition">
-                        {saving ? "Saving..." : isEdit ? "Save Changes" : (restrictedRole === "sales_rep" ? "Create Representative" : "Create User")}
-                    </button>
-                </div>
-            </form>
-        </ModalOverlay >
+                </form>
+            </ModalOverlay >
+
+            <ChangePasswordModal
+                isOpen={isPasswordModalOpen}
+                onClose={() => setIsPasswordModalOpen(false)}
+                userId={user?._id || user?.id}
+            />
+        </>
     );
 }
