@@ -1,5 +1,5 @@
 import express from "express"
-import { adminTest, activateUser, adminResetPassword, bulkReassignRecords, changePassword, deactivateUser, forgotPassword, getProfile, getUserById, getTeamUsers, loginUser, logoutUser, registerUser, resetPassword, updateUser, softDeleteUser, getDeletedUsers, restoreUser, setupPassword, resendInvitation, uploadProfilePicture } from "../controllers/userController.js"
+import { adminTest, activateUser, adminResetPassword, bulkReassignRecords, changePassword, deactivateUser, forgotPassword, getProfile, getUserById, getTeamUsers, loginUser, logoutUser, registerUser, resetPassword, updateUser, softDeleteUser, getDeletedUsers, restoreUser, setupPassword, resendInvitation, resendVerificationByEmail, uploadProfilePicture } from "../controllers/userController.js"
 import { protect } from "../middlewares/authMiddleware.js"
 import { requireRole } from "../middlewares/roleMiddleware.js"
 import { upload } from "../middlewares/uploadMiddleware.js"
@@ -26,12 +26,7 @@ router.put("/profile/picture", protect, upload.single("profilePicture"), uploadP
 router.post("/forgot-password", forgotPassword)
 router.post("/reset-password", resetPassword)
 router.post("/setup-password", setupPassword)
-router.post("/resend-verification", (req, res, next) => {
-    // Import here to avoid circular dependencies if any, though not expected
-    import("../controllers/userController.js").then(module => {
-        module.resendVerificationByEmail(req, res, next);
-    });
-})
+router.post("/resend-verification", resendVerificationByEmail)
 router.post("/:id/resend-invitation", protect, resendInvitation)
 router.get("/admin-test", protect, requireRole("admin"), adminTest)
 router.get("/team", protect, getTeamUsers)

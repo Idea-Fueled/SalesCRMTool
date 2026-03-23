@@ -1090,11 +1090,17 @@ export const resendInvitation = async (req, res) => {
 
 export const resendVerificationByEmail = async (req, res) => {
     try {
-        const { email } = req.body;
+        let { email } = req.body;
         if (!email) return res.status(400).json({ message: "Email is required." });
 
+        email = email.trim().toLowerCase();
+        console.log(`[resendVerificationByEmail] Request received for: ${email}`);
+
         const user = await User.findOne({ email });
-        if (!user) return res.status(404).json({ message: "No account found with this email." });
+        if (!user) {
+            console.warn(`[resendVerificationByEmail] No user found for: ${email}`);
+            return res.status(404).json({ message: "No account found with this email." });
+        }
 
         const frontendUrl = process.env.FRONTEND_URL || req.get("origin") || "http://localhost:5173";
         const logoUrl = `${frontendUrl}/Logo.png`;
@@ -1102,6 +1108,7 @@ export const resendVerificationByEmail = async (req, res) => {
         let message = "";
 
         if (!user.isSetupComplete && !user.lastLogin) {
+            console.log(`[resendVerificationByEmail] Path: Invitation Flow for ${email}`);
             // Flow A: Resend Account Setup Invitation
             const invitationToken = crypto.randomBytes(32).toString("hex");
             const invitationExpiry = Date.now() + 3600000; // 1 hour
@@ -1130,6 +1137,7 @@ export const resendVerificationByEmail = async (req, res) => {
                 </div>
             `;
         } else {
+            console.log(`[resendVerificationByEmail] Path: Password Reset Flow for ${email}`);
             // Flow B: Resend Password Reset Link (Account is already verified/setup)
             const resetToken = crypto.randomBytes(32).toString("hex");
             const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
@@ -1159,7 +1167,9 @@ export const resendVerificationByEmail = async (req, res) => {
             `;
         }
 
+        console.log(`[resendVerificationByEmail] Dispatching email to: ${user.email} with subject: ${subject}`);
         await sendEmail(user.email, subject, message);
+        console.log(`[resendVerificationByEmail] Success: Link resent to ${user.email}`);
         res.status(200).json({ message: "Link resent successfully! Please check your email." });
     } catch (error) {
         console.error("❌ Error resending link:", error);
