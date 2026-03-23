@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getContactById, updateContact, addRemark as addContactRemark, deleteContact, getArchivedContacts, restoreContact, deleteRemarkFile, deleteAttachment, deleteRemark } from "../../API/services/contactService";
+import { getCompanies } from "../../API/services/companyService";
 import { getTeamUsers } from "../../API/services/userService";
 import { useAuth } from "../../context/AuthContext";
 import ContactModal from "../../components/modals/ContactModal";
@@ -110,18 +111,21 @@ export default function ContactDetails() {
     const [remarkFiles, setRemarkFiles] = useState([]);
     const [savingRemark, setSavingRemark] = useState(false);
     const [users, setUsers] = useState([]);
+    const [companies, setCompanies] = useState([]);
     const [isDealsModalOpen, setIsDealsModalOpen] = useState(false);
 
     const fetchContact = async (silent = false) => {
         if (!silent) setLoading(true);
         else setIsRefreshing(true);
         try {
-            const [contactRes, usersRes] = await Promise.all([
+            const [contactRes, usersRes, companiesRes] = await Promise.all([
                 getContactById(id),
-                getTeamUsers()
+                getTeamUsers(),
+                getCompanies({ limit: 1000 })
             ]);
             setContact(contactRes.data.data);
             setUsers(usersRes.data.data || []);
+            setCompanies(companiesRes.data.data || []);
         } catch (error) {
             console.error(error);
             toast.error("Failed to fetch contact details");
@@ -637,6 +641,7 @@ export default function ContactDetails() {
                 onSave={handleSaveContact}
                 userRole={currentUser?.role}
                 potentialOwners={users}
+                companies={companies}
             />
             {/* Delete Confirmation Modal for Full Item */}
             <DeleteConfirmModal

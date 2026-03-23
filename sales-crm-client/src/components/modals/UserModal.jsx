@@ -175,7 +175,7 @@ export default function UserModal({ isOpen, onClose, user, managers = [], onSave
                         <div>
                             <label className="block text-xs font-semibold text-gray-600 mb-1">Password (Optional)</label>
                             <input type="password" name="password" value={form.password} onChange={handleChange}
-                                className={inputClass(errors.password)} placeholder="Leave blank to send invitation email" />
+                                className={inputClass(errors.password)} placeholder="Min. 6 characters or leave blank" />
                             {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
                             <p className="text-[10px] text-gray-400 mt-1 italic">
                                 If omitted, the user will receive a link via email to set their own password.
@@ -234,7 +234,7 @@ export default function UserModal({ isOpen, onClose, user, managers = [], onSave
                                         value={adminNewPassword}
                                         onChange={e => setAdminNewPassword(e.target.value)}
                                         className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-red-400 bg-white"
-                                        placeholder="Enter temporary password"
+                                        placeholder="Min. 6 characters"
                                     />
                                     <button
                                         type="button"

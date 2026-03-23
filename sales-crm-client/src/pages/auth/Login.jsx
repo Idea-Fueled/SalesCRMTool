@@ -195,7 +195,7 @@ const Login = () => {
                                             value={formData.password}
                                             onChange={handleChange}
                                             className={fieldClass("password")}
-                                            placeholder="Enter Your Password"
+                                            placeholder="Min. 6 characters"
                                             autoComplete="current-password"
                                         />
                                         <ErrorTag message={errors.password} />
@@ -265,7 +265,7 @@ const Login = () => {
                                                 value={formData.password}
                                                 onChange={handleChange}
                                                 className={fieldClass("password")}
-                                                placeholder="••••••••"
+                                                placeholder="Min. 6 characters"
                                                 autoComplete="current-password"
                                             />
                                             <button

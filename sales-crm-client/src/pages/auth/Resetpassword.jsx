@@ -123,7 +123,7 @@ const Resetpassword = () => {
                                         value={form.password}
                                         onChange={handleChange}
                                         className={fieldClass("password")}
-                                        placeholder="Min 6 characters"
+                                        placeholder="Min. 6 characters"
                                     />
                                     <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2"
                                         onClick={() => setShow(s => ({ ...s, password: !s.password }))}>
@@ -145,7 +145,7 @@ const Resetpassword = () => {
                                         value={form.confirm}
                                         onChange={handleChange}
                                         className={fieldClass("confirm")}
-                                        placeholder="Re-enter your new password"
+                                        placeholder="Min. 6 characters"
                                     />
                                     <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2"
                                         onClick={() => setShow(s => ({ ...s, confirm: !s.confirm }))}>

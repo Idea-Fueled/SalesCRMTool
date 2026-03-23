@@ -53,7 +53,7 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
         setErrors({});
         setCompanySearch("");
         setCompanyDropdownOpen(false);
-    }, [contact, isOpen, companies]);
+    }, [contact, isOpen]);
 
     // Close dropdown on outside click
     useEffect(() => {

@@ -89,7 +89,7 @@ export default function SetPassword() {
                                         <Lock className="absolute left-4 top-4 text-gray-400" size={18} />
                                         <input
                                             type="password"
-                                            placeholder="New Password"
+                                            placeholder="Min. 6 characters"
                                             className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 pl-12 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 transition"
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
@@ -100,7 +100,7 @@ export default function SetPassword() {
                                         <Lock className="absolute left-4 top-4 text-gray-400" size={18} />
                                         <input
                                             type="password"
-                                            placeholder="Confirm Password"
+                                            placeholder="Min. 6 characters"
                                             className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 pl-12 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 transition"
                                             value={confirmPassword}
                                             onChange={(e) => setConfirmPassword(e.target.value)}

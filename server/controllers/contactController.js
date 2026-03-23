@@ -1,9 +1,10 @@
 import { Company } from "../models/companySchema.js";
 import { Contact } from "../models/contactSchema.js";
+import { Deal } from "../models/dealSchema.js";
 import User from "../models/userSchema.js";
 import { logAction } from "../utils/auditLogger.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../middlewares/uploadMiddleware.js";
-import { sendHierarchyNotification } from "../services/notificationService.js";
+import { sendTieredNotification } from "../services/notificationService.js";
 
 export const createContact = async (req, res, next) => {
     try {
@@ -57,23 +58,34 @@ export const createContact = async (req, res, next) => {
             }
 
             if (role !== "admin") {
+                let teamIds = [];
                 if (role === "sales_manager") {
                     const teamUsers = await User.find({ $or: [{ _id: id }, { managerId: id }] }).select("_id");
-                    const teamIds = teamUsers.map(user => user._id.toString());
+                    teamIds = teamUsers.map(user => user._id.toString());
+                }
 
-                    if (!teamIds.includes(company.ownerId.toString())) {
+                const hasExistingDeal = await Deal.exists({ 
+                    companyId: sanitizedCompanyId, 
+                    ownerId: role === "sales_manager" ? { $in: teamIds } : id,
+                    isDeleted: { $ne: true }
+                });
+
+                if (role === "sales_manager") {
+                    const isTeamOwned = company.ownerId && teamIds.includes(company.ownerId.toString());
+                    if (!isTeamOwned && !hasExistingDeal) {
                         return res.status(403).json({
                             message: "You can only add contacts to your team companies!"
                         })
                     }
                 }
-            }
 
-            if (role === "sales_rep") {
-                if (company.ownerId.toString() !== id) {
-                    return res.status(403).json({
-                        message: "You can only add contacts to your own companies!"
-                    })
+                if (role === "sales_rep") {
+                    const isOwned = company.ownerId && company.ownerId.toString() === id;
+                    if (!isOwned && !hasExistingDeal) {
+                        return res.status(403).json({
+                            message: "You can only add contacts to your own companies!"
+                        })
+                    }
                 }
             }
         }
@@ -128,9 +140,10 @@ export const createContact = async (req, res, next) => {
             req
         });
 
-        // Hierarchical Notification
-        await sendHierarchyNotification({
+        // Tiered Notification (Admins, Owner, Manager)
+        await sendTieredNotification({
             actorId: id,
+            ownerId: contact.ownerId,
             entityId: contact._id,
             entityType: "Contact",
             entityName: `${contact.firstName} ${contact.lastName}`,
@@ -263,22 +276,34 @@ export const updateContact = async (req, res, next) => {
         }
 
         if (role !== "admin") {
+            let teamIds = [];
             if (role === "sales_manager") {
                 const teamUsers = await User.find({ $or: [{ _id: userId }, { managerId: userId }] }).select("_id");
-                const teamIds = teamUsers.map(user => user._id.toString());
-                if (!teamIds.includes(contact.ownerId.toString())) {
+                teamIds = teamUsers.map(user => user._id.toString());
+            }
+
+            const hasExistingDeal = await Deal.exists({ 
+                contactId: id, 
+                ownerId: role === "sales_manager" ? { $in: teamIds } : userId,
+                isDeleted: { $ne: true }
+            });
+
+            if (role === "sales_manager") {
+                const isTeamOwned = contact.ownerId && teamIds.includes(contact.ownerId.toString());
+                if (!isTeamOwned && !hasExistingDeal) {
                     return res.status(403).json({
                         message: "You can only update contacts of your team members!"
                     })
                 }
             }
-        }
 
-        if (role === "sales_rep") {
-            if (contact.ownerId.toString() !== userId) {
-                return res.status(403).json({
-                    message: "You can only update your own contacts!"
-                })
+            if (role === "sales_rep") {
+                const isOwned = contact.ownerId && contact.ownerId.toString() === userId;
+                if (!isOwned && !hasExistingDeal) {
+                    return res.status(403).json({
+                        message: "You can only update your own contacts!"
+                    })
+                }
             }
         }
 
@@ -377,13 +402,15 @@ export const updateContact = async (req, res, next) => {
             req
         });
 
-        // Hierarchical Notification
-        await sendHierarchyNotification({
+        // Tiered Notification (Admins, Owner, Manager)
+        await sendTieredNotification({
             actorId: userId,
+            ownerId: contact.ownerId,
             entityId: id,
             entityType: "Contact",
             entityName: `${contact.firstName} ${contact.lastName}`,
-            action: "UPDATE"
+            action: req.body.ownerId && req.body.ownerId.toString() !== (contact.ownerId?.toString() || "") ? "ASSIGN" : "UPDATE",
+            customMessage: reassignedToName ? `Contact "${contact.firstName} ${contact.lastName}" reassigned to ${reassignedToName} by ${req.user.firstName}.` : null
         });
 
         return;
@@ -448,9 +475,10 @@ export const deleteContact = async (req, res, next) => {
             req
         });
 
-        // Hierarchical Notification
-        await sendHierarchyNotification({
+        // Tiered Notification (Admins, Owner, Manager)
+        await sendTieredNotification({
             actorId: userId,
+            ownerId: contact.ownerId,
             entityId: id,
             entityType: "Contact",
             entityName: `${contact.firstName} ${contact.lastName}`,
@@ -575,6 +603,16 @@ export const restoreContact = async (req, res) => {
             performedBy: userId,
             details: { message: `Contact "${contact.firstName} ${contact.lastName}" restored from trash.` },
             req
+        });
+
+        // Tiered Notification for Restore
+        await sendTieredNotification({
+            actorId: userId,
+            ownerId: contact.ownerId,
+            entityId: id,
+            entityType: "Contact",
+            entityName: `${contact.firstName} ${contact.lastName}`,
+            action: "ACTIVATE"
         });
     } catch (error) {
         res.status(500).json({ message: error.message || "Server error!" });
@@ -722,6 +760,17 @@ export const addRemark = async (req, res) => {
             performedBy: userId,
             details: { message: "Added a new remark", remark: newRemark },
             req
+        });
+
+        // Tiered Notification for Remark
+        await sendTieredNotification({
+            actorId: userId,
+            ownerId: contact.ownerId,
+            entityId: id,
+            entityType: "Contact",
+            entityName: `${contact.firstName} ${contact.lastName}`,
+            action: "REMARK",
+            customMessage: `${authorName} added a remark to Contact "${contact.firstName} ${contact.lastName}": "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`
         });
 
     } catch (error) {

@@ -6,7 +6,7 @@ import { logAction } from "../utils/auditLogger.js";
 import { Notification } from "../models/notificationSchema.js";
 import { emitNotification } from "../utils/socket.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../middlewares/uploadMiddleware.js";
-import { sendHierarchyNotification } from "../services/notificationService.js";
+import { sendTieredNotification } from "../services/notificationService.js";
 
 const getProbabilityForStage = (stage) => {
     const mapping = {
@@ -88,15 +88,28 @@ export const createDeal = async (req, res, next) => {
             }
 
             if (role !== "admin") {
+                let teamIds = [];
                 if (role === "sales_manager") {
                     const teamUsers = await User.find({ $or: [{ _id: userId }, { managerId: userId }] }).select("_id");
-                    const teamIds = teamUsers.map(u => u._id.toString());
-                    if (!teamIds.includes(company.ownerId.toString())) {
+                    teamIds = teamUsers.map(u => u._id.toString());
+                }
+
+                // Determine if user can "see" this company based on ownership or existing deals
+                const hasExistingDeal = await Deal.exists({ 
+                    companyId: sanitizedCompanyId, 
+                    ownerId: role === "sales_manager" ? { $in: teamIds } : userId,
+                    isDeleted: { $ne: true }
+                });
+
+                if (role === "sales_manager") {
+                    const isTeamOwned = company.ownerId && teamIds.includes(company.ownerId.toString());
+                    if (!isTeamOwned && !hasExistingDeal) {
                         return res.status(403).json({ message: "Access denied!" });
                     }
                 }
                 if (role === "sales_rep") {
-                    if (company.ownerId.toString() !== userId) {
+                    const isOwned = company.ownerId && company.ownerId.toString() === userId;
+                    if (!isOwned && !hasExistingDeal) {
                         return res.status(403).json({ message: "Access denied!" });
                     }
                 }
@@ -139,30 +152,15 @@ export const createDeal = async (req, res, next) => {
             req
         });
 
-        // Create Notifications via Hierarchy Service
-        await sendHierarchyNotification({
+        // Create Tiered Notifications (Admins, Owner, and Manager)
+        await sendTieredNotification({
             actorId: userId,
+            ownerId: deal.ownerId,
             entityId: deal._id,
             entityType: "Deal",
             entityName: deal.name,
             action: "CREATE"
         });
-
-        // Notify Assignee ONLY if it's someone else (not the hierarchy which is for managers/admins)
-        if (deal.ownerId.toString() !== userId) {
-             const owner = await User.findById(deal.ownerId);
-             const creatorName = `${req.user.firstName} ${req.user.lastName || ""}`.trim();
-             const notification = await Notification.create({
-                recipientId: deal.ownerId,
-                senderId: userId,
-                entityId: deal._id,
-                entityType: "Deal",
-                type: "deal_created",
-                message: `Deal "${deal.name}" has been created by ${creatorName} and assigned to you.`,
-                teamId: owner?.managerId || null
-            });
-            emitNotification(notification);
-        }
 
         return;
 
@@ -221,6 +219,17 @@ export const addRemark = async (req, res) => {
             performedBy: userId,
             details: { message: "Added a new remark", remark: newRemark },
             req
+        });
+
+        // Tiered Notification for Remark
+        await sendTieredNotification({
+            actorId: userId,
+            ownerId: deal.ownerId,
+            entityId: id,
+            entityType: "Deal",
+            entityName: deal.name,
+            action: "REMARK",
+            customMessage: `${authorName} added a remark to Deal "${deal.name}": "${text ? text.substring(0, 50) : 'Attached files'}${text && text.length > 50 ? '...' : ''}"`
         });
 
     } catch (error) {
@@ -372,74 +381,31 @@ export const updateDealInformation = async (req, res, next) => {
             req
         });
 
-        // Notification and Ownership Sync for reassignment
+        // Sync Company and Contact ownership for reassignment
         if (req.body.ownerId && req.body.ownerId !== deal.ownerId.toString()) {
-            const newOwner = await User.findById(req.body.ownerId);
-            const creatorName = `${req.user.firstName} ${req.user.lastName || ""}`.trim();
-
-            // Sync Company and Contact ownership to the NEW owner
             const syncOwnership = async () => {
                 if (deal.companyId) await Company.findByIdAndUpdate(deal.companyId, { ownerId: req.body.ownerId });
                 if (deal.contactId) await Contact.findByIdAndUpdate(deal.contactId, { ownerId: req.body.ownerId });
             };
             syncOwnership().catch(err => console.error("Ownership sync error on reassignment:", err));
-
-            // Notify Assignee
-            const notification = await Notification.create({
-                recipientId: req.body.ownerId,
-                senderId: userId,
-                entityId: deal._id,
-                entityType: "Deal",
-                type: "deal_reassigned",
-                message: `Deal "${deal.name}" has been reassigned to you by ${creatorName}.`,
-                teamId: newOwner?.managerId || null
-            });
-            emitNotification(notification);
-
-            // Notify Assignee's Manager if exists
-            if (newOwner && newOwner.managerId && newOwner.managerId.toString() !== userId) {
-                const managerNotification = await Notification.create({
-                    recipientId: newOwner.managerId,
-                    senderId: userId,
-                    entityId: deal._id,
-                    entityType: "Deal",
-                    type: "deal_reassigned",
-                    message: `Deal Reassigned: "${deal.name}" has been reassigned to your team member ${reassignedToName} by ${creatorName}.`,
-                    teamId: newOwner.managerId
-                });
-                emitNotification(managerNotification);
-        }
         }
 
-        // Create Hierarchical Notification (covers ALL edits)
+        // Create Tiered Notifications (Admins, Owner, and Manager)
         let hierarchyMsg = null;
         if (req.body.stage && req.body.stage !== oldStage) {
-            hierarchyMsg = `Deal "${deal.name}" stage updated to ${req.body.stage} by ${req.user.firstName} ${req.user.lastName || ""}.`;
+            const actorFullName = `${req.user.firstName} ${req.user.lastName || ""}`.trim();
+            hierarchyMsg = `Deal "${deal.name}" stage updated to ${req.body.stage} by ${actorFullName}.`;
         }
-        
-        await sendHierarchyNotification({
+
+        await sendTieredNotification({
             actorId: userId,
-            entityId: deal._id,
+            ownerId: deal.ownerId,
+            entityId: id,
             entityType: "Deal",
             entityName: deal.name,
-            action: "UPDATE",
-            customMessage: hierarchyMsg
+            action: req.body.ownerId && req.body.ownerId.toString() !== deal.ownerId.toString() ? "ASSIGN" : "UPDATE",
+            customMessage: hierarchyMsg || (reassignedToName ? `Deal "${deal.name}" reassigned to ${reassignedToName}` : null)
         });
-
-        // Notify Owner if actor is not the owner (regardless of hierarchy)
-        if (deal.ownerId.toString() !== userId) {
-            const owner = await User.findById(deal.ownerId);
-            const notification = await Notification.create({
-                recipientId: deal.ownerId,
-                senderId: userId,
-                entityId: deal._id,
-                entityType: "Deal",
-                type: "deal_updated",
-                message: hierarchyMsg || `Deal "${deal.name}" has been updated by ${req.user.firstName}.`,
-                teamId: owner?.managerId || null
-            });
-            emitNotification(notification);
-        }
 
         return;
 
@@ -538,30 +504,16 @@ export const moveDealStage = async (req, res, next) => {
             req
         });
 
-        // Create Hierarchical Notification
-        await sendHierarchyNotification({
+        // Create Tiered Notification (covers ALL roles: Admin, Owner, Manager)
+        await sendTieredNotification({
             actorId: userId,
+            ownerId: deal.ownerId,
             entityId: deal._id,
             entityType: "Deal",
             entityName: deal.name,
-            action: "UPDATE",
+            action: "STAGE_CHANGE",
             customMessage: `Deal "${deal.name}" moved to ${newStage} by ${req.user.firstName} ${req.user.lastName || ""}.`
         });
-
-        // Notify Owner if actor is not owner
-        if (deal.ownerId.toString() !== userId) {
-            const owner = await User.findById(deal.ownerId);
-            const notification = await Notification.create({
-                recipientId: deal.ownerId,
-                senderId: userId,
-                entityId: deal._id,
-                entityType: "Deal",
-                type: "deal_updated",
-                message: `Deal "${deal.name}" moved to ${newStage}.`,
-                teamId: owner?.managerId || null
-            });
-            emitNotification(notification);
-        }
 
         return;
 
@@ -654,9 +606,10 @@ export const markDealResult = async (req, res, next) => {
             req
         });
 
-        // Hierarchical Notification
-        await sendHierarchyNotification({
+        // Tiered Notification (Admins, Owner, Manager)
+        await sendTieredNotification({
             actorId: userId,
+            ownerId: deal.ownerId,
             entityId: id,
             entityType: "Deal",
             entityName: deal.name,
@@ -725,9 +678,10 @@ export const deleteDeal = async (req, res, next) => {
             req
         });
 
-        // Hierarchical Notification
-        await sendHierarchyNotification({
+        // Tiered Notification (Admins, Owner, Manager)
+        await sendTieredNotification({
             actorId: userId,
+            ownerId: deal.ownerId,
             entityId: id,
             entityType: "Deal",
             entityName: deal.name,

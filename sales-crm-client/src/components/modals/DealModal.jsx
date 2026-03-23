@@ -36,10 +36,29 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
     const filteredContacts = React.useMemo(() => {
         if (!formData.companyId) return contacts || [];
         return (contacts || []).filter(c => {
-            const contactCompanyId = c.companyId?._id || c.companyId;
-            return contactCompanyId === formData.companyId;
+            const primaryId = c.companyId?._id || c.companyId;
+            if (primaryId === formData.companyId) return true;
+            if (c.companies && Array.isArray(c.companies)) {
+                return c.companies.some(comp => (comp.companyId?._id || comp.companyId) === formData.companyId);
+            }
+            return false;
         });
     }, [formData.companyId, contacts]);
+
+    // Derived: Filtered companies based on selected contact
+    const filteredCompanies = React.useMemo(() => {
+        if (!formData.contactId) return companies || [];
+        const contact = contacts?.find(c => c._id === formData.contactId);
+        if (!contact) return companies || [];
+        
+        const associatedIds = new Set();
+        if (contact.companyId) associatedIds.add(String(contact.companyId?._id || contact.companyId));
+        if (contact.companies && Array.isArray(contact.companies)) {
+            contact.companies.forEach(c => associatedIds.add(String(c.companyId?._id || c.companyId)));
+        }
+        
+        return (companies || []).filter(c => associatedIds.has(String(c._id)));
+    }, [formData.contactId, contacts, companies]);
 
     useEffect(() => {
         if (deal) {
@@ -69,15 +88,41 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
         setFormData(prev => {
             const newData = { ...prev, [field]: value };
             
-            // If company changes, validate and potentially clear contact
-            if (field === "companyId") {
+            // If company changes, validate if current contact still belongs
+            if (field === "companyId" && value) {
                 const currentContactId = prev.contactId;
-                if (currentContactId && value) {
+                if (currentContactId) {
                     const contactObj = contacts.find(c => c._id === currentContactId);
-                    const contactCompanyId = contactObj?.companyId?._id || contactObj?.companyId;
-                    if (contactCompanyId !== value) {
-                        newData.contactId = "";
-                        newData.contactName = "";
+                    if (contactObj) {
+                        const primaryId = contactObj.companyId?._id || contactObj.companyId;
+                        const otherIds = contactObj.companies?.map(c => c.companyId?._id || c.companyId) || [];
+                        const allIds = [primaryId, ...otherIds].map(String);
+                        if (!allIds.includes(String(value))) {
+                            newData.contactId = "";
+                            newData.contactName = "";
+                        }
+                    }
+                }
+            }
+
+            // If contact changes, potentially auto-select company
+            if (field === "contactId" && value) {
+                const contactObj = contacts.find(c => c._id === value);
+                if (contactObj) {
+                    const primaryId = contactObj.companyId?._id || contactObj.companyId;
+                    const otherIds = contactObj.companies?.map(c => c.companyId?._id || c.companyId) || [];
+                    const allIds = [...new Set([primaryId, ...otherIds].filter(Boolean).map(String))];
+                    
+                    // If contact has exactly 1 company and we don't have one selected (or it's different), auto-select it
+                    if (allIds.length === 1 && (!prev.companyId || !allIds.includes(String(prev.companyId)))) {
+                        const compId = allIds[0];
+                        const comp = companies.find(c => String(c._id) === compId);
+                        newData.companyId = compId;
+                        newData.companyName = comp?.name || "";
+                    } else if (allIds.length > 1 && prev.companyId && !allIds.includes(String(prev.companyId))) {
+                        // If current company is NOT in the contact's list, clear it to force user to pick from contact's companies
+                        newData.companyId = "";
+                        newData.companyName = "";
                     }
                 }
             }
@@ -147,13 +192,13 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
                             value={formData.companyId}
                             onChange={e => {
                                 const selectedId = e.target.value;
-                                const comp = companies.find(c => c._id === selectedId);
+                                const comp = companies.find(c => String(c._id) === selectedId);
                                 set("companyId", selectedId);
                                 set("companyName", comp?.name || "");
                             }}
                         >
                             <option value="">— Select Company —</option>
-                            {(companies || []).map(comp => (
+                            {(filteredCompanies || []).map(comp => (
                                 <option key={comp._id} value={comp._id}>
                                     {comp.name}
                                 </option>
@@ -166,28 +211,19 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
                         <select
                             className={inputClass("contactId")}
                             value={formData.contactId}
-                            disabled={!formData.companyId}
                             onChange={e => {
                                 const selectedId = e.target.value;
-                                const cont = filteredContacts.find(c => c._id === selectedId);
+                                const cont = (contacts || []).find(c => String(c._id) === selectedId);
                                 set("contactId", selectedId);
                                 set("contactName", cont ? `${cont.firstName} ${cont.lastName}`.trim() : "");
                             }}
                         >
-                            {!formData.companyId ? (
-                                <option value="">Select company first</option>
-                            ) : filteredContacts.length === 0 ? (
-                                <option value="">No contacts found</option>
-                            ) : (
-                                <>
-                                    <option value="">— Select Contact —</option>
-                                    {filteredContacts.map(cont => (
-                                        <option key={cont._id} value={cont._id}>
-                                            {cont.firstName} {cont.lastName}
-                                        </option>
-                                    ))}
-                                </>
-                            )}
+                            <option value="">— Select Contact —</option>
+                            {(filteredContacts || []).map(cont => (
+                                <option key={cont._id} value={cont._id}>
+                                    {cont.firstName} {cont.lastName}
+                                </option>
+                            ))}
                         </select>
                         {errors.contactName && <p className="text-red-500 text-xs">{errors.contactName}</p>}
                     </div>

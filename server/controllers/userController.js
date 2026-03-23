@@ -10,7 +10,7 @@ import { logAction } from "../utils/auditLogger.js";
 import crypto from "crypto";
 import { sendEmail } from "../utils/sendEmail.js";
 import { getIO } from "../utils/socket.js";
-import { notifyReassignment } from "../services/notificationService.js";
+import { notifyReassignment, sendTieredNotification } from "../services/notificationService.js";
 import { uploadToCloudinary } from "../middlewares/uploadMiddleware.js";
 
 export const registerUser = async (req, res, next) => {
@@ -175,6 +175,19 @@ export const registerUser = async (req, res, next) => {
             performedBy: req.user?.id || user._id,
             details: { message: isInvitation ? `User invited: ${user.email}` : `New user registered: ${user.email}`, email: user.email },
             req
+        });
+
+        // Tiered Notification for User Creation
+        await sendTieredNotification({
+            actorId: req.user?._id || user._id,
+            ownerId: user._id,
+            entityId: user._id,
+            entityType: "User",
+            entityName: `${user.firstName} ${user.lastName}`,
+            action: "CREATE",
+            customMessage: isInvitation 
+                ? `New user account created for ${user.firstName} ${user.lastName} (${user.role}) by ${req.user?.firstName}.`
+                : `New user self-registered: ${user.firstName} ${user.lastName} (${user.role}).`
         });
         return;
 
@@ -386,17 +399,18 @@ export const softDeleteUser = async (req, res, next) => {
 
         res.status(200).json({ message: responseMsg });
 
-        // Hierarchy Notification
-        if (newOwnerId) {
-            await notifyReassignment({
-                oldOwnerId: id,
-                newOwnerId,
-                actorId: currentUserId,
-                entityType: "User",
-                entityId: id,
-                customMessage: `User "${user.firstName} ${user.lastName}" soft-deleted. All records reassigned to ${newOwner.firstName} ${newOwner.lastName}.`
-            });
-        }
+        // Tiered Notification (Admins + Manager)
+        await sendTieredNotification({
+            actorId: currentUserId,
+            ownerId: id,
+            entityId: id,
+            entityType: "User",
+            entityName: `${user.firstName} ${user.lastName}`,
+            action: "DELETE",
+            customMessage: newOwner 
+                ? `User "${user.firstName} ${user.lastName}" soft-deleted. Records reassigned to ${newOwner.firstName} ${newOwner.lastName}.`
+                : `User "${user.firstName} ${user.lastName}" soft-deleted.`
+        });
 
         await logAction({
             entityType: "User",
@@ -453,13 +467,15 @@ export const restoreUser = async (req, res, next) => {
 
         res.status(200).json({ message: `${user.firstName} ${user.lastName} restored successfully!` });
 
-        await logAction({
-            entityType: "User",
+        // Tiered Notification (Admins + Manager)
+        await sendTieredNotification({
+            actorId: currentUserId,
+            ownerId: id,
             entityId: id,
+            entityType: "User",
+            entityName: `${user.firstName} ${user.lastName}`,
             action: "ACTIVATE",
-            performedBy: currentUserId,
-            details: { message: `User "${user.firstName} ${user.lastName}" restored from trash.`, targetName: `${user.firstName} ${user.lastName}` },
-            req
+            customMessage: `User "${user.firstName} ${user.lastName}" restored from trash by ${req.user.firstName}.`
         });
     } catch (error) {
         return res.status(500).json({ message: error.message || "Server error!" });
@@ -515,14 +531,15 @@ export const updateUser = async (req, res, next) => {
             data: user
         })
 
-        // Log update
-        await logAction({
-            entityType: "User",
+        // Tiered Notification (Admins + Manager)
+        await sendTieredNotification({
+            actorId: currentUserId,
+            ownerId: id,
             entityId: id,
+            entityType: "User",
+            entityName: `${user.firstName} ${user.lastName}`,
             action: "UPDATE",
-            performedBy: currentUserId,
-            details: { newValues: req.body },
-            req
+            customMessage: `User details updated for ${user.firstName} ${user.lastName} by ${req.user.firstName}.`
         });
         return;
 
@@ -606,17 +623,18 @@ export const deactivateUser = async (req, res, next) => {
 
         res.status(200).json({ message: responseMsg });
 
-        // Hierarchy Notification
-        if (newOwnerId) {
-            await notifyReassignment({
-                oldOwnerId: id,
-                newOwnerId,
-                actorId: currentUserId,
-                entityType: "User",
-                entityId: id,
-                customMessage: `User "${user.firstName} ${user.lastName}" deactivated. All records reassigned to ${newOwner.firstName} ${newOwner.lastName}.`
-            });
-        }
+        // Tiered Notification (Admins + Manager)
+        await sendTieredNotification({
+            actorId: currentUserId,
+            ownerId: id,
+            entityId: id,
+            entityType: "User",
+            entityName: `${user.firstName} ${user.lastName}`,
+            action: "DEACTIVATE",
+            customMessage: newOwner 
+                ? `User "${user.firstName} ${user.lastName}" deactivated. Records reassigned to ${newOwner.firstName} ${newOwner.lastName}.`
+                : `User "${user.firstName} ${user.lastName}" deactivated.`
+        });
 
         // Log the deactivation
         await logAction({
@@ -691,6 +709,16 @@ export const activateUser = async (req, res, next) => {
             req
         });
 
+        // Tiered Notification (Admins + Manager)
+        await sendTieredNotification({
+            actorId: currentUserId,
+            ownerId: id,
+            entityId: id,
+            entityType: "User",
+            entityName: `${user.firstName} ${user.lastName}`,
+            action: "ACTIVATE"
+        });
+
     } catch (error) {
         return res.status(500).json({
             message: error.message || "Server error!"
@@ -735,6 +763,17 @@ export const adminResetPassword = async (req, res, next) => {
             performedBy: currentUserId,
             details: { message: `Admin reset password for user: ${user.email}` },
             req
+        });
+
+        // Tiered Notification (Admins + Manager)
+        await sendTieredNotification({
+            actorId: currentUserId,
+            ownerId: id, // User whose password was reset
+            entityId: id,
+            entityType: "User",
+            entityName: `${user.firstName} ${user.lastName}`,
+            action: "UPDATE",
+            customMessage: `Password for user ${user.email} was reset by ${req.user.firstName}.`
         });
 
     } catch (error) {
@@ -868,14 +907,15 @@ export const bulkReassignRecords = async (req, res, next) => {
             message: "All records reassigned successfully!"
         });
 
-        // Hierarchy Notification
-        await notifyReassignment({
-            oldOwnerId: id,
-            newOwnerId,
+        // Tiered Notification (Admins + Manager)
+        await sendTieredNotification({
             actorId: currentUserId,
-            entityType: "User",
+            ownerId: id, // Original owner being reassigned
             entityId: id,
-            customMessage: `All records reassigned from ${oldUser.firstName} ${oldUser.lastName} to ${newUser.firstName} ${newUser.lastName}.`
+            entityType: "User",
+            entityName: `${oldUser.firstName} ${oldUser.lastName}`,
+            action: "REASSIGN",
+            customMessage: `Records reassigned from ${oldUser.firstName} ${oldUser.lastName} to ${newUser.firstName} ${newUser.lastName} by ${req.user.firstName}.`
         });
 
         return;

@@ -67,64 +67,75 @@ export const notifyReassignment = async ({
 };
 
 /**
- * Sends hierarchical notifications for CREATE, UPDATE, DELETE actions.
- * Hierarchy:
- * - Rep actions notify direct Manager AND all Admins.
- * - Manager actions notify all Admins.
- * - Admin actions: No hierarchical notification.
+ * Sends tiered notifications (Admin + Owner + Owner's Manager)
+ * Rules:
+ * - Admins are always notified (except the actor).
+ * - The Owner of the record is notified (except the actor).
+ * - The Owner's Manager is notified (if applicable and not the actor).
  */
-export const sendHierarchyNotification = async ({
+export const sendTieredNotification = async ({
     actorId,
+    ownerId,
     entityId,
     entityType,
     entityName,
-    action, // "CREATE", "UPDATE", "DELETE"
-    customMessage
+    action, // "CREATE", "UPDATE", "DELETE", "ASSIGN", "STAGE_CHANGE", "REMARK", "DEACTIVATE", "ACTIVATE"
+    customMessage,
+    type // Optional: override notification type
 }) => {
     try {
         const actor = await User.findById(actorId);
         if (!actor) return;
 
-        const actorRole = actor.role;
         const actorName = `${actor.firstName} ${actor.lastName}`;
         const recipients = new Set();
 
-        // 1. Determine Recipients based on Role
-        if (actorRole === "sales_rep") {
-            // Rep -> Manager
-            if (actor.managerId) {
-                recipients.add(actor.managerId.toString());
+        // 1. Add ALL active Admins
+        const admins = await User.find({ role: "admin", isActive: true }).select("_id");
+        admins.forEach(admin => recipients.add(admin._id.toString()));
+
+        // 2. Add Owner and Owner's Manager
+        if (ownerId) {
+            const owner = await User.findById(ownerId);
+            if (owner && owner.isActive) {
+                recipients.add(ownerId.toString());
+                if (owner.managerId) {
+                    recipients.add(owner.managerId.toString());
+                }
             }
-            // Rep -> All Admins
-            const admins = await User.find({ role: "admin", isActive: true }).select("_id");
-            admins.forEach(admin => recipients.add(admin._id.toString()));
-        } else if (actorRole === "sales_manager") {
-            // Manager -> All Admins
-            const admins = await User.find({ role: "admin", isActive: true }).select("_id");
-            admins.forEach(admin => recipients.add(admin._id.toString()));
         }
 
-        // Remove actor from recipients if they are an admin or manager themselves (though hierarchy usually prevents this)
+        // 3. Remove Actor from recipients (prevent self-notification)
         recipients.delete(actorId.toString());
 
         if (recipients.size === 0) return;
 
-        // 2. Format Message
+        // 4. Format Message
         const actionVerb = action === "CREATE" ? "created" : 
                            action === "UPDATE" ? "updated" : 
-                           action === "DELETE" ? "deleted" : action.toLowerCase();
+                           action === "DELETE" ? "deleted" : 
+                           action === "ASSIGN" ? "assigned" : 
+                           action === "STAGE_CHANGE" ? "moved stage for" :
+                           action === "REMARK" ? "added a remark to" :
+                           action === "DEACTIVATE" ? "deactivated" :
+                           action === "ACTIVATE" ? "activated" : action.toLowerCase();
         
-        const defaultMessage = `${actorName} ${actionVerb} ${entityType} "${entityName}".`;
+        const defaultMessage = `${actorName} ${actionVerb} ${entityType} "${entityName || 'record'}".`;
         const notificationMessage = customMessage || defaultMessage;
 
+        // Determine Notification Type
         const typeMap = {
             "Deal": "deal_updated",
             "Company": "system",
-            "Contact": "system"
+            "Contact": "system",
+            "User": "system"
         };
-        if (action === "CREATE") typeMap["Deal"] = "deal_created";
+        if (action === "CREATE" && entityType === "Deal") typeMap["Deal"] = "deal_created";
+        if (action === "ASSIGN") typeMap["Deal"] = "deal_reassigned";
 
-        // 3. Create and Emit Notifications
+        const notificationType = type || typeMap[entityType] || "system";
+
+        // 5. Create and Emit Notifications
         const notifications = await Promise.all(
             Array.from(recipients).map(async (recipientId) => {
                 const notification = await Notification.create({
@@ -133,8 +144,7 @@ export const sendHierarchyNotification = async ({
                     entityId,
                     entityType,
                     message: notificationMessage,
-                    type: typeMap[entityType] || "system",
-                    teamId: (recipientId === actor.managerId?.toString()) ? actor.managerId : null
+                    type: notificationType
                 });
                 
                 emitNotification(notification);
@@ -142,9 +152,32 @@ export const sendHierarchyNotification = async ({
             })
         );
 
-        console.log(`[notificationService] Created ${notifications.length} hierarchical notifications for ${action} ${entityType}.`);
+        console.log(`[notificationService] Created ${notifications.length} tiered notifications for ${action} ${entityType}.`);
 
     } catch (error) {
-        console.error("❌ Notification Service Error (sendHierarchyNotification):", error);
+        console.error("❌ Notification Service Error (sendTieredNotification):", error);
     }
+};
+
+/**
+ * Sends hierarchical notifications for CREATE, UPDATE, DELETE actions.
+ * @deprecated Use sendTieredNotification for consistent Admin+Owner+Manager coverage.
+ */
+export const sendHierarchyNotification = async ({
+    actorId,
+    entityId,
+    entityType,
+    entityName,
+    action,
+    customMessage
+}) => {
+    // Fallback to tiered notification
+    return sendTieredNotification({
+        actorId,
+        entityId,
+        entityType,
+        entityName,
+        action,
+        customMessage
+    });
 };

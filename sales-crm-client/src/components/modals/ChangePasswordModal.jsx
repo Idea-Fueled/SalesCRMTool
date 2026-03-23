@@ -83,7 +83,7 @@ export default function ChangePasswordModal({ isOpen, onClose, userId }) {
                             value={formData.oldPassword}
                             onChange={handleChange}
                             className={`w-full pl-10 pr-12 py-2.5 bg-gray-50 border rounded-xl text-sm transition-all focus:ring-2 focus:ring-red-100 outline-none ${errors.oldPassword ? "border-red-300 ring-red-50" : "border-gray-200 focus:border-red-400"}`}
-                            placeholder="••••••••"
+                            placeholder="Enter current password"
                         />
                         <button
                             type="button"
@@ -109,7 +109,7 @@ export default function ChangePasswordModal({ isOpen, onClose, userId }) {
                             value={formData.newPassword}
                             onChange={handleChange}
                             className={`w-full pl-10 pr-12 py-2.5 bg-gray-50 border rounded-xl text-sm transition-all focus:ring-2 focus:ring-red-100 outline-none ${errors.newPassword ? "border-red-300 ring-red-50" : "border-gray-200 focus:border-red-400"}`}
-                            placeholder="••••••••"
+                            placeholder="Min. 6 characters"
                         />
                         <button
                             type="button"
@@ -135,7 +135,7 @@ export default function ChangePasswordModal({ isOpen, onClose, userId }) {
                             value={formData.confirmPassword}
                             onChange={handleChange}
                             className={`w-full pl-10 pr-12 py-2.5 bg-gray-50 border rounded-xl text-sm transition-all focus:ring-2 focus:ring-red-100 outline-none ${errors.confirmPassword ? "border-red-300 ring-red-50" : "border-gray-200 focus:border-red-400"}`}
-                            placeholder="••••••••"
+                            placeholder="Min. 6 characters"
                         />
                         <button
                             type="button"

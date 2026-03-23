@@ -153,7 +153,7 @@ export default function SalesManagerLayout() {
                     </div>
                 </nav>
 
-                <div className="p-4 border-t border-gray-100 pb-20 lg:pb-4">
+                <div className="p-4 border-t border-gray-100 pb-6 lg:pb-6">
                     <button
                         onClick={() => setShowLogout(true)}
                         className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-500 rounded-lg hover:bg-red-50 transition-colors"

@@ -1,8 +1,9 @@
 import { Company } from "../models/companySchema.js";
+import { Deal } from "../models/dealSchema.js";
 import User from "../models/userSchema.js";
 import { logAction } from "../utils/auditLogger.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../middlewares/uploadMiddleware.js";
-import { sendHierarchyNotification } from "../services/notificationService.js";
+import { sendTieredNotification } from "../services/notificationService.js";
 
 export const createCompany = async (req, res) => {
     try {
@@ -103,9 +104,10 @@ export const createCompany = async (req, res) => {
             req
         });
 
-        // Hierarchical Notification
-        await sendHierarchyNotification({
+        // Tiered Notification (Admins, Owner, Manager)
+        await sendTieredNotification({
             actorId: req.user.id,
+            ownerId: company.ownerId,
             entityId: company._id,
             entityType: "Company",
             entityName: company.name,
@@ -237,15 +239,21 @@ export const updateCompany = async (req, res) => {
         }
 
         if (role !== "admin") {
+            let teamIds = [];
+            if (role === "sales_manager") {
+                const teamUsers = await User.find({ $or: [{ _id: userId }, { managerId: userId }] }).select("_id");
+                teamIds = teamUsers.map(u => u._id.toString());
+            }
+
+            const hasExistingDeal = await Deal.exists({ 
+                companyId: id, 
+                ownerId: role === "sales_manager" ? { $in: teamIds } : userId,
+                isDeleted: { $ne: true }
+            });
 
             if (role === "sales_manager") {
-                const teamUsers = await User.find({
-                    $or: [{ _id: userId }, { managerId: userId }]
-                }).select("_id");
-
-                const teamIds = teamUsers.map(u => u._id.toString());
-
-                if (!company.ownerId || !teamIds.includes(company.ownerId.toString())) {
+                const isTeamOwned = company.ownerId && teamIds.includes(company.ownerId.toString());
+                if (!isTeamOwned && !hasExistingDeal) {
                     return res.status(403).json({
                         message: "Access denied!"
                     });
@@ -253,7 +261,8 @@ export const updateCompany = async (req, res) => {
             }
 
             if (role === "sales_rep") {
-                if (!company.ownerId || company.ownerId.toString() !== userId) {
+                const isOwned = company.ownerId && company.ownerId.toString() === userId;
+                if (!isOwned && !hasExistingDeal) {
                     return res.status(403).json({
                         message: "Access denied!"
                     });
@@ -334,13 +343,14 @@ export const updateCompany = async (req, res) => {
             req
         });
 
-        // Hierarchical Notification
-        await sendHierarchyNotification({
+        // Tiered Notification (Admins, Owner, Manager)
+        await sendTieredNotification({
             actorId: userId,
+            ownerId: company.ownerId,
             entityId: id,
             entityType: "Company",
             entityName: company.name,
-            action: "UPDATE"
+            action: req.body.ownerId && req.body.ownerId.toString() !== (company.ownerId?.toString() || "") ? "ASSIGN" : "UPDATE"
         });
 
         return;
@@ -408,9 +418,10 @@ export const deleteCompany = async (req, res) => {
             req
         });
 
-        // Hierarchical Notification
-        await sendHierarchyNotification({
+        // Tiered Notification (Admins, Owner, Manager)
+        await sendTieredNotification({
             actorId: userId,
+            ownerId: company.ownerId,
             entityId: id,
             entityType: "Company",
             entityName: company.name,
@@ -486,13 +497,14 @@ export const changeOwnership = async (req, res) => {
             req
         });
 
-        // Hierarchical Notification
-        await sendHierarchyNotification({
+        // Tiered Notification (Admins, Owner, Manager)
+        await sendTieredNotification({
             actorId: userId,
+            ownerId: company.ownerId,
             entityId: id,
             entityType: "Company",
             entityName: company.name,
-            action: "UPDATE",
+            action: "ASSIGN",
             customMessage: `Company "${company.name}" ownership changed to ${newOwner ? `${newOwner.firstName} ${newOwner.lastName}` : newOwnerId} by ${req.user.firstName}.`
         });
 
@@ -609,6 +621,16 @@ export const restoreCompany = async (req, res) => {
             performedBy: userId,
             details: { message: `Company "${company.name}" restored from trash.` },
             req
+        });
+
+        // Tiered Notification for Restore
+        await sendTieredNotification({
+            actorId: userId,
+            ownerId: company.ownerId,
+            entityId: id,
+            entityType: "Company",
+            entityName: company.name,
+            action: "ACTIVATE"
         });
     } catch (error) {
         res.status(500).json({ message: error.message || "Server error!" });
@@ -756,6 +778,17 @@ export const addRemark = async (req, res) => {
             performedBy: userId,
             details: { message: "Added a new remark", remark: newRemark },
             req
+        });
+
+        // Tiered Notification for Remark
+        await sendTieredNotification({
+            actorId: userId,
+            ownerId: company.ownerId,
+            entityId: id,
+            entityType: "Company",
+            entityName: company.name,
+            action: "REMARK",
+            customMessage: `${authorName} added a remark to Company "${company.name}": "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`
         });
 
     } catch (error) {
