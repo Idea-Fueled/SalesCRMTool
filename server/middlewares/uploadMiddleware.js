@@ -29,8 +29,11 @@ export const uploadToCloudinary = async (file, folder = "deals") => {
         
         const uploadOptions = {
             folder,
-            public_id: isPdf ? `${cleanBaseName}_${timestamp}.${extension}` : `${cleanBaseName}_${timestamp}`,
-            resource_type: "auto",
+            // For 'raw' files, providing the extension in public_id is essential for identifying the file type in the URL.
+            // We ensure we don't add it if it's already part of the cleanBaseName logic or if Cloudinary handles it.
+            // Actually, for consistency, we'll provide the full name with extension here.
+            public_id: `${cleanBaseName}_${timestamp}.${extension}`,
+            resource_type: isPdf ? "raw" : "auto",
             timestamp: timestamp,
             use_filename: true,
             unique_filename: true
