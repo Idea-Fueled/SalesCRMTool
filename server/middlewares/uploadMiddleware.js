@@ -33,6 +33,7 @@ export const uploadToCloudinary = async (file, folder = "deals") => {
             public_id: `${cleanBaseName}_${timestamp}.${extension}`,
             resource_type: isPdf ? "raw" : "auto",
             type: "upload",  // Ensures public access (not authenticated/private which causes 401)
+            access_mode: "public", // Explicitly set public access for environments with strict delivery policies
             timestamp: timestamp,
             use_filename: true,
             unique_filename: true
