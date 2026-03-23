@@ -1168,9 +1168,20 @@ export const resendVerificationByEmail = async (req, res) => {
         }
 
         console.log(`[resendVerificationByEmail] Dispatching email to: ${user.email} with subject: ${subject}`);
-        await sendEmail(user.email, subject, message);
-        console.log(`[resendVerificationByEmail] Success: Link resent to ${user.email}`);
+        
+        // Return success immediately to the client to avoid UI hangs
         res.status(200).json({ message: "Link resent successfully! Please check your email." });
+
+        // Background the email delivery without 'await'
+        sendEmail(user.email, subject, message)
+            .then(() => {
+                console.log(`[resendVerificationByEmail] Success: Email sent to ${user.email} (Background)`);
+            })
+            .catch(err => {
+                console.error(`[resendVerificationByEmail] Background Send FAILURE for ${user.email}:`, err.message);
+            });
+
+        return;
     } catch (error) {
         console.error("❌ Error resending link:", error);
         res.status(500).json({ message: error.message || "Server error resending link." });
