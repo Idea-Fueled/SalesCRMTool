@@ -95,11 +95,13 @@ const NotificationDropdown = () => {
                 <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
                     <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                         <h3 className="font-bold text-gray-800 text-sm">Notifications</h3>
-                        {unreadCount > 0 && (
+                        {notifications.length > 0 && (
                             <button
                                 onClick={markAllAsRead}
-                                className="text-[11px] font-bold text-red-600 hover:text-red-700 transition uppercase"
+                                disabled={unreadCount === 0}
+                                className={`text-[11px] font-bold flex items-center gap-1 transition uppercase ${unreadCount > 0 ? "text-red-600 hover:text-red-700" : "text-gray-300 cursor-default"}`}
                             >
+                                <Check size={12} strokeWidth={3} />
                                 Mark all as read
                             </button>
                         )}
