@@ -31,7 +31,8 @@ export default function DealDetailsModal({ isOpen, onClose, deal }) {
         "Closed Lost": "bg-red-100 text-red-700 border border-red-200",
     };
 
-    const getProbabilityColor = (prob) => {
+    const getProbabilityColor = (prob, stage) => {
+        if (stage === "Closed Lost") return "text-red-500";
         if (prob >= 75) return "text-green-600";
         if (prob >= 40) return "text-orange-500";
         return "text-red-500";
@@ -75,7 +76,7 @@ export default function DealDetailsModal({ isOpen, onClose, deal }) {
                                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Value</p>
                                 </div>
                                 <div className="space-y-1 border-l border-gray-200 pl-4">
-                                    <p className={`text-lg font-bold leading-none ${getProbabilityColor(deal.probability)}`}>
+                                    <p className={`text-lg font-bold leading-none ${getProbabilityColor(deal.probability, deal.stage)}`}>
                                         {deal.probability}%
                                     </p>
                                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Probability</p>

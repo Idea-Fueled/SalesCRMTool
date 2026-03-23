@@ -111,7 +111,7 @@ function SortableDealCard({ deal, onEdit, onDelete, isOverlay = false }) {
                 <div className="flex items-center justify-between">
                     <span className="text-sm font-black text-gray-900">{formatValue(deal.value)}</span>
                     {deal.probability != null && (
-                        <div className="flex items-center gap-1 text-[10px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded">
+                        <div className={`flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded ${deal.stage === "Closed Lost" ? "text-red-600 bg-red-50" : "text-green-600 bg-green-50"}`}>
                             <TrendingUp size={10} />
                             {deal.probability}%
                         </div>

@@ -70,8 +70,8 @@ const DealCard = ({ deal, onEdit, onDelete, onView }) => {
                             <DollarSign size={14} className="text-green-500" />
                             <span className="text-sm font-bold text-gray-800">${deal.value?.toLocaleString()}</span>
                         </div>
-                        <div className="flex items-center gap-1.5 text-gray-400">
-                            <TrendingUp size={12} className="text-blue-500" />
+                        <div className={`flex items-center gap-1.5 ${deal.stage === "Closed Lost" ? "text-red-500" : "text-gray-400"}`}>
+                            <TrendingUp size={12} className={deal.stage === "Closed Lost" ? "text-red-500" : "text-blue-500"} />
                             <span className="text-[11px] font-bold">{deal.probability || 0}%</span>
                         </div>
                     </div>

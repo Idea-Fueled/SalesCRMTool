@@ -73,8 +73,8 @@ export default function DashboardDetailModal({ isOpen, onClose, category, data }
                                             </span>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-1.5 justify-end capitalize">
-                                        <span className={`w-2 h-2 rounded-full ${deal.stage === 'Closed Won' ? 'bg-green-500' : 'bg-orange-400'}`} />
+                                    <div className={`flex items-center gap-1.5 justify-end capitalize font-bold ${deal.stage === 'Closed Lost' ? 'text-red-600' : ''}`}>
+                                        <span className={`w-2 h-2 rounded-full ${deal.stage === 'Closed Won' ? 'bg-green-500' : deal.stage === 'Closed Lost' ? 'bg-red-500' : 'bg-orange-400'}`} />
                                         {deal.stage}
                                     </div>
                                 </div>
