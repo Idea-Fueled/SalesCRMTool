@@ -84,7 +84,7 @@ const Emailverification = () => {
 
                         <Link to="/login" className="w-full">
                             <button className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-semibold transition duration-300 cursor-pointer">
-                                Skip
+                                Back to Login
                             </button>
                         </Link>
 
