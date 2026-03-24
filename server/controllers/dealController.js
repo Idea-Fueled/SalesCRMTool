@@ -178,7 +178,7 @@ export const addRemark = async (req, res) => {
         const { id: userId, firstName, lastName } = req.user;
 
         if (!text && (!req.files || req.files.length === 0)) {
-            return res.status(400).json({ message: "Remark text or files are required [V2]!" });
+            return res.status(400).json({ message: "Remark text or files are required!" });
         }
 
         const deal = await Deal.findById(id);
@@ -906,6 +906,12 @@ export const deleteRemarkFile = async (req, res) => {
 
         // Remove from DB
         remark.files.pull(fileId);
+
+        // If no text and no files left, remove the entire remark
+        if (!remark.text?.trim() && remark.files.length === 0) {
+            deal.remarks.pull(remarkId);
+        }
+
         await deal.save();
 
         res.status(200).json({ message: "File deleted successfully!" });
