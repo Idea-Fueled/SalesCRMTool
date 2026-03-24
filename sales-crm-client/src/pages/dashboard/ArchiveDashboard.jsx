@@ -126,7 +126,7 @@ export default function ArchiveDashboard() {
                     </div>
                 </div>
 
-                <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-350px)] custom-scrollbar">
+                <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="bg-gray-50 border-b border-gray-100">

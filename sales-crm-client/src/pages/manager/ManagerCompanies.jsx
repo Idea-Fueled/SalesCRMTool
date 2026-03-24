@@ -218,7 +218,7 @@ export default function ManagerCompanies() {
                         </table>
                     </div>
                 ) : (
-                    <div className="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-auto max-h-[calc(100vh-350px)] custom-scrollbar">
+                    <div className="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         {loading && companies.length === 0 ? (
                             <div className="col-span-full text-center py-10 text-gray-400">Loading companies...</div>
                         ) : companies.length === 0 ? (
