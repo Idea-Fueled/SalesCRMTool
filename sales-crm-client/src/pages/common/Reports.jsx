@@ -61,10 +61,10 @@ export default function Reports() {
     const [searchQuery, setSearchQuery] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [dateRange, setDateRange] = useState({
-        start: searchParams.get("start") || localDateStr(new Date()),
-        end: searchParams.get("end") || localDateStr(new Date())
+        start: searchParams.get("start") || localDateStr(new Date(new Date().getFullYear(), new Date().getMonth(), 1)),
+        end: searchParams.get("end") || localDateStr(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0))
     });
-    const [rangePreset, setRangePreset] = useState(searchParams.get("preset") || "today");
+    const [rangePreset, setRangePreset] = useState(searchParams.get("preset") || "thisMonth");
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
