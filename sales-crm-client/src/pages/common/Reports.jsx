@@ -667,8 +667,8 @@ export default function Reports() {
                                                 </div>
                                         </td>
                                         {activeTab !== "contacts" && (
-                                            <td className="px-4 py-4 text-left">
-                                                <span className={`px-2 py-0.5 rounded text-[9px] font-bold border ${
+                                            <td className="px-4 py-4 text-left whitespace-nowrap">
+                                                <span className={`px-2 py-0.5 rounded text-[9px] font-bold border whitespace-nowrap ${
                                                     (item.status === 'Active' || item.stage === 'Closed Won') 
                                                     ? 'bg-green-50 text-green-600 border-green-100' 
                                                     : 'bg-gray-50 text-gray-500 border-gray-100'
