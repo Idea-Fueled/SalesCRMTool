@@ -69,7 +69,7 @@ app.use("/api/auth", userRoutes);
 app.use("/api/companies", companyRoutes);
 app.use("/api/contacts", contactRoutes);
 app.use("/api/deals", dealRoutes);
-app.use("/api/audit-logs", auditLogRoutes);
+app.use("/api/activity-history", auditLogRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/files", fileRoutes);
 
