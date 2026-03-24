@@ -351,7 +351,7 @@ export default function DealsDashboard() {
                                                     <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
                                                         {d.contactId?._id ? (
                                                             <button
-                                                                onClick={() => { setSelectedContact(d.contactId); setIsContactDetailsModalOpen(true); }}
+                                                                onClick={() => { if (d.contactId?._id || d.contactId) navigate(`/dashboard/contacts/${d.contactId?._id || d.contactId}`); }}
                                                                 className="hover:text-red-600 hover:underline"
                                                             >
                                                                 {`${d.contactId.firstName} ${d.contactId.lastName}`.trim()}

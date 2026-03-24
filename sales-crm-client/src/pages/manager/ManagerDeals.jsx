@@ -292,9 +292,8 @@ export default function ManagerDeals() {
                                             </td>
                                             <td className="px-4 py-3 text-gray-500 whitespace-nowrap cursor-pointer hover:text-red-600 transition-colors"
                                                 onClick={() => {
-                                                    if (d.contactId) {
-                                                        setSelectedContact(d.contactId);
-                                                        setIsContactDetailsModalOpen(true);
+                                                    if (d.contactId?._id || d.contactId) {
+                                                        navigate(`/manager/contacts/${d.contactId?._id || d.contactId}`);
                                                     }
                                                 }}>
                                                 {d.contactId ? `${d.contactId.firstName} ${d.contactId.lastName}`.trim() : (d.contactName || "—")}
