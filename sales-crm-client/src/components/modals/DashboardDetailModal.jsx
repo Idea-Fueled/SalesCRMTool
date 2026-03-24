@@ -87,9 +87,9 @@ export default function DashboardDetailModal({ isOpen, onClose, category, data }
                     <div className="grid grid-cols-1 gap-4">
                         {data.map((company) => (
                             <div key={company._id} className="p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors flex items-center justify-between">
-                                <div>
-                                    <h4 className="font-bold text-gray-900 uppercase text-[11px] tracking-wide">{truncateName(company.name)}</h4>
-                                    <p className="text-xs text-gray-500 mt-1">{company.industry || "No Industry specified"}</p>
+                                <div className="flex-1 min-w-0">
+                                    <h4 className="font-bold text-gray-900 uppercase text-[11px] tracking-wide truncate">{truncateName(company.name)}</h4>
+                                    <p className="text-xs text-gray-500 mt-1 truncate">{company.industry || "No Industry specified"}</p>
                                 </div>
                                 <Building2 size={20} className="text-gray-300 shrink-0" />
                             </div>
@@ -104,9 +104,9 @@ export default function DashboardDetailModal({ isOpen, onClose, category, data }
                                 <div className="w-10 h-10 shrink-0 rounded-full bg-red-600 flex items-center justify-center font-bold text-white uppercase text-xs">
                                     {user.firstName?.[0] || ""}{user.lastName?.slice(-1) || ""}
                                 </div>
-                                <div className="flex-1">
-                                    <h4 className="font-bold text-gray-900">{user.firstName} {user.lastName}</h4>
-                                    <p className="text-xs text-gray-500">{user.email}</p>
+                                <div className="flex-1 min-w-0">
+                                    <h4 className="font-bold text-gray-900 truncate">{user.firstName} {user.lastName}</h4>
+                                    <p className="text-xs text-gray-500 truncate">{user.email}</p>
                                 </div>
                                 <span className={`text-[10px] font-bold px-2 py-1 rounded-full uppercase ${user.isSetupComplete ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
                                     {user.isSetupComplete ? 'Active' : 'Pending'}
