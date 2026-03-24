@@ -722,8 +722,8 @@ export const addRemark = async (req, res) => {
         const { text } = req.body;
         const { id: userId, firstName, lastName } = req.user;
 
-        if (!text) {
-            return res.status(400).json({ message: "Remark text is required!" });
+        if (!text && (!req.files || req.files.length === 0)) {
+            return res.status(400).json({ message: "Remark text or files are required!" });
         }
 
         const contact = await Contact.findById(id);
@@ -770,7 +770,7 @@ export const addRemark = async (req, res) => {
             entityType: "Contact",
             entityName: `${contact.firstName} ${contact.lastName}`,
             action: "REMARK",
-            customMessage: `${authorName} added a remark to Contact "${contact.firstName} ${contact.lastName}": "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`
+            customMessage: `${authorName} added a remark to Contact "${contact.firstName} ${contact.lastName}": "${text ? text.substring(0, 50) : 'Attached files'}${text && text.length > 50 ? '...' : ''}"`
         });
 
     } catch (error) {

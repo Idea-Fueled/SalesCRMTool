@@ -788,7 +788,7 @@ export const addRemark = async (req, res) => {
             entityType: "Company",
             entityName: company.name,
             action: "REMARK",
-            customMessage: `${authorName} added a remark to Company "${company.name}": "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`
+            customMessage: `${authorName} added a remark to Company "${company.name}": "${text ? text.substring(0, 50) : 'Attached files'}${text && text.length > 50 ? '...' : ''}"`
         });
 
     } catch (error) {
