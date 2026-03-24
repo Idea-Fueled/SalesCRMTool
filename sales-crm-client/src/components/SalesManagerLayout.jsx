@@ -70,7 +70,7 @@ export default function SalesManagerLayout() {
         if (window.innerWidth < 1024) setSidebarOpen(false);
     };
 
-    const initials = user ? `${user.firstName?.[0] || ""}${user.lastName?.slice(-1) || ""}`.toUpperCase() : "M";
+    const initials = user ? `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase() : "M";
 
     useEffect(() => {
         const handler = (e) => {

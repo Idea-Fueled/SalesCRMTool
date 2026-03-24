@@ -102,7 +102,7 @@ export default function DashboardDetailModal({ isOpen, onClose, category, data }
                         {data.map((user) => (
                             <div key={user._id} className="p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors flex items-center gap-4">
                                 <div className="w-10 h-10 shrink-0 rounded-full bg-red-600 flex items-center justify-center font-bold text-white uppercase text-xs">
-                                    {user.firstName?.[0] || ""}{user.lastName?.slice(-1) || ""}
+                                    {user.firstName?.[0] || ""}{user.lastName?.[0] || ""}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <h4 className="font-bold text-gray-900 truncate">{user.firstName} {user.lastName}</h4>

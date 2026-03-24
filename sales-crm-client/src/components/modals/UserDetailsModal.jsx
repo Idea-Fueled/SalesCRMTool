@@ -5,7 +5,7 @@ import { Mail, Shield, User, Calendar, Clock, CheckCircle, XCircle } from "lucid
 export default function UserDetailsModal({ isOpen, onClose, user }) {
     if (!user) return null;
 
-    const initials = `${user.firstName?.[0] || ""}${user.lastName?.slice(-1) || ""}`.toUpperCase();
+    const initials = `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase();
     const avatarColor = "bg-red-600";
 
     const formatRole = (r) => ({

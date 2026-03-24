@@ -70,7 +70,7 @@ const SalesRepLayout = () => {
         if (window.innerWidth < 1024) setSidebarOpen(false);
     };
 
-    const initials = user ? `${user.firstName?.[0] || ""}${user.lastName?.slice(-1) || ""}`.toUpperCase() : "R";
+    const initials = user ? `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase() : "R";
 
     useEffect(() => {
         const handler = (e) => {

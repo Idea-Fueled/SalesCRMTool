@@ -471,7 +471,7 @@ export default function DealDetails() {
                                     {deal.ownerId?.profilePicture ? (
                                         <img src={deal.ownerId.profilePicture} alt="Owner" className="w-full h-full object-cover" />
                                     ) : (
-                                        <>{deal.ownerId?.firstName?.[0]}{deal.ownerId?.lastName?.slice(-1)}</>
+                                        <>{deal.ownerId?.firstName?.[0]}{deal.ownerId?.lastName?.[0]}</>
                                     )}
                                 </div>
                                 <div>
@@ -601,7 +601,7 @@ export default function DealDetails() {
                                                             {remark.author?.profilePicture ? (
                                                                 <img src={remark.author.profilePicture} alt="Author" className="w-full h-full object-cover" />
                                                             ) : (
-                                                                <>{remark.author?.firstName?.[0]}{remark.author?.lastName?.slice(-1)}</> || 'U1'
+                                                                <>{remark.author?.firstName?.[0]}{remark.author?.lastName?.[0]}</> || 'U1'
                                                             )}
                                                         </div>
                                                         <span className="text-[11px] font-semibold text-gray-500">

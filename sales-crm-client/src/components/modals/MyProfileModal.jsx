@@ -14,7 +14,7 @@ export default function MyProfileModal({ isOpen, onClose }) {
 
     if (!user) return null;
 
-    const initials = `${user.firstName?.[0] || ""}${user.lastName?.slice(-1) || ""}`.toUpperCase();
+    const initials = `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase();
     
     // Instead of random colors, we'll keep a consistent gradient or fallback color
     const avatarColor = "bg-red-600";

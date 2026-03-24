@@ -465,7 +465,7 @@ export default function ContactDetails() {
                         <div className="p-5">
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white text-[10px] font-bold border-2 border-white shadow-sm ring-1 ring-red-50">
-                                    {contact.ownerId?.firstName?.[0]}{contact.ownerId?.lastName?.slice(-1)}
+                                    {contact.ownerId?.firstName?.[0]}{contact.ownerId?.lastName?.[0]}
                                 </div>
                                 <div>
                                     <p className="text-xs font-bold text-gray-800 leading-none">{contact.ownerId?.firstName} {contact.ownerId?.lastName || ""}</p>

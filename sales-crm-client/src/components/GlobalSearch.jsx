@@ -232,7 +232,7 @@ export default function GlobalSearch({ isOpen, onClose }) {
                                     >
                                         <div className="flex items-center gap-3 text-left">
                                             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 transition-colors ${isSelected ? 'bg-red-700' : 'bg-red-600'}`}>
-                                                {`${c.firstName?.[0] || ""}${c.lastName?.slice(-1) || ""}`.toUpperCase()}
+                                                {`${c.firstName?.[0] || ""}${c.lastName?.[0] || ""}`.toUpperCase()}
                                             </div>
                                             <div className="min-w-0 flex-1">
                                                 <p className={`text-sm font-medium truncate ${isSelected ? 'text-red-700' : 'text-gray-800'}`}>{c.firstName} {c.lastName}</p>

@@ -87,7 +87,7 @@ export default function AuditLogs() {
                         <img src={log.performedBy.profilePicture} alt="Performer" className="w-full h-full object-cover" />
                     ) : log.performedBy ? (
                         <span className="text-white">
-                            {log.performedBy.firstName?.[0]}{log.performedBy.lastName?.slice(-1)}
+                            {log.performedBy.firstName?.[0]}{log.performedBy.lastName?.[0]}
                         </span>
                     ) : (
                         <User size={16} className="text-gray-400" />
@@ -241,7 +241,7 @@ export default function AuditLogs() {
                                                             <img src={log.targetUserId.profilePicture} alt="Target" className="w-full h-full object-cover" />
                                                         ) : (
                                                             <span className="text-white">
-                                                                {log.targetUserId.firstName?.[0]}{log.targetUserId.lastName?.slice(-1)}
+                                                                {log.targetUserId.firstName?.[0]}{log.targetUserId.lastName?.[0]}
                                                             </span>
                                                         )}
                                                     </div>

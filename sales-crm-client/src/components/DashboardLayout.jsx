@@ -64,7 +64,7 @@ const DashboardLayout = () => {
     const [showLogout, setShowLogout] = useState(false);
     const [profileModalOpen, setProfileModalOpen] = useState(false);
 
-    const initials = user ? `${user.firstName?.[0] || ""}${user.lastName?.slice(-1) || ""}`.toUpperCase() : "A";
+    const initials = user ? `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase() : "A";
 
     // Initial load: set sidebar based on screen width
     useEffect(() => {
