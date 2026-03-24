@@ -589,11 +589,11 @@ export default function Reports() {
                     <table className="w-full table-fixed text-left text-sm border-separate border-spacing-0">
                         <thead>
                             <tr className="bg-[#FFF9E5] border-b border-gray-100 text-[13px] font-bold text-gray-800 uppercase tracking-wider">
-                                <th className={`px-4 py-3.5 font-bold ${activeTab === "contacts" ? "w-[22%]" : "w-1/5"}`}>Creation Date</th>
-                                <th className={`px-4 py-3.5 font-bold ${activeTab === "contacts" ? "w-[28%]" : "w-1/5"}`}>{activeTab === "contacts" ? "Name" : activeTab === "companies" ? "Company" : "Deal name"}</th>
-                                <th className={`px-4 py-3.5 font-bold ${activeTab === "contacts" ? "w-[25%]" : "w-1/5"}`}>{activeTab === "deals" ? "Value" : activeTab === "companies" ? "Industry" : "Title"}</th>
-                                <th className={`px-4 py-3.5 font-bold ${activeTab === "contacts" ? "w-[25%]" : "w-1/5"}`}>Owner</th>
-                                {activeTab !== "contacts" && <th className="px-4 py-3.5 text-right font-bold w-1/5">Status</th>}
+                                <th className={`px-4 py-3.5 font-bold ${activeTab === "contacts" ? "w-[22%]" : "w-[15%]"}`}>Creation Date</th>
+                                <th className={`px-4 py-3.5 font-bold ${activeTab === "contacts" ? "w-[28%]" : "w-[25%]"}`}>{activeTab === "contacts" ? "Name" : activeTab === "companies" ? "Company" : "Deal name"}</th>
+                                <th className={`px-4 py-3.5 font-bold ${activeTab === "contacts" ? "w-[25%]" : "w-[30%]"}`}>{activeTab === "deals" ? "Value" : activeTab === "companies" ? "Industry" : "Title"}</th>
+                                <th className={`px-4 py-3.5 font-bold ${activeTab === "contacts" ? "w-[25%]" : "w-[20%]"}`}>Owner</th>
+                                {activeTab !== "contacts" && <th className="px-4 py-3.5 text-left font-bold w-[10%]">Status</th>}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
@@ -659,7 +659,7 @@ export default function Reports() {
                                                 </div>
                                         </td>
                                         {activeTab !== "contacts" && (
-                                            <td className="px-4 py-4 text-right">
+                                            <td className="px-4 py-4 text-left">
                                                 <span className={`px-2 py-0.5 rounded text-[9px] font-bold border ${
                                                     (item.status === 'Active' || item.stage === 'Closed Won') 
                                                     ? 'bg-green-50 text-green-600 border-green-100' 
