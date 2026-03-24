@@ -594,14 +594,14 @@ export default function Reports() {
                 )}
 
                 <div className="overflow-x-auto min-h-[300px]" ref={tableRef}>
-                    <table className="w-full table-fixed text-left text-sm border-separate border-spacing-0">
+                    <table className="w-full min-w-[700px] text-left text-sm border-separate border-spacing-0">
                         <thead>
                             <tr className="bg-[#FFF9E5] border-b border-gray-100 text-[13px] font-bold text-gray-800 uppercase tracking-wider">
-                                <th className={`px-4 py-3.5 font-bold ${activeTab === "contacts" ? "w-[22%]" : "w-[15%]"}`}>Creation Date</th>
-                                <th className={`px-4 py-3.5 font-bold ${activeTab === "contacts" ? "w-[28%]" : "w-[25%]"}`}>{activeTab === "contacts" ? "Name" : activeTab === "companies" ? "Company" : "Deal name"}</th>
-                                <th className={`px-4 py-3.5 font-bold ${activeTab === "contacts" ? "w-[25%]" : "w-[30%]"}`}>{activeTab === "deals" ? "Value" : activeTab === "companies" ? "Industry" : "Title"}</th>
-                                <th className={`px-4 py-3.5 font-bold ${activeTab === "contacts" ? "w-[25%]" : "w-[20%]"}`}>Owner</th>
-                                {activeTab !== "contacts" && <th className="px-4 py-3.5 text-left font-bold w-[10%]">Status</th>}
+                                <th className="px-4 py-3.5 font-bold whitespace-nowrap min-w-[120px]">Creation Date</th>
+                                <th className="px-4 py-3.5 font-bold min-w-[160px]">{activeTab === "contacts" ? "Name" : activeTab === "companies" ? "Company" : "Deal name"}</th>
+                                <th className="px-4 py-3.5 font-bold min-w-[140px]">{activeTab === "deals" ? "Value" : activeTab === "companies" ? "Industry" : "Title"}</th>
+                                <th className="px-4 py-3.5 font-bold min-w-[160px]">Owner</th>
+                                {activeTab !== "contacts" && <th className="px-4 py-3.5 text-left font-bold min-w-[90px]">Status</th>}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
