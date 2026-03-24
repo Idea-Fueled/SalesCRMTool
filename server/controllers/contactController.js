@@ -721,9 +721,11 @@ export const addRemark = async (req, res) => {
         const { id } = req.params;
         const { text } = req.body;
         const { id: userId, firstName, lastName } = req.user;
+        
+        console.log("DEBUG [Contact AddRemark]:", { text, filesCount: req.files?.length });
 
         if (!text && (!req.files || req.files.length === 0)) {
-            return res.status(400).json({ message: "Remark text or files are required!" });
+            return res.status(400).json({ message: "Remark text or files are required [V2]!" });
         }
 
         const contact = await Contact.findById(id);
