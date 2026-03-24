@@ -7,6 +7,7 @@ import { getDeals } from "../../API/services/dealService";
 import { getCompanies } from "../../API/services/companyService";
 import { getTeamUsers } from "../../API/services/userService";
 import CompanyDetailsModal from "../../components/modals/CompanyDetailsModal";
+import DashboardDetailModal from "../../components/modals/DashboardDetailModal";
 import { toast } from "react-hot-toast";
 import { Eye } from "lucide-react";
 
@@ -30,8 +31,8 @@ const CardHeader = ({ title, children }) => (
     </div>
 );
 
-const StatCard = ({ label, value, sub, color, icon: IconComp }) => (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-start gap-4">
+const StatCard = ({ label, value, sub, color, icon: IconComp, onClick }) => (
+    <div onClick={onClick} className={`bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-start gap-4 ${onClick ? "cursor-pointer hover:shadow-md active:scale-95 transition-all duration-300" : ""}`}>
         <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${color}`}>
             <IconComp size={20} />
         </div>
@@ -71,6 +72,7 @@ export default function ManagerDashboard() {
     const [loading, setLoading] = useState(true);
     const [selectedCompany, setSelectedCompany] = useState(null);
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+    const [modalConfig, setModalConfig] = useState({ isOpen: false, category: null, data: [] });
 
     useEffect(() => {
         const fetchData = async () => {
@@ -135,10 +137,10 @@ export default function ManagerDashboard() {
     return (
         <div className="p-4 sm:p-6 max-w-screen-xl mx-auto">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <StatCard label="Team Members" value={loading ? "..." : String(teamMembers.length)} sub="+ you as manager" color="bg-red-50 text-red-600" icon={Users2} />
-                <StatCard label="Team Deals" value={loading ? "..." : String(deals.length)} sub="All stages" color="bg-orange-50 text-orange-600" icon={Briefcase} />
-                <StatCard label="Team Won" value={loading ? "..." : String(wonDeals.length)} sub={`${formatCurrency(wonRevenue)} revenue`} color="bg-red-600 text-white shadow-sm shadow-red-100" icon={CheckCircle2} />
-                <StatCard label="Team Pipeline" value={loading ? "..." : formatCurrency(totalPipeline)} sub={`${activeDeals.length} active deals`} color="bg-red-50 text-red-600 border border-red-100" icon={DollarSign} />
+                <StatCard label="Team Members" value={loading ? "..." : String(teamMembers.length)} sub="+ you as manager" color="bg-red-50 text-red-600" icon={Users2} onClick={() => setModalConfig({ isOpen: true, category: 'users', data: teamMembers })} />
+                <StatCard label="Team Deals" value={loading ? "..." : String(deals.length)} sub="All stages" color="bg-orange-50 text-orange-600" icon={Briefcase} onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: deals })} />
+                <StatCard label="Team Won" value={loading ? "..." : String(wonDeals.length)} sub={`${formatCurrency(wonRevenue)} revenue`} color="bg-red-600 text-white shadow-sm shadow-red-100" icon={CheckCircle2} onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: wonDeals })} />
+                <StatCard label="Team Pipeline" value={loading ? "..." : formatCurrency(totalPipeline)} sub={`${activeDeals.length} active deals`} color="bg-red-50 text-red-600 border border-red-100" icon={DollarSign} onClick={() => setModalConfig({ isOpen: true, category: 'revenue', data: activeDeals })} />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-6">
@@ -258,6 +260,12 @@ export default function ManagerDashboard() {
                 isOpen={isDetailsModalOpen}
                 onClose={() => setIsDetailsModalOpen(false)}
                 company={selectedCompany}
+            />
+            <DashboardDetailModal
+                isOpen={modalConfig.isOpen}
+                onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
+                category={modalConfig.category}
+                data={modalConfig.data}
             />
         </div>
     );
