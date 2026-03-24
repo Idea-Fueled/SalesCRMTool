@@ -187,8 +187,8 @@ export default function AuditLogs() {
                                 <th className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider whitespace-nowrap">Timestamp</th>
                                 <th className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider">Performer</th>
                                 <th className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider">Action</th>
-                                <th className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider w-36">Entity</th>
-                                <th className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider">Details</th>
+                                <th className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider min-w-[150px] w-36">Entity</th>
+                                <th className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider min-w-[250px]">Details</th>
                                 <th className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wider whitespace-nowrap">Recipient</th>
                             </tr>
                         </thead>
@@ -214,7 +214,7 @@ export default function AuditLogs() {
                                         <td className="px-4 py-4 whitespace-nowrap">
                                             <ActionBadge action={log.action} />
                                         </td>
-                                        <td className="px-4 py-4 w-36 max-w-[160px]">
+                                        <td className="px-4 py-4 min-w-[150px] w-36 max-w-[160px]">
                                             <div className="flex items-center gap-2 text-gray-800">
                                                 <EntityIcon type={log.entityType} />
                                                 <span className="font-semibold text-xs truncate">
@@ -225,7 +225,7 @@ export default function AuditLogs() {
                                             </div>
                                             <p className="text-[9px] font-mono text-gray-400 mt-0.5 truncate">{log.entityId?._id || log.entityId || "—"}</p>
                                         </td>
-                                        <td className="px-4 py-4 w-56 max-w-xs">
+                                        <td className="px-4 py-4 min-w-[250px] max-w-sm">
                                             <p
                                                 className="text-xs text-gray-600 font-medium leading-relaxed line-clamp-2"
                                                 title={formatLogMessage(log)}
