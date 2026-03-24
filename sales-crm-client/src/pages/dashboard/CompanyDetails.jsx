@@ -240,7 +240,7 @@ export default function CompanyDetails() {
         const parts = name.trim().split(/\s+/);
         const firstName = parts[0] || "";
         const lastName = parts[parts.length - 1] || "";
-        return `${firstName?.[0] || ""}${lastName?.slice(-1) || ""}`.toUpperCase();
+        return `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
     };
 
     if (loading) {

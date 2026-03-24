@@ -27,7 +27,7 @@ function Avatar({ name }) {
     const parts = name.trim().split(/\s+/);
     const firstName = parts[0] || "";
     const lastName = parts[parts.length - 1] || "";
-    const initials = `${firstName?.[0] || ""}${lastName?.slice(-1) || ""}`.toUpperCase();
+    const initials = `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
     return (
         <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
             {initials}

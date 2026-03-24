@@ -238,7 +238,7 @@ export default function ContactDetails() {
 
     const getInitials = (firstName, lastName) => {
         return (
-            (firstName?.[0] || "") + (lastName?.slice(-1) || "")
+            (firstName?.[0] || "") + (lastName?.[0] || "")
         ).toUpperCase() || "C";
     };
 
