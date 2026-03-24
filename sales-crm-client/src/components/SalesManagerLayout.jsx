@@ -171,7 +171,7 @@ export default function SalesManagerLayout() {
                     </button>
                     <button
                         onClick={() => setSearchOpen(true)}
-                        className="flex items-center gap-2 flex-1 max-w-[140px] sm:max-w-xs pl-3 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg text-gray-400 hover:border-red-300 hover:bg-red-50/30 transition text-left"
+                        className="flex items-center gap-2 flex-1 max-w-xs sm:max-w-sm pl-3 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg text-gray-400 hover:border-red-300 hover:bg-red-50/30 transition text-left"
                     >
                         <Search size={15} />
                         <span className="flex-1 truncate">Search...</span>

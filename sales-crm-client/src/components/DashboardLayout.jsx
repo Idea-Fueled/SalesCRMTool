@@ -198,7 +198,7 @@ const DashboardLayout = () => {
                     {/* Search trigger */}
                     <button
                         onClick={() => setSearchOpen(true)}
-                        className="flex items-center gap-2 flex-1 max-w-[160px] sm:max-w-xs pl-3 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg text-gray-400 hover:border-red-300 hover:bg-red-50/30 transition text-left group"
+                        className="flex items-center gap-2 flex-1 max-w-xs sm:max-w-sm pl-3 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg text-gray-400 hover:border-red-300 hover:bg-red-50/30 transition text-left group"
                     >
                         <Search size={15} className="group-hover:text-red-500 transition-colors" />
                         <span className="flex-1 truncate">Search...</span>
