@@ -198,7 +198,7 @@ export default function AdminDashboard() {
             {/* Click outside overlay for dropdown */}
             {isDatePickerOpen && (
                 <div 
-                    className="fixed inset-0 z-40" 
+                    className="fixed inset-0 z-30" 
                     onClick={() => setIsDatePickerOpen(false)} 
                 />
             )}
@@ -207,7 +207,7 @@ export default function AdminDashboard() {
                     <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
                     <p className="text-gray-500 mt-1">Global sales performance and activity overview</p>
                 </div>
-                <div className="flex items-center gap-2 relative z-50">
+                <div className="flex items-center gap-2 relative z-30">
                     <button
                         onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
                         className={`flex items-center gap-2 px-4 py-2 border rounded-xl text-sm font-bold shadow-sm transition-all hover:border-red-200 ${selectedMonth ? 'bg-red-50 border-red-200 text-red-700' : 'bg-white border-gray-200 text-gray-700'}`}

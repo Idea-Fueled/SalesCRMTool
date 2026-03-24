@@ -165,7 +165,7 @@ export default function SalesManagerLayout() {
             </aside>
 
             <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-                <header className="h-16 bg-white border-b border-gray-200 flex items-center px-5 gap-4 flex-shrink-0 relative z-20">
+                <header className="h-16 bg-white border-b border-gray-200 flex items-center px-5 gap-4 flex-shrink-0 relative z-[45]">
                     <button onClick={() => setSidebarOpen(p => !p)} className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 transition">
                         <Menu size={18} />
                     </button>
