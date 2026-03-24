@@ -91,7 +91,7 @@ export default function DashboardDetailModal({ isOpen, onClose, category, data }
                                     <h4 className="font-bold text-gray-900 uppercase text-[11px] tracking-wide">{truncateName(company.name)}</h4>
                                     <p className="text-xs text-gray-500 mt-1">{company.industry || "No Industry specified"}</p>
                                 </div>
-                                <Building2 size={20} className="text-gray-300" />
+                                <Building2 size={20} className="text-gray-300 shrink-0" />
                             </div>
                         ))}
                     </div>
@@ -101,7 +101,7 @@ export default function DashboardDetailModal({ isOpen, onClose, category, data }
                     <div className="space-y-3">
                         {data.map((user) => (
                             <div key={user._id} className="p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors flex items-center gap-4">
-                                <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center font-bold text-white uppercase text-xs">
+                                <div className="w-10 h-10 shrink-0 rounded-full bg-red-600 flex items-center justify-center font-bold text-white uppercase text-xs">
                                     {user.firstName?.[0] || ""}{user.lastName?.slice(-1) || ""}
                                 </div>
                                 <div className="flex-1">
