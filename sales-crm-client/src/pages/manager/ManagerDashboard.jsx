@@ -144,11 +144,11 @@ export default function ManagerDashboard() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-6">
-                <Card className="lg:col-span-3">
+                <Card className="lg:col-span-3 flex flex-col">
                     <CardHeader title="TEAM SALES REPRESENTATIVE PERFORMANCE">
                         <Select options={periodOptions} value={period} onChange={setPeriod} />
                     </CardHeader>
-                    <div className="overflow-x-auto min-h-[200px]">
+                    <div className="overflow-x-auto min-h-[200px] flex-1">
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="border-b border-gray-100 bg-gray-50">

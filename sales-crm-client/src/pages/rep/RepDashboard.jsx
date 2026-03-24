@@ -129,12 +129,12 @@ export default function RepDashboard() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-6">
-                <div className="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
                     <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <h2 className="font-bold text-gray-800">My Recent Deals</h2>
                         <Select options={periodOptions} value={period} onChange={setPeriod} />
                     </div>
-                    <div className="overflow-x-auto min-h-[200px]">
+                    <div className="overflow-x-auto min-h-[200px] flex-1">
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="border-b border-gray-100 bg-gray-50">
