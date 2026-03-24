@@ -193,11 +193,12 @@ export default function SalesManagerLayout() {
                             <span className="absolute bottom-0 right-0 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-green-400 border-2 border-white rounded-full" />
                         </button>
                         <div className="hidden sm:block min-w-0">
-                            <p className="text-sm font-bold text-gray-800">{user ? `${user.firstName} ${user.lastName}` : "MANAGER"}</p>
-                            <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">
-                                {user?.role === "sales_manager" ? "SALES MANAGER" :
-                                    user?.role === "sales_rep" ? "SALES REPRESENTATIVE" :
-                                        (user?.role?.replace("_", " ")?.toUpperCase() || "SALES MANAGER")}
+                            <p className="text-sm font-bold text-gray-800">{user ? `${user.firstName} ${user.lastName}` : "Admin"}</p>
+                            <p className="text-[10px] text-gray-400 mt-1 font-medium tracking-wider">
+                                {user?.role === "admin" ? "Admin" :
+                                    user?.role === "sales_manager" ? "Sales Manager" :
+                                        user?.role === "sales_rep" ? "Sales Representative" :
+                                            (user?.role?.replace("_", " ")?.replace(/\b\w/g, l => l.toUpperCase()) || "Administrator")}
                             </p>
                         </div>
                     </div>

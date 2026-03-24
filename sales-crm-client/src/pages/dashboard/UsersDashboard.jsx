@@ -45,7 +45,7 @@ const roleBadge = {
     sales_manager: "bg-red-50 text-red-600 border border-red-100",
     sales_rep: "bg-red-50 text-red-600 border border-red-100",
 };
-const formatRole = (r) => ({ admin: "ADMIN", sales_manager: "SALES MANAGER", sales_rep: "SALES REPRESENTATIVE" }[r] || r?.toUpperCase());
+const formatRole = (r) => ({ admin: "Admin", sales_manager: "Sales Manager", sales_rep: "Sales Representative" }[r] || r?.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '));
 const ModalOverlay = ({ children, onClose }) => (
     <div className="fixed inset-0 z-[100] flex items-center justify-center px-4"
         style={{ background: "rgba(15,15,25,0.5)", backdropFilter: "blur(4px)" }}

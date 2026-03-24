@@ -345,7 +345,7 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
                         >
                             <option value="">Default (Myself)</option>
                             {options.map(u => (
-                                <option key={u._id} value={u._id}>{u.firstName} {u.lastName} ({u.role === "admin" ? "ADMIN" : u.role === "sales_manager" ? "SALES MANAGER" : u.role === "sales_rep" ? "SALES REPRESENTATIVE" : u.role.replace(/_/g, " ").toUpperCase()})</option>
+                                <option key={u._id} value={u._id}>{u.firstName} {u.lastName} ({u.role === "admin" ? "Admin" : u.role === "sales_manager" ? "Sales Manager" : u.role === "sales_rep" ? "Sales Representative" : u.role.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())})</option>
                             ))}
                         </select>
                         <p className="text-[10px] text-gray-400 italic">Only Admins and Managers can reassign records.</p>

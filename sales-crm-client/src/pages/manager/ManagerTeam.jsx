@@ -37,7 +37,7 @@ const roleBadge = {
     sales_manager: "bg-red-100 text-red-700",
     sales_rep: "bg-red-50 text-red-600 border border-red-50",
 };
-const formatRole = (r) => ({ admin: "ADMIN", sales_manager: "SALES MANAGER", sales_rep: "SALES REPRESENTATIVE" }[r] || r?.toUpperCase());
+const formatRole = (r) => ({ admin: "Admin", sales_manager: "Sales Manager", sales_rep: "Sales Representative" }[r] || r?.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '));
 
 export default function ManagerTeam() {
     const { user: currentUser } = useAuth();

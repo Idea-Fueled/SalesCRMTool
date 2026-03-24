@@ -13,6 +13,13 @@ import { getIO } from "../utils/socket.js";
 import { notifyReassignment, sendTieredNotification } from "../services/notificationService.js";
 import { uploadToCloudinary } from "../middlewares/uploadMiddleware.js";
 
+const formatRoleName = (role) => {
+    if (role === "sales_manager") return "Sales Manager";
+    if (role === "sales_rep") return "Sales Representative";
+    if (role === "admin") return "Admin";
+    return role?.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+};
+
 export const registerUser = async (req, res, next) => {
     try {
         const { firstName, lastName, email, password, role, managerId } = req.body;
@@ -186,8 +193,8 @@ export const registerUser = async (req, res, next) => {
             entityName: `${user.firstName} ${user.lastName}`,
             action: "CREATE",
             customMessage: isInvitation 
-                ? `New user account created for ${user.firstName} ${user.lastName} (${user.role}) by ${req.user?.firstName}.`
-                : `New user self-registered: ${user.firstName} ${user.lastName} (${user.role}).`
+                ? `New user account created for ${user.firstName} ${user.lastName} (${formatRoleName(user.role)}) by ${req.user?.firstName}.`
+                : `New user self-registered: ${user.firstName} ${user.lastName} (${formatRoleName(user.role)}).`
         });
         return;
 

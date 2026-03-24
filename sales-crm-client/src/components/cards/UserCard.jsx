@@ -13,7 +13,7 @@ const roleIcon = {
     sales_rep: UserCheck,
 };
 
-const formatRole = (r) => ({ admin: "ADMIN", sales_manager: "SALES MANAGER", sales_rep: "SALES REPRESENTATIVE" }[r] || r?.toUpperCase());
+const formatRole = (r) => ({ admin: "Admin", sales_manager: "Sales Manager", sales_rep: "Sales Representative" }[r] || r?.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '));
 
 const Avatar = ({ name, profilePicture }) => {
     if (!name) return null;

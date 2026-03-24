@@ -9,10 +9,10 @@ export default function UserDetailsModal({ isOpen, onClose, user }) {
     const avatarColor = "bg-red-600";
 
     const formatRole = (r) => ({
-        admin: "ADMIN",
-        sales_manager: "SALES MANAGER",
-        sales_rep: "SALES REPRESENTATIVE"
-    }[r] || r?.toUpperCase());
+        admin: "Admin",
+        sales_manager: "Sales Manager",
+        sales_rep: "Sales Representative"
+    }[r] || r?.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '));
 
     const roleBadge = {
         admin: "bg-red-100 text-red-700 border-red-200",

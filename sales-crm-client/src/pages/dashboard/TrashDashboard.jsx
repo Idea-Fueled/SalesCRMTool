@@ -9,7 +9,7 @@ const roleBadge = {
     sales_manager: "bg-purple-100 text-purple-700",
     sales_rep: "bg-blue-100 text-blue-700",
 };
-const formatRole = (r) => ({ admin: "ADMIN", sales_manager: "SALES MANAGER", sales_rep: "SALES REPRESENTATIVE" }[r] || r?.toUpperCase());
+const formatRole = (r) => ({ admin: "Admin", sales_manager: "Sales Manager", sales_rep: "Sales Representative" }[r] || r?.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '));
 
 const getRestorationStatus = (deletedAt) => {
     if (!deletedAt) return { isExpired: false, daysLeft: null };
