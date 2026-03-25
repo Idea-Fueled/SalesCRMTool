@@ -40,35 +40,46 @@ const SessionTimeoutManager = ({ children }) => {
         }
     };
 
+    // Initial setup and Activity Listeners
     useEffect(() => {
         if (!user) {
-            // Clear timers if logged out
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            return;
+        }
+
+        // Initialize timer once on mount/login
+        resetTimer();
+
+        // Event listeners for user activity
+        const events = ["mousedown", "mousemove", "keydown", "scroll", "touchstart"];
+        const handleActivityWrapper = () => {
+            if (!isExpired) resetTimer();
+        };
+
+        events.forEach(event => document.addEventListener(event, handleActivityWrapper));
+
+        return () => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            events.forEach(event => document.removeEventListener(event, handleActivityWrapper));
+        };
+    }, [user?._id, isExpired]); // Only re-setup if user ID or expiration state changes
+
+    // Periodic backend session refresh (Sliding window on server)
+    useEffect(() => {
+        if (!user || isExpired) {
             if (refreshIntervalRef.current) clearInterval(refreshIntervalRef.current);
             return;
         }
 
-        // Initialize inactivity timer
-        resetTimer();
-
-        // Setup periodic backend refresh (sliding session backup)
         refreshIntervalRef.current = setInterval(() => {
-            if (!isExpired) {
-                console.log("Activity check: refreshing session...");
-                fetchProfile();
-            }
+            console.log("Activity check: checking session validity with backend...");
+            fetchProfile();
         }, REFRESH_INTERVAL);
 
-        // Event listeners for user activity
-        const events = ["mousedown", "mousemove", "keydown", "scroll", "touchstart"];
-        events.forEach(event => document.addEventListener(event, handleActivity));
-
         return () => {
-            if (timeoutRef.current) clearTimeout(timeoutRef.current);
             if (refreshIntervalRef.current) clearInterval(refreshIntervalRef.current);
-            events.forEach(event => document.removeEventListener(event, handleActivity));
         };
-    }, [user, isExpired]);
+    }, [user?._id, isExpired]);
 
     return (
         <>
