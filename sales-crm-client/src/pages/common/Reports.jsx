@@ -250,12 +250,12 @@ export default function Reports() {
 
             // Brand Header (Logo)
             try {
-                pdf.addImage(logoImg, 'PNG', margin, 10, 25, 0);
+                pdf.addImage(logoImg, 'PNG', margin, 7, 25, 0);
             } catch (err) {
                 console.warn('PDF Logo error:', err);
             }
 
-            y = 32;
+            y = 35;
             // ── Title ──────────────────────────────────────────────
             pdf.setFontSize(22);
             pdf.setFont('helvetica', 'bold');

@@ -31,12 +31,12 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
             // Brand Header (Logo & Title)
             try {
                 // Width 25mm, 0 for auto aspect ratio
-                pdf.addImage(logoImg, 'PNG', margin, 10, 25, 0);
+                pdf.addImage(logoImg, 'PNG', margin, 7, 25, 0);
             } catch (err) {
                 console.warn('PDF Logo error:', err);
             }
 
-            y = 32;
+            y = 35;
             // Title
             pdf.setFontSize(22);
             pdf.setFont('helvetica', 'bold');
