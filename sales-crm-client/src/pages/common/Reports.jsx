@@ -300,26 +300,26 @@ export default function Reports() {
             let columns = [];
             if (activeTab === 'deals') {
                 columns = [
-                    { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString('en-IN'), w: 35 },
-                    { header: 'Deal Name',     key: d => d.name || '—',                              w: 55 },
-                    { header: 'Value',         key: d => d.value ? `${d.currency || '$'}${Number(d.value).toLocaleString()}` : '—', w: 30 },
-                    { header: 'Executive Owner', key: d => d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : (d.ownerName || '—'), w: 40 },
-                    { header: 'Status',        key: d => d.stage || '—',                             w: 31 },
+                    { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString('en-IN'), w: 32 },
+                    { header: 'Deal Name',     key: d => d.name || '—',                              w: 50 },
+                    { header: 'Value',         key: d => d.value ? `${d.currency || '$'}${Number(d.value).toLocaleString()}` : '—', w: 28 },
+                    { header: 'Executive Owner', key: d => d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : (d.ownerName || '—'), w: 42 },
+                    { header: 'Status',        key: d => d.stage || '—',                             w: 28 },
                 ];
             } else if (activeTab === 'companies') {
                 columns = [
-                    { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString('en-IN'), w: 35 },
-                    { header: 'Company Name',  key: d => d.name || '—',                              w: 60 },
-                    { header: 'Industry',      key: d => d.industry || '—',                          w: 40 },
-                    { header: 'Status',        key: d => d.status || '—',                            w: 30 },
-                    { header: 'Executive Owner', key: d => d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : '—', w: 26 },
+                    { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString('en-IN'), w: 32 },
+                    { header: 'Company Name',  key: d => d.name || '—',                              w: 50 },
+                    { header: 'Industry',      key: d => d.industry || '—',                          w: 38 },
+                    { header: 'Status',        key: d => d.status || '—',                            w: 25 },
+                    { header: 'Executive Owner', key: d => d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : '—', w: 35 },
                 ];
             } else {
                 columns = [
-                    { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString(), w: 35 },
+                    { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString(), w: 30 },
                     { header: 'Name',          key: d => `${d.firstName || ''} ${d.lastName || ''}`.trim() || '—', w: 50 },
                     { header: 'Email',         key: d => d.email || '—',                             w: 60 },
-                    { header: 'Phone',         key: d => d.phone || d.mobile || '—',                 w: 46 },
+                    { header: 'Phone',         key: d => d.phone || d.mobile || '—',                 w: 40 },
                 ];
             }
 
@@ -361,8 +361,8 @@ export default function Reports() {
                 columns.forEach(col => {
                     const cellText = String(col.key(item) ?? '—');
                     pdf.setTextColor(55, 65, 81);
-                    // Truncate long text to fit column
-                    const maxChars = Math.floor(col.w / 2.2);
+                    // More generous truncation logic (approx 3 chars per 5mm)
+                    const maxChars = Math.floor(col.w / 1.6);
                     const displayText = cellText.length > maxChars ? cellText.slice(0, maxChars - 1) + '…' : cellText;
                     pdf.text(displayText, x, y + 5.5);
                     x += col.w;
