@@ -268,8 +268,25 @@ export default function Reports() {
             pdf.setTextColor(107, 114, 128);
             pdf.text(`Period: ${dateRange.start} to ${dateRange.end}`, margin, y);
             y += 5;
-            pdf.text(`Generated on: ${new Date().toLocaleString()}`, margin, y);
+            pdf.text(`Generated on: ${new Date().toLocaleString('en-IN')}`, margin, y);
             y += 10;
+
+            // ── Chart Section ──────────────────────────────────────
+            const chartElement = document.getElementById('report-chart-container');
+            if (chartElement) {
+                try {
+                    const chartPng = await toPng(chartElement, { 
+                        backgroundColor: '#ffffff',
+                        pixelRatio: 2
+                    });
+                    // Aspect ratio check or fixed size? 
+                    // Container is approx 3:1 or 2:1. Let's use 180x60mm.
+                    pdf.addImage(chartPng, 'PNG', margin, y, pageWidth - margin * 2, 60);
+                    y += 65;
+                } catch (err) {
+                    console.warn('PDF Chart error:', err);
+                }
+            }
 
             // ── Horizontal rule ────────────────────────────────────
             pdf.setDrawColor(229, 231, 235);
@@ -547,7 +564,7 @@ export default function Reports() {
                 {/* Chart Section */}
                 {!loading && data.length > 0 && (
                     <div className="p-6 bg-gray-50/30 border-b border-gray-100 flex flex-col items-center">
-                        <div className="w-full flex flex-col md:flex-row items-center justify-around gap-8">
+                        <div id="report-chart-container" className="w-full flex flex-col md:flex-row items-center justify-around gap-8">
                             <div className="w-full h-[220px] max-w-[400px] focus:outline-none">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart style={{ outline: 'none' }}>

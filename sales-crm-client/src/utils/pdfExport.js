@@ -142,16 +142,31 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
                     y += 5;
 
                     // Remark Text
-                    pdf.setFontSize(9);
-                    pdf.setFont('helvetica', 'normal');
-                    pdf.setTextColor(55, 65, 81);
-                    
-                    // Handle multi-line text
-                    const splitText = pdf.splitTextToSize(remark.text, pageWidth - margin * 2 - 10);
-                    pdf.text(splitText, margin + 2, y);
-                    y += (splitText.length * 5) + 5;
+                    if (remark.text) {
+                        pdf.setFontSize(9);
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.setTextColor(55, 65, 81);
+                        
+                        const splitText = pdf.splitTextToSize(remark.text, pageWidth - margin * 2 - 10);
+                        pdf.text(splitText, margin + 2, y);
+                        y += (splitText.length * 5) + 2;
+                    }
+
+                    // Attachments
+                    if (remark.files && remark.files.length > 0) {
+                        pdf.setFontSize(8);
+                        pdf.setFont('helvetica', 'italic');
+                        pdf.setTextColor(107, 114, 128);
+                        remark.files.forEach(file => {
+                            if (y > pageHeight - 15) { pdf.addPage(); y = 20; }
+                            pdf.text(`[Attachment: ${file.fileName}]`, margin + 2, y);
+                            y += 4;
+                        });
+                        y += 2;
+                    }
 
                     // Small separator line
+                    y += 2;
                     pdf.setDrawColor(243, 244, 246);
                     pdf.setLineWidth(0.2);
                     pdf.line(margin + 2, y - 2, pageWidth - margin - 2, y - 2);
