@@ -281,8 +281,13 @@ export default function Reports() {
                         cacheBust: true
                     });
                     // Place chart below Title
-                    pdf.addImage(chartPng, 'PNG', margin, y, pageWidth - margin * 2, 85);
-                    y += 90;
+                    // Use 0 for height to maintain aspect ratio, but we want it 'stretched' (larger)
+                    // so we'll set a reasonable width and let it scale.
+                    const imgProps = pdf.getImageProperties(chartPng);
+                    const imgHeight = (imgProps.height * (pageWidth - margin * 2)) / imgProps.width;
+                    
+                    pdf.addImage(chartPng, 'PNG', margin, y, pageWidth - margin * 2, imgHeight);
+                    y += imgHeight + 5;
                 } catch (err) {
                     console.warn('PDF Chart error:', err);
                 }
@@ -578,7 +583,7 @@ export default function Reports() {
                 {/* Chart Section */}
                 {!loading && data.length > 0 && (
                     <div className="p-6 bg-gray-50/30 border-b border-gray-100 flex flex-col items-center">
-                        <div id="report-chart-container" className="w-full flex flex-col md:flex-row items-center justify-around gap-8">
+                        <div id="report-chart-container" className="w-full flex flex-col md:flex-row items-center justify-around gap-16 py-6 px-4 bg-white rounded-xl">
                             <div className="w-full h-[220px] max-w-[400px] focus:outline-none">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart style={{ outline: 'none' }}>
