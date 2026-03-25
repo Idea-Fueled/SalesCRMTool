@@ -52,10 +52,13 @@ export const NotificationProvider = ({ children }) => {
                 setNotifications(prev => [notification, ...prev]);
                 if (!notification.isRead) {
                     setUnreadCount(prev => prev + 1);
-                    toast.success(notification.message, {
-                        icon: "🔔",
-                        duration: 5000
-                    });
+                    // Admins and Managers should only get the notification in the list, not the toast
+                    if (user?.role !== "admin" && user?.role !== "sales_manager") {
+                        toast.success(notification.message, {
+                            icon: "🔔",
+                            duration: 5000
+                        });
+                    }
                 }
             });
 
