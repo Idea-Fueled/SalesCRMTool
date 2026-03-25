@@ -275,12 +275,14 @@ export default function Reports() {
             const chartElement = document.getElementById('report-chart-container');
             if (chartElement) {
                 try {
+                    // Small delay to ensure Recharts is fully rendered/stable
+                    await new Promise(resolve => setTimeout(resolve, 500));
                     const chartPng = await toPng(chartElement, { 
                         backgroundColor: '#ffffff',
-                        pixelRatio: 2
+                        pixelRatio: 2,
+                        cacheBust: true
                     });
-                    // Aspect ratio check or fixed size? 
-                    // Container is approx 3:1 or 2:1. Let's use 180x60mm.
+                    // Place chart below Title
                     pdf.addImage(chartPng, 'PNG', margin, y, pageWidth - margin * 2, 60);
                     y += 65;
                 } catch (err) {

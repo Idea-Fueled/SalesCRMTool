@@ -80,16 +80,19 @@ export default function ContactDealsModal({ isOpen, onClose, contact }) {
                                         <h4 className="font-bold text-gray-800 group-hover:text-red-600 transition-colors uppercase text-xs tracking-wide truncate">
                                             {deal.name}
                                         </h4>
-                                        <div className="flex items-center gap-2 mt-1.5">
-                                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter ${getStageColor(deal.stage)}`}>
-                                                {deal.stage}
+                                        <p className="text-[10px] text-gray-500 font-medium mt-0.5">
+                                            {deal.companyId?.name || deal.companyName || "No Company"}
+                                        </p>
+                                    </div>
+                                    <div className="flex flex-col items-end gap-1.5 shrink-0">
+                                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter ${getStageColor(deal.stage)}`}>
+                                            {deal.stage}
+                                        </span>
+                                        {isDealOverdue(deal) && (
+                                            <span className="text-[9px] px-1.5 py-0.5 bg-red-600 text-white rounded font-black uppercase tracking-tighter animate-pulse flex items-center gap-1">
+                                                <Clock size={8} /> Overdue
                                             </span>
-                                            {isDealOverdue(deal) && (
-                                                <span className="text-[9px] px-1.5 py-0.5 bg-red-600 text-white rounded font-black uppercase tracking-tighter animate-pulse flex items-center gap-1">
-                                                    <Clock size={8} /> Overdue
-                                                </span>
-                                            )}
-                                        </div>
+                                        )}
                                     </div>
                                 </div>
                                 
