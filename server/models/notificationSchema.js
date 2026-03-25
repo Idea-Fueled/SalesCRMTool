@@ -11,6 +11,10 @@ const notificationSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "User"
         },
+        senderRole: {
+            type: String,
+            enum: ["admin", "sales_manager", "sales_rep"]
+        },
         entityId: {
             type: mongoose.Schema.Types.ObjectId,
             required: true

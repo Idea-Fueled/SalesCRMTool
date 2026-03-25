@@ -44,6 +44,7 @@ export const notifyReassignment = async ({
                 const notification = await Notification.create({
                     recipientId,
                     senderId: actorId,
+                    senderRole: actor?.role,
                     entityId: entityId || oldOwnerId,
                     entityType,
                     message: notificationMessage,
@@ -141,6 +142,7 @@ export const sendTieredNotification = async ({
                 const notification = await Notification.create({
                     recipientId,
                     senderId: actorId,
+                    senderRole: actor?.role,
                     entityId,
                     entityType,
                     message: notificationMessage,

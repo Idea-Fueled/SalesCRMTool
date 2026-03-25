@@ -46,14 +46,27 @@ export const NotificationProvider = ({ children }) => {
             });
 
             newSocket.on("new_notification", (notification) => {
+                console.log("[NotificationContext] New notification received:", notification);
+                console.log("[NotificationContext] Current user role:", user?.role);
+
                 // Safety check: only process if intended for this user
-                if (notification.recipientId.toString() !== user.id.toString()) return;
+                if (!user || notification.recipientId.toString() !== user.id.toString()) return;
 
                 setNotifications(prev => [notification, ...prev]);
                 if (!notification.isRead) {
                     setUnreadCount(prev => prev + 1);
-                    // Admins and Managers should only get the notification in the list, not the toast
-                    if (user?.role !== "admin" && user?.role !== "sales_manager") {
+                    // Suppression logic:
+                    // 1. Admins and Managers should NOT get toasts for any notifications to reduce UI noise.
+                    // 2. They should only see notifications in the dropdown list.
+                    const userRole = user?.role?.toLowerCase();
+                    const isManager = userRole === "sales_manager" || userRole === "manager";
+                    const isAdmin = userRole === "admin";
+
+                    const shouldSuppress = isAdmin || isManager;
+                    
+                    console.log("[NotificationContext] Suppression check:", { userRole, isAdmin, isManager, shouldSuppress });
+                    
+                    if (!shouldSuppress) {
                         toast.success(notification.message, {
                             icon: "🔔",
                             duration: 5000
