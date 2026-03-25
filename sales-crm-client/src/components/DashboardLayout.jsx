@@ -140,11 +140,11 @@ const DashboardLayout = () => {
                     </div>
 
                     <div>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Deals</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Contacts</p>
                         <div className="space-y-1">
-                            <SidebarLink to="/dashboard/deals" icon={Briefcase} label="All Deals" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/dashboard/reports?tab=deals" icon={BarChart3} label="Reports" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/dashboard/archive?tab=deals" icon={Archive} label="Archives" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/dashboard/contacts" icon={ContactRound} label="All Contacts" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/dashboard/reports?tab=contacts" icon={BarChart3} label="Reports" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/dashboard/archive?tab=contacts" icon={Archive} label="Archives" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
 
@@ -158,11 +158,11 @@ const DashboardLayout = () => {
                     </div>
 
                     <div>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Contacts</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Deals</p>
                         <div className="space-y-1">
-                            <SidebarLink to="/dashboard/contacts" icon={ContactRound} label="All Contacts" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/dashboard/reports?tab=contacts" icon={BarChart3} label="Reports" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/dashboard/archive?tab=contacts" icon={Archive} label="Archives" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/dashboard/deals" icon={Briefcase} label="All Deals" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/dashboard/reports?tab=deals" icon={BarChart3} label="Reports" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/dashboard/archive?tab=deals" icon={Archive} label="Archives" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
 

@@ -119,12 +119,13 @@ export default function SalesManagerLayout() {
                             <SidebarLink to="/manager/team" icon={Users2} label="My Team" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
+
                     <div>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Deals</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Contacts</p>
                         <div className="space-y-1">
-                            <SidebarLink to="/manager/deals" icon={Briefcase} label="Team Deals" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/manager/reports?tab=deals" icon={BarChart3} label="Reports" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/manager/archive?tab=deals" icon={History} label="Archives" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/manager/contacts" icon={ContactRound} label="Team Contacts" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/manager/reports?tab=contacts" icon={BarChart3} label="Reports" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/manager/archive?tab=contacts" icon={History} label="Archives" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
 
@@ -138,13 +139,14 @@ export default function SalesManagerLayout() {
                     </div>
 
                     <div>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Contacts</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Deals</p>
                         <div className="space-y-1">
-                            <SidebarLink to="/manager/contacts" icon={ContactRound} label="Team Contacts" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/manager/reports?tab=contacts" icon={BarChart3} label="Reports" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/manager/archive?tab=contacts" icon={History} label="Archives" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/manager/deals" icon={Briefcase} label="Team Deals" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/manager/reports?tab=deals" icon={BarChart3} label="Reports" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/manager/archive?tab=deals" icon={History} label="Archives" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
+
                     <div>
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Technical</p>
                         <div className="space-y-1">
