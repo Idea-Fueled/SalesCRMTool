@@ -4,8 +4,7 @@ import { Clock, LogOut } from "lucide-react";
 
 const SessionTimeoutManager = ({ children }) => {
     const { user, logout, fetchProfile } = useAuth();
-    const timeoutRef = useRef(null);
-    const refreshIntervalRef = useRef(null);
+    const lastActivityRef = useRef(Date.now());
     const [isExpired, setIsExpired] = useState(false);
 
     // 1 minute = 60,000 ms
@@ -14,13 +13,7 @@ const SessionTimeoutManager = ({ children }) => {
     const REFRESH_INTERVAL = 30 * 1000;
 
     const resetTimer = () => {
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-
-        if (user && !isExpired) {
-            timeoutRef.current = setTimeout(() => {
-                handleLogout();
-            }, INACTIVITY_LIMIT);
-        }
+        lastActivityRef.current = Date.now();
     };
 
     const handleLogout = () => {
@@ -34,51 +27,50 @@ const SessionTimeoutManager = ({ children }) => {
         window.location.href = "/login";
     };
 
-    const handleActivity = () => {
-        if (!isExpired) {
-            resetTimer();
-        }
-    };
+    // Inactivity Checker
+    useEffect(() => {
+        if (!user || isExpired) return;
+
+        const checkInactivity = setInterval(() => {
+            const now = Date.now();
+            if (now - lastActivityRef.current >= INACTIVITY_LIMIT) {
+                handleLogout();
+            }
+        }, 1000); // Check every second
+
+        return () => clearInterval(checkInactivity);
+    }, [user?._id, isExpired]);
 
     // Initial setup and Activity Listeners
     useEffect(() => {
-        if (!user) {
-            if (timeoutRef.current) clearTimeout(timeoutRef.current);
-            return;
-        }
+        if (!user || isExpired) return;
 
-        // Initialize timer once on mount/login
+        // Initialize last activity time
         resetTimer();
 
         // Event listeners for user activity
         const events = ["mousedown", "mousemove", "keydown", "scroll", "touchstart"];
         const handleActivityWrapper = () => {
-            if (!isExpired) resetTimer();
+            resetTimer();
         };
 
         events.forEach(event => document.addEventListener(event, handleActivityWrapper));
 
         return () => {
-            if (timeoutRef.current) clearTimeout(timeoutRef.current);
             events.forEach(event => document.removeEventListener(event, handleActivityWrapper));
         };
-    }, [user?._id, isExpired]); // Only re-setup if user ID or expiration state changes
+    }, [user?._id, isExpired]);
 
-    // Periodic backend session refresh (Sliding window on server)
+    // Periodic backend session refresh
     useEffect(() => {
-        if (!user || isExpired) {
-            if (refreshIntervalRef.current) clearInterval(refreshIntervalRef.current);
-            return;
-        }
+        if (!user || isExpired) return;
 
-        refreshIntervalRef.current = setInterval(() => {
-            console.log("Activity check: checking session validity with backend...");
+        const refreshInterval = setInterval(() => {
+            console.log("Activity check: checking session validity...");
             fetchProfile();
         }, REFRESH_INTERVAL);
 
-        return () => {
-            if (refreshIntervalRef.current) clearInterval(refreshIntervalRef.current);
-        };
+        return () => clearInterval(refreshInterval);
     }, [user?._id, isExpired]);
 
     return (
