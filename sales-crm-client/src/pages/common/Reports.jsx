@@ -281,8 +281,8 @@ export default function Reports() {
                         cacheBust: true
                     });
                     // Place chart below Title
-                    pdf.addImage(chartPng, 'PNG', margin, y, pageWidth - margin * 2, 60);
-                    y += 65;
+                    pdf.addImage(chartPng, 'PNG', margin, y, pageWidth - margin * 2, 85);
+                    y += 90;
                 } catch (err) {
                     console.warn('PDF Chart error:', err);
                 }
