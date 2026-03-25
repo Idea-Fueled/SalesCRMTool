@@ -131,7 +131,16 @@ export const getCompanies = async (req, res) => {
         let teamIds = []; // declared at outer scope for use in dealCount filter below
         let filter = { isDeleted: { $ne: true } };
         if (name) {
-            filter.name = { $regex: name, $options: "i" };
+            filter.$or = [
+                { name: { $regex: name, $options: "i" } },
+                { industry: { $regex: name, $options: "i" } },
+                { website: { $regex: name, $options: "i" } },
+                { status: { $regex: name, $options: "i" } },
+                { address: { $regex: name, $options: "i" } },
+                { phone: { $regex: name, $options: "i" } },
+                { notes: { $regex: name, $options: "i" } },
+                { email: { $regex: name, $options: "i" } }
+            ];
         }
         if (industry) {
             filter.industry = industry;

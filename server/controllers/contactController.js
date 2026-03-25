@@ -170,7 +170,12 @@ export const getContacts = async (req, res, next) => {
             filter.$or = [
                 { firstName: { $regex: name, $options: "i" } },
                 { lastName: { $regex: name, $options: "i" } },
-                { jobTitle: { $regex: name, $options: "i" } }
+                { jobTitle: { $regex: name, $options: "i" } },
+                { email: { $regex: name, $options: "i" } },
+                { phone: { $regex: name, $options: "i" } },
+                { mobile: { $regex: name, $options: "i" } },
+                { companyName: { $regex: name, $options: "i" } },
+                { notes: { $regex: name, $options: "i" } }
             ]
         }
         if (jobTitle) {

@@ -709,7 +709,31 @@ export const getDeals = async (req, res, next) => {
 
         let filter = { isDeleted: { $ne: true } }
 
-        if (name) filter.name = { $regex: name, $options: "i" };
+        if (name) {
+            // More complex search for deals: lookup related IDs
+            const companyIds = await Company.find({ name: { $regex: name, $options: "i" } }).distinct("_id");
+            const contactIds = await Contact.find({
+                $or: [
+                    { firstName: { $regex: name, $options: "i" } },
+                    { lastName: { $regex: name, $options: "i" } }
+                ]
+            }).distinct("_id");
+
+            filter.$or = [
+                { name: { $regex: name, $options: "i" } },
+                { stage: { $regex: name, $options: "i" } },
+                { companyName: { $regex: name, $options: "i" } },
+                { contactName: { $regex: name, $options: "i" } },
+                { notes: { $regex: name, $options: "i" } },
+                { companyId: { $in: companyIds } },
+                { contactId: { $in: contactIds } }
+            ];
+
+            // If it's a number, try to search the exact value
+            if (!isNaN(name) && name.trim() !== "") {
+                filter.$or.push({ value: Number(name) });
+            }
+        }
         if (contactId) filter.contactId = contactId;
 
         if (stage) {
