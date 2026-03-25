@@ -76,7 +76,7 @@ const Emailverification = () => {
                             <button 
                                 onClick={handleResend}
                                 disabled={isResending || cooldown > 0}
-                                className={`font-semibold cursor-pointer hover:underline outline-none bg-transparent border-none p-0 ${cooldown > 0 ? 'text-gray-400' : 'text-red-600'}`}
+                                className={`font-semibold hover:underline outline-none bg-transparent border-none p-0 ${cooldown > 0 ? 'text-gray-400 cursor-not-allowed' : 'text-red-600 cursor-pointer'}`}
                             >
                                 {isResending ? "Sending..." : cooldown > 0 ? `Resend Link (${cooldown}s)` : "Resend Link"}
                             </button>
