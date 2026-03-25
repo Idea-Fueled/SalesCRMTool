@@ -2,10 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "./Modal";
 import { getDeals } from "../../API/services/dealService";
-import { Loader2, DollarSign, Calendar } from "lucide-react";
+import { Loader2, DollarSign, Calendar, Eye, Clock } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { isDealOverdue } from "../../utils/dateUtils";
-import { Clock } from "lucide-react";
 
 export default function ContactDealsModal({ isOpen, onClose, contact }) {
     const navigate = useNavigate();
@@ -73,13 +72,19 @@ export default function ContactDealsModal({ isOpen, onClose, contact }) {
                                     onClose();
                                     navigate(`${basePath}/deals/${deal._id}`);
                                 }}
-                                className="group p-4 bg-gray-50 hover:bg-red-50 border border-gray-100 hover:border-red-200 rounded-xl transition-all cursor-pointer flex flex-col gap-3"
+                                className="group p-4 bg-gray-50 hover:bg-red-50 border border-gray-100 hover:border-red-200 rounded-xl transition-all cursor-pointer flex flex-col gap-3 relative overflow-hidden"
                             >
+                                {/* Hover View Indicator */}
+                                <div className="absolute right-0 top-0 bottom-0 w-1 bg-red-500 transform translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
+                                
                                 <div className="flex justify-between items-start gap-4">
                                     <div className="min-w-0">
-                                        <h4 className="font-bold text-gray-800 group-hover:text-red-600 transition-colors uppercase text-xs tracking-wide truncate">
-                                            {deal.name}
-                                        </h4>
+                                        <div className="flex items-center gap-2">
+                                            <h4 className="font-bold text-gray-800 group-hover:text-red-600 transition-colors uppercase text-xs tracking-wide truncate">
+                                                {deal.name}
+                                            </h4>
+                                            <Eye size={12} className="text-gray-300 group-hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all transform translate-x-1 group-hover:translate-x-0" />
+                                        </div>
                                         <p className="text-[10px] text-gray-500 font-medium mt-0.5">
                                             {deal.companyId?.name || deal.companyName || "No Company"}
                                         </p>
