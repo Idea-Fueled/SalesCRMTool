@@ -93,7 +93,7 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
                 drawSection('Summary', [
                     ['Owner', data.ownerId ? `${data.ownerId.firstName} ${data.ownerId.lastName || ''}`.trim() : '—'],
                     ['Status', data.status],
-                    ['Total Value', data.totalValue ? `$${data.totalValue.toLocaleString()}` : '—'],
+                    ['Deal Value', data.totalValue ? `$${data.totalValue.toLocaleString()}` : '—'],
                 ]);
             } else if (type === 'contact') {
                 drawSection('Contact Information', [

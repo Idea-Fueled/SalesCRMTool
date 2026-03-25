@@ -538,12 +538,15 @@ export const getCompanyById = async (req, res) => {
             dealFilter.ownerId = { $in: teamIds };
         }
 
-        const dealCount = await Deal.countDocuments(dealFilter);
+        const deals = await Deal.find(dealFilter).select("value");
+        const totalValue = deals.reduce((sum, d) => sum + (d.value || 0), 0);
+        const dealCount = deals.length;
 
         res.status(200).json({ 
             data: {
                 ...company.toObject(),
-                dealCount
+                dealCount,
+                totalValue
             } 
         });
     } catch (error) {
