@@ -36,7 +36,7 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
                 console.warn('PDF Logo error:', err);
             }
 
-            y = 28;
+            y = 40;
             // Title
             pdf.setFontSize(22);
             pdf.setFont('helvetica', 'bold');
@@ -47,7 +47,7 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
             pdf.setFontSize(9);
             pdf.setFont('helvetica', 'normal');
             pdf.setTextColor(107, 114, 128);
-            pdf.text(`Generated on: ${new Date().toLocaleString()}`, margin, y);
+            pdf.text(`Generated on: ${new Date().toLocaleString('en-IN')}`, margin, y);
             y += 8;
 
             pdf.setDrawColor(229, 231, 235);
@@ -127,7 +127,7 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
                 pdf.setFontSize(12);
                 pdf.setFont('helvetica', 'bold');
                 pdf.setTextColor(31, 41, 55);
-                pdf.text('RECENT REMARKS', margin, y);
+                pdf.text('REMARK', margin, y);
                 y += 8;
 
                 data.remarks.forEach((remark) => {

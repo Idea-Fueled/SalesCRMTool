@@ -255,7 +255,7 @@ export default function Reports() {
                 console.warn('PDF Logo error:', err);
             }
 
-            y = 28;
+            y = 40;
             // ── Title ──────────────────────────────────────────────
             pdf.setFontSize(22);
             pdf.setFont('helvetica', 'bold');
