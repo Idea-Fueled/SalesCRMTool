@@ -377,11 +377,11 @@ export default function AdminDashboard() {
                                 onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: stats.dealList.filter(d => d.stage === 'Negotiation' && new Date(d.updatedAt) < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) })}
                                 className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100 cursor-pointer group"
                             >
-                                <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-500 group-hover:scale-110 transition-transform">
+                                <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform">
                                     <Briefcase size={18} />
                                 </div>
                                 <div>
-                                    <p className="text-sm font-bold text-gray-800 group-hover:text-orange-500 transition-colors">{stats.stagnantDeals} Stagnant Deals</p>
+                                    <p className="text-sm font-bold text-gray-800 group-hover:text-red-500 transition-colors">{stats.stagnantDeals} Stagnant Deals</p>
                                     <p className="text-xs text-gray-500">Inactive in Negotiation for 7+ days</p>
                                 </div>
                             </li>
