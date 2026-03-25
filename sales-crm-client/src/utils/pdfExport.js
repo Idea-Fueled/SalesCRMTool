@@ -71,7 +71,7 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
                 drawSection('Deal Information', [
                     ['Deal Name', data.name],
                     ['Stage', data.stage],
-                    ['Value', data.value ? `$${Number(data.value).toLocaleString()}` : '—'],
+                    ['Deal Value', data.value ? `$${Number(data.value).toLocaleString()}` : '—'],
                     ['Probability', data.probability ? `${data.probability}%` : '—'],
                     ['Expected Close', data.expectedCloseDate ? new Date(data.expectedCloseDate).toLocaleDateString() : '—'],
                     ['Source', data.source],

@@ -591,7 +591,7 @@ export default function DealDetails() {
                         <div className="p-6 space-y-6">
                             {/* Narratives/Notes */}
                             <div className="space-y-4">
-                                <div className="space-y-4 max-h-[500px] overflow-y-auto px-1">
+                                <div className="space-y-4 max-h-[350px] overflow-y-auto px-1">
                                     {deal.remarks && Array.isArray(deal.remarks) && deal.remarks.length > 0 ? (
                                         deal.remarks.map((remark, i) => (
                                             <div key={i} className="group p-4 bg-gray-50/30 rounded-xl border border-gray-100 transition-all hover:bg-white hover:shadow-sm">

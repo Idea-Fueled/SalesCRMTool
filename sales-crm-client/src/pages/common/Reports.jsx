@@ -599,7 +599,7 @@ export default function Reports() {
                             <tr className="bg-[#FFF9E5] border-b border-gray-100 text-[13px] font-bold text-gray-800 uppercase tracking-wider">
                                 <th className="px-4 py-3.5 font-bold whitespace-nowrap min-w-[120px]">Creation Date</th>
                                 <th className="px-4 py-3.5 font-bold min-w-[160px]">{activeTab === "contacts" ? "Name" : activeTab === "companies" ? "Company" : "Deal name"}</th>
-                                <th className="px-4 py-3.5 font-bold min-w-[140px]">{activeTab === "deals" ? "Value" : activeTab === "companies" ? "Industry" : "Title"}</th>
+                                <th className="px-4 py-3.5 font-bold min-w-[140px]">{activeTab === "deals" ? "Deal Value" : activeTab === "companies" ? "Industry" : "Title"}</th>
                                 <th className="px-4 py-3.5 font-bold min-w-[160px]">Owner</th>
                                 {activeTab !== "contacts" && <th className="px-4 py-3.5 text-left font-bold min-w-[90px]">Status</th>}
                             </tr>

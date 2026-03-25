@@ -256,7 +256,7 @@ export default function RepDeals() {
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="border-b border-gray-100 bg-gray-50">
-                                    {["Deal Name", "Company", "Contact", "Stage", "Value", "Expected Close", "Actions"].map(h => (
+                                    {["Deal Name", "Company", "Contact", "Stage", "Deal Value", "Expected Close", "Actions"].map(h => (
                                         <th key={h} className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wide whitespace-nowrap">{h}</th>
                                     ))}
                                 </tr>

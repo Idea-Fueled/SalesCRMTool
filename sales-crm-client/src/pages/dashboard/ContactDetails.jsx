@@ -480,8 +480,8 @@ export default function ContactDetails() {
                 <div className="lg:col-span-8 space-y-8">
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <div className="px-6 h-14 border-b border-gray-50 flex items-center justify-between">
-                            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Remarks</h3>
-                            <div className="flex items-center gap-3">
+                            <h3 className="text-sm font-bold text-gray-900 tracking-tight">Remarks</h3>
+                            <div className="flex items-center gap-2">
                                 <button
                                     onClick={() => fetchContact(true)}
                                     disabled={isRefreshing}
@@ -494,129 +494,122 @@ export default function ContactDetails() {
                         </div>
 
                         <div className="p-6 space-y-6">
-                            {/* Narratives/Intel */}
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                                    <MessageSquare size={10} /> Remarks
-                                </div>
-                                
-                                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                                    {Array.isArray(contact.remarks) && contact.remarks.length > 0 ? (
-                                        contact.remarks.map((remark, idx) => (
-                                            <div key={idx} className="group p-4 bg-gray-50/30 rounded-xl border border-gray-100 transition-all hover:bg-white hover:shadow-sm">
-                                                <div className="flex items-start justify-between mb-2">
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center text-[10px] font-bold text-white border border-red-100">
-                                                            {remark.authorName?.[0] || 'U'}
-                                                        </div>
-                                                        <span className="text-[11px] font-semibold text-gray-500">
-                                                            {remark.authorName || "Unknown"} <span className="text-gray-300 mx-1">•</span> {formatDate(remark.createdAt || new Date(), true)}
-                                                        </span>
+                            <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+                                {Array.isArray(contact.remarks) && contact.remarks.length > 0 ? (
+                                    contact.remarks.map((remark, idx) => (
+                                        <div key={idx} className="group p-4 bg-gray-50/30 rounded-xl border border-gray-100 transition-all hover:bg-white hover:shadow-sm">
+                                            <div className="flex items-start justify-between mb-2">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center text-[10px] font-bold text-white border border-red-100">
+                                                        {remark.authorName?.[0] || 'U'}
                                                     </div>
-                                                    {(currentUser?.role === 'admin' || (currentUser?._id || currentUser?.id) === remark.author) && (
-                                                        <button
-                                                            onClick={() => prepareDeleteRemark(remark._id || idx)}
-                                                            className="p-1.5 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
-                                                            title="Delete remark"
-                                                        >
-                                                            <Trash2 size={12} />
-                                                        </button>
-                                                    )}
+                                                    <span className="text-[11px] font-semibold text-gray-500">
+                                                        {remark.authorName || "Unknown"} <span className="text-gray-300 mx-1">•</span> {formatDate(remark.createdAt || new Date(), true)}
+                                                    </span>
                                                 </div>
-                                                <div className="text-[13px] text-gray-700 leading-relaxed font-medium">
-                                                    {remark.text}
-                                                </div>
-                                                {remark.files && remark.files.length > 0 && (
-                                                    <div className="mt-2 flex flex-wrap gap-2">
-                                                        {remark.files.map((file, fIdx) => (
-                                                            <div key={fIdx} className="group flex items-center gap-1">
-                                                                <button
-                                                                     onClick={() => viewFile(formatFileUrl(file.url, file.fileType))}
-                                                                     className="flex items-center gap-2 px-2 py-1 bg-white border border-gray-200 rounded-lg text-[10px] font-medium text-gray-500 hover:border-red-400 hover:text-red-600 transition-all shadow-sm cursor-pointer"
-                                                                 >
-                                                                     <Paperclip size={10} className="text-gray-400" />
-                                                                     <span className="max-w-[150px] truncate">{file.fileName}</span>
-                                                                 </button>
-                                                                 <button
-                                                                    onClick={() => downloadFile(file.url, file.fileName)}
-                                                                    className="p-1.5 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
-                                                                    title="Download to system"
-                                                                >
-                                                                    <Download size={12} />
-                                                                </button>
-                                                                {(currentUser?.role === 'admin' || String(currentUser?._id || currentUser?.id) === String(remark.author?._id || remark.author?.id || remark.author)) && (
-                                                                    <button
-                                                                        onClick={() => prepareDeleteRemarkFile(remark._id || idx, file._id, file.fileName)}
-                                                                        className="p-1.5 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
-                                                                        title="Delete file"
-                                                                    >
-                                                                        <Trash2 size={12} />
-                                                                    </button>
-                                                                )}
-                                                            </div>
-                                                        ))}
-                                                    </div>
+                                                {(currentUser?.role === 'admin' || (currentUser?._id || currentUser?.id) === remark.author) && (
+                                                    <button
+                                                        onClick={() => prepareDeleteRemark(remark._id || idx)}
+                                                        className="p-1.5 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                                                        title="Delete remark"
+                                                    >
+                                                        <Trash2 size={12} />
+                                                    </button>
                                                 )}
                                             </div>
-                                        ))
-                                    ) : (
-                                        <div className="text-center py-6 bg-gray-50/20 rounded-xl border border-dashed border-gray-100">
-                                            <MessageSquare size={18} className="mx-auto text-gray-300 mb-1.5 opacity-20" />
-                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em] italic">No remarks yet</p>
-                                        </div>
-                                    )}
-                                </div>
-                                
-                                <div className="mt-4 pt-4 border-t border-gray-100 flex flex-col gap-3 no-print">
-                                    <textarea
-                                        value={newRemark}
-                                        onChange={(e) => setNewRemark(e.target.value)}
-                                        placeholder="Add a remark..."
-                                        className="w-full min-h-[45px] p-3 text-[13px] bg-gray-50/50 border border-red-500 rounded-xl focus:ring-4 focus:ring-red-50 focus:border-red-300 focus:bg-white transition-all resize-none font-medium text-gray-700 shadow-inner"
-                                    />
-                                    
-                                    <div className="flex items-center justify-between mt-1">
-                                        <div className="flex flex-wrap gap-2">
-                                            {remarkFiles.map((file, idx) => (
-                                                <div key={idx} className="flex items-center gap-2 bg-red-50 px-2 py-1 rounded-lg border border-red-100 text-[9px] font-bold text-red-600">
-                                                    <span className="max-w-[120px] truncate">{file.name}</span>
-                                                    <button
-                                                        onClick={() => setRemarkFiles(prev => prev.filter((_, i) => i !== idx))}
-                                                        className="hover:text-red-900"
-                                                    >
-                                                        <X size={10} />
-                                                    </button>
+                                            <div className="text-[13px] text-gray-700 leading-relaxed font-medium">
+                                                {remark.text}
+                                            </div>
+                                            {remark.files && remark.files.length > 0 && (
+                                                <div className="mt-2 flex flex-wrap gap-2">
+                                                    {remark.files.map((file, fIdx) => (
+                                                        <div key={fIdx} className="group flex items-center gap-1">
+                                                            <button
+                                                                 onClick={() => viewFile(formatFileUrl(file.url, file.fileType))}
+                                                                 className="flex items-center gap-2 px-2 py-1 bg-white border border-gray-200 rounded-lg text-[10px] font-medium text-gray-500 hover:border-red-400 hover:text-red-600 transition-all shadow-sm cursor-pointer"
+                                                             >
+                                                                 <Paperclip size={10} className="text-gray-400" />
+                                                                 <span className="max-w-[150px] truncate">{file.fileName}</span>
+                                                             </button>
+                                                             <button
+                                                                onClick={() => downloadFile(file.url, file.fileName)}
+                                                                className="p-1.5 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+                                                                title="Download to system"
+                                                            >
+                                                                <Download size={12} />
+                                                            </button>
+                                                            {(currentUser?.role === 'admin' || String(currentUser?._id || currentUser?.id) === String(remark.author?._id || remark.author?.id || remark.author)) && (
+                                                                <button
+                                                                    onClick={() => prepareDeleteRemarkFile(remark._id || idx, file._id, file.fileName)}
+                                                                    className="p-1.5 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                                                                    title="Delete file"
+                                                                >
+                                                                    <Trash2 size={12} />
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    ))}
                                                 </div>
-                                            ))}
-                                            <label className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-bold text-gray-500 hover:border-red-400 hover:text-red-600 cursor-pointer transition-all shadow-sm active:scale-95 group">
-                                                <Paperclip size={12} className="group-hover:rotate-12 transition-transform" />
-                                                <span>{remarkFiles.length > 0 ? "Add More" : "Attach"}</span>
-                                                <input
-                                                    type="file"
-                                                    multiple
-                                                    className="hidden"
-                                                    onChange={(e) => {
-                                                        const files = Array.from(e.target.files);
-                                                        setRemarkFiles(prev => [...prev, ...files]);
-                                                        // Reset value so duplicate files can be selected again
-                                                        e.target.value = "";
-                                                    }}
-                                                />
-                                            </label>
-                                        </div>
-
-                                        <button
-                                            onClick={handleAddRemark}
-                                            disabled={savingRemark || (!newRemark.trim() && remarkFiles.length === 0)}
-                                            className="px-5 py-2 text-[11px] font-black text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-md shadow-red-100 transition-all disabled:opacity-50 flex items-center gap-2 active:scale-95"
-                                        >
-                                            {savingRemark ? (
-                                                <Loader2 size={12} className="animate-spin" />
-                                            ) : (
-                                                <><MessageSquare size={12} /> Post</>
                                             )}
-                                        </button>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-6 bg-gray-50/20 rounded-xl border border-dashed border-gray-100">
+                                        <MessageSquare size={18} className="mx-auto text-gray-300 mb-1.5 opacity-20" />
+                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em] italic">No remarks yet</p>
                                     </div>
+                                )}
+                            </div>
+                            
+                            <div className="mt-4 pt-4 border-t border-gray-100 flex flex-col gap-3 no-print">
+                                <textarea
+                                    value={newRemark}
+                                    onChange={(e) => setNewRemark(e.target.value)}
+                                    placeholder="Add a remark..."
+                                    className="w-full min-h-[45px] p-3 text-[13px] bg-gray-50/50 border border-red-500 rounded-xl focus:ring-4 focus:ring-red-50 focus:border-red-300 focus:bg-white transition-all resize-none font-medium text-gray-700 shadow-inner"
+                                />
+                                
+                                <div className="flex items-center justify-between mt-1">
+                                    <div className="flex flex-wrap gap-2">
+                                        {remarkFiles.map((file, idx) => (
+                                            <div key={idx} className="flex items-center gap-2 bg-red-50 px-2 py-1 rounded-lg border border-red-100 text-[9px] font-bold text-red-600">
+                                                <span className="max-w-[120px] truncate">{file.name}</span>
+                                                <button
+                                                    onClick={() => setRemarkFiles(prev => prev.filter((_, i) => i !== idx))}
+                                                    className="hover:text-red-900"
+                                                >
+                                                    <X size={10} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                        <label className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-bold text-gray-500 hover:border-red-400 hover:text-red-600 cursor-pointer transition-all shadow-sm active:scale-95 group">
+                                            <Paperclip size={12} className="group-hover:rotate-12 transition-transform" />
+                                            <span>{remarkFiles.length > 0 ? "Add More" : "Attach"}</span>
+                                            <input
+                                                type="file"
+                                                multiple
+                                                className="hidden"
+                                                onChange={(e) => {
+                                                    const files = Array.from(e.target.files);
+                                                    setRemarkFiles(prev => [...prev, ...files]);
+                                                    // Reset value so duplicate files can be selected again
+                                                    e.target.value = "";
+                                                }}
+                                            />
+                                        </label>
+                                    </div>
+
+                                    <button
+                                        onClick={handleAddRemark}
+                                        disabled={savingRemark || (!newRemark.trim() && remarkFiles.length === 0)}
+                                        className="px-5 py-2 text-[11px] font-black text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-md shadow-red-100 transition-all disabled:opacity-50 flex items-center gap-2 active:scale-95"
+                                    >
+                                        {savingRemark ? (
+                                            <Loader2 size={12} className="animate-spin" />
+                                        ) : (
+                                            <><MessageSquare size={12} /> Post</>
+                                        )}
+                                    </button>
                                 </div>
                             </div>
                         </div>

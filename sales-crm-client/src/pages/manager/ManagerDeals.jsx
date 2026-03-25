@@ -203,7 +203,7 @@ export default function ManagerDeals() {
                 <StatCard icon={BriefcaseIcon} label="Team Deals" value={deals.length} color="bg-red-50 text-red-600" />
                 <StatCard icon={ZapIcon} label="Active Deals" value={deals.filter(d => !d.stage.startsWith("Closed")).length} color="bg-orange-50 text-orange-600" />
                 <StatCard label="Closed Won" value={deals.filter(d => d.stage === "Closed Won").length} color="bg-red-600 text-white shadow-sm shadow-red-100" icon={CheckCircleIcon} />
-                <StatCard icon={BuildingIcon} label="Total Value" value={`$${deals.reduce((sum, d) => sum + (d.value || 0), 0).toLocaleString()}`} color="bg-red-50 text-red-600 border border-red-100" />
+                <StatCard icon={BuildingIcon} label="Deal Value" value={`$${deals.reduce((sum, d) => sum + (d.value || 0), 0).toLocaleString()}`} color="bg-red-50 text-red-600 border border-red-100" />
             </div>
 
             {viewMode === "kanban" ? (
@@ -264,7 +264,7 @@ export default function ManagerDeals() {
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="border-b border-gray-100 bg-gray-50">
-                                    {["Deal Name", "Owned By", "Company", "Contact", "Stage", "Value", "Expected Close", "Actions"].map(h => (
+                                    {["Deal Name", "Owned By", "Company", "Contact", "Stage", "Deal Value", "Expected Close", "Actions"].map(h => (
                                         <th key={h} className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wide whitespace-nowrap">{h}</th>
                                     ))}
                                 </tr>

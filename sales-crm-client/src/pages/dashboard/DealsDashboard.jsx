@@ -224,7 +224,7 @@ export default function DealsDashboard() {
         </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard label="Total Value" value={`$${totalValue >= 1000000 ? `${(totalValue / 1000000).toFixed(2)}M` : `${(totalValue / 1000).toFixed(1)}K`}`} color="bg-red-50 text-red-600" icon={DollarSign} />
+                <StatCard label="Deal Value" value={`$${totalValue >= 1000000 ? `${(totalValue / 1000000).toFixed(2)}M` : `${(totalValue / 1000).toFixed(1)}K`}`} color="bg-red-50 text-red-600" icon={DollarSign} />
                 <StatCard label="Active Deals" value={String(activeCount)} color="bg-orange-50 text-red-500" icon={Zap} />
                 <StatCard label="Won Deals" value={String(wonCount)} color="bg-green-50 text-green-600" icon={CheckCircle2} />
                 <StatCard label="New Deals" value={String(deals.length)} color="bg-red-100 text-red-700" icon={Briefcase} />
@@ -321,7 +321,7 @@ export default function DealsDashboard() {
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className="border-b border-gray-100 bg-gray-50">
-                                            {["Deal Name", "Owner", "Company", "Contact", "Stage", "Value", "Actions"].map(h => (
+                                            {["Deal Name", "Owner", "Company", "Contact", "Stage", "Deal Value", "Actions"].map(h => (
                                                 <th key={h} className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wide whitespace-nowrap">{h}</th>
                                             ))}
                                         </tr>
