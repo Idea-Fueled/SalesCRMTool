@@ -32,7 +32,7 @@ const CardHeader = ({ title, children }) => (
 
 const StatCard = ({ label, value, sub, icon: IconComp }) => (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-start gap-4">
-        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 bg-red-50 text-red-600 border border-red-100 shadow-sm shadow-red-50">
+        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 bg-red-600 text-white shadow-md shadow-red-100">
             <IconComp size={20} />
         </div>
         <div>

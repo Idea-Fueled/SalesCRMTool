@@ -20,7 +20,7 @@ const OverviewStat = ({ label, value, icon: IconComp, onClick }) => (
         className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer active:scale-95 group"
     >
         <div className="flex items-start justify-between">
-            <div className="p-3 rounded-xl bg-red-50 text-red-600 border border-red-100 shadow-sm group-hover:scale-110 transition-transform duration-300">
+            <div className="p-3 rounded-xl bg-red-600 text-white shadow-md shadow-red-100 group-hover:scale-110 transition-transform duration-300">
                 <IconComp size={20} />
             </div>
         </div>

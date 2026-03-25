@@ -71,8 +71,8 @@ export default function TrashDashboard() {
     return (
         <div className="p-6 space-y-6 max-w-screen-xl mx-auto">
             <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-red-50 rounded-xl border border-red-100">
-                    <Trash2 size={22} className="text-red-600" />
+                <div className="p-2.5 bg-red-600 rounded-xl shadow-md shadow-red-100 transition-transform hover:scale-105">
+                    <Trash2 size={22} className="text-white" />
                 </div>
                 <div>
                     <h1 className="text-xl font-bold text-gray-800">Trash</h1>

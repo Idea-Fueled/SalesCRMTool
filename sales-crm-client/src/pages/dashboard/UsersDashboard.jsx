@@ -274,10 +274,10 @@ export default function UsersDashboard() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 {[
-                    { label: "Total Users", value: loading ? "..." : String(users.length), color: "bg-red-50 text-red-600", icon: Users2 },
-                    { label: "Admins", value: loading ? "..." : String(adminCount), color: "bg-red-50 text-red-600", icon: ShieldCheck },
-                    { label: "Sales Managers", value: loading ? "..." : String(managerCount), color: "bg-red-50 text-red-600", icon: Briefcase },
-                    { label: "Sales Representatives", value: loading ? "..." : String(repCount), color: "bg-red-50 text-red-600", icon: UserCheck },
+                    { label: "Total Users", value: loading ? "..." : String(users.length), color: "bg-red-600 text-white shadow-md shadow-red-100", icon: Users2 },
+                    { label: "Admins", value: loading ? "..." : String(adminCount), color: "bg-red-600 text-white shadow-md shadow-red-100", icon: ShieldCheck },
+                    { label: "Sales Managers", value: loading ? "..." : String(managerCount), color: "bg-red-600 text-white shadow-md shadow-red-100", icon: Briefcase },
+                    { label: "Sales Representatives", value: loading ? "..." : String(repCount), color: "bg-red-600 text-white shadow-md shadow-red-100", icon: UserCheck },
                 ].map(s => (
                     <div key={s.label} className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-start gap-4">
                         <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${s.color}`}>

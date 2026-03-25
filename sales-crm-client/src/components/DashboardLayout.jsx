@@ -117,9 +117,9 @@ const DashboardLayout = () => {
 
                 {/* Role badge */}
                 <div className="px-4 py-3 border-b border-gray-50 bg-gray-50/30">
-                    <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-lg px-3 py-1.5 transition-all">
-                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                        <span className="text-[10px] font-bold text-red-700 uppercase tracking-wider">Administrator</span>
+                    <div className="flex items-center gap-2 bg-red-600 border border-red-600 rounded-lg px-3 py-1.5 transition-all shadow-sm">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                        <span className="text-[10px] font-bold text-white uppercase tracking-wider">Administrator</span>
                     </div>
                 </div>
 
