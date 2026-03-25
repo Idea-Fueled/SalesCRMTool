@@ -44,8 +44,6 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
             pdf.text(`${type.toUpperCase()} DETAILS`, margin, y);
             y += 8;
 
-            y += 8;
-
             pdf.setDrawColor(229, 231, 235);
             pdf.setLineWidth(0.4);
             pdf.line(margin, y, pageWidth - margin, y);
