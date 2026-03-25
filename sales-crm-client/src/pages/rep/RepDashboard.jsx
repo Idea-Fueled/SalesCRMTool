@@ -116,7 +116,7 @@ export default function RepDashboard() {
                     { label: "My Companies", value: loading ? "..." : String(companies.length), sub: "Active accounts", icon: Building2, onClick: () => setModalConfig({ isOpen: true, category: 'companies', data: companies }) },
                 ].map(s => (
                     <div key={s.label} onClick={s.onClick} className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-start gap-4 cursor-pointer hover:shadow-md active:scale-95 transition-all duration-300 group">
-                        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 bg-red-600 text-white shadow-sm shadow-red-100 group-hover:scale-110 transition-transform">
+                        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 bg-red-50 text-red-600 border border-red-100 shadow-sm shadow-red-50 group-hover:scale-110 transition-transform">
                             <s.icon size={20} />
                         </div>
                         <div>

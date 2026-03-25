@@ -460,22 +460,26 @@ export default function DealDetails() {
                         </div>
                     </div>
 
-                    {/* Strategic Owner */}
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-50">
-                            <h3 className="text-[10px] font-bold">Ownership</h3>
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden text-center">
+                        <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-center">
+                            <h3 className="text-sm font-bold uppercase tracking-wider">OWNER</h3>
                         </div>
                         <div className="p-4">
-                            <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
-                                <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-sm ring-1 ring-red-100 overflow-hidden">
+                            <div className="flex flex-col items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                <div className="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-sm ring-1 ring-red-100 overflow-hidden">
                                     {deal.ownerId?.profilePicture ? (
                                         <img src={deal.ownerId.profilePicture} alt="Owner" className="w-full h-full object-cover" />
                                     ) : (
                                         <>{deal.ownerId?.firstName?.[0]}{deal.ownerId?.lastName?.[0]}</>
                                     )}
                                 </div>
-                                <div>
+                                <div className="text-center">
                                     <p className="text-sm font-black text-gray-900 leading-none">{deal.ownerId?.firstName} {deal.ownerId?.lastName || ""}</p>
+                                    <p className="text-[11px] text-gray-400 font-bold mt-2 uppercase tracking-widest">
+                                        {deal.ownerId?.role === 'admin' ? 'Admin' : 
+                                         deal.ownerId?.role === 'sales_manager' ? 'Sales Manager' : 
+                                         deal.ownerId?.role === 'sales_rep' ? 'Sales Representative' : 'Sales Representative'}
+                                    </p>
                                 </div>
                             </div>
                         </div>

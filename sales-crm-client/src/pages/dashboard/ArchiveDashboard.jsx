@@ -86,9 +86,9 @@ export default function ArchiveDashboard() {
         <div className="p-6 space-y-6 max-w-screen-xl mx-auto">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-gray-50 rounded-xl border border-gray-100">
-                        <Briefcase size={22} className="text-gray-500" />
-                    </div>
+                <div className="p-2.5 bg-red-50 rounded-xl border border-red-100">
+                    <Briefcase size={22} className="text-red-600" />
+                </div>
                     <div>
                         <h1 className="text-xl font-bold text-gray-800">Archived Records</h1>
                         <p className="text-sm text-gray-400">Restore items within 30 days before permanent deletion.</p>

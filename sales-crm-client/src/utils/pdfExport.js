@@ -82,8 +82,9 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
                     ['Expected Close', data.expectedCloseDate ? new Date(data.expectedCloseDate).toLocaleDateString('en-IN') : '—'],
                     ['Lead Source', data.source || 'Direct Identification'],
                 ]);
-                drawSection('Ownership', [
+                drawSection('OWNER', [
                     ['Owner', data.ownerId ? `${data.ownerId.firstName} ${data.ownerId.lastName || ''}`.trim() : '—'],
+                    ['Designation', data.ownerId?.role === 'admin' ? 'Admin' : data.ownerId?.role === 'sales_manager' ? 'Sales Manager' : data.ownerId?.role === 'sales_rep' ? 'Sales Representative' : 'Sales Representative'],
                     ['Company', data.companyId?.name || data.companyName || '—'],
                     ['Primary Contact', data.contactId ? `${data.contactId.firstName} ${data.contactId.lastName || ''}`.trim() : (data.contactName || '—')],
                 ]);
@@ -98,8 +99,9 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
                     ['Company Size', data.size ? `${data.size} Employees` : '—'],
                     ['Revenue Range', data.revenueRange ? `$${data.revenueRange.toLocaleString()}` : '—'],
                 ]);
-                drawSection('Ownership', [
+                drawSection('OWNER', [
                     ['Owner', data.ownerId ? `${data.ownerId.firstName} ${data.ownerId.lastName || ''}`.trim() : '—'],
+                    ['Designation', data.ownerId?.role === 'admin' ? 'Admin' : data.ownerId?.role === 'sales_manager' ? 'Sales Manager' : data.ownerId?.role === 'sales_rep' ? 'Sales Representative' : 'Sales Representative'],
                     ['Account Status', data.status || 'Prospect'],
                 ]);
             } else if (type === 'contact') {
@@ -110,8 +112,9 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
                     ['Phone / Mobile', data.phone || data.mobile],
                     ['LinkedIn', data.linkedin || '—'],
                 ]);
-                drawSection('Executive Ownership', [
-                    ['Executive Owner', data.ownerId ? `${data.ownerId.firstName} ${data.ownerId.lastName || ''}`.trim() : '—'],
+                drawSection('OWNER', [
+                    ['Owner', data.ownerId ? `${data.ownerId.firstName} ${data.ownerId.lastName || ''}`.trim() : '—'],
+                    ['Designation', data.ownerId?.role === 'admin' ? 'Admin' : data.ownerId?.role === 'sales_manager' ? 'Sales Manager' : data.ownerId?.role === 'sales_rep' ? 'Sales Representative' : 'Sales Representative'],
                     ['Associated Companies', data.companies?.map(c => c.companyId?.name || c.companyName).filter(Boolean).join(', ') || data.companyName || '—'],
                 ]);
             }

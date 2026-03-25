@@ -435,19 +435,22 @@ export default function CompanyDetails() {
                         </div>
                     </div>
 
-                    {/* Strategic Owner */}
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
-                            <h3 className="text-sm font-bold">Ownership</h3>
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden text-center">
+                        <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-center">
+                            <h3 className="text-sm font-bold uppercase tracking-wider">OWNER</h3>
                         </div>
                         <div className="p-5">
-                            <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
-                                <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-sm ring-1 ring-red-100">
+                            <div className="flex flex-col items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                <div className="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-sm ring-1 ring-red-100">
                                     {company.ownerId?.firstName?.[0]}{company.ownerId?.lastName?.[0]}
                                 </div>
-                                <div>
+                                <div className="text-center">
                                     <p className="text-sm font-black text-gray-900 leading-none">{company.ownerId?.firstName} {company.ownerId?.lastName || ""}</p>
-                                    <p className="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-tighter">Account Executive</p>
+                                    <p className="text-[11px] text-gray-400 font-bold mt-2 uppercase tracking-widest">
+                                        {company.ownerId?.role === 'admin' ? 'Admin' : 
+                                         company.ownerId?.role === 'sales_manager' ? 'Sales Manager' : 
+                                         company.ownerId?.role === 'sales_rep' ? 'Sales Representative' : 'Sales Representative'}
+                                    </p>
                                 </div>
                             </div>
                         </div>

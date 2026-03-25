@@ -33,7 +33,7 @@ const CardHeader = ({ title, children }) => (
 
 const StatCard = ({ label, value, sub, icon: IconComp, onClick }) => (
     <div onClick={onClick} className={`bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-start gap-4 ${onClick ? "cursor-pointer hover:shadow-md active:scale-95 transition-all duration-300" : ""}`}>
-        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 bg-red-600 text-white shadow-sm shadow-red-100">
+        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 bg-red-50 text-red-600 border border-red-100 shadow-sm shadow-red-50">
             <IconComp size={20} />
         </div>
         <div>
