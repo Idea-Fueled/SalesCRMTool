@@ -169,7 +169,8 @@ export const getContacts = async (req, res, next) => {
         if (name) {
             filter.$or = [
                 { firstName: { $regex: name, $options: "i" } },
-                { lastName: { $regex: name, $options: "i" } }
+                { lastName: { $regex: name, $options: "i" } },
+                { jobTitle: { $regex: name, $options: "i" } }
             ]
         }
         if (jobTitle) {
