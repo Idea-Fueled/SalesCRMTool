@@ -7,17 +7,17 @@ const SessionTimeoutManager = ({ children }) => {
     const lastActivityRef = useRef(Date.now());
     const [isExpired, setIsExpired] = useState(false);
 
-    // 1 minute = 60,000 ms
-    const INACTIVITY_LIMIT = 1 * 60 * 1000;
-    // Refresh backend cookie every 30 seconds if active
-    const REFRESH_INTERVAL = 30 * 1000;
+    // 15 minutes = 900,000 ms
+    const INACTIVITY_LIMIT = 15 * 60 * 1000;
+    // Refresh backend cookie every 5 minutes if active
+    const REFRESH_INTERVAL = 5 * 60 * 1000;
 
     const resetTimer = () => {
         lastActivityRef.current = Date.now();
     };
 
     const handleLogout = () => {
-        console.warn("User inactive for 1 minute. Logging out.");
+        console.warn("User inactive for 15 minutes. Logging out.");
         setIsExpired(true);
     };
 
@@ -85,7 +85,7 @@ const SessionTimeoutManager = ({ children }) => {
                             </div>
                             <h2 className="text-xl font-bold text-gray-900 mb-2">Session Expired</h2>
                             <p className="text-gray-500 text-sm mb-8 leading-relaxed">
-                                Your session has expired due to 1 minute of inactivity. Please log in again to continue.
+                                Your session has expired due to 15 minutes of inactivity. Please log in again to continue.
                             </p>
                             <button
                                 onClick={handleActualLogout}
