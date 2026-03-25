@@ -539,9 +539,9 @@ export default function Reports() {
                 {!loading && data.length > 0 && (
                     <div className="p-6 bg-gray-50/30 border-b border-gray-100 flex flex-col items-center">
                         <div className="w-full flex flex-col md:flex-row items-center justify-around gap-8">
-                            <div className="w-full h-[220px] max-w-[400px]">
+                            <div className="w-full h-[220px] max-w-[400px] focus:outline-none">
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <PieChart>
+                                    <PieChart style={{ outline: 'none' }}>
                                         <Pie
                                             data={getChartData()}
                                             cx="50%"
