@@ -209,6 +209,11 @@ export const addRemark = async (req, res) => {
         await deal.save();
 
         const savedRemark = deal.remarks[deal.remarks.length - 1];
+        await deal.populate({
+            path: `remarks.${deal.remarks.length - 1}.author`,
+            select: 'firstName lastName email profilePicture'
+        });
+
         res.status(200).json({ message: "Remark added successfully!", data: savedRemark });
 
         // Log action

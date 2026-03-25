@@ -500,7 +500,11 @@ export const getContactById = async (req, res, next) => {
         const contact = await Contact.findById(id)
             .populate("ownerId", "firstName lastName email")
             .populate("companyId", "name industry")
-            .populate("companies.companyId", "name industry");
+            .populate("companies.companyId", "name industry")
+            .populate({
+                path: 'remarks.author',
+                select: 'firstName lastName email profilePicture'
+            });
 
         if (!contact) {
             return res.status(404).json({ message: "Contact not found!" });
@@ -756,6 +760,11 @@ export const addRemark = async (req, res) => {
         await contact.save();
 
         const savedRemark = contact.remarks[contact.remarks.length - 1];
+        await contact.populate({
+            path: `remarks.${contact.remarks.length - 1}.author`,
+            select: 'firstName lastName email profilePicture'
+        });
+
         res.status(200).json({ message: "Remark added successfully!", data: savedRemark });
 
         // Log action

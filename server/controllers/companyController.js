@@ -521,7 +521,7 @@ export const getCompanyById = async (req, res) => {
     try {
         const { id } = req.params;
         const { _id: userId, role } = req.user;
-        const company = await Company.findById(id).populate("ownerId", "firstName lastName email");
+        const company = await Company.findById(id).populate("ownerId", "firstName lastName email").populate({ path: "remarks.author", select: "firstName lastName email profilePicture" });
 
         if (!company) {
             return res.status(404).json({ message: "Company not found!" });
@@ -568,7 +568,7 @@ export const getArchivedCompanies = async (req, res) => {
         }
 
         const companies = await Company.find(filter)
-            .populate("ownerId", "firstName lastName email")
+            .populate("ownerId", "firstName lastName email").populate({ path: "remarks.author", select: "firstName lastName email profilePicture" })
             .sort({ deletedAt: -1 });
 
         res.status(200).json({ data: companies });
@@ -777,6 +777,11 @@ export const addRemark = async (req, res) => {
         await company.save();
 
         const savedRemark = company.remarks[company.remarks.length - 1];
+        await company.populate({
+            path: `remarks.${company.remarks.length - 1}.author`,
+            select: 'firstName lastName email profilePicture'
+        });
+
         res.status(200).json({ message: "Remark added successfully!", data: savedRemark });
 
         // Log action
