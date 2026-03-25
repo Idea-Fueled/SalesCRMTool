@@ -456,7 +456,7 @@ export default function AdminDashboard() {
                         ))}
                     </div>
 
-                    <div className="flex gap-1 h-32 rounded-xl overflow-hidden mb-6 flex-1 items-end">
+                    <div className="flex gap-1 h-32 rounded-xl mb-6 flex-1 items-end">
                         {pipelineStats.map((stat, i) => {
                             const heightPercent = pipelineTotalDeals > 0 ? Math.max((stat.count / pipelineTotalDeals) * 100, 10) : 0;
                             if (heightPercent === 0) return null;
