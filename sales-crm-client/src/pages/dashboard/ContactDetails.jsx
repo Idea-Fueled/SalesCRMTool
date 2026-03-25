@@ -336,9 +336,9 @@ export default function ContactDetails() {
                     {currentUser?.role === 'admin' && (
                         <button
                             onClick={() => exportToPDF('contact', contact, `${contact.firstName}_${contact.lastName}_Details.pdf`)}
-                            className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-gray-700 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl transition-all shadow-sm active:scale-[0.98]"
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-white bg-red-600 hover:bg-red-700 border border-red-200 rounded-xl transition-all shadow-sm active:scale-[0.98]"
                         >
-                            <Download size={16} className="text-gray-500" /> Export PDF
+                            <Download size={16} className="text-white" /> Export PDF
                         </button>
                     )}
                     {canEdit && (
