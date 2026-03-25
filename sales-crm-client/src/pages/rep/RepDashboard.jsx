@@ -110,13 +110,13 @@ export default function RepDashboard() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 {[
-                    { label: "My Deals", value: loading ? "..." : String(deals.length), sub: "Across all stages", color: "bg-red-50 text-red-600", icon: Briefcase, onClick: () => setModalConfig({ isOpen: true, category: 'deals', data: deals }) },
-                    { label: "Deals Won", value: loading ? "..." : String(wonDeals.length), sub: `${formatCurrency(totalWon)} won`, color: "bg-red-600 text-white shadow-sm shadow-red-100", icon: CheckCircle2, onClick: () => setModalConfig({ isOpen: true, category: 'deals', data: wonDeals }) },
-                    { label: "My Pipeline", value: loading ? "..." : formatCurrency(totalPipeline), sub: `${activeDeals.length} in progress`, color: "bg-red-50 text-red-600 border border-red-100", icon: DollarSign, onClick: () => setModalConfig({ isOpen: true, category: 'revenue', data: activeDeals }) },
-                    { label: "My Companies", value: loading ? "..." : String(companies.length), sub: "Active accounts", color: "bg-orange-50 text-orange-600", icon: Building2, onClick: () => setModalConfig({ isOpen: true, category: 'companies', data: companies }) },
+                    { label: "My Deals", value: loading ? "..." : String(deals.length), sub: "Across all stages", icon: Briefcase, onClick: () => setModalConfig({ isOpen: true, category: 'deals', data: deals }) },
+                    { label: "Deals Won", value: loading ? "..." : String(wonDeals.length), sub: `${formatCurrency(totalWon)} won`, icon: CheckCircle2, onClick: () => setModalConfig({ isOpen: true, category: 'deals', data: wonDeals }) },
+                    { label: "My Pipeline", value: loading ? "..." : formatCurrency(totalPipeline), sub: `${activeDeals.length} in progress`, icon: DollarSign, onClick: () => setModalConfig({ isOpen: true, category: 'revenue', data: activeDeals }) },
+                    { label: "My Companies", value: loading ? "..." : String(companies.length), sub: "Active accounts", icon: Building2, onClick: () => setModalConfig({ isOpen: true, category: 'companies', data: companies }) },
                 ].map(s => (
-                    <div key={s.label} onClick={s.onClick} className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-start gap-4 cursor-pointer hover:shadow-md active:scale-95 transition-all duration-300">
-                        <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${s.color}`}>
+                    <div key={s.label} onClick={s.onClick} className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-start gap-4 cursor-pointer hover:shadow-md active:scale-95 transition-all duration-300 group">
+                        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 bg-red-600 text-white shadow-sm shadow-red-100 group-hover:scale-110 transition-transform">
                             <s.icon size={20} />
                         </div>
                         <div>

@@ -14,13 +14,13 @@ import { toast } from "react-hot-toast";
 import DashboardDetailModal from "../../components/modals/DashboardDetailModal";
 import { truncateName } from "../../utils/stringUtils";
 
-const OverviewStat = ({ label, value, icon: IconComp, color, onClick }) => (
+const OverviewStat = ({ label, value, icon: IconComp, onClick }) => (
     <div
         onClick={onClick}
         className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer active:scale-95 group"
     >
         <div className="flex items-start justify-between">
-            <div className={`p-3 rounded-xl ${color} group-hover:scale-110 transition-transform duration-300`}>
+            <div className="p-3 rounded-xl bg-red-600 text-white shadow-sm shadow-red-100 group-hover:scale-110 transition-transform duration-300">
                 <IconComp size={20} />
             </div>
         </div>
@@ -294,28 +294,24 @@ export default function AdminDashboard() {
                     label="Total Revenue"
                     value={`$${(stats.totalValue / (stats.totalValue >= 1000000 ? 1000000 : 1000)).toFixed(1)}${stats.totalValue >= 1000000 ? 'M' : 'K'}`}
                     icon={DollarSign}
-                    color="bg-red-50 text-red-600"
                     onClick={() => setModalConfig({ isOpen: true, category: 'revenue', data: stats.dealList })}
                 />
                 <OverviewStat
                     label="Active Deals"
                     value={stats.deals}
                     icon={Briefcase}
-                    color="bg-orange-50 text-orange-600"
                     onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: stats.activeDealList || [] })}
                 />
                 <OverviewStat
                     label="Total Companies"
                     value={stats.companies}
                     icon={Building2}
-                    color="bg-rose-50 text-rose-600"
                     onClick={() => setModalConfig({ isOpen: true, category: 'companies', data: stats.companyList })}
                 />
                 <OverviewStat
                     label="System Users"
                     value={stats.users}
                     icon={Users}
-                    color="bg-gray-100 text-gray-700"
                     onClick={() => setModalConfig({ isOpen: true, category: 'users', data: stats.userList })}
                 />
             </div>
@@ -468,7 +464,7 @@ export default function AdminDashboard() {
                             return (
                                 <div 
                                     key={i} 
-                                    className={`${stat.color} flex-1 rounded-t-md transition-all duration-500 hover:opacity-80 relative group cursor-pointer ${isActive ? 'ring-2 ring-offset-2 ring-gray-200' : ''}`}
+                                    className={`${stat.color} flex-1 rounded-t-md transition-all duration-500 hover:scale-y-105 hover:brightness-110 relative group cursor-pointer ${isActive ? 'ring-2 ring-offset-2 ring-gray-200' : ''}`}
                                     style={{ height: `${heightPercent}%` }}
                                     onClick={(e) => {
                                         e.stopPropagation();
@@ -484,7 +480,7 @@ export default function AdminDashboard() {
                                         }
                                     }}
                                 >
-                                    <div className={`absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded transition-opacity whitespace-nowrap z-10 pointer-events-none ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                                    <div className={`absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded transition-opacity whitespace-nowrap z-10 pointer-events-none opacity-0 group-hover:opacity-100 ${isActive ? 'opacity-100' : ''}`}>
                                         {stat.count} Deals
                                     </div>
                                 </div>

@@ -30,9 +30,9 @@ const CardHeader = ({ title, children }) => (
     </div>
 );
 
-const StatCard = ({ label, value, sub, color, icon: IconComp }) => (
+const StatCard = ({ label, value, sub, icon: IconComp }) => (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-start gap-4">
-        <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${color}`}>
+        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 bg-red-600 text-white shadow-sm shadow-red-100">
             <IconComp size={20} />
         </div>
         <div>
@@ -224,17 +224,17 @@ export default function DealsDashboard() {
         </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard label="Deal Value" value={`$${totalValue >= 1000000 ? `${(totalValue / 1000000).toFixed(2)}M` : `${(totalValue / 1000).toFixed(1)}K`}`} color="bg-red-50 text-red-600" icon={DollarSign} />
-                <StatCard label="Active Deals" value={String(activeCount)} color="bg-orange-50 text-red-500" icon={Zap} />
-                <StatCard label="Won Deals" value={String(wonCount)} color="bg-green-50 text-green-600" icon={CheckCircle2} />
-                <StatCard label="New Deals" value={String(deals.length)} color="bg-red-100 text-red-700" icon={Briefcase} />
+                <StatCard label="Deal Value" value={`$${totalValue >= 1000000 ? `${(totalValue / 1000000).toFixed(2)}M` : `${(totalValue / 1000).toFixed(1)}K`}`} icon={DollarSign} />
+                <StatCard label="Active Deals" value={String(activeCount)} icon={Zap} />
+                <StatCard label="Won Deals" value={String(wonCount)} icon={CheckCircle2} />
+                <StatCard label="New Deals" value={String(deals.length)} icon={Briefcase} />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <StatCard icon={Briefcase} label="Total Deals" value={deals.length} color="bg-red-50 text-red-600" />
-                <StatCard icon={LayoutDashboard} label="Pipeline Value" value={`$${deals.reduce((sum, d) => sum + (d.value || 0), 0).toLocaleString()}`} color="bg-orange-50 text-red-500" />
-                <StatCard icon={Users} label="Active Owners" value={new Set(deals.map(d => d.ownerId?._id)).size} color="bg-red-100 text-red-700" />
-                <StatCard icon={Building2} label="Companies" value={new Set(deals.map(d => d.companyId?._id)).size} color="bg-rose-50 text-red-600" />
+                <StatCard icon={Briefcase} label="Total Deals" value={deals.length} />
+                <StatCard icon={LayoutDashboard} label="Pipeline Value" value={`$${deals.reduce((sum, d) => sum + (d.value || 0), 0).toLocaleString()}`} />
+                <StatCard icon={Users} label="Active Owners" value={new Set(deals.map(d => d.ownerId?._id)).size} />
+                <StatCard icon={Building2} label="Companies" value={new Set(deals.map(d => d.companyId?._id)).size} />
             </div>
 
             {/* Kanban Board View */}

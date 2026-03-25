@@ -31,9 +31,9 @@ const CardHeader = ({ title, children }) => (
     </div>
 );
 
-const StatCard = ({ label, value, sub, color, icon: IconComp, onClick }) => (
+const StatCard = ({ label, value, sub, icon: IconComp, onClick }) => (
     <div onClick={onClick} className={`bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-start gap-4 ${onClick ? "cursor-pointer hover:shadow-md active:scale-95 transition-all duration-300" : ""}`}>
-        <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${color}`}>
+        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 bg-red-600 text-white shadow-sm shadow-red-100">
             <IconComp size={20} />
         </div>
         <div>
@@ -137,10 +137,10 @@ export default function ManagerDashboard() {
     return (
         <div className="p-4 sm:p-6 max-w-screen-xl mx-auto">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <StatCard label="Team Members" value={loading ? "..." : String(teamMembers.length)} sub="+ you as manager" color="bg-red-50 text-red-600" icon={Users2} onClick={() => setModalConfig({ isOpen: true, category: 'users', data: teamMembers })} />
-                <StatCard label="Team Deals" value={loading ? "..." : String(deals.length)} sub="All stages" color="bg-orange-50 text-orange-600" icon={Briefcase} onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: deals })} />
-                <StatCard label="Team Won" value={loading ? "..." : String(wonDeals.length)} sub={`${formatCurrency(wonRevenue)} revenue`} color="bg-red-600 text-white shadow-sm shadow-red-100" icon={CheckCircle2} onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: wonDeals })} />
-                <StatCard label="Team Pipeline" value={loading ? "..." : formatCurrency(totalPipeline)} sub={`${activeDeals.length} active deals`} color="bg-red-50 text-red-600 border border-red-100" icon={DollarSign} onClick={() => setModalConfig({ isOpen: true, category: 'revenue', data: activeDeals })} />
+                <StatCard label="Team Members" value={loading ? "..." : String(teamMembers.length)} sub="+ you as manager" icon={Users2} onClick={() => setModalConfig({ isOpen: true, category: 'users', data: teamMembers })} />
+                <StatCard label="Team Deals" value={loading ? "..." : String(deals.length)} sub="All stages" icon={Briefcase} onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: deals })} />
+                <StatCard label="Team Won" value={loading ? "..." : String(wonDeals.length)} sub={`${formatCurrency(wonRevenue)} revenue`} icon={CheckCircle2} onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: wonDeals })} />
+                <StatCard label="Team Pipeline" value={loading ? "..." : formatCurrency(totalPipeline)} sub={`${activeDeals.length} active deals`} icon={DollarSign} onClick={() => setModalConfig({ isOpen: true, category: 'revenue', data: activeDeals })} />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-6">
