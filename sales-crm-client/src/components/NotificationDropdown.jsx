@@ -159,8 +159,10 @@ const NotificationDropdown = () => {
                             onClick={() => {
                                 setIsOpen(false);
                                 if (user?.role === "admin") navigate("/dashboard/audit-logs");
+                                else if (user?.role === "sales_manager") navigate("/manager/audit-logs");
+                                else if (user?.role === "sales_rep") navigate("/rep/audit-logs");
                             }}
-                            className="text-[10px] font-bold text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1 mx-auto uppercase"
+                            className="text-[10px] font-bold text-red-600 hover:text-red-700 flex items-center justify-center gap-1 mx-auto uppercase transition-colors"
                         >
                             View all history <ChevronRight size={10} />
                         </button>

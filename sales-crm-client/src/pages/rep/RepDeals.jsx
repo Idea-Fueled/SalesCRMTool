@@ -134,9 +134,9 @@ export default function RepDeals() {
     const wonDealsCount = deals.filter(d => d.stage === "Closed Won").length;
     const pipelineValue = deals.reduce((acc, curr) => acc + (curr.value || 0), 0);
     const stats = [
-        { label: "Pipeline Value", value: `$${pipelineValue.toLocaleString()}`, color: "bg-red-50 text-red-600", icon: DollarSign },
-        { label: "Active Deals", value: String(activeDealsCount), color: "bg-orange-50 text-orange-600", icon: Briefcase },
-        { label: "Deals Won", value: String(wonDealsCount), color: "bg-red-600 text-white shadow-sm shadow-red-100", icon: CheckCircle2 },
+        { label: "Pipeline Value", value: `$${pipelineValue.toLocaleString()}`, color: "bg-red-600 text-white shadow-md shadow-red-100", icon: DollarSign },
+        { label: "Active Deals", value: String(activeDealsCount), color: "bg-red-600 text-white shadow-md shadow-red-100", icon: Briefcase },
+        { label: "Deals Won", value: String(wonDealsCount), color: "bg-red-600 text-white shadow-md shadow-red-100", icon: CheckCircle2 },
     ];
 
     return (

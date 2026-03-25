@@ -114,9 +114,9 @@ export default function ManagerContacts() {
     };
 
     const stats = [
-        { label: "Team Contacts", value: String(contacts.length), color: "bg-red-50 text-red-600", icon: Users },
-        { label: "Linked to Company", value: String(contacts.filter(c => c.companyId).length), color: "bg-red-600 text-white shadow-sm shadow-red-100", icon: Building2 },
-        { label: "Total Active", value: String(contacts.length), color: "bg-orange-50 text-orange-600", icon: Users2 },
+        { label: "Team Contacts", value: String(contacts.length), color: "bg-red-600 text-white shadow-md shadow-red-100", icon: Users },
+        { label: "Linked to Company", value: String(contacts.filter(c => c.companyId).length), color: "bg-red-600 text-white shadow-md shadow-red-100", icon: Building2 },
+        { label: "Total Active", value: String(contacts.length), color: "bg-red-600 text-white shadow-md shadow-red-100", icon: Users2 },
     ];
 
     return (

@@ -200,10 +200,10 @@ export default function ManagerDeals() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <StatCard icon={BriefcaseIcon} label="Team Deals" value={deals.length} color="bg-red-50 text-red-600" />
-                <StatCard icon={ZapIcon} label="Active Deals" value={deals.filter(d => !d.stage.startsWith("Closed")).length} color="bg-orange-50 text-orange-600" />
-                <StatCard label="Closed Won" value={deals.filter(d => d.stage === "Closed Won").length} color="bg-red-600 text-white shadow-sm shadow-red-100" icon={CheckCircleIcon} />
-                <StatCard icon={BuildingIcon} label="Deal Value" value={`$${deals.reduce((sum, d) => sum + (d.value || 0), 0).toLocaleString()}`} color="bg-red-50 text-red-600 border border-red-100" />
+                <StatCard icon={BriefcaseIcon} label="Team Deals" value={deals.length} color="bg-red-600 text-white shadow-md shadow-red-100" />
+                <StatCard icon={ZapIcon} label="Active Deals" value={deals.filter(d => !d.stage.startsWith("Closed")).length} color="bg-red-600 text-white shadow-md shadow-red-100" />
+                <StatCard label="Closed Won" value={deals.filter(d => d.stage === "Closed Won").length} color="bg-red-600 text-white shadow-md shadow-red-100" icon={CheckCircleIcon} />
+                <StatCard icon={BuildingIcon} label="Deal Value" value={`$${deals.reduce((sum, d) => sum + (d.value || 0), 0).toLocaleString()}`} color="bg-red-600 text-white shadow-md shadow-red-100" />
             </div>
 
             {viewMode === "kanban" ? (

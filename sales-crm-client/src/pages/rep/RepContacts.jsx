@@ -104,10 +104,10 @@ export default function RepContacts() {
     };
 
     const stats = [
-        { label: "Total Contacts", value: String(contacts.length), color: "bg-red-50 text-red-600", icon: Users },
-        { label: "With Email", value: String(contacts.filter(c => c.email).length), color: "bg-orange-50 text-orange-600", icon: Building2 },
-        { label: "With LinkedIn", value: String(contacts.filter(c => c.linkedin).length), color: "bg-red-600 text-white shadow-sm shadow-red-100", icon: Linkedin },
-        { label: "With Mobile", value: String(contacts.filter(c => c.mobile).length), color: "bg-red-50 text-red-600 border border-red-100", icon: Phone },
+        { label: "Total Contacts", value: String(contacts.length), color: "bg-red-600 text-white shadow-md shadow-red-100", icon: Users },
+        { label: "With Email", value: String(contacts.filter(c => c.email).length), color: "bg-red-600 text-white shadow-md shadow-red-100", icon: Building2 },
+        { label: "With LinkedIn", value: String(contacts.filter(c => c.linkedin).length), color: "bg-red-600 text-white shadow-md shadow-red-100", icon: Linkedin },
+        { label: "With Mobile", value: String(contacts.filter(c => c.mobile).length), color: "bg-red-600 text-white shadow-md shadow-red-100", icon: Phone },
     ];
 
     return (

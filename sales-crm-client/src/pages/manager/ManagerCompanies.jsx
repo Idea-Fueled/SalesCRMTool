@@ -89,10 +89,10 @@ export default function ManagerCompanies() {
     };
 
     const stats = [
-        { label: "Team Companies", value: String(companies.length), color: "bg-red-50 text-red-600", icon: Building2 },
-        { label: "Active", value: String(companies.filter(c => c.status === "Active").length), color: "bg-red-600 text-white shadow-sm shadow-red-100", icon: CheckCircle2 },
-        { label: "Prospects", value: String(companies.filter(c => c.status === "Prospect").length), color: "bg-orange-50 text-orange-600", icon: Eye },
-        { label: "Inactive", value: String(companies.filter(c => c.status === "Inactive").length), color: "bg-red-50 text-red-500", icon: XCircle },
+        { label: "Team Companies", value: String(companies.length), color: "bg-red-600 text-white shadow-md shadow-red-100", icon: Building2 },
+        { label: "Active", value: String(companies.filter(c => c.status === "Active").length), color: "bg-red-600 text-white shadow-md shadow-red-100", icon: CheckCircle2 },
+        { label: "Prospects", value: String(companies.filter(c => c.status === "Prospect").length), color: "bg-red-600 text-white shadow-md shadow-red-100", icon: Eye },
+        { label: "Inactive", value: String(companies.filter(c => c.status === "Inactive").length), color: "bg-red-600 text-white shadow-md shadow-red-100", icon: XCircle },
     ];
 
     return (
