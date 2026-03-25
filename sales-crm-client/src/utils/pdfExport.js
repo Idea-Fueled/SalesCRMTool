@@ -41,13 +41,9 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
             pdf.setFontSize(22);
             pdf.setFont('helvetica', 'bold');
             pdf.setTextColor(239, 68, 68); // Red-500
-            pdf.text(`${type.toUpperCase()} DETAILS REPORT`, margin, y);
+            pdf.text(`${type.toUpperCase()} DETAILS`, margin, y);
             y += 8;
 
-            pdf.setFontSize(9);
-            pdf.setFont('helvetica', 'normal');
-            pdf.setTextColor(107, 114, 128);
-            pdf.text(`Generated on: ${new Date().toLocaleString('en-IN')}`, margin, y);
             y += 8;
 
             pdf.setDrawColor(229, 231, 235);
@@ -86,8 +82,8 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
                     ['Expected Close', data.expectedCloseDate ? new Date(data.expectedCloseDate).toLocaleDateString('en-IN') : '—'],
                     ['Lead Source', data.source || 'Direct Identification'],
                 ]);
-                drawSection('Executive Ownership', [
-                    ['Executive Owner', data.ownerId ? `${data.ownerId.firstName} ${data.ownerId.lastName || ''}`.trim() : '—'],
+                drawSection('Ownership', [
+                    ['Owner', data.ownerId ? `${data.ownerId.firstName} ${data.ownerId.lastName || ''}`.trim() : '—'],
                     ['Company', data.companyId?.name || data.companyName || '—'],
                     ['Primary Contact', data.contactId ? `${data.contactId.firstName} ${data.contactId.lastName || ''}`.trim() : (data.contactName || '—')],
                 ]);
@@ -102,8 +98,8 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
                     ['Company Size', data.size ? `${data.size} Employees` : '—'],
                     ['Revenue Range', data.revenueRange ? `$${data.revenueRange.toLocaleString()}` : '—'],
                 ]);
-                drawSection('Executive Ownership', [
-                    ['Executive Owner', data.ownerId ? `${data.ownerId.firstName} ${data.ownerId.lastName || ''}`.trim() : '—'],
+                drawSection('Ownership', [
+                    ['Owner', data.ownerId ? `${data.ownerId.firstName} ${data.ownerId.lastName || ''}`.trim() : '—'],
                     ['Account Status', data.status || 'Prospect'],
                 ]);
             } else if (type === 'contact') {
@@ -180,7 +176,7 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
                 pdf.setPage(i);
                 pdf.setFontSize(8);
                 pdf.setTextColor(156, 163, 175);
-                pdf.text(`mbdConsulting CRM  •  Page ${i} of ${totalPages}`, margin, pageHeight - 10);
+                pdf.text(`Page ${i} of ${totalPages}`, margin, pageHeight - 10);
             }
 
             pdf.save(filename);

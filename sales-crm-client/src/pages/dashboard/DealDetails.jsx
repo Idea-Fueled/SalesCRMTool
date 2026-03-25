@@ -463,7 +463,7 @@ export default function DealDetails() {
                     {/* Strategic Owner */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <div className="px-6 py-4 border-b border-gray-50">
-                            <h3 className="text-[10px] font-bold">Executive Ownership</h3>
+                            <h3 className="text-[10px] font-bold">Ownership</h3>
                         </div>
                         <div className="p-4">
                             <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">

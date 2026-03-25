@@ -260,15 +260,13 @@ export default function Reports() {
             pdf.setFontSize(22);
             pdf.setFont('helvetica', 'bold');
             pdf.setTextColor(239, 68, 68);
-            pdf.text(`${activeTab.toUpperCase()} PERFORMANCE REPORT`, margin, y);
+            pdf.text(`PERFORMANCE REPORTS`, margin, y);
             y += 8;
 
             pdf.setFontSize(9);
             pdf.setFont('helvetica', 'normal');
             pdf.setTextColor(107, 114, 128);
             pdf.text(`Period: ${dateRange.start} to ${dateRange.end}`, margin, y);
-            y += 5;
-            pdf.text(`Generated on: ${new Date().toLocaleString('en-IN')}`, margin, y);
             y += 10;
 
             // ── Chart Section ──────────────────────────────────────
@@ -301,25 +299,25 @@ export default function Reports() {
             if (activeTab === 'deals') {
                 columns = [
                     { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString('en-IN'), w: 32 },
-                    { header: 'Deal Name',     key: d => d.name || '—',                              w: 50 },
-                    { header: 'Value',         key: d => d.value ? `${d.currency || '$'}${Number(d.value).toLocaleString()}` : '—', w: 28 },
-                    { header: 'Executive Owner', key: d => d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : (d.ownerName || '—'), w: 42 },
+                    { header: 'Deal name',     key: d => d.name || '—',                              w: 50 },
+                    { header: 'Deal Value',    key: d => d.value ? `${d.currency || '$'}${Number(d.value).toLocaleString()}` : '—', w: 28 },
+                    { header: 'Owner', key: d => d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : (d.ownerName || '—'), w: 42 },
                     { header: 'Status',        key: d => d.stage || '—',                             w: 28 },
                 ];
             } else if (activeTab === 'companies') {
                 columns = [
                     { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString('en-IN'), w: 32 },
-                    { header: 'Company Name',  key: d => d.name || '—',                              w: 50 },
+                    { header: 'Company',       key: d => d.name || '—',                              w: 50 },
                     { header: 'Industry',      key: d => d.industry || '—',                          w: 38 },
+                    { header: 'Owner', key: d => d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : '—', w: 35 },
                     { header: 'Status',        key: d => d.status || '—',                            w: 25 },
-                    { header: 'Executive Owner', key: d => d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : '—', w: 35 },
                 ];
             } else {
                 columns = [
                     { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString(), w: 30 },
                     { header: 'Name',          key: d => `${d.firstName || ''} ${d.lastName || ''}`.trim() || '—', w: 50 },
-                    { header: 'Email',         key: d => d.email || '—',                             w: 60 },
-                    { header: 'Phone',         key: d => d.phone || d.mobile || '—',                 w: 40 },
+                    { header: 'Title',         key: d => d.jobTitle || '—',                          w: 60 },
+                    { header: 'Owner',         key: d => d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : '—', w: 40 },
                 ];
             }
 
@@ -380,8 +378,7 @@ export default function Reports() {
                 pdf.setPage(i);
                 pdf.setFontSize(8);
                 pdf.setTextColor(156, 163, 175);
-                pdf.text(`mbdConsulting CRM  •  Page ${i} of ${totalPages}`, margin, pageHeight - 8);
-                pdf.text(`Total: ${data.length} record${data.length !== 1 ? 's' : ''}`, pageWidth - margin - 30, pageHeight - 8);
+                pdf.text(`Page ${i} of ${totalPages}`, margin, pageHeight - 8);
             }
 
             pdf.save(`CRM_${activeTab}_Report_${dateRange.start}_to_${dateRange.end}.pdf`);
