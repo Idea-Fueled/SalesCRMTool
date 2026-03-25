@@ -41,7 +41,7 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
             pdf.setFontSize(22);
             pdf.setFont('helvetica', 'bold');
             pdf.setTextColor(239, 68, 68); // Red-500
-            pdf.text(`${type.toUpperCase()} DETAILS`, pageWidth - margin, y, { align: 'right' });
+            pdf.text(`${type.toUpperCase()} DETAILS`, margin, y);
             y += 8;
 
             y += 8;

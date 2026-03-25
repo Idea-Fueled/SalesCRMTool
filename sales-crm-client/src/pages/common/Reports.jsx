@@ -260,7 +260,7 @@ export default function Reports() {
             pdf.setFontSize(22);
             pdf.setFont('helvetica', 'bold');
             pdf.setTextColor(239, 68, 68);
-            pdf.text(`PERFORMANCE REPORTS`, pageWidth - margin, y, { align: 'right' });
+            pdf.text(`PERFORMANCE REPORTS`, margin, y);
             y += 8;
 
             pdf.setFontSize(9);
