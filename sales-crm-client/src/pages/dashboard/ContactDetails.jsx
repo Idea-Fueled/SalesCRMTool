@@ -368,30 +368,30 @@ export default function ContactDetails() {
                 <div className="lg:col-span-4 space-y-6">
                     {/* Contact Information */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-50">
-                            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Contact Channels</h3>
+                        <div className="px-6 py-4 border-b border-gray-50 bg-gray-50/30">
+                            <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider">Contact Channels</h3>
                         </div>
                         <div className="p-6 space-y-5">
                             <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
                                     <Mail size={10} className="text-red-400" /> Email
                                 </label>
                                 <p className="text-sm font-bold text-gray-900 truncate">{contact.email}</p>
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
                                     <Phone size={10} className="text-red-400" /> Phone
                                 </label>
                                 <p className="text-sm font-bold text-gray-900">{contact.phone || "—"}</p>
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
                                     <Smartphone size={10} className="text-red-400" /> Mobile
                                 </label>
                                 <p className="text-sm font-bold text-gray-900">{contact.mobile || "—"}</p>
                             </div>
                             <div className="space-y-1 pt-2">
-                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
                                     <Linkedin size={10} className="text-blue-500" /> LinkedIn
                                 </label>
                                 {contact.linkedin ? (
@@ -405,7 +405,7 @@ export default function ContactDetails() {
                             
                             {/* Interaction Notes displayed in Primary Info */}
                             <div className="space-y-1 pt-2 border-t border-gray-50">
-                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
+                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
                                     <FileText size={10} className="text-gray-400" /> Interaction Notes
                                 </label>
                                 <div className="p-4 bg-gray-50/50 rounded-xl border border-gray-100 text-[13px] text-gray-800 leading-relaxed whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto">
@@ -416,7 +416,7 @@ export default function ContactDetails() {
                             {/* Digital Assets moved here */}
                             {contact.attachments && contact.attachments.length > 0 && (
                                 <div className="space-y-3 pt-4 border-t border-gray-50">
-                                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                                    <label className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
                                         <Layers size={10} className="text-red-500" /> Digital Assets
                                     </label>
                                     <div className="grid grid-cols-1 gap-2">
@@ -458,8 +458,8 @@ export default function ContactDetails() {
                     </div>
 
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden text-center">
-                        <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-center">
-                            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">OWNER</h3>
+                        <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-center bg-gray-50/30">
+                            <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider">OWNER</h3>
                         </div>
                         <div className="p-5">
                             <div className="flex flex-col items-center gap-3">

@@ -364,18 +364,18 @@ export default function DealDetails() {
                 <div className="lg:col-span-4 space-y-6">
                     {/* Deals Information */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-50">
-                            <h3 className="text-[10px] font-bold">Commercial Parameters</h3>
+                        <div className="px-6 py-4 border-b border-gray-50 bg-gray-50/30">
+                            <h3 className="text-sm font-black uppercase tracking-wider text-gray-900">Commercial Parameters</h3>
                         </div>
                         <div className="p-6 space-y-5">
                             <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
                                     <DollarSign size={10} className="text-green-500" /> Deal Value
                                 </label>
                                 <p className="text-sm font-bold text-gray-900">{deal.currency} {deal.value?.toLocaleString() || "0"}</p>
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
                                     <TrendingUp size={10} className="text-blue-500" /> Win Probability
                                 </label>
                                 <div className="flex items-center gap-3">
@@ -389,7 +389,7 @@ export default function DealDetails() {
                                 </div>
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
                                     <Calendar size={10} className="text-red-400" /> Expected Close
                                 </label>
                                 <div className="flex items-center gap-2">
@@ -400,7 +400,7 @@ export default function DealDetails() {
                                 </div>
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
                                     <Target size={10} className="text-purple-500" /> Lead Source
                                 </label>
                                 <p className="text-sm font-bold text-gray-900 capitalize">{deal.source || "Direct Identification"}</p>
@@ -408,7 +408,7 @@ export default function DealDetails() {
                             
                             {/* Notes displayed in Commercial Parameters */}
                             <div className="space-y-1 pt-2 border-t border-gray-50">
-                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
+                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
                                     <FileText size={10} className="text-gray-400" /> Interaction Notes
                                 </label>
                                 <div className="p-4 bg-gray-50/50 rounded-xl border border-gray-100 text-[13px] text-gray-800 leading-relaxed whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto">
@@ -419,7 +419,7 @@ export default function DealDetails() {
                             {/* Digital Assets moved here */}
                             {deal.attachments && deal.attachments.length > 0 && (
                                 <div className="space-y-3 pt-4 border-t border-gray-50">
-                                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                                    <label className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
                                         <Layers size={10} className="text-red-500" /> Digital Assets
                                     </label>
                                     <div className="grid grid-cols-1 gap-2">
@@ -461,8 +461,8 @@ export default function DealDetails() {
                     </div>
 
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden text-center">
-                        <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-center">
-                            <h3 className="text-sm font-bold uppercase tracking-wider">OWNER</h3>
+                        <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-center bg-gray-50/30">
+                            <h3 className="text-sm font-black uppercase tracking-wider text-gray-900">OWNER</h3>
                         </div>
                         <div className="p-4">
                             <div className="flex flex-col items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
@@ -487,8 +487,8 @@ export default function DealDetails() {
 
                     {/* Stage History */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
-                            <h3 className="text-[10px] font-bold">Pipeline Transition Log</h3>
+                        <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
+                            <h3 className="text-sm font-black uppercase tracking-wider text-gray-900">Pipeline Transition Log</h3>
                             <button
                                 onClick={() => fetchDealData(true, true)}
                                 disabled={isRefreshing}
