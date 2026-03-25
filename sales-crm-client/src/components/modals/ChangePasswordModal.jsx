@@ -37,6 +37,9 @@ export default function ChangePasswordModal({ isOpen, onClose, userId }) {
         if (formData.confirmPassword !== formData.newPassword) {
             newErrors.confirmPassword = "Passwords do not match";
         }
+        if (formData.newPassword && formData.oldPassword && formData.newPassword === formData.oldPassword) {
+            newErrors.newPassword = "New password cannot be same as current password";
+        }
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
