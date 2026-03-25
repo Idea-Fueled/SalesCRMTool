@@ -12,6 +12,7 @@ import { useAuth } from "../../context/AuthContext";
 import { getUserById } from "../../API/services/userService";
 import { toast } from "react-hot-toast";
 import { jsPDF } from "jspdf";
+import logoImg from "../../assets/Logo.png";
 import { toPng } from "html-to-image";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import CollapsibleDealName from "../../components/CollapsibleDealName";
@@ -245,8 +246,16 @@ export default function Reports() {
             const pageWidth = pdf.internal.pageSize.getWidth();
             const pageHeight = pdf.internal.pageSize.getHeight();
             const margin = 15;
-            let y = 20;
+            let y = 15;
 
+            // Brand Header (Logo)
+            try {
+                pdf.addImage(logoImg, 'PNG', margin, 10, 35, 0);
+            } catch (err) {
+                console.warn('PDF Logo error:', err);
+            }
+
+            y = 28;
             // ── Title ──────────────────────────────────────────────
             pdf.setFontSize(22);
             pdf.setFont('helvetica', 'bold');
@@ -272,19 +281,19 @@ export default function Reports() {
             let columns = [];
             if (activeTab === 'deals') {
                 columns = [
-                    { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString(), w: 35 },
+                    { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString('en-IN'), w: 35 },
                     { header: 'Deal Name',     key: d => d.name || '—',                              w: 55 },
-                    { header: 'Value',         key: d => d.value ? `$${Number(d.value).toLocaleString()}` : '—', w: 30 },
-                    { header: 'Owner',         key: d => d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : (d.ownerName || '—'), w: 40 },
+                    { header: 'Value',         key: d => d.value ? `${d.currency || '$'}${Number(d.value).toLocaleString()}` : '—', w: 30 },
+                    { header: 'Executive Owner', key: d => d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : (d.ownerName || '—'), w: 40 },
                     { header: 'Status',        key: d => d.stage || '—',                             w: 31 },
                 ];
             } else if (activeTab === 'companies') {
                 columns = [
-                    { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString(), w: 35 },
+                    { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString('en-IN'), w: 35 },
                     { header: 'Company Name',  key: d => d.name || '—',                              w: 60 },
                     { header: 'Industry',      key: d => d.industry || '—',                          w: 40 },
                     { header: 'Status',        key: d => d.status || '—',                            w: 30 },
-                    { header: 'Owner',         key: d => d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : '—', w: 26 },
+                    { header: 'Executive Owner', key: d => d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : '—', w: 26 },
                 ];
             } else {
                 columns = [

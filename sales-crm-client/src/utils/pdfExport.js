@@ -1,4 +1,5 @@
 import { jsPDF } from 'jspdf';
+import logoImg from '../assets/Logo.png';
 import { toCanvas } from 'html-to-image';
 import { toast } from 'react-hot-toast';
 
@@ -25,14 +26,23 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
             const pageWidth = pdf.internal.pageSize.getWidth();
             const pageHeight = pdf.internal.pageSize.getHeight();
             const margin = 15;
-            let y = 20;
+            let y = 15;
 
+            // Brand Header (Logo & Title)
+            try {
+                // Width 35mm, 0 for auto aspect ratio
+                pdf.addImage(logoImg, 'PNG', margin, 10, 35, 0);
+            } catch (err) {
+                console.warn('PDF Logo error:', err);
+            }
+
+            y = 28;
             // Title
             pdf.setFontSize(22);
             pdf.setFont('helvetica', 'bold');
             pdf.setTextColor(239, 68, 68); // Red-500
             pdf.text(`${type.toUpperCase()} DETAILS REPORT`, margin, y);
-            y += 10;
+            y += 8;
 
             pdf.setFontSize(9);
             pdf.setFont('helvetica', 'normal');
@@ -68,44 +78,85 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
             };
 
             if (type === 'deal') {
-                drawSection('Deal Information', [
+                drawSection('Commercial Parameters', [
                     ['Deal Name', data.name],
-                    ['Stage', data.stage],
-                    ['Deal Value', data.value ? `$${Number(data.value).toLocaleString()}` : '—'],
-                    ['Probability', data.probability ? `${data.probability}%` : '—'],
-                    ['Expected Close', data.expectedCloseDate ? new Date(data.expectedCloseDate).toLocaleDateString() : '—'],
-                    ['Source', data.source],
+                    ['Pipeline Stage', data.stage],
+                    ['Deal Value', data.value ? `${data.currency || '$'}${Number(data.value).toLocaleString()}` : '—'],
+                    ['Win Probability', data.probability ? `${data.probability}%` : '—'],
+                    ['Expected Close', data.expectedCloseDate ? new Date(data.expectedCloseDate).toLocaleDateString('en-IN') : '—'],
+                    ['Lead Source', data.source || 'Direct Identification'],
                 ]);
-                drawSection('Stakeholders', [
-                    ['Owner', data.ownerId ? `${data.ownerId.firstName} ${data.ownerId.lastName || ''}`.trim() : '—'],
-                    ['Company', data.companyId?.name || '—'],
-                    ['Contact', data.contactId ? `${data.contactId.firstName} ${data.contactId.lastName || ''}`.trim() : '—'],
+                drawSection('Executive Ownership', [
+                    ['Executive Owner', data.ownerId ? `${data.ownerId.firstName} ${data.ownerId.lastName || ''}`.trim() : '—'],
+                    ['Company', data.companyId?.name || data.companyName || '—'],
+                    ['Primary Contact', data.contactId ? `${data.contactId.firstName} ${data.contactId.lastName || ''}`.trim() : (data.contactName || '—')],
                 ]);
             } else if (type === 'company') {
-                drawSection('Company Details', [
+                drawSection('Operational Identity', [
                     ['Company Name', data.name],
-                    ['Industry', data.industry],
+                    ['Industry', data.industry || 'General Industry'],
                     ['Website', data.website],
-                    ['Email', data.email],
+                    ['Email Address', data.email],
                     ['Phone', data.phone],
-                    ['Address', data.address],
+                    ['Headquarters', data.address],
+                    ['Company Size', data.size ? `${data.size} Employees` : '—'],
+                    ['Revenue Range', data.revenueRange ? `$${data.revenueRange.toLocaleString()}` : '—'],
                 ]);
-                drawSection('Summary', [
-                    ['Owner', data.ownerId ? `${data.ownerId.firstName} ${data.ownerId.lastName || ''}`.trim() : '—'],
-                    ['Status', data.status],
-                    ['Deal Value', data.totalValue ? `$${data.totalValue.toLocaleString()}` : '—'],
+                drawSection('Executive Ownership', [
+                    ['Executive Owner', data.ownerId ? `${data.ownerId.firstName} ${data.ownerId.lastName || ''}`.trim() : '—'],
+                    ['Account Status', data.status || 'Prospect'],
                 ]);
             } else if (type === 'contact') {
-                drawSection('Contact Information', [
-                    ['Name', `${data.firstName} ${data.lastName || ''}`.trim()],
-                    ['Email', data.email],
-                    ['Phone', data.phone || data.mobile],
+                drawSection('Contact Channels', [
+                    ['Full Name', `${data.firstName} ${data.lastName || ''}`.trim()],
                     ['Job Title', data.jobTitle],
+                    ['Email', data.email],
+                    ['Phone / Mobile', data.phone || data.mobile],
+                    ['LinkedIn', data.linkedin || '—'],
                 ]);
-                drawSection('Associations', [
-                    ['Companies', data.companies?.map(c => c.companyId?.name || c.companyName).filter(Boolean).join(', ') || '—'],
-                    ['Owner', data.ownerId ? `${data.ownerId.firstName} ${data.ownerId.lastName || ''}`.trim() : '—'],
+                drawSection('Executive Ownership', [
+                    ['Executive Owner', data.ownerId ? `${data.ownerId.firstName} ${data.ownerId.lastName || ''}`.trim() : '—'],
+                    ['Associated Companies', data.companies?.map(c => c.companyId?.name || c.companyName).filter(Boolean).join(', ') || data.companyName || '—'],
                 ]);
+            }
+
+            // Remarks Section
+            if (data.remarks && Array.isArray(data.remarks) && data.remarks.length > 0) {
+                if (y > pageHeight - 40) { pdf.addPage(); y = 20; }
+                
+                pdf.setFontSize(12);
+                pdf.setFont('helvetica', 'bold');
+                pdf.setTextColor(31, 41, 55);
+                pdf.text('RECENT REMARKS', margin, y);
+                y += 8;
+
+                data.remarks.forEach((remark) => {
+                    if (y > pageHeight - 30) { pdf.addPage(); y = 20; }
+                    
+                    // Remark Header (Author & Date)
+                    pdf.setFontSize(8);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setTextColor(107, 114, 128);
+                    const authorName = remark.authorName || (remark.author ? `${remark.author.firstName} ${remark.author.lastName || ''}`.trim() : 'Unknown');
+                    pdf.text(`${authorName.toUpperCase()}  •  ${new Date(remark.createdAt).toLocaleString('en-IN')}`, margin + 2, y);
+                    y += 5;
+
+                    // Remark Text
+                    pdf.setFontSize(9);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setTextColor(55, 65, 81);
+                    
+                    // Handle multi-line text
+                    const splitText = pdf.splitTextToSize(remark.text, pageWidth - margin * 2 - 10);
+                    pdf.text(splitText, margin + 2, y);
+                    y += (splitText.length * 5) + 5;
+
+                    // Small separator line
+                    pdf.setDrawColor(243, 244, 246);
+                    pdf.setLineWidth(0.2);
+                    pdf.line(margin + 2, y - 2, pageWidth - margin - 2, y - 2);
+                    y += 2;
+                });
             }
 
             // Footer
