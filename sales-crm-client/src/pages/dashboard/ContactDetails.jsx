@@ -471,7 +471,7 @@ export default function ContactDetails() {
                                     <p className="text-[11px] text-gray-400 font-bold mt-2 uppercase tracking-widest">
                                         {contact.ownerId?.role === 'admin' ? 'Admin' : 
                                          contact.ownerId?.role === 'sales_manager' ? 'Sales Manager' : 
-                                         contact.ownerId?.role === 'sales_rep' ? 'Sales Representative' : 'Sales Representative'}
+                                         contact.ownerId?.role === 'sales_rep' ? 'Sales Representative' : ''}
                                     </p>
                                 </div>
                             </div>

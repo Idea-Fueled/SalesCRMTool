@@ -449,7 +449,7 @@ export default function CompanyDetails() {
                                     <p className="text-[11px] text-gray-400 font-bold mt-2 uppercase tracking-widest">
                                         {company.ownerId?.role === 'admin' ? 'Admin' : 
                                          company.ownerId?.role === 'sales_manager' ? 'Sales Manager' : 
-                                         company.ownerId?.role === 'sales_rep' ? 'Sales Representative' : 'Sales Representative'}
+                                         company.ownerId?.role === 'sales_rep' ? 'Sales Representative' : ''}
                                     </p>
                                 </div>
                             </div>

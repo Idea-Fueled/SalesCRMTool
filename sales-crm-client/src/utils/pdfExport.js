@@ -84,7 +84,7 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
                 ]);
                 drawSection('OWNER', [
                     ['Owner', data.ownerId ? `${data.ownerId.firstName} ${data.ownerId.lastName || ''}`.trim() : '—'],
-                    ['Designation', data.ownerId?.role === 'admin' ? 'Admin' : data.ownerId?.role === 'sales_manager' ? 'Sales Manager' : data.ownerId?.role === 'sales_rep' ? 'Sales Representative' : 'Sales Representative'],
+                    ['Designation', data.ownerId?.role === 'admin' ? 'Admin' : data.ownerId?.role === 'sales_manager' ? 'Sales Manager' : data.ownerId?.role === 'sales_rep' ? 'Sales Representative' : '—'],
                     ['Company', data.companyId?.name || data.companyName || '—'],
                     ['Primary Contact', data.contactId ? `${data.contactId.firstName} ${data.contactId.lastName || ''}`.trim() : (data.contactName || '—')],
                 ]);
@@ -101,7 +101,7 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
                 ]);
                 drawSection('OWNER', [
                     ['Owner', data.ownerId ? `${data.ownerId.firstName} ${data.ownerId.lastName || ''}`.trim() : '—'],
-                    ['Designation', data.ownerId?.role === 'admin' ? 'Admin' : data.ownerId?.role === 'sales_manager' ? 'Sales Manager' : data.ownerId?.role === 'sales_rep' ? 'Sales Representative' : 'Sales Representative'],
+                    ['Designation', data.ownerId?.role === 'admin' ? 'Admin' : data.ownerId?.role === 'sales_manager' ? 'Sales Manager' : data.ownerId?.role === 'sales_rep' ? 'Sales Representative' : '—'],
                     ['Account Status', data.status || 'Prospect'],
                 ]);
             } else if (type === 'contact') {
@@ -114,7 +114,7 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
                 ]);
                 drawSection('OWNER', [
                     ['Owner', data.ownerId ? `${data.ownerId.firstName} ${data.ownerId.lastName || ''}`.trim() : '—'],
-                    ['Designation', data.ownerId?.role === 'admin' ? 'Admin' : data.ownerId?.role === 'sales_manager' ? 'Sales Manager' : data.ownerId?.role === 'sales_rep' ? 'Sales Representative' : 'Sales Representative'],
+                    ['Designation', data.ownerId?.role === 'admin' ? 'Admin' : data.ownerId?.role === 'sales_manager' ? 'Sales Manager' : data.ownerId?.role === 'sales_rep' ? 'Sales Representative' : '—'],
                     ['Associated Companies', data.companies?.map(c => c.companyId?.name || c.companyName).filter(Boolean).join(', ') || data.companyName || '—'],
                 ]);
             }

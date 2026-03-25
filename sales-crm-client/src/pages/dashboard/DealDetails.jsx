@@ -478,7 +478,7 @@ export default function DealDetails() {
                                     <p className="text-[11px] text-gray-400 font-bold mt-2 uppercase tracking-widest">
                                         {deal.ownerId?.role === 'admin' ? 'Admin' : 
                                          deal.ownerId?.role === 'sales_manager' ? 'Sales Manager' : 
-                                         deal.ownerId?.role === 'sales_rep' ? 'Sales Representative' : 'Sales Representative'}
+                                         deal.ownerId?.role === 'sales_rep' ? 'Sales Representative' : ''}
                                     </p>
                                 </div>
                             </div>

@@ -224,7 +224,7 @@ export const getContacts = async (req, res, next) => {
 
         const skip = (page - 1) * limit;
         const contacts = await Contact.find(filter)
-            .populate("ownerId", "firstName lastName email profilePicture")
+            .populate("ownerId", "firstName lastName email profilePicture role")
             .populate("companyId", "name industry")
             .populate("companies.companyId", "name industry")
             .sort(sort)
@@ -498,7 +498,7 @@ export const getContactById = async (req, res, next) => {
     try {
         const { id } = req.params;
         const contact = await Contact.findById(id)
-            .populate("ownerId", "firstName lastName email")
+            .populate("ownerId", "firstName lastName email profilePicture role")
             .populate("companyId", "name industry")
             .populate("companies.companyId", "name industry")
             .populate({
@@ -550,7 +550,7 @@ export const getArchivedContacts = async (req, res) => {
         }
 
         const contacts = await Contact.find(filter)
-            .populate("ownerId", "firstName lastName email")
+            .populate("ownerId", "firstName lastName email profilePicture role")
             .populate("companyId", "name")
             .sort({ deletedAt: -1 });
 

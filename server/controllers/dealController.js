@@ -753,7 +753,7 @@ export const getDeals = async (req, res, next) => {
         //pagination
         const skip = (page - 1) * limit;
         const deals = await Deal.find(filter)
-            .populate("ownerId", "firstName lastName email profilePicture")
+            .populate("ownerId", "firstName lastName email profilePicture role")
             .populate("companyId", "name industry")
             .populate("contactId", "firstName lastName email")
             .populate({
@@ -785,7 +785,7 @@ export const getDealById = async (req, res, next) => {
     try {
         const { id } = req.params;
         const deal = await Deal.findById(id)
-            .populate("ownerId", "firstName lastName email profilePicture")
+            .populate("ownerId", "firstName lastName email profilePicture role")
             .populate("companyId", "name industry size website address phone")
             .populate("contactId", "firstName lastName email jobTitle phone mobile linkedin")
             .populate({
@@ -821,7 +821,7 @@ export const getArchivedDeals = async (req, res) => {
         }
 
         const deals = await Deal.find(filter)
-            .populate("ownerId", "firstName lastName email")
+            .populate("ownerId", "firstName lastName email profilePicture role")
             .populate("companyId", "name")
             .populate("contactId", "firstName lastName")
             .sort({ deletedAt: -1 });

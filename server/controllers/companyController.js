@@ -190,7 +190,7 @@ export const getCompanies = async (req, res) => {
         const skip = (page - 1) * limit;
 
         const companies = await Company.find(filter)
-            .populate("ownerId", "firstName lastName email profilePicture")
+            .populate("ownerId", "firstName lastName email profilePicture role")
             .sort(sort)
             .skip(skip)
             .limit(Number(limit));
@@ -521,7 +521,7 @@ export const getCompanyById = async (req, res) => {
     try {
         const { id } = req.params;
         const { _id: userId, role } = req.user;
-        const company = await Company.findById(id).populate("ownerId", "firstName lastName email").populate({ path: "remarks.author", select: "firstName lastName email profilePicture" });
+        const company = await Company.findById(id).populate("ownerId", "firstName lastName email profilePicture role").populate({ path: "remarks.author", select: "firstName lastName email profilePicture" });
 
         if (!company) {
             return res.status(404).json({ message: "Company not found!" });
@@ -568,7 +568,7 @@ export const getArchivedCompanies = async (req, res) => {
         }
 
         const companies = await Company.find(filter)
-            .populate("ownerId", "firstName lastName email").populate({ path: "remarks.author", select: "firstName lastName email profilePicture" })
+            .populate("ownerId", "firstName lastName email profilePicture role").populate({ path: "remarks.author", select: "firstName lastName email profilePicture" })
             .sort({ deletedAt: -1 });
 
         res.status(200).json({ data: companies });
