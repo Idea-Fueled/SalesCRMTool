@@ -134,7 +134,7 @@ const UserCard = ({ user, onEdit, onDeactivate, onActivate, onReassign, onDelete
                 </div>
 
                 <div className="flex gap-2">
-                    {user.role !== "admin" && user.isActive && (
+                    {user.role !== "admin" && user.isActive && onDeactivate && (
                         <button
                             onClick={(e) => { e.stopPropagation(); onDeactivate(user); }}
                             className="text-[10px] font-bold text-red-600 hover:bg-red-100 px-2 py-1 rounded transition border border-red-200"
@@ -142,7 +142,7 @@ const UserCard = ({ user, onEdit, onDeactivate, onActivate, onReassign, onDelete
                             DEACTIVATE
                         </button>
                     )}
-                    {user.role !== "admin" && !user.isActive && (
+                    {user.role !== "admin" && !user.isActive && onActivate && (
                         <button
                             onClick={(e) => { e.stopPropagation(); onActivate(user); }}
                             className="text-[10px] font-bold text-green-700 hover:bg-green-100 px-2 py-1 rounded transition border border-green-200"

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Users2, Search, Plus, Eye, LayoutList, LayoutGrid, CheckCircle2, XCircle, UserCheck, ChevronRight } from "lucide-react";
+import { Users2, Search, Plus, Eye, LayoutList, LayoutGrid, CheckCircle2, XCircle, UserCheck, ChevronRight, FolderSync } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getTeamUsers, deactivateUser, activateUser } from "../../API/services/userService";
 import { getDeals } from "../../API/services/dealService";
@@ -224,7 +224,7 @@ export default function ManagerTeam() {
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="border-b border-gray-100 bg-gray-50">
-                                    {["Member", "Role", "Reports To", "Status", "Last Login", "Action"].map(h => (
+                                    {["Member", "Role", "Reports To", "Status", "Last Login", "Actions"].map(h => (
                                         <th key={h} className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wide whitespace-nowrap">{h}</th>
                                     ))}
                                 </tr>
@@ -279,16 +279,25 @@ export default function ManagerTeam() {
                                                     >
                                                         <Eye size={15} />
                                                     </button>
-                                                    {m.role === "sales_rep" ? (
+                                                    {m._id !== currentUser?._id && (
+                                                        <button
+                                                            onClick={() => { setSelectedMember(m); setIsReassignModalOpen(true); }}
+                                                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                                                            title="Reassign Records"
+                                                        >
+                                                            <FolderSync size={15} />
+                                                        </button>
+                                                    )}
+                                                    {m.role === "sales_rep" && m._id !== currentUser?._id ? (
                                                         <button
                                                             onClick={() => handleToggleActive(m)}
                                                             className={`text-xs px-3 py-1.5 rounded-lg font-semibold border transition ${m.isActive ? "border-red-200 text-red-600 hover:bg-red-50" : "border-green-200 text-green-600 hover:bg-green-50"}`}
                                                         >
                                                             {m.isActive ? "Deactivate" : "Activate"}
                                                         </button>
-                                                    ) : (
+                                                    ) : m._id !== currentUser?._id ? (
                                                         <span className="text-xs text-gray-400">—</span>
-                                                    )}
+                                                    ) : null}
                                                 </div>
                                             </td>
                                         </tr>
@@ -310,9 +319,9 @@ export default function ManagerTeam() {
                                             user={m}
                                             onView={handleViewDetails}
                                             onEdit={null}
-                                            onDeactivate={(u) => { setSelectedMember(u); setIsDeactivateModalOpen(true); }}
+                                            onDeactivate={m._id === currentUser?._id ? null : (u) => { setSelectedMember(u); setIsDeactivateModalOpen(true); }}
                                             onActivate={handleActivate}
-                                            onReassign={(u) => { setSelectedMember(u); setIsReassignModalOpen(true); }}
+                                            onReassign={m._id === currentUser?._id ? null : (u) => { setSelectedMember(u); setIsReassignModalOpen(true); }}
                                             onDelete={null}
                                         />
                                     ))
