@@ -89,7 +89,8 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
         setFormData(prev => {
             const newData = { ...prev, [field]: value };
             
-            // If company changes, validate if current contact still belongs
+            // If company changes, validate if current contact still belongs. 
+            // If not, clear the contact field.
             if (field === "companyId" && value) {
                 const currentContactId = prev.contactId;
                 if (currentContactId) {
@@ -106,22 +107,15 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
                 }
             }
 
-            // If contact changes, potentially auto-select company
+            // If contact changes, validate if current company still belongs.
+            // If not, clear the company field.
             if (field === "contactId" && value) {
                 const contactObj = contacts.find(c => c._id === value);
                 if (contactObj) {
                     const primaryId = contactObj.companyId?._id || contactObj.companyId;
                     const otherIds = contactObj.companies?.map(c => c.companyId?._id || c.companyId) || [];
-                    const allIds = [...new Set([primaryId, ...otherIds].filter(Boolean).map(String))];
-                    
-                    // If contact has exactly 1 company and we don't have one selected (or it's different), auto-select it
-                    if (allIds.length === 1 && (!prev.companyId || !allIds.includes(String(prev.companyId)))) {
-                        const compId = allIds[0];
-                        const comp = companies.find(c => String(c._id) === compId);
-                        newData.companyId = compId;
-                        newData.companyName = comp?.name || "";
-                    } else if (allIds.length > 1 && prev.companyId && !allIds.includes(String(prev.companyId))) {
-                        // If current company is NOT in the contact's list, clear it to force user to pick from contact's companies
+                    const allIds = [primaryId, ...otherIds].map(String);
+                    if (prev.companyId && !allIds.includes(String(prev.companyId))) {
                         newData.companyId = "";
                         newData.companyName = "";
                     }
@@ -131,6 +125,34 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
         });
         if (errors[field]) setErrors(prev => ({ ...prev, [field]: "" }));
     };
+
+    // Auto-fill Contact if Company is selected and only one contact exists for it
+    useEffect(() => {
+        if (formData.companyId && !formData.contactId && !deal) {
+            if (filteredContacts.length === 1) {
+                const cont = filteredContacts[0];
+                setFormData(prev => ({
+                    ...prev,
+                    contactId: cont._id,
+                    contactName: `${cont.firstName} ${cont.lastName}`.trim()
+                }));
+            }
+        }
+    }, [formData.companyId, filteredContacts, deal]);
+
+    // Auto-fill Company if Contact is selected and only one company exists for it
+    useEffect(() => {
+        if (formData.contactId && !formData.companyId && !deal) {
+            if (filteredCompanies.length === 1) {
+                const comp = filteredCompanies[0];
+                setFormData(prev => ({
+                    ...prev,
+                    companyId: comp._id,
+                    companyName: comp.name
+                }));
+            }
+        }
+    }, [formData.contactId, filteredCompanies, deal]);
 
     const validate = () => {
         const errs = {};
