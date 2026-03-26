@@ -14,7 +14,11 @@ export const AuthProvider = ({ children }) => {
             setUser(response.data.data);
         } catch (error) {
             console.error("Failed to fetch profile:", error.message);
-            setUser(null);
+            // Only clear user if it's a definitive auth failure (401 or 403)
+            // If it's a network error (no response), keep the user state so the app doesn't break/logout unnecessarily
+            if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+                setUser(null);
+            }
         } finally {
             setLoading(false);
         }
