@@ -1,6 +1,7 @@
 import { Company } from "../models/companySchema.js";
 import { Deal } from "../models/dealSchema.js";
 import User from "../models/userSchema.js";
+import { Contact } from "../models/contactSchema.js";
 import { logAction } from "../utils/auditLogger.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../middlewares/uploadMiddleware.js";
 import { sendTieredNotification } from "../services/notificationService.js";
@@ -163,17 +164,29 @@ export const getCompanies = async (req, res) => {
                 $or: [{ _id: id }, { managerId: id }]
             }).select("_id");
 
-            teamIds = teamUsers.map(u => u._id); // assign to outer-scope variable
+            teamIds = teamUsers.map(u => u._id);
             
             // Get companies linked to team's deals
-            const { Deal } = await import("../models/dealSchema.js");
             const teamDeals = await Deal.find({ ownerId: { $in: teamIds }, isDeleted: { $ne: true } }).select("companyId");
             const dealCompanyIds = teamDeals.map(d => d.companyId).filter(id => id);
+
+            // Get companies linked to team's contacts
+            const teamContacts = await Contact.find({ ownerId: { $in: teamIds }, isDeleted: { $ne: true } }).select("companyId companies");
+            const contactCompanyIds = [];
+            teamContacts.forEach(c => {
+                if (c.companyId) contactCompanyIds.push(c.companyId);
+                if (c.companies && Array.isArray(c.companies)) {
+                    c.companies.forEach(assoc => {
+                        if (assoc.companyId) contactCompanyIds.push(assoc.companyId);
+                    });
+                }
+            });
 
             const visibilityFilter = {
                 $or: [
                     { ownerId: { $in: teamIds } },
-                    { _id: { $in: dealCompanyIds } }
+                    { _id: { $in: dealCompanyIds } },
+                    { _id: { $in: contactCompanyIds } }
                 ]
             };
             filter = { $and: [filter, visibilityFilter] };
@@ -181,14 +194,26 @@ export const getCompanies = async (req, res) => {
 
         if (role === "sales_rep") {
             // Get companies linked to rep's deals
-            const { Deal } = await import("../models/dealSchema.js");
             const myDeals = await Deal.find({ ownerId: id, isDeleted: { $ne: true } }).select("companyId");
             const dealCompanyIds = myDeals.map(d => d.companyId).filter(id => id);
+
+            // Get companies linked to rep's contacts
+            const myContacts = await Contact.find({ ownerId: id, isDeleted: { $ne: true } }).select("companyId companies");
+            const contactCompanyIds = [];
+            myContacts.forEach(c => {
+                if (c.companyId) contactCompanyIds.push(c.companyId);
+                if (c.companies && Array.isArray(c.companies)) {
+                    c.companies.forEach(assoc => {
+                        if (assoc.companyId) contactCompanyIds.push(assoc.companyId);
+                    });
+                }
+            });
 
             const visibilityFilter = {
                 $or: [
                     { ownerId: id },
-                    { _id: { $in: dealCompanyIds } }
+                    { _id: { $in: dealCompanyIds } },
+                    { _id: { $in: contactCompanyIds } }
                 ]
             };
             filter = { $and: [filter, visibilityFilter] };
@@ -260,9 +285,15 @@ export const updateCompany = async (req, res) => {
                 isDeleted: { $ne: true }
             });
 
+            const hasAssociatedContact = await Contact.exists({
+                $or: [{ companyId: id }, { "companies.companyId": id }],
+                ownerId: role === "sales_manager" ? { $in: teamIds } : userId,
+                isDeleted: { $ne: true }
+            });
+
             if (role === "sales_manager") {
                 const isTeamOwned = company.ownerId && teamIds.includes(company.ownerId.toString());
-                if (!isTeamOwned && !hasExistingDeal) {
+                if (!isTeamOwned && !hasExistingDeal && !hasAssociatedContact) {
                     return res.status(403).json({
                         message: "Access denied!"
                     });
@@ -271,7 +302,7 @@ export const updateCompany = async (req, res) => {
 
             if (role === "sales_rep") {
                 const isOwned = company.ownerId && company.ownerId.toString() === userId;
-                if (!isOwned && !hasExistingDeal) {
+                if (!isOwned && !hasExistingDeal && !hasAssociatedContact) {
                     return res.status(403).json({
                         message: "Access denied!"
                     });
