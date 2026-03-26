@@ -1,24 +1,19 @@
 import React from "react";
 import Modal from "./Modal";
-import { Mail, Shield, User, Calendar, Clock, CheckCircle, XCircle } from "lucide-react";
+import {
+    User, Mail, Briefcase, Building2,
+    Calendar, Clock, Target, Info,
+    TrendingUp, CheckCircle2, XCircle, DollarSign,
+    Shield, Activity
+} from "lucide-react";
 
-export default function UserDetailsModal({ isOpen, onClose, user }) {
+export default function UserDetailsModal({ isOpen, onClose, user, stats, recentDeals }) {
     if (!user) return null;
 
+    const fullName = `${user.firstName || ""} ${user.lastName || ""}`.trim();
     const initials = `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase();
-    const avatarColor = "bg-red-600";
-
-    const formatRole = (r) => ({
-        admin: "Admin",
-        sales_manager: "Sales Manager",
-        sales_rep: "Sales Representative"
-    }[r] || r?.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '));
-
-    const roleBadge = {
-        admin: "bg-red-100 text-red-700 border-red-200",
-        sales_manager: "bg-orange-100 text-orange-700 border-orange-200",
-        sales_rep: "bg-red-50 text-red-600 border-red-100",
-    };
+    const colors = ["bg-red-600", "bg-orange-500", "bg-rose-500", "bg-red-400", "bg-pink-600"];
+    const avatarColor = colors[(user.firstName?.charCodeAt(0) || 0) % colors.length];
 
     const formatDate = (date) => {
         if (!date) return "Never";
@@ -31,98 +26,147 @@ export default function UserDetailsModal({ isOpen, onClose, user }) {
         });
     };
 
+    const roleMap = {
+        admin: "Administrator",
+        sales_manager: "Sales Manager",
+        sales_rep: "Sales Representative"
+    };
+
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="User Profile Details">
+        <Modal isOpen={isOpen} onClose={onClose} title="Representative Information">
             <div className="space-y-6">
-                {/* Header Information */}
-                <div className="flex items-center gap-5 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                    <div className={`w-16 h-16 rounded-full ${!user.profilePicture ? avatarColor : 'bg-white'} flex items-center justify-center text-white text-xl font-bold border-4 border-white shadow-sm flex-shrink-0 overflow-hidden`}>
-                        {user.profilePicture ? (
-                            <img src={user.profilePicture} alt="Profile" className="w-full h-full object-cover" />
-                        ) : (
-                            initials
-                        )}
+                {/* Header Profile Section */}
+                <div className="flex items-center gap-5 p-5 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100 shadow-sm">
+                    <div className={`w-16 h-16 rounded-2xl ${avatarColor} flex items-center justify-center text-white text-xl font-bold border-4 border-white shadow-md flex-shrink-0`}>
+                        {initials}
                     </div>
                     <div className="min-w-0">
-                        <h2 className="text-xl font-bold text-gray-900 truncate">{`${user.firstName || ""} ${user.lastName || ""}`.trim()}</h2>
-                        <div className={`inline-flex items-center mt-1 px-2.5 py-0.5 rounded-full text-xs font-bold border ${roleBadge[user.role] || "bg-gray-100 text-gray-600 border-gray-200"}`}>
-                            {formatRole(user.role)}
+                        <h2 className="text-xl font-bold text-gray-900 truncate">{fullName}</h2>
+                        <div className="flex items-center gap-2 mt-1">
+                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider bg-red-50 text-red-600 border-red-100`}>
+                                {roleMap[user.role] || user.role}
+                            </span>
+                            <span className="text-gray-300">•</span>
+                            <div className={`flex items-center gap-1.5 text-xs font-semibold ${user.isActive ? "text-green-600" : "text-gray-400"}`}>
+                                <span className={`w-1.5 h-1.5 rounded-full ${user.isActive ? "bg-green-500" : "bg-gray-400"}`} />
+                                {user.isActive ? "Active" : "Inactive"}
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {/* Information Sections */}
-                    <div className="space-y-4 min-w-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                    {/* Performance & Metrics */}
+                    <div className="space-y-6">
+                        <section className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                            <h4 className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">
+                                <Activity size={12} className="text-red-500" />
+                                Performance Statistics
+                            </h4>
+                            <div className="grid grid-cols-2 gap-y-4 gap-x-2">
+                                <div className="space-y-0.5 transform transition-all hover:translate-x-1">
+                                    <p className="text-sm font-bold text-gray-900 leading-none">{stats?.deals || 0}</p>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Total Deals</p>
+                                </div>
+                                <div className="space-y-0.5 border-l border-gray-200 pl-4 transform transition-all hover:translate-x-1">
+                                    <p className="text-sm font-bold text-green-600 leading-none">{stats?.won || 0}</p>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Closed Won</p>
+                                </div>
+                                <div className="space-y-0.5 transform transition-all hover:translate-x-1">
+                                    <p className="text-sm font-bold text-red-500 leading-none">{stats?.lost || 0}</p>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Closed Lost</p>
+                                </div>
+                                <div className="space-y-0.5 border-l border-gray-200 pl-4 transform transition-all hover:translate-x-1">
+                                    <p className="text-sm font-bold text-red-600 leading-none">{stats?.pipeline || "$0"}</p>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Pipeline Value</p>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className="px-1">
+                            <h4 className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">
+                                <Briefcase size={12} className="text-red-400" />
+                                Recent Activity
+                            </h4>
+                            <div className="space-y-2">
+                                {recentDeals && recentDeals.length > 0 ? (
+                                    recentDeals.slice(0, 3).map(deal => (
+                                        <div key={deal._id} className="flex items-center justify-between p-2.5 bg-white border border-gray-100 rounded-xl shadow-sm hover:border-red-100 transition-colors group">
+                                            <div className="flex items-center gap-2 overflow-hidden">
+                                                <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 flex-shrink-0 group-hover:bg-red-50 group-hover:text-red-500 transition-colors">
+                                                    <Building2 size={14} />
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <p className="text-[11px] font-bold text-gray-700 truncate">{deal.name}</p>
+                                                    <p className="text-[10px] text-gray-400 truncate">{deal.companyId?.name || deal.companyName || "—"}</p>
+                                                </div>
+                                            </div>
+                                            <span className="text-[10px] font-black text-gray-900 flex-shrink-0 ml-2">
+                                                ${deal.value?.toLocaleString()}
+                                            </span>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="text-xs text-gray-400 italic py-2">No recent deal activity recorded.</p>
+                                )}
+                            </div>
+                        </section>
+                    </div>
+
+                    {/* Contact & Context */}
+                    <div className="space-y-6">
                         <section>
-                            <h4 className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                                <Mail size={12} className="text-gray-400" />
+                            <h4 className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">
+                                <Mail size={12} className="text-red-400" />
                                 Contact Details
                             </h4>
-                            <div className="flex flex-col min-w-0">
-                                <span className="text-sm font-semibold text-gray-700 break-all">{user.email}</span>
-                                <span className="text-[11px] text-gray-400 italic">Primary Business Email</span>
+                            <div className="flex flex-col p-4 bg-red-50/50 rounded-2xl border border-red-100/50">
+                                <span className="text-[10px] text-red-500 font-bold uppercase tracking-tighter mb-1">Business Email</span>
+                                <span className="text-sm font-bold text-red-700 truncate">{user.email}</span>
+                                <div className="flex items-center gap-2 mt-2 pt-2 border-t border-red-100/30">
+                                    <Clock size={10} className="text-red-400" />
+                                    <span className="text-[10px] text-red-500 font-medium tracking-tight">
+                                        Last Active: <span className="font-bold">{formatDate(user.lastLogin)}</span>
+                                    </span>
+                                </div>
                             </div>
                         </section>
 
                         <section>
-                            <h4 className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                                <Shield size={12} className="text-gray-400" />
-                                Account Status
+                            <h4 className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">
+                                <Shield size={12} className="text-red-400" />
+                                Security & Access
                             </h4>
-                            <div className="flex items-center gap-2">
-                                <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full ${user.isActive ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>
-                                    {user.isActive ? <CheckCircle size={10} /> : <XCircle size={10} />}
-                                    {user.isActive ? "ACTIVE" : "DEACTIVATED"}
-                                </span>
-                            </div>
-                        </section>
-                    </div>
-
-                    <div className="space-y-4 min-w-0">
-                        <section>
-                            <h4 className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                                <User size={12} className="text-gray-400" />
-                                Reporting To
-                            </h4>
-                            <div className="flex flex-col min-w-0">
-                                <span className="text-sm font-semibold text-gray-700 truncate">
-                                    {user.managerId ? `${user.managerId.firstName || ""} ${user.managerId.lastName || ""}`.trim() : "No Direct Manager"}
-                                </span>
-                                {user.managerId && user.managerId.email && (
-                                    <span className="text-[11px] font-medium text-gray-500 truncate mt-0.5">{user.managerId.email}</span>
-                                )}
-                                <span className="text-[10px] text-gray-400 italic mt-0.5">Assigned Supervisor</span>
+                            <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-[10px] font-bold text-gray-500 uppercase">Account Setup</span>
+                                    <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase ${user.isSetupComplete ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                        {user.isSetupComplete ? 'Complete' : 'Pending'}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-[10px] font-bold text-gray-500 uppercase">Member Since</span>
+                                    <span className="text-[11px] font-semibold text-gray-700">
+                                        {new Date(user.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                                    </span>
+                                </div>
                             </div>
                         </section>
 
-                        <section>
-                            <h4 className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                                <Clock size={12} className="text-gray-400" />
-                                Last Activity
-                            </h4>
-                            <div className="flex flex-col">
-                                <span className="text-sm font-semibold text-gray-700">{formatDate(user.lastLogin)}</span>
-                                <span className="text-[11px] text-gray-400 italic">User's last successful session</span>
+                        <div className="pt-2 flex flex-col gap-1.5 opacity-60">
+                            <div className="flex items-center gap-2 text-[9px] font-bold text-gray-400 uppercase">
+                                <Target size={10} className="text-gray-300" />
+                                Hierarchy: <span className="text-gray-600">Strategic Account Unit</span>
                             </div>
-                        </section>
+                        </div>
                     </div>
                 </div>
 
-                {/* System Timestamps */}
-                <div className="pt-4 mt-2 border-t border-gray-100 flex flex-wrap gap-x-8 gap-y-2">
-                    <div className="flex items-center gap-2">
-                        <Calendar size={12} className="text-gray-300" />
-                        <span className="text-[11px] text-gray-400">Created: <span className="font-semibold text-gray-500">{formatDate(user.createdAt)}</span></span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Clock size={12} className="text-gray-300" />
-                        <span className="text-[11px] text-gray-400">Last Modified: <span className="font-semibold text-gray-500">{formatDate(user.updatedAt)}</span></span>
-                    </div>
-                </div>
-
-                <div className="flex pt-2">
-                    <button onClick={onClose} className="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm shadow-lg shadow-red-100 transition-all active:scale-[0.98]">
+                <div className="pt-6">
+                    <button
+                        onClick={onClose}
+                        className="w-full py-3.5 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-bold text-sm shadow-xl shadow-red-100 transition-all active:scale-[0.98]"
+                    >
                         Close Profile
                     </button>
                 </div>
