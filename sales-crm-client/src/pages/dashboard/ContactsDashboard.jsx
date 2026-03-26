@@ -14,6 +14,7 @@ import ContactDetailsModal from "../../components/modals/ContactDetailsModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
 import ContactCard from "../../components/cards/ContactCard";
 import ContactDealsModal from "../../components/modals/ContactDealsModal";
+import useDashboardRefresh from "../../hooks/useDashboardRefresh";
 import { toast } from "react-hot-toast";
 
 const Select = ({ options, value, onChange }) => (
@@ -102,6 +103,8 @@ export default function ContactsDashboard() {
         }, 500);
         return () => clearTimeout(timer);
     }, [search]);
+
+    useDashboardRefresh(fetchData);
 
     const handleSaveContact = async (formData) => {
         try {

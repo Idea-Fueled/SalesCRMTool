@@ -19,6 +19,7 @@ import ContactDetailsModal from "../../components/modals/ContactDetailsModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
 import { isDealOverdue } from "../../utils/dateUtils";
 import { toast } from "react-hot-toast";
+import useDashboardRefresh from "../../hooks/useDashboardRefresh";
 
 const Select = ({ options, value, onChange }) => (
     <div className="relative">
@@ -107,6 +108,8 @@ export default function ManagerDeals() {
     useEffect(() => {
         fetchData();
     }, [stageFilter, period]);
+
+    useDashboardRefresh(fetchData);
 
     const handleSaveDeal = async (formData) => {
         try {

@@ -3,7 +3,7 @@ import Modal from "./Modal";
 import { Briefcase, Building2, Users, DollarSign } from "lucide-react";
 import { truncateName } from "../../utils/stringUtils";
 
-export default function DashboardDetailModal({ isOpen, onClose, category, data }) {
+export default function DashboardDetailModal({ isOpen, onClose, category, data, title }) {
     const getDealOwnerFullName = (deal) =>
         `${deal?.ownerId?.firstName || ""} ${deal?.ownerId?.lastName || ""}`.trim();
 
@@ -125,10 +125,12 @@ export default function DashboardDetailModal({ isOpen, onClose, category, data }
             isOpen={isOpen}
             onClose={onClose}
             title={
-                <div className="flex items-center gap-3">
-                    {icons[category]}
-                    <span>{titles[category]}</span>
-                </div>
+                title || (
+                    <div className="flex items-center gap-3">
+                        {category && icons[category]}
+                        <span>{category ? titles[category] : ""}</span>
+                    </div>
+                )
             }
         >
             <div className="max-h-[60vh] overflow-y-auto pr-1 -mr-1 custom-scrollbar">

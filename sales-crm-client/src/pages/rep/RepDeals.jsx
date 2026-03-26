@@ -18,6 +18,7 @@ import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
 import { isDealOverdue } from "../../utils/dateUtils";
 import CollapsibleDealName from "../../components/CollapsibleDealName";
 import { toast } from "react-hot-toast";
+import useDashboardRefresh from "../../hooks/useDashboardRefresh";
 
 const Select = ({ options, value, onChange }) => (
     <div className="relative">
@@ -88,6 +89,8 @@ export default function RepDeals() {
     useEffect(() => {
         fetchData();
     }, [stageFilter]);
+
+    useDashboardRefresh(fetchData);
 
     const handleSaveDeal = async (formData) => {
         try {

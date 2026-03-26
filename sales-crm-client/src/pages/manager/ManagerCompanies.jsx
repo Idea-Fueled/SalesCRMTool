@@ -7,6 +7,7 @@ import CompanyCard from "../../components/cards/CompanyCard";
 import CompanyModal from "../../components/modals/CompanyModal";
 import CompanyDetailsModal from "../../components/modals/CompanyDetailsModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
+import useDashboardRefresh from "../../hooks/useDashboardRefresh";
 import { toast } from "react-hot-toast";
 
 const Card = ({ children, className = "" }) => (
@@ -57,6 +58,8 @@ export default function ManagerCompanies() {
         }, 500);
         return () => clearTimeout(timer);
     }, [search]);
+
+    useDashboardRefresh(fetchData);
 
     const handleSaveCompany = async (formData) => {
         try {

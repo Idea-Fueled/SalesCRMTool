@@ -10,6 +10,7 @@ import ContactCard from "../../components/cards/ContactCard";
 import ContactDealsModal from "../../components/modals/ContactDealsModal";
 import { toast } from "react-hot-toast";
 import { Eye } from "lucide-react";
+import useDashboardRefresh from "../../hooks/useDashboardRefresh";
 
 const Card = ({ children, className = "" }) => (
     <div className={`bg-white rounded-xl border border-gray-100 shadow-sm ${className}`}>{children}</div>
@@ -72,6 +73,8 @@ export default function RepContacts() {
         }, 500);
         return () => clearTimeout(timer);
     }, [search]);
+
+    useDashboardRefresh(fetchData);
 
     const handleSaveContact = async (formData) => {
         try {

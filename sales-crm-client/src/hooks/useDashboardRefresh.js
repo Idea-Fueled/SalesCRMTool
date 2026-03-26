@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
  * @param {Function} fetchData - The function to call to refresh data.
  * @param {number} intervalMs - The polling interval in milliseconds (default 1 minute).
  */
-const useDashboardRefresh = (fetchData, intervalMs = 60000) => {
+const useDashboardRefresh = (fetchData, intervalMs = 30000) => {
     const fetchRef = useRef(fetchData);
 
     useEffect(() => {

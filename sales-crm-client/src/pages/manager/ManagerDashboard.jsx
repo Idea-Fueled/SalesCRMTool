@@ -73,7 +73,7 @@ export default function ManagerDashboard() {
     const [loading, setLoading] = useState(true);
     const [selectedCompany, setSelectedCompany] = useState(null);
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-    const [modalConfig, setModalConfig] = useState({ isOpen: false, category: null, data: [] });
+    const [modalConfig, setModalConfig] = useState({ isOpen: false, category: null, data: [], title: null });
 
     const fetchData = async () => {
         setLoading(true);
@@ -169,7 +169,16 @@ export default function ManagerDashboard() {
                                     <tr><td colSpan={6} className="text-center py-10 text-gray-400">NO SALES REPRESENTATIVES IN YOUR TEAM YET.</td></tr>
                                 ) : (
                                     repStats.map((rep) => (
-                                        <tr key={rep._id} className="hover:bg-gray-50/50 transition-colors">
+                                        <tr 
+                                            key={rep._id} 
+                                            className="hover:bg-red-50/50 transition-all duration-200 cursor-pointer group"
+                                            onClick={() => setModalConfig({ 
+                                                isOpen: true, 
+                                                category: 'deals', 
+                                                data: deals.filter(d => d.ownerId?._id === rep._id || d.ownerId === rep._id),
+                                                title: `Active Deals for ${rep.name}`
+                                            })}
+                                        >
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center gap-3">
                                                     <Avatar name={rep.name} color={rep.color} />
@@ -271,6 +280,7 @@ export default function ManagerDashboard() {
                 onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
                 category={modalConfig.category}
                 data={modalConfig.data}
+                title={modalConfig.title}
             />
         </div>
     );

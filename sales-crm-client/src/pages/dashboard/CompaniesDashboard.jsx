@@ -11,6 +11,7 @@ import { useAuth } from "../../context/AuthContext";
 import CompanyCard from "../../components/cards/CompanyCard";
 import CompanyModal from "../../components/modals/CompanyModal";
 import CompanyDetailsModal from "../../components/modals/CompanyDetailsModal";
+import useDashboardRefresh from "../../hooks/useDashboardRefresh";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
 import { toast } from "react-hot-toast";
 
@@ -86,6 +87,8 @@ export default function CompaniesDashboard() {
         }, 500);
         return () => clearTimeout(timer);
     }, [search]);
+
+    useDashboardRefresh(fetchData);
 
     const handleSaveCompany = async (formData) => {
         try {

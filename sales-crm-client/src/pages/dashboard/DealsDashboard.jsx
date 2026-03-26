@@ -19,6 +19,7 @@ import ContactDetailsModal from "../../components/modals/ContactDetailsModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
 import CollapsibleDealName from "../../components/CollapsibleDealName";
 import { toast } from "react-hot-toast";
+import useDashboardRefresh from "../../hooks/useDashboardRefresh";
 
 const Card = ({ children, className = "" }) => (
     <div className={`bg-white rounded-xl border border-gray-100 shadow-sm ${className}`}>{children}</div>
@@ -103,6 +104,8 @@ export default function DealsDashboard() {
         }, 500);
         return () => clearTimeout(timer);
     }, [search]);
+
+    useDashboardRefresh(fetchData);
 
     const handleSaveDeal = async (formData) => {
         try {
