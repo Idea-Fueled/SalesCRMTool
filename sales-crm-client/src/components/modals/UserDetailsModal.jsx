@@ -86,7 +86,7 @@ export default function UserDetailsModal({ isOpen, onClose, user, stats, recentD
                         <section className="px-1">
                             <h4 className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">
                                 <Briefcase size={12} className="text-red-400" />
-                                Recent Activity
+                                Recent Deals
                             </h4>
                             <div className="space-y-2">
                                 {recentDeals && recentDeals.length > 0 ? (
@@ -122,7 +122,7 @@ export default function UserDetailsModal({ isOpen, onClose, user, stats, recentD
                             </h4>
                             <div className="flex flex-col p-4 bg-red-50/50 rounded-2xl border border-red-100/50">
                                 <span className="text-[10px] text-red-500 font-bold uppercase tracking-tighter mb-1">Business Email</span>
-                                <span className="text-sm font-bold text-red-700 truncate">{user.email}</span>
+                                <span className="text-sm font-bold text-red-700 break-all">{user.email}</span>
                                 <div className="flex items-center gap-2 mt-2 pt-2 border-t border-red-100/30">
                                     <Clock size={10} className="text-red-400" />
                                     <span className="text-[10px] text-red-500 font-medium tracking-tight">
