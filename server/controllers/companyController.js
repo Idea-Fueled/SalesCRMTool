@@ -1,7 +1,6 @@
 import { Company } from "../models/companySchema.js";
-import { Deal } from "../models/dealSchema.js";
 import User from "../models/userSchema.js";
-import { Contact } from "../models/contactSchema.js";
+
 import { logAction } from "../utils/auditLogger.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../middlewares/uploadMiddleware.js";
 import { sendTieredNotification } from "../services/notificationService.js";
@@ -166,6 +165,9 @@ export const getCompanies = async (req, res) => {
 
             teamIds = teamUsers.map(u => u._id);
             
+            const { Deal } = await import("../models/dealSchema.js");
+            const { Contact } = await import("../models/contactSchema.js");
+
             // Get companies linked to team's deals
             const teamDeals = await Deal.find({ ownerId: { $in: teamIds }, isDeleted: { $ne: true } }).select("companyId");
             const dealCompanyIds = teamDeals.map(d => d.companyId).filter(id => id);
@@ -193,6 +195,9 @@ export const getCompanies = async (req, res) => {
         }
 
         if (role === "sales_rep") {
+            const { Deal } = await import("../models/dealSchema.js");
+            const { Contact } = await import("../models/contactSchema.js");
+
             // Get companies linked to rep's deals
             const myDeals = await Deal.find({ ownerId: id, isDeleted: { $ne: true } }).select("companyId");
             const dealCompanyIds = myDeals.map(d => d.companyId).filter(id => id);
@@ -279,12 +284,14 @@ export const updateCompany = async (req, res) => {
                 teamIds = teamUsers.map(u => u._id.toString());
             }
 
+            const { Deal } = await import("../models/dealSchema.js");
             const hasExistingDeal = await Deal.exists({ 
                 companyId: id, 
                 ownerId: role === "sales_manager" ? { $in: teamIds } : userId,
                 isDeleted: { $ne: true }
             });
 
+            const { Contact } = await import("../models/contactSchema.js");
             const hasAssociatedContact = await Contact.exists({
                 $or: [{ companyId: id }, { "companies.companyId": id }],
                 ownerId: role === "sales_manager" ? { $in: teamIds } : userId,
