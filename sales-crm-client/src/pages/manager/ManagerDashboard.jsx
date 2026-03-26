@@ -8,7 +8,6 @@ import { getCompanies } from "../../API/services/companyService";
 import { getTeamUsers } from "../../API/services/userService";
 import CompanyDetailsModal from "../../components/modals/CompanyDetailsModal";
 import DashboardDetailModal from "../../components/modals/DashboardDetailModal";
-import UserDetailsModal from "../../components/modals/UserDetailsModal";
 import { toast } from "react-hot-toast";
 import { Eye } from "lucide-react";
 import useDashboardRefresh from "../../hooks/useDashboardRefresh";
@@ -73,11 +72,7 @@ export default function ManagerDashboard() {
     const [teamMembers, setTeamMembers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedCompany, setSelectedCompany] = useState(null);
-    const [selectedUser, setSelectedUser] = useState(null);
-    const [userStats, setUserStats] = useState(null);
-    const [userDeals, setUserDeals] = useState([]);
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-    const [isUserModalOpen, setIsUserModalOpen] = useState(false);
     const [modalConfig, setModalConfig] = useState({ isOpen: false, category: null, data: [], title: null });
 
     const fetchData = async () => {
@@ -176,19 +171,7 @@ export default function ManagerDashboard() {
                                     repStats.map((rep) => (
                                         <tr 
                                             key={rep._id} 
-                                            className="hover:bg-red-50/50 transition-all duration-200 cursor-pointer group"
-                                            onClick={() => {
-                                                const repDeals = deals.filter(d => d.ownerId?._id === rep._id || d.ownerId === rep._id);
-                                                setSelectedUser(teamMembers.find(u => u._id === rep._id));
-                                                setUserStats({
-                                                    deals: rep.deals,
-                                                    won: rep.won,
-                                                    lost: rep.lost,
-                                                    pipeline: rep.pipeline
-                                                });
-                                                setUserDeals(repDeals.slice(0, 5));
-                                                setIsUserModalOpen(true);
-                                            }}
+                                            className="hover:bg-gray-50/50 transition-colors"
                                         >
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center gap-3">
@@ -285,13 +268,6 @@ export default function ManagerDashboard() {
                 isOpen={isDetailsModalOpen}
                 onClose={() => setIsDetailsModalOpen(false)}
                 company={selectedCompany}
-            />
-            <UserDetailsModal
-                isOpen={isUserModalOpen}
-                onClose={() => setIsUserModalOpen(false)}
-                user={selectedUser}
-                stats={userStats}
-                recentDeals={userDeals}
             />
             <DashboardDetailModal
                 isOpen={modalConfig.isOpen}
