@@ -148,7 +148,7 @@ export const registerUser = async (req, res, next) => {
                     secure: true,
                     sameSite: "none",
                     partitioned: true,
-                    maxAge: 15 * 60 * 1000
+                    maxAge: 60 * 1000
                 })
             }
         }
@@ -253,7 +253,7 @@ export const loginUser = async (req, res, next) => {
             secure: true,
             sameSite: "none",
             partitioned: true,
-            maxAge: 15 * 60 * 1000
+            maxAge: 60 * 1000
         })
 
         const lastLogin = new Date();

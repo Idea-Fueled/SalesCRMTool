@@ -40,9 +40,8 @@ let deactivationHandled = false;
 
 API.interceptors.response.use(
     (response) => {
-        console.log("Response recieved!");
-        console.log("Status", response.status);
-        console.log("Response data", response.data);
+        // Reset the frontend session expiry timer on successful active requests
+        window.dispatchEvent(new CustomEvent("session_activity"));
 
         return response;
     },
@@ -70,7 +69,10 @@ API.interceptors.response.use(
                 // Swallow all — prevents page-level catch blocks from showing "Failed to load data"
                 return new Promise(() => { });
             } else if (error.response.status === 401) {
-                // Silenced 401 logs to reduce console noise for unauthenticated users
+                // If a 401 actually occurs (token expired or missing), trigger the session expired modal immediately.
+                if (!error.config?.url?.includes("/auth/login") && !error.config?.url?.includes("/auth/profile")) {
+                    window.dispatchEvent(new CustomEvent("session_expired"));
+                }
             } else if (error.response.status === 500) {
                 console.log("Internal server error");
             } else {
