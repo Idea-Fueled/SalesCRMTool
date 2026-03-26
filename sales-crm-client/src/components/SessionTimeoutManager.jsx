@@ -69,7 +69,7 @@ const SessionTimeoutManager = ({ children }) => {
     return (
         <>
             {children}
-            <SessionExpiredModal isOpen={isExpired} />
+            <SessionExpiredModal isOpen={isExpired} onClose={() => setIsExpired(false)} />
         </>
     );
 };

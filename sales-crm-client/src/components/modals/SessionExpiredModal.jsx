@@ -2,12 +2,17 @@ import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Clock, LogOut } from 'lucide-react';
 
-const SessionExpiredModal = ({ isOpen }) => {
+const SessionExpiredModal = ({ isOpen, onClose }) => {
     const { logout } = useAuth();
 
     const handleLoginAgain = async () => {
         await logout();
-        window.location.href = "/login";
+        if (onClose) onClose();
+        // The AuthContext will set user to null, and ProtectedRoute will handle the react-router navigation to /login automatically.
+        // We ensure we fall back to manual redirect if needed.
+        if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+        }
     };
 
     if (!isOpen) return null;
