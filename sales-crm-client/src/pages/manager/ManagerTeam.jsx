@@ -279,7 +279,7 @@ export default function ManagerTeam() {
                                                     >
                                                         <Eye size={15} />
                                                     </button>
-                                                    {m._id !== currentUser?._id && (
+                                                    {(m._id || m.id)?.toString() !== (currentUser?._id || currentUser?.id)?.toString() && (
                                                         <button
                                                             onClick={() => { setSelectedMember(m); setIsReassignModalOpen(true); }}
                                                             className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
@@ -288,14 +288,14 @@ export default function ManagerTeam() {
                                                             <FolderSync size={15} />
                                                         </button>
                                                     )}
-                                                    {m.role === "sales_rep" && m._id !== currentUser?._id ? (
+                                                    {m.role === "sales_rep" && (m._id || m.id)?.toString() !== (currentUser?._id || currentUser?.id)?.toString() ? (
                                                         <button
                                                             onClick={() => handleToggleActive(m)}
                                                             className={`text-xs px-3 py-1.5 rounded-lg font-semibold border transition ${m.isActive ? "border-red-200 text-red-600 hover:bg-red-50" : "border-green-200 text-green-600 hover:bg-green-50"}`}
                                                         >
                                                             {m.isActive ? "Deactivate" : "Activate"}
                                                         </button>
-                                                    ) : m._id !== currentUser?._id ? (
+                                                    ) : (m._id || m.id)?.toString() !== (currentUser?._id || currentUser?.id)?.toString() ? (
                                                         <span className="text-xs text-gray-400">—</span>
                                                     ) : null}
                                                 </div>
@@ -319,9 +319,9 @@ export default function ManagerTeam() {
                                             user={m}
                                             onView={handleViewDetails}
                                             onEdit={null}
-                                            onDeactivate={m._id === currentUser?._id ? null : (u) => { setSelectedMember(u); setIsDeactivateModalOpen(true); }}
+                                            onDeactivate={(m._id || m.id)?.toString() === (currentUser?._id || currentUser?.id)?.toString() ? null : (u) => { setSelectedMember(u); setIsDeactivateModalOpen(true); }}
                                             onActivate={handleActivate}
-                                            onReassign={m._id === currentUser?._id ? null : (u) => { setSelectedMember(u); setIsReassignModalOpen(true); }}
+                                            onReassign={(m._id || m.id)?.toString() === (currentUser?._id || currentUser?.id)?.toString() ? null : (u) => { setSelectedMember(u); setIsReassignModalOpen(true); }}
                                             onDelete={null}
                                         />
                                     ))
