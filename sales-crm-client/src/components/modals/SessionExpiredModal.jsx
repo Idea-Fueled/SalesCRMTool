@@ -5,11 +5,10 @@ import { useNavigate } from 'react-router-dom';
 
 const SessionExpiredModal = ({ isOpen }) => {
     const { logout } = useAuth();
-    const navigate = useNavigate();
 
     const handleLoginAgain = async () => {
         await logout();
-        navigate("/login");
+        window.location.href = "/login";
     };
 
     return (

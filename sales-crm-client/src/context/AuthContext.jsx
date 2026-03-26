@@ -1,14 +1,12 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import API from "../API/Interceptor";
 import { toast } from "react-hot-toast";
-import SessionExpiredModal from "../components/modals/SessionExpiredModal";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [isSessionExpired, setIsSessionExpired] = useState(false);
 
     const fetchProfile = async () => {
         try {
@@ -49,44 +47,8 @@ export const AuthProvider = ({ children }) => {
         return () => window.removeEventListener("account_deactivated", handleDeactivated);
     }, []);
 
-    // Session Expiry Logic
-    useEffect(() => {
-        let sessionTimer;
-        // 1 minute timeout for testing
-        const TIMEOUT_DURATION = 60 * 1000;
-
-        const startTimer = () => {
-            clearTimeout(sessionTimer);
-            if (user) {
-                sessionTimer = setTimeout(() => {
-                    setIsSessionExpired(true);
-                }, TIMEOUT_DURATION);
-            }
-        };
-
-        const handleActivity = () => {
-            startTimer();
-        };
-
-        const handleExpired = () => {
-            setIsSessionExpired(true);
-        };
-
-        window.addEventListener("session_activity", handleActivity);
-        window.addEventListener("session_expired", handleExpired);
-
-        startTimer();
-
-        return () => {
-            window.removeEventListener("session_activity", handleActivity);
-            window.removeEventListener("session_expired", handleExpired);
-            clearTimeout(sessionTimer);
-        };
-    }, [user]);
-
     const login = (userData) => {
         setUser(userData);
-        setIsSessionExpired(false);
     };
 
     const logout = async () => {
@@ -97,7 +59,6 @@ export const AuthProvider = ({ children }) => {
             console.error("Logout error:", error.message);
         } finally {
             setUser(null);
-            setIsSessionExpired(false);
             toast.success("Logged out successfully");
         }
     };
@@ -105,7 +66,6 @@ export const AuthProvider = ({ children }) => {
     return (
         <AuthContext.Provider value={{ user, loading, login, logout, fetchProfile }}>
             {children}
-            <SessionExpiredModal isOpen={isSessionExpired} />
         </AuthContext.Provider>
     );
 };
