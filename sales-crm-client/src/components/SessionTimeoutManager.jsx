@@ -1,106 +1,70 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import SessionExpiredModal from "./modals/SessionExpiredModal";
 
 const SessionTimeoutManager = ({ children }) => {
     const { user, logout, fetchProfile } = useAuth();
     const [isExpired, setIsExpired] = useState(false);
-    
-    console.log("DEBUG: SessionTimeoutManager Rendered. User:", user ? "YES" : "NO", "isExpired:", isExpired);
+    const lastActivityRef = useRef(Date.now());
 
     // 1 minute = 60,000 ms (for testing)
     const INACTIVITY_LIMIT = 60 * 1000;
     // Refresh backend cookie every 30 seconds if active (for testing)
     const REFRESH_INTERVAL = 30 * 1000;
 
-    // Persist last activity in localStorage to survive tab sleeps/reloads
-    const getStoredLastActivity = () => {
-        const stored = localStorage.getItem("crm_last_activity");
-        return stored ? parseInt(stored, 10) : Date.now();
-    };
-
-    const resetTimer = () => {
-        const now = Date.now();
-        localStorage.setItem("crm_last_activity", now.toString());
-    };
-
-    const handleLogout = () => {
-        console.warn("Session Expired: User inactive for 1 minute.");
+    const handleLoggedOutMode = async () => {
         setIsExpired(true);
     };
 
-    const handleActualLogout = async () => {
-        setIsExpired(false);
-        localStorage.removeItem("crm_last_activity");
-        await logout();
-        window.location.href = "/login";
-    };
-
+    // Main Inactivity Logic
     useEffect(() => {
-        console.log("DEBUG: Inactivity useEffect running. User:", !!user, "isExpired:", isExpired);
         if (!user || isExpired) return;
 
-        console.log("Inactivity monitor started. Limit: 1 minute (60 seconds).");
+        console.log("DEBUG: Inactivity monitor STARTED (1 minute limit)");
+        lastActivityRef.current = Date.now();
 
-        const checkInactivity = setInterval(() => {
-            const lastActivity = getStoredLastActivity();
+        const checkInterval = setInterval(() => {
             const now = Date.now();
-            const idleTime = now - lastActivity;
+            const idleTime = now - lastActivityRef.current;
+            const idleSeconds = Math.floor(idleTime / 1000);
 
-            // log heartbeat every 10 seconds
-            if (Math.floor(idleTime / 1000) % 10 === 0) {
-                console.log(`Inactivity check: Idle for ${Math.floor(idleTime / 1000)} seconds...`);
+            if (idleSeconds > 0 && idleSeconds % 10 === 0) {
+                console.log(`DEBUG: Still idle... ${idleSeconds}s / 60s`);
             }
 
             if (idleTime >= INACTIVITY_LIMIT) {
-                handleLogout();
+                console.warn("DEBUG: INACTIVITY LIMIT REACHED!");
+                handleLoggedOutMode();
             }
-        }, 1000); // Check every second
+        }, 1000);
 
-        return () => clearInterval(checkInactivity);
-    }, [user?._id, isExpired]);
+        const resetTimer = () => {
+            lastActivityRef.current = Date.now();
+        };
 
-    // Initial setup and Activity Listeners
-    useEffect(() => {
-        if (!user || isExpired) return;
-
-        // Sync initial state
-        const last = localStorage.getItem("crm_last_activity");
-        if (!last) resetTimer();
-
-        // Event listeners for user activity
         const events = ["mousedown", "mousemove", "keydown", "scroll", "touchstart"];
-        const handleActivityWrapper = () => {
-            resetTimer();
+        events.forEach(event => document.addEventListener(event, resetTimer));
+
+        // Listen for server-side expiration (401s)
+        const handleServerExpired = () => {
+            console.warn("DEBUG: SESSION_EXPIRED EVENT RECEIVED FROM SERVER!");
+            setIsExpired(true);
         };
+        window.addEventListener("session_expired", handleServerExpired);
 
-        events.forEach(event => document.addEventListener(event, handleActivityWrapper));
-
-        return () => {
-            events.forEach(event => document.removeEventListener(event, handleActivityWrapper));
-        };
-    }, [user?._id, isExpired]);
-
-    // Periodic backend session refresh
-    useEffect(() => {
-        if (!user || isExpired) return;
-
-        const refreshInterval = setInterval(() => {
-            console.log("Activity check: checking session validity...");
+        // Periodically refresh profile to keep backend session alive if active
+        const refreshTimer = setInterval(() => {
+            console.log("DEBUG: Periodic session refresh (fetchProfile)");
             fetchProfile();
         }, REFRESH_INTERVAL);
 
-        const handleExpired = () => {
-            setIsExpired(true);
-        };
-
-        window.addEventListener("session_expired", handleExpired);
-
         return () => {
-            clearInterval(refreshInterval);
-            window.removeEventListener("session_expired", handleExpired);
+            clearInterval(checkInterval);
+            clearInterval(refreshTimer);
+            events.forEach(event => document.removeEventListener(event, resetTimer));
+            window.removeEventListener("session_expired", handleServerExpired);
         };
-    }, [user?._id, isExpired]);
+    }, [user, isExpired]);
 
     return (
         <>
