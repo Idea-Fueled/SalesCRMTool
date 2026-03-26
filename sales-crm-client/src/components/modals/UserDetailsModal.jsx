@@ -7,7 +7,7 @@ import {
     Shield, Activity
 } from "lucide-react";
 
-export default function UserDetailsModal({ isOpen, onClose, user, stats, recentDeals }) {
+export default function UserDetailsModal({ isOpen, onClose, user, stats, recentDeals, title }) {
     if (!user) return null;
 
     const fullName = `${user.firstName || ""} ${user.lastName || ""}`.trim();
@@ -33,7 +33,7 @@ export default function UserDetailsModal({ isOpen, onClose, user, stats, recentD
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Representative Information">
+        <Modal isOpen={isOpen} onClose={onClose} title={title || "User Profile Details"}>
             <div className="space-y-6">
                 {/* Header Profile Section */}
                 <div className="flex items-center gap-5 p-5 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100 shadow-sm">

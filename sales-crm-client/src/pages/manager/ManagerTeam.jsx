@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Users2, Search, Plus, Eye, LayoutList, LayoutGrid, CheckCircle2, XCircle, UserCheck, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getTeamUsers, deactivateUser, activateUser } from "../../API/services/userService";
+import { getDeals } from "../../API/services/dealService";
 import UserModal from "../../components/modals/UserModal";
 import UserDetailsModal from "../../components/modals/UserDetailsModal";
 import DeactivateModal from "../../components/modals/DeactivateModal";
@@ -47,8 +48,11 @@ export default function ManagerTeam() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false);
     const [selectedMember, setSelectedMember] = useState(null);
+    const [userStats, setUserStats] = useState(null);
+    const [userDeals, setUserDeals] = useState([]);
     const [viewMode, setViewMode] = useState("list"); // "list" | "card"
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+    const [allDeals, setAllDeals] = useState([]);
     const [confirmState, setConfirmState] = useState({ isOpen: false, title: "", message: "", confirmLabel: "", confirmColor: "", onConfirm: null });
     const openConfirm = (opts) => setConfirmState({ isOpen: true, ...opts });
     const closeConfirm = () => setConfirmState(s => ({ ...s, isOpen: false }));
@@ -56,14 +60,35 @@ export default function ManagerTeam() {
     const fetchTeam = async () => {
         setLoading(true);
         try {
-            const res = await getTeamUsers();
-            setMembers(res.data);
+            const [usersRes, dealsRes] = await Promise.all([
+                getTeamUsers(),
+                getDeals()
+            ]);
+            setMembers(usersRes.data);
+            setAllDeals(dealsRes.data);
         } catch (error) {
             console.error(error);
-            toast.error("Failed to load team");
+            toast.error("Failed to load team data");
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleViewDetails = (member) => {
+        const memberDeals = allDeals.filter(d => d.ownerId?._id === member._id || d.ownerId === member._id);
+        const won = memberDeals.filter(d => d.stage === "Closed Won").length;
+        const lost = memberDeals.filter(d => d.stage === "Closed Lost").length;
+        const totalValue = memberDeals.reduce((sum, d) => sum + (d.value || 0), 0);
+
+        setSelectedMember(member);
+        setUserStats({
+            deals: memberDeals.length,
+            won,
+            lost,
+            pipeline: `$${totalValue.toLocaleString()}`
+        });
+        setUserDeals(memberDeals.slice(0, 5));
+        setIsDetailsModalOpen(true);
     };
 
     useEffect(() => {
@@ -212,7 +237,7 @@ export default function ManagerTeam() {
                                         <tr
                                             key={m._id}
                                             className="hover:bg-gray-50/50 transition-colors cursor-pointer group"
-                                            onClick={() => { setSelectedMember(m); setIsDetailsModalOpen(true); }}
+                                            onClick={() => handleViewDetails(m)}
                                         >
                                             <td className="px-4 py-3 whitespace-nowrap">
                                                 <div className="flex items-center gap-3">
@@ -246,7 +271,7 @@ export default function ManagerTeam() {
                                             <td className="px-4 py-3 whitespace-nowrap" onClick={e => e.stopPropagation()}>
                                                 <div className="flex items-center gap-1.5">
                                                     <button
-                                                        onClick={() => { setSelectedMember(m); setIsDetailsModalOpen(true); }}
+                                                        onClick={() => handleViewDetails(m)}
                                                         className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
                                                         title="View profile details"
                                                     >
@@ -281,7 +306,7 @@ export default function ManagerTeam() {
                                 <UserCard
                                     key={m._id}
                                     user={m}
-                                    onView={(u) => { setSelectedMember(u); setIsDetailsModalOpen(true); }}
+                                    onView={handleViewDetails}
                                     onEdit={() => { /* Edit not directly supported in manager team view yet */ }}
                                     onDeactivate={(u) => { setSelectedMember(u); setIsDeactivateModalOpen(true); }}
                                     onActivate={handleActivate}
@@ -313,6 +338,8 @@ export default function ManagerTeam() {
                 isOpen={isDetailsModalOpen}
                 onClose={() => setIsDetailsModalOpen(false)}
                 user={selectedMember}
+                stats={userStats}
+                recentDeals={userDeals}
             />
             <ConfirmDialog
                 isOpen={confirmState.isOpen}
