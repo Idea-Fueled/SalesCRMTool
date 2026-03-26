@@ -2,7 +2,7 @@ import React from "react";
 import Modal from "./Modal";
 import {
     User, Mail, Briefcase, Building2,
-    Calendar, Clock, Target, Info,
+    Calendar, Clock, Info,
     TrendingUp, CheckCircle2, XCircle, DollarSign,
     Shield, Activity
 } from "lucide-react";
@@ -153,12 +153,6 @@ export default function UserDetailsModal({ isOpen, onClose, user, stats, recentD
                             </div>
                         </section>
 
-                        <div className="pt-2 flex flex-col gap-1.5 opacity-60">
-                            <div className="flex items-center gap-2 text-[9px] font-bold text-gray-400 uppercase">
-                                <Target size={10} className="text-gray-300" />
-                                Hierarchy: <span className="text-gray-600">Strategic Account Unit</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
