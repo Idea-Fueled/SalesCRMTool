@@ -65,7 +65,7 @@ export default function ManagerTeam() {
                 getDeals()
             ]);
             setMembers(usersRes.data);
-            setAllDeals(dealsRes.data);
+            setAllDeals(dealsRes.data.data || dealsRes.data);
         } catch (error) {
             console.error(error);
             toast.error("Failed to load team data");
