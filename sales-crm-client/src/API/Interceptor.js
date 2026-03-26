@@ -2,7 +2,8 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 const getBaseURL = () => {
-    if (import.meta.env.MODE === "development") {
+    const isDevelopment = import.meta.env.MODE === "development" || window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    if (isDevelopment) {
         return `http://${window.location.hostname}:8000/api`;
     } else {
         return (import.meta.env.VITE_BASE_URL || "").trim() + "/api";
