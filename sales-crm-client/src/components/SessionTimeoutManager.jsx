@@ -5,6 +5,8 @@ import SessionExpiredModal from "./modals/SessionExpiredModal";
 const SessionTimeoutManager = ({ children }) => {
     const { user, logout, fetchProfile } = useAuth();
     const [isExpired, setIsExpired] = useState(false);
+    
+    console.log("DEBUG: SessionTimeoutManager Rendered. User:", user ? "YES" : "NO", "isExpired:", isExpired);
 
     // 1 minute = 60,000 ms (for testing)
     const INACTIVITY_LIMIT = 60 * 1000;
@@ -34,8 +36,8 @@ const SessionTimeoutManager = ({ children }) => {
         window.location.href = "/login";
     };
 
-    // Inactivity Checker
     useEffect(() => {
+        console.log("DEBUG: Inactivity useEffect running. User:", !!user, "isExpired:", isExpired);
         if (!user || isExpired) return;
 
         console.log("Inactivity monitor started. Limit: 1 minute (60 seconds).");
