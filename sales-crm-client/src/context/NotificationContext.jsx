@@ -6,7 +6,15 @@ import { toast } from "react-hot-toast";
 
 const NotificationContext = createContext();
 
-const SOCKET_URL = (import.meta.env.VITE_BASE_URL || "http://localhost:8000").trim();
+const getSocketURL = () => {
+    if (import.meta.env.MODE === "development") {
+        return `http://${window.location.hostname}:8000`;
+    } else {
+        return (import.meta.env.VITE_BASE_URL || "").trim();
+    }
+};
+
+const SOCKET_URL = getSocketURL();
 
 export const NotificationProvider = ({ children }) => {
     const { user, logout } = useAuth();
