@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "./Modal";
 import {
     User, Mail, Briefcase, Building2,
@@ -6,8 +6,49 @@ import {
     TrendingUp, CheckCircle2, XCircle, DollarSign,
     Shield, Activity
 } from "lucide-react";
+import { getDeals } from "../../API/services/dealService";
 
-export default function UserDetailsModal({ isOpen, onClose, user, stats, recentDeals, title }) {
+export default function UserDetailsModal({ isOpen, onClose, user, title }) {
+    const [stats, setStats] = useState({ deals: 0, won: 0, lost: 0, pipeline: "$0" });
+    const [recentDeals, setRecentDeals] = useState([]);
+    const [loadingStats, setLoadingStats] = useState(false);
+
+    useEffect(() => {
+        const fetchUserStats = async () => {
+            if (!user || !isOpen) return;
+            setLoadingStats(true);
+            try {
+                // Fetch all deals for this specific user
+                const res = await getDeals({ owner: user._id, limit: 1000 });
+                const deals = res.data.data || [];
+                
+                const wonDeals = deals.filter(d => d.stage === "Closed Won");
+                const lostDeals = deals.filter(d => d.stage === "Closed Lost");
+                const activeDeals = deals.filter(d => d.stage !== "Closed Won" && d.stage !== "Closed Lost");
+                
+                const pipelineValue = activeDeals.reduce((sum, d) => sum + (d.value || 0), 0);
+                
+                setStats({
+                    deals: activeDeals.length,
+                    won: wonDeals.length,
+                    lost: lostDeals.length,
+                    pipeline: `$${pipelineValue >= 1000 ? (pipelineValue / 1000).toFixed(1) + 'K' : pipelineValue}`
+                });
+                
+                // Get the 3 most recent deals
+                const sortedRecent = [...deals].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
+                setRecentDeals(sortedRecent);
+                
+            } catch (error) {
+                console.error("Failed to fetch user stats:", error);
+            } finally {
+                setLoadingStats(false);
+            }
+        };
+
+        fetchUserStats();
+    }, [user, isOpen]);
+
     if (!user) return null;
 
     const fullName = `${user.firstName || ""} ${user.lastName || ""}`.trim();

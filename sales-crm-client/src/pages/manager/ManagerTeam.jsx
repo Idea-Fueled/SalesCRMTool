@@ -49,8 +49,6 @@ export default function ManagerTeam() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false);
     const [selectedMember, setSelectedMember] = useState(null);
-    const [userStats, setUserStats] = useState(null);
-    const [userDeals, setUserDeals] = useState([]);
     const [viewMode, setViewMode] = useState("list"); // "list" | "card"
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [isReassignModalOpen, setIsReassignModalOpen] = useState(false);
@@ -77,19 +75,7 @@ export default function ManagerTeam() {
     };
 
     const handleViewDetails = (member) => {
-        const memberDeals = allDeals.filter(d => d.ownerId?._id === member._id || d.ownerId === member._id);
-        const won = memberDeals.filter(d => d.stage === "Closed Won").length;
-        const lost = memberDeals.filter(d => d.stage === "Closed Lost").length;
-        const totalValue = memberDeals.reduce((sum, d) => sum + (d.value || 0), 0);
-
         setSelectedMember(member);
-        setUserStats({
-            deals: memberDeals.length,
-            won,
-            lost,
-            pipeline: `$${totalValue.toLocaleString()}`
-        });
-        setUserDeals(memberDeals.slice(0, 5));
         setIsDetailsModalOpen(true);
     };
 
@@ -349,8 +335,7 @@ export default function ManagerTeam() {
                 isOpen={isDetailsModalOpen}
                 onClose={() => setIsDetailsModalOpen(false)}
                 user={selectedMember}
-                stats={userStats}
-                recentDeals={userDeals}
+                title="User Profile"
             />
             <ReassignModal
                 isOpen={isReassignModalOpen}
