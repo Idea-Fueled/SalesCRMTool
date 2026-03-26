@@ -64,7 +64,7 @@ const SessionTimeoutManager = ({ children }) => {
             events.forEach(event => document.removeEventListener(event, resetTimer));
             window.removeEventListener("session_expired", handleServerExpired);
         };
-    }, [user, isExpired]);
+    }, [user?._id, user?.id, isExpired]);
 
     return (
         <>
