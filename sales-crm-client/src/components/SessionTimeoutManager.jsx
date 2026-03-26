@@ -23,7 +23,7 @@ const SessionTimeoutManager = ({ children }) => {
     };
 
     const handleLogout = () => {
-        console.warn("Session Expired: User inactive for 15 minutes.");
+        console.warn("Session Expired: User inactive for 1 minute.");
         setIsExpired(true);
     };
 
@@ -38,16 +38,16 @@ const SessionTimeoutManager = ({ children }) => {
     useEffect(() => {
         if (!user || isExpired) return;
 
-        console.log("Inactivity monitor started. Limit: 15 minutes.");
+        console.log("Inactivity monitor started. Limit: 1 minute (60 seconds).");
 
         const checkInactivity = setInterval(() => {
             const lastActivity = getStoredLastActivity();
             const now = Date.now();
             const idleTime = now - lastActivity;
 
-            // Optional: log heartbeat every minute
-            if (Math.floor(idleTime / 1000) % 60 === 0) {
-                console.log(`Inactivity check: Idle for ${Math.floor(idleTime / 1000 / 60)} minutes...`);
+            // log heartbeat every 10 seconds
+            if (Math.floor(idleTime / 1000) % 10 === 0) {
+                console.log(`Inactivity check: Idle for ${Math.floor(idleTime / 1000)} seconds...`);
             }
 
             if (idleTime >= INACTIVITY_LIMIT) {
