@@ -135,7 +135,7 @@ const DashboardLayout = () => {
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Users</p>
                         <div className="space-y-1">
                             <SidebarLink to="/dashboard/users" icon={Users} label="Users" onClick={closeSidebarOnMobile} />
-                            <SidebarLink to="/dashboard/trash" icon={Trash2} label="Trash / Bin" onClick={closeSidebarOnMobile} />
+                            <SidebarLink to="/dashboard/trash" icon={Trash2} label="Trash" onClick={closeSidebarOnMobile} />
                         </div>
                     </div>
 
