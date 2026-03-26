@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "./Modal";
 import { getDeals } from "../../API/services/dealService";
-import { Loader2, DollarSign, Calendar, Eye, Clock } from "lucide-react";
+import { Loader2, DollarSign, Calendar, Clock } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { isDealOverdue } from "../../utils/dateUtils";
 
@@ -83,7 +83,6 @@ export default function ContactDealsModal({ isOpen, onClose, contact }) {
                                             <h4 className="font-bold text-gray-800 group-hover:text-red-600 transition-colors uppercase text-xs tracking-wide truncate">
                                                 {deal.name}
                                             </h4>
-                                            <Eye size={12} className="text-gray-300 group-hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all transform translate-x-1 group-hover:translate-x-0" />
                                         </div>
                                         <p className="text-[10px] text-gray-500 font-medium mt-0.5">
                                             {deal.companyId?.name || deal.companyName || "No Company"}
