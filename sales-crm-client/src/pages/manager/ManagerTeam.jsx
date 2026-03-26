@@ -54,6 +54,7 @@ export default function ManagerTeam() {
     const [viewMode, setViewMode] = useState("list"); // "list" | "card"
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [isReassignModalOpen, setIsReassignModalOpen] = useState(false);
+    const [allDeals, setAllDeals] = useState([]);
     const [confirmState, setConfirmState] = useState({ isOpen: false, title: "", message: "", confirmLabel: "", confirmColor: "", onConfirm: null });
     const openConfirm = (opts) => setConfirmState({ isOpen: true, ...opts });
     const closeConfirm = () => setConfirmState(s => ({ ...s, isOpen: false }));
