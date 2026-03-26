@@ -10,6 +10,7 @@ import DealDetailsModal from "../../components/modals/DealDetailsModal";
 import DashboardDetailModal from "../../components/modals/DashboardDetailModal";
 import { toast } from "react-hot-toast";
 import { Eye } from "lucide-react";
+import useDashboardRefresh from "../../hooks/useDashboardRefresh";
 
 const Select = ({ options, value, onChange }) => (
     <div className="relative">
@@ -59,25 +60,29 @@ export default function RepDashboard() {
     const [isDealDetailsOpen, setIsDealDetailsOpen] = useState(false);
     const [modalConfig, setModalConfig] = useState({ isOpen: false, category: null, data: [] });
 
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const [dealsRes, companiesRes] = await Promise.all([
+                getDeals({ limit: 100 }),
+                getCompanies({ limit: 100 })
+            ]);
+            setDeals(dealsRes.data.data);
+            setCompanies(companiesRes.data.data);
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to load dashboard data");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            try {
-                const [dealsRes, companiesRes] = await Promise.all([
-                    getDeals({ limit: 100 }),
-                    getCompanies({ limit: 100 })
-                ]);
-                setDeals(dealsRes.data.data);
-                setCompanies(companiesRes.data.data);
-            } catch (error) {
-                console.error(error);
-                toast.error("Failed to load dashboard data");
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchData();
     }, []);
+
+    // Set up auto-refresh
+    useDashboardRefresh(fetchData);
 
     // Computed stats from live data
     const wonDeals = deals.filter(d => d.stage === "Closed Won");

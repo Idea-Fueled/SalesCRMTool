@@ -10,6 +10,7 @@ import CompanyDetailsModal from "../../components/modals/CompanyDetailsModal";
 import DashboardDetailModal from "../../components/modals/DashboardDetailModal";
 import { toast } from "react-hot-toast";
 import { Eye } from "lucide-react";
+import useDashboardRefresh from "../../hooks/useDashboardRefresh";
 
 const Select = ({ options, value, onChange }) => (
     <div className="relative">
@@ -74,27 +75,31 @@ export default function ManagerDashboard() {
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [modalConfig, setModalConfig] = useState({ isOpen: false, category: null, data: [] });
 
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const [dealsRes, usersRes, companiesRes] = await Promise.all([
+                getDeals({ limit: 500 }),
+                getTeamUsers(),
+                getCompanies({ limit: 1000 })
+            ]);
+            setDeals(dealsRes.data.data);
+            setTeamMembers(usersRes.data.filter(u => u.role === "sales_rep"));
+            setCompanies(companiesRes.data.data);
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to load team dashboard");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            try {
-                const [dealsRes, usersRes, companiesRes] = await Promise.all([
-                    getDeals({ limit: 500 }),
-                    getTeamUsers(),
-                    getCompanies({ limit: 1000 })
-                ]);
-                setDeals(dealsRes.data.data);
-                setTeamMembers(usersRes.data.filter(u => u.role === "sales_rep"));
-                setCompanies(companiesRes.data.data);
-            } catch (error) {
-                console.error(error);
-                toast.error("Failed to load team dashboard");
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchData();
     }, []);
+
+    // Set up auto-refresh
+    useDashboardRefresh(fetchData);
 
     // Computed stats
     const wonDeals = deals.filter(d => d.stage === "Closed Won");

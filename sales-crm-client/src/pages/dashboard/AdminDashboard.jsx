@@ -13,6 +13,7 @@ import { getTeamUsers } from "../../API/services/userService";
 import { toast } from "react-hot-toast";
 import DashboardDetailModal from "../../components/modals/DashboardDetailModal";
 import { truncateName } from "../../utils/stringUtils";
+import useDashboardRefresh from "../../hooks/useDashboardRefresh";
 
 const OverviewStat = ({ label, value, icon: IconComp, onClick }) => (
     <div
@@ -144,6 +145,9 @@ export default function AdminDashboard() {
     useEffect(() => {
         fetchStats();
     }, [selectedMonth]);
+
+    // Set up auto-refresh (every 1 minute + focus events)
+    useDashboardRefresh(fetchStats);
 
     const maxChartValue = Math.max(...stats.revenueChart.map(m => m.value), 1000);
 
