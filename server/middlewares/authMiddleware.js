@@ -27,14 +27,14 @@ export const protect = async (req, res, next) => {
             });
         }
 
-        // Sliding Session: Re-issue token to extend the session by another 1 minutes on every active request
+        // Sliding Session: Re-issue token to extend the session by another 15 minutes on every active request
         const newToken = await generateToken(user._id, user.role);
         res.cookie("token", newToken, {
             httpOnly: true,
             secure: true,
             sameSite: "none",
             partitioned: true,
-            maxAge: 60 * 1000
+            maxAge: 15 * 60 * 1000
         });
 
         req.user = user
