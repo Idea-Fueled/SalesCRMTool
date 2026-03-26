@@ -4,7 +4,6 @@ import { Clock, LogOut } from "lucide-react";
 
 const SessionTimeoutManager = ({ children }) => {
     const { user, logout, fetchProfile } = useAuth();
-    const lastActivityRef = useRef(Date.now());
     const [isExpired, setIsExpired] = useState(false);
 
     // 15 minutes = 900,000 ms
@@ -12,16 +11,24 @@ const SessionTimeoutManager = ({ children }) => {
     // Refresh backend cookie every 5 minutes if active
     const REFRESH_INTERVAL = 5 * 60 * 1000;
 
+    // Persist last activity in localStorage to survive tab sleeps/reloads
+    const getStoredLastActivity = () => {
+        const stored = localStorage.getItem("crm_last_activity");
+        return stored ? parseInt(stored, 10) : Date.now();
+    };
+
     const resetTimer = () => {
-        lastActivityRef.current = Date.now();
+        const now = Date.now();
+        localStorage.setItem("crm_last_activity", now.toString());
     };
 
     const handleLogout = () => {
-        console.warn("User inactive for 15 minutes. Logging out.");
+        console.warn("Session Expired: User inactive for 15 minutes.");
         setIsExpired(true);
     };
 
     const handleActualLogout = async () => {
+        localStorage.removeItem("crm_last_activity");
         await logout();
         setIsExpired(false);
         window.location.href = "/login";
@@ -31,9 +38,19 @@ const SessionTimeoutManager = ({ children }) => {
     useEffect(() => {
         if (!user || isExpired) return;
 
+        console.log("Inactivity monitor started. Limit: 15 minutes.");
+
         const checkInactivity = setInterval(() => {
+            const lastActivity = getStoredLastActivity();
             const now = Date.now();
-            if (now - lastActivityRef.current >= INACTIVITY_LIMIT) {
+            const idleTime = now - lastActivity;
+
+            // Optional: log heartbeat every minute
+            if (Math.floor(idleTime / 1000) % 60 === 0) {
+                console.log(`Inactivity check: Idle for ${Math.floor(idleTime / 1000 / 60)} minutes...`);
+            }
+
+            if (idleTime >= INACTIVITY_LIMIT) {
                 handleLogout();
             }
         }, 1000); // Check every second
@@ -45,8 +62,9 @@ const SessionTimeoutManager = ({ children }) => {
     useEffect(() => {
         if (!user || isExpired) return;
 
-        // Initialize last activity time
-        resetTimer();
+        // Sync initial state
+        const last = localStorage.getItem("crm_last_activity");
+        if (!last) resetTimer();
 
         // Event listeners for user activity
         const events = ["mousedown", "mousemove", "keydown", "scroll", "touchstart"];
@@ -77,21 +95,21 @@ const SessionTimeoutManager = ({ children }) => {
         <>
             {children}
             {isExpired && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
-                    <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden transform animate-in zoom-in-95 duration-300">
-                        <div className="p-8 text-center">
-                            <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-red-600 ring-4 ring-red-50/50">
-                                <Clock size={32} />
+                <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-slate-900/80 backdrop-blur-md p-4 animate-in fade-in duration-300">
+                    <div className="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden transform animate-in zoom-in-95 duration-300 border border-gray-100">
+                        <div className="p-10 text-center">
+                            <div className="w-20 h-20 bg-red-50 rounded-3xl flex items-center justify-center mx-auto mb-8 text-red-600 ring-8 ring-red-50/50 animate-pulse">
+                                <Clock size={40} />
                             </div>
-                            <h2 className="text-xl font-bold text-gray-900 mb-2">Session Expired</h2>
-                            <p className="text-gray-500 text-sm mb-8 leading-relaxed">
-                                Your session has expired due to 15 minutes of inactivity. Please log in again to continue.
+                            <h2 className="text-2xl font-black text-gray-900 mb-3 tracking-tight">Session Expired</h2>
+                            <p className="text-gray-500 text-sm mb-10 leading-relaxed font-medium">
+                                Your session has expired due to **15 minutes** of inactivity. Please log in again to safeguard your data.
                             </p>
                             <button
                                 onClick={handleActualLogout}
-                                className="w-full flex items-center justify-center gap-2 bg-red-600 text-white py-3.5 px-6 rounded-xl font-bold text-sm hover:bg-red-700 transition-all active:scale-[0.98] shadow-lg shadow-red-100"
+                                className="w-full flex items-center justify-center gap-3 bg-red-600 text-white py-4 px-8 rounded-2xl font-black text-sm hover:bg-red-700 transition-all active:scale-[0.97] shadow-xl shadow-red-200"
                             >
-                                <LogOut size={18} />
+                                <LogOut size={20} />
                                 Back to Login
                             </button>
                         </div>
