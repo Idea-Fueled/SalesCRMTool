@@ -6,6 +6,7 @@ import { getDeals } from "../../API/services/dealService";
 import UserModal from "../../components/modals/UserModal";
 import UserDetailsModal from "../../components/modals/UserDetailsModal";
 import DeactivateModal from "../../components/modals/DeactivateModal";
+import ReassignModal from "../../components/modals/ReassignModal";
 import { useAuth } from "../../context/AuthContext";
 import ConfirmDialog from "../../components/modals/ConfirmDialog";
 import UserCard from "../../components/cards/UserCard";
@@ -52,7 +53,7 @@ export default function ManagerTeam() {
     const [userDeals, setUserDeals] = useState([]);
     const [viewMode, setViewMode] = useState("list"); // "list" | "card"
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-    const [allDeals, setAllDeals] = useState([]);
+    const [isReassignModalOpen, setIsReassignModalOpen] = useState(false);
     const [confirmState, setConfirmState] = useState({ isOpen: false, title: "", message: "", confirmLabel: "", confirmColor: "", onConfirm: null });
     const openConfirm = (opts) => setConfirmState({ isOpen: true, ...opts });
     const closeConfirm = () => setConfirmState(s => ({ ...s, isOpen: false }));
@@ -302,18 +303,18 @@ export default function ManagerTeam() {
                         ) : filtered.length === 0 ? (
                             <div className="col-span-full text-center py-10 text-gray-400">No members found.</div>
                         ) : (
-                            filtered.map(m => (
-                                <UserCard
-                                    key={m._id}
-                                    user={m}
-                                    onView={handleViewDetails}
-                                    onEdit={() => { /* Edit not directly supported in manager team view yet */ }}
-                                    onDeactivate={(u) => { setSelectedMember(u); setIsDeactivateModalOpen(true); }}
-                                    onActivate={handleActivate}
-                                    onReassign={(u) => { /* Reassign not directly supported in manager team view yet */ }}
-                                    onDelete={() => { /* Delete not supported for managers */ }}
-                                />
-                            ))
+                                    filtered.map(m => (
+                                        <UserCard
+                                            key={m._id}
+                                            user={m}
+                                            onView={handleViewDetails}
+                                            onEdit={null}
+                                            onDeactivate={(u) => { setSelectedMember(u); setIsDeactivateModalOpen(true); }}
+                                            onActivate={handleActivate}
+                                            onReassign={(u) => { setSelectedMember(u); setIsReassignModalOpen(true); }}
+                                            onDelete={null}
+                                        />
+                                    ))
                         )}
                     </div>
                 )}
@@ -340,6 +341,13 @@ export default function ManagerTeam() {
                 user={selectedMember}
                 stats={userStats}
                 recentDeals={userDeals}
+            />
+            <ReassignModal
+                isOpen={isReassignModalOpen}
+                onClose={() => setIsReassignModalOpen(false)}
+                fromUser={selectedMember}
+                activeUsers={members}
+                onSaved={fetchTeam}
             />
             <ConfirmDialog
                 isOpen={confirmState.isOpen}

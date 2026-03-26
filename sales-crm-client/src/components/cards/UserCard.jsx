@@ -104,14 +104,16 @@ const UserCard = ({ user, onEdit, onDeactivate, onActivate, onReassign, onDelete
 
             <div className="px-5 py-3 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
                 <div className="flex items-center gap-1">
-                    <button
-                        onClick={(e) => { e.stopPropagation(); onEdit(user); }}
-                        className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
-                        title="Edit user"
-                    >
-                        <Edit2 size={16} />
-                    </button>
-                    {user.role !== "admin" && (
+                    {onEdit && (
+                        <button
+                            onClick={(e) => { e.stopPropagation(); onEdit(user); }}
+                            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                            title="Edit user"
+                        >
+                            <Edit2 size={16} />
+                        </button>
+                    )}
+                    {user.role !== "admin" && onReassign && (
                         <button
                             onClick={(e) => { e.stopPropagation(); onReassign(user); }}
                             className="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition"
@@ -120,7 +122,7 @@ const UserCard = ({ user, onEdit, onDeactivate, onActivate, onReassign, onDelete
                             <FolderSync size={16} />
                         </button>
                     )}
-                    {user.role !== "admin" && (
+                    {user.role !== "admin" && onDelete && (
                         <button
                             onClick={(e) => { e.stopPropagation(); onDelete(user); }}
                             className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"

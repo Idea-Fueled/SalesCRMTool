@@ -6,6 +6,7 @@ import { getTeamUsers, deactivateUser, activateUser, bulkReassignRecords, softDe
 import UserModal from "../../components/modals/UserModal";
 import UserDetailsModal from "../../components/modals/UserDetailsModal";
 import DeactivateModal from "../../components/modals/DeactivateModal";
+import ReassignModal from "../../components/modals/ReassignModal";
 import ConfirmDialog from "../../components/modals/ConfirmDialog";
 import { toast } from "react-hot-toast";
 
@@ -46,92 +47,7 @@ const roleBadge = {
     sales_rep: "bg-red-50 text-red-600 border border-red-100",
 };
 const formatRole = (r) => ({ admin: "Admin", sales_manager: "Sales Manager", sales_rep: "Sales Representative" }[r] || r?.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '));
-const ModalOverlay = ({ children, onClose }) => (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center px-4"
-        style={{ background: "rgba(15,15,25,0.5)", backdropFilter: "blur(4px)" }}
-        onClick={onClose}>
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md" onClick={e => e.stopPropagation()}>
-            {children}
-        </div>
-    </div>
-);
-const ModalHeader = ({ title, onClose }) => (
-    <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100">
-        <h2 className="text-lg font-bold text-gray-800">{title}</h2>
-        <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition">
-            <X size={18} />
-        </button>
-    </div>
-);
-const Field = ({ label, children }) => (
-    <div>
-        <label className="block text-xs font-semibold text-gray-600 mb-1">{label}</label>
-        {children}
-    </div>
-);
-const baseInput = "w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 bg-white transition";
-const inputClass = (err) => err
-    ? `${baseInput} border-red-400 focus:ring-red-200 bg-red-50`
-    : `${baseInput} border-gray-200 focus:ring-red-400`;
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-
-
-// ─── Reassign Modal ────────────────────────────────────────────
-function ReassignModal({ isOpen, onClose, fromUser, activeUsers, onSaved }) {
-    const [newOwnerId, setNewOwnerId] = useState("");
-    const [saving, setSaving] = useState(false);
-
-    useEffect(() => { if (isOpen) setNewOwnerId(""); }, [isOpen]);
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!newOwnerId) { toast.error("Please select a new owner"); return; }
-        setSaving(true);
-        try {
-            await bulkReassignRecords(fromUser._id, newOwnerId);
-            toast.success("All records reassigned successfully");
-            onSaved();
-            onClose();
-        } catch (err) {
-            toast.error(err.response?.data?.message || "Failed to reassign records");
-        } finally {
-            setSaving(false);
-        }
-    };
-
-    if (!isOpen || !fromUser) return null;
-    const opts = activeUsers.filter(u => u._id !== fromUser._id && u.isActive);
-
-    return (
-        <ModalOverlay onClose={onClose}>
-            <ModalHeader title="Bulk Reassign Records" onClose={onClose} />
-            <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
-                <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
-                    <p className="font-semibold mb-1">⚠️ Reassigning all records</p>
-                    <p>This will transfer <span className="font-bold">all companies, contacts & deals</span> owned by <span className="font-bold">{fromUser.firstName} {fromUser.lastName}</span> to the selected user.</p>
-                </div>
-                <Field label="Assign all records to *">
-                    <select value={newOwnerId} onChange={e => setNewOwnerId(e.target.value)} className={`${inputClass} w-full border rounded-full border-slate-200 px-4 py-2 text-center`} required>
-                        <option value="">— Select a user —</option>
-                        {opts.map(u => (
-                            <option key={u._id} value={u._id}>{u.firstName} {u.lastName} ({formatRole(u.role)})</option>
-                        ))}
-                    </select>
-                </Field>
-                <div className="flex gap-3 pt-2">
-                    <button type="button" onClick={onClose} className="flex-1 px-4 py-2 border border-gray-200 text-sm font-semibold rounded-lg text-gray-600 hover:bg-gray-50">
-                        Cancel
-                    </button>
-                    <button type="submit" disabled={saving}
-                        className="flex-1 px-4 py-2 bg-amber-600 text-white text-sm font-semibold rounded-lg hover:bg-amber-700 disabled:opacity-60 transition">
-                        {saving ? "Reassigning..." : "Reassign All Records"}
-                    </button>
-                </div>
-            </form>
-        </ModalOverlay>
-    );
-}
 
 
 // ─── Main Dashboard ────────────────────────────────────────────
