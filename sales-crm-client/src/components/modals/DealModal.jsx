@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Paperclip, X } from "lucide-react";
+import { validateFiles, ALLOWED_EXTENSIONS_STRING } from "../../utils/fileUtils";
 import Modal from "./Modal";
 
 const STAGES = ["Lead", "Qualified", "Proposal", "Negotiation", "Closed Won", "Closed Lost"];
@@ -375,10 +376,12 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
                             <input
                                 type="file"
                                 multiple
+                                accept={ALLOWED_EXTENSIONS_STRING}
                                 className="hidden"
                                 onChange={(e) => {
                                     const newFiles = Array.from(e.target.files);
-                                    set("files", [...formData.files, ...newFiles]);
+                                    const validFiles = validateFiles(newFiles);
+                                    set("files", [...formData.files, ...validFiles]);
                                     e.target.value = null;
                                 }}
                             />

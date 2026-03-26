@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Paperclip, X, Building2, ChevronDown, Check } from "lucide-react";
+import { validateFiles, ALLOWED_EXTENSIONS_STRING } from "../../utils/fileUtils";
 import Modal from "./Modal";
 
 export default function ContactModal({ isOpen, onClose, contact, onSave, companies = [], userRole, potentialOwners = [] }) {
@@ -297,10 +298,12 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
                             <input
                                 type="file"
                                 multiple
+                                accept={ALLOWED_EXTENSIONS_STRING}
                                 className="hidden"
                                 onChange={(e) => {
                                     const newFiles = Array.from(e.target.files);
-                                    set("files", [...formData.files, ...newFiles]);
+                                    const validFiles = validateFiles(newFiles);
+                                    set("files", [...formData.files, ...validFiles]);
                                     e.target.value = null;
                                 }}
                             />

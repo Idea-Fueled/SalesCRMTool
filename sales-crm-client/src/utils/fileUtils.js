@@ -1,5 +1,36 @@
 import { toast } from "react-hot-toast";
 
+export const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".webp", ".png", ".pdf", ".doc", ".docx"];
+export const ALLOWED_EXTENSIONS_STRING = ALLOWED_EXTENSIONS.join(",");
+
+/**
+ * Validates files based on allowed extensions.
+ * @param {File[]} files - Selected files
+ * @returns {File[]} - Array of valid files
+ */
+export const validateFiles = (files) => {
+    const validFiles = [];
+    const invalidFiles = [];
+
+    files.forEach(file => {
+        const fileName = file.name.toLowerCase();
+        const isValid = ALLOWED_EXTENSIONS.some(ext => fileName.endsWith(ext));
+        
+        if (isValid) {
+            validFiles.push(file);
+        } else {
+            invalidFiles.push(file.name);
+        }
+    });
+
+    if (invalidFiles.length > 0) {
+        toast.error(`Unsupported file(s): ${invalidFiles.join(", ")}. Allowed: ${ALLOWED_EXTENSIONS_STRING}`);
+    }
+
+    return validFiles;
+};
+
+
 /**
  * Downloads a file from a URL by fetching it and creating a blob.
  * This is more reliable than simple clicks for cross-origin resources.

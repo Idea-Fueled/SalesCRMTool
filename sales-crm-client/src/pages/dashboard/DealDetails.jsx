@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { exportToPDF } from "../../utils/pdfExport";
-import { downloadFile, viewFile } from "../../utils/fileUtils";
+import { downloadFile, viewFile, validateFiles, ALLOWED_EXTENSIONS_STRING } from "../../utils/fileUtils";
 import { isDealOverdue } from "../../utils/dateUtils";
 
 const pipelineStages = [
@@ -694,10 +694,12 @@ export default function DealDetails() {
                                                 <input
                                                     type="file"
                                                     multiple
+                                                    accept={ALLOWED_EXTENSIONS_STRING}
                                                     className="hidden"
                                                     onChange={(e) => {
                                                         const files = Array.from(e.target.files);
-                                                        setRemarkFiles(prev => [...prev, ...files]);
+                                                        const validFiles = validateFiles(files);
+                                                        setRemarkFiles(prev => [...prev, ...validFiles]);
                                                         // Reset value so duplicate files can be selected again
                                                         e.target.value = "";
                                                     }}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Paperclip, X } from "lucide-react";
+import { validateFiles, ALLOWED_EXTENSIONS_STRING } from "../../utils/fileUtils";
 import Modal from "./Modal";
 
 const SIZES = ["", "1-10", "11-50", "51-200", "201-500", "500+"];
@@ -190,10 +191,12 @@ export default function CompanyModal({ isOpen, onClose, company, onSave, userRol
                             <input
                                 type="file"
                                 multiple
+                                accept={ALLOWED_EXTENSIONS_STRING}
                                 className="hidden"
                                 onChange={(e) => {
                                     const newFiles = Array.from(e.target.files);
-                                    set("files", [...formData.files, ...newFiles]);
+                                    const validFiles = validateFiles(newFiles);
+                                    set("files", [...formData.files, ...validFiles]);
                                     e.target.value = null;
                                 }}
                             />
