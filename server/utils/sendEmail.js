@@ -1,43 +1,37 @@
-import nodemailer from 'nodemailer';
+import sgMail from '@sendgrid/mail';
 
 /**
- * Send an email using Gmail SMTP (via Nodemailer)
+ * Send an email using SendGrid API
  */
 export const sendEmail = async (to, subject, html) => {
     try {
-        console.log(`[sendEmail] Attempting to send email to: ${to} (via Gmail SMTP)`);
+        console.log(`[sendEmail] Attempting to send email to: ${to} (via SendGrid API)`);
 
-        const user = process.env.EMAIL_USER;
-        const pass = process.env.EMAIL_PASS;
+        const apiKey = process.env.SENDGRID_API_KEY;
+        const senderEmail = process.env.SENDGRID_SENDER_EMAIL;
 
-        if (!user || !pass) {
+        if (!apiKey || !senderEmail) {
             const missing = [];
-            if (!user) missing.push("EMAIL_USER");
-            if (!pass) missing.push("EMAIL_PASS");
+            if (!apiKey) missing.push("SENDGRID_API_KEY");
+            if (!senderEmail) missing.push("SENDGRID_SENDER_EMAIL");
             console.error(`[sendEmail] MISSING environment variables: ${missing.join(", ")}`);
             throw new Error(`Email configuration is incomplete. Missing: ${missing.join(", ")}`);
         }
 
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: user,
-                pass: pass
-            }
-        });
-
-        const mailOptions = {
-            from: user,
+        sgMail.setApiKey(apiKey.trim());
+        
+        const msg = {
             to,
+            from: senderEmail, // Must be verified in SendGrid
             subject,
             html,
         };
 
-        const info = await transporter.sendMail(mailOptions);
-        console.log("✅ Email sent successfully via Gmail SMTP. MsgID: %s", info.messageId);
-        return info;
+        const response = await sgMail.send(msg);
+        console.log("✅ Email sent successfully via SendGrid. MsgID: %s", response[0]?.headers?.['x-message-id'] || "Success");
+        return response;
     } catch (error) {
-        console.error("❌ Gmail SMTP Error:", error.message);
+        console.error("❌ SendGrid Error Details:", error.response?.body || error.message);
         throw new Error(`Failed to send email: ${error.message}`);
     }
 }
