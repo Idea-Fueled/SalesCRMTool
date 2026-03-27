@@ -19,6 +19,8 @@ export const sendEmail = async (to, subject, html) => {
         }
 
         sgMail.setApiKey(apiKey.trim());
+        
+        console.log(`[sendEmail] Final check - FROM: ${senderEmail}, TO: ${to}, SUBJECT: ${subject}`);
 
         const msg = {
             to,
@@ -28,10 +30,10 @@ export const sendEmail = async (to, subject, html) => {
         };
 
         const response = await sgMail.send(msg);
-        console.log("✅ Email sent successfully via SendGrid: %s", response[0]?.headers?.['x-message-id'] || "Success");
+        console.log("✅ Email sent successfully via SendGrid. MsgID: %s", response[0]?.headers?.['x-message-id'] || "Success");
         return response;
     } catch (error) {
         console.error("❌ SendGrid Error Details:", error.response?.body || error.message);
         throw new Error(`Failed to send email: ${error.message}`);
     }
-}
+}

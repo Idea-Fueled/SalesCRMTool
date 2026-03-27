@@ -946,7 +946,12 @@ export const logoutUser = (req, res) => {
 
 export const forgotPassword = async (req, res, next) => {
     try {
-        const { email } = req.body;
+        let { email } = req.body;
+        if (!email) return res.status(400).json({ message: "Email is required!" });
+        
+        email = email.trim().toLowerCase();
+        console.log(`[forgotPassword] Request for: ${email}`);
+
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(404).json({
@@ -1222,10 +1227,10 @@ export const resendVerificationByEmail = async (req, res) => {
         // Background the email delivery without 'await'
         sendEmail(user.email, subject, message)
             .then(() => {
-                console.log(`[resendVerificationByEmail] Success: Email sent to ${user.email} (Background)`);
+                console.log(`[resendVerificationByEmail] SUCCESS: Email sent to ${user.email} (Background)`);
             })
             .catch(err => {
-                console.error(`[resendVerificationByEmail] Background Send FAILURE for ${user.email}:`, err.message);
+                console.error(`[resendVerificationByEmail] FAILURE: Background Send for ${user.email}:`, err.message);
             });
 
         return;
