@@ -274,7 +274,7 @@ export default function Reports() {
             if (chartElement) {
                 try {
                     // Small delay to ensure Recharts is fully rendered/stable
-                    await new Promise(resolve => setTimeout(resolve, 500));
+                    await new Promise(resolve => setTimeout(resolve, 1500));
                     const chartPng = await toPng(chartElement, { 
                         backgroundColor: '#ffffff',
                         pixelRatio: 2,
@@ -595,6 +595,7 @@ export default function Reports() {
                                             outerRadius={80}
                                             paddingAngle={5}
                                             dataKey="value"
+                                            isAnimationActive={false}
                                         >
                                             {getChartData().map((entry, index) => (
                                                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
