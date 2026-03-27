@@ -251,10 +251,9 @@ export default function DealDetails() {
     const getInitials = (name) => {
         if (!name) return "D";
         const parts = name.trim().split(/\s+/);
-        if (parts.length >= 2) {
-            return (parts[0][0] + parts[1][0]).toUpperCase();
-        }
-        return parts[0].slice(0, 2).toUpperCase();
+        const firstName = parts[0] || "";
+        const lastName = parts.length > 1 ? parts[parts.length - 1] : "";
+        return `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
     };
 
     if (loading) {
