@@ -992,13 +992,19 @@ export const forgotPassword = async (req, res, next) => {
 
         console.log("Constructed Reset URL:", resetUrl);
 
-        try {
-            await sendEmail(user.email, "Password Reset Request", message);
-            res.status(200).json({ message: "Reset link sent to your email!" });
-        } catch (err) {
-            console.error("❌ Email Delivery Error (Forgot Password):", err);
-            return res.status(500).json({ message: "Error sending reset link. Please try again later." });
-        }
+        // Respond immediately so the UI never gets stuck
+        res.status(200).json({ message: "Reset link sent to your email!" });
+
+        // Fire-and-forget: send email in the background
+        sendEmail(user.email, "Password Reset Request", message)
+            .then(() => {
+                console.log(`[forgotPassword] ✅ Email sent to ${user.email}`);
+            })
+            .catch(err => {
+                console.error(`[forgotPassword] ❌ Background email failed for ${user.email}:`, err.message);
+            });
+
+        return;
     } catch (error) {
         return res.status(500).json({
             message: error.message || "Server error!"
