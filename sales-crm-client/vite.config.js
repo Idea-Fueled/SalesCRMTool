@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://sales-crm-backend-r0z9.onrender.com",
+        target: "http://localhost:8000",
         changeOrigin: true,
       }
     }
