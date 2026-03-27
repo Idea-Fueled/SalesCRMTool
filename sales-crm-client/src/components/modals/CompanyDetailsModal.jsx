@@ -3,7 +3,7 @@ import Modal from "./Modal";
 import {
     Building2, Globe, Phone, MapPin,
     Calendar, Clock, Users, Briefcase,
-    TrendingUp, FileText, Share2
+    TrendingUp, FileText
 } from "lucide-react";
 
 export default function CompanyDetailsModal({ isOpen, onClose, company }) {
@@ -74,7 +74,6 @@ export default function CompanyDetailsModal({ isOpen, onClose, company }) {
                                         className="text-sm font-semibold text-blue-600 hover:underline inline-flex items-center gap-1"
                                     >
                                         {company.website || "No website listed"}
-                                        {company.website && <Share2 size={10} />}
                                     </a>
                                     <span className="text-[10px] text-gray-400 italic">Official Website</span>
                                 </div>
