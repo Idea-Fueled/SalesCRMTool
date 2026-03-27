@@ -105,19 +105,19 @@ export default function UserDetailsModal({ isOpen, onClose, user, title }) {
                                 Performance Statistics
                             </h4>
                             <div className="grid grid-cols-2 gap-y-4 gap-x-2">
-                                <div className="space-y-0.5 transform transition-all hover:translate-x-1">
+                                <div className="space-y-0.5">
                                     <p className="text-sm font-bold text-gray-900 leading-none">{stats?.deals || 0}</p>
                                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Total Deals</p>
                                 </div>
-                                <div className="space-y-0.5 border-l border-gray-200 pl-4 transform transition-all hover:translate-x-1">
+                                <div className="space-y-0.5 border-l border-gray-200 pl-4">
                                     <p className="text-sm font-bold text-green-600 leading-none">{stats?.won || 0}</p>
                                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Closed Won</p>
                                 </div>
-                                <div className="space-y-0.5 transform transition-all hover:translate-x-1">
+                                <div className="space-y-0.5">
                                     <p className="text-sm font-bold text-red-500 leading-none">{stats?.lost || 0}</p>
                                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Closed Lost</p>
                                 </div>
-                                <div className="space-y-0.5 border-l border-gray-200 pl-4 transform transition-all hover:translate-x-1">
+                                <div className="space-y-0.5 border-l border-gray-200 pl-4">
                                     <p className="text-sm font-bold text-red-600 leading-none">{stats?.pipeline || "$0"}</p>
                                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Pipeline Value</p>
                                 </div>
