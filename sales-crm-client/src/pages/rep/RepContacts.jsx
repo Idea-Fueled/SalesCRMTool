@@ -218,10 +218,11 @@ export default function RepContacts() {
                                             <td className="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">{c.phone || c.mobile || "—"}</td>
                                             <td className="px-4 py-3 whitespace-nowrap">
                                                 {c.linkedin ? (
-                                                    <span className="text-xs text-blue-600 hover:underline flex items-center gap-1 cursor-pointer"
-                                                        onClick={() => navigate(`/rep/contacts/${c._id}`)}>
-                                                        <Eye size={12} /> View Details
-                                                    </span>
+                                                    <a href={c.linkedin.startsWith("http") ? c.linkedin : `https://${c.linkedin}`}
+                                                        target="_blank" rel="noopener noreferrer"
+                                                        className="text-xs text-blue-600 hover:underline flex items-center gap-1">
+                                                        <Linkedin size={13} /><ExternalLink size={11} />
+                                                    </a>
                                                 ) : (
                                                     <span className="text-xs text-gray-400">—</span>
                                                 )}
