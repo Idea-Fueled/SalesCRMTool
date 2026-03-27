@@ -19,7 +19,7 @@ const Avatar = ({ name, profilePicture }) => {
     if (!name) return null;
     const parts = name.trim().split(" ");
     const firstName = parts[0];
-    const lastName = parts[parts.length - 1];
+    const lastName = parts.length > 1 ? parts[parts.length - 1] : "";
     const initials = `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
     
     if (profilePicture) {

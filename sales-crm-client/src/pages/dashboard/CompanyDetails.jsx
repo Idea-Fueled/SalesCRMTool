@@ -239,8 +239,8 @@ export default function CompanyDetails() {
         if (!name) return "C";
         const parts = name.trim().split(/\s+/);
         const firstName = parts[0] || "";
-        const lastName = parts[parts.length - 1] || "";
-        return `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
+        const lastName = parts.length > 1 ? parts[parts.length - 1] : "";
+        const initials = `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
     };
 
     if (loading) {
