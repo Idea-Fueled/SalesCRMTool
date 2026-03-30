@@ -418,19 +418,19 @@ export default function AdminDashboard() {
                     </div>
                     <div className="flex-1 overflow-y-auto pr-2 space-y-4">
                         {topDeals.map((deal, index) => (
-                            <div key={deal._id || index} className="flex items-center justify-between group cursor-pointer hover:bg-gray-50 p-3 -mx-2 rounded-xl transition-colors gap-3" onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: [deal] })}>
-                                <div className="flex items-center gap-3 min-w-0 flex-1">
-                                    <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center font-bold text-gray-400 shadow-sm border border-gray-100 group-hover:bg-red-50 group-hover:text-red-500 group-hover:border-red-100 transition-colors flex-shrink-0">
+                            <div key={deal._id || index} className="flex items-start justify-between group cursor-pointer hover:bg-gray-50 p-3 -mx-2 rounded-xl transition-colors gap-3" onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: [deal] })}>
+                                <div className="flex items-center gap-4 min-w-[120px] flex-1">
+                                    <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center font-bold text-lg text-gray-400 shadow-sm border border-gray-100 group-hover:bg-red-50 group-hover:text-red-500 group-hover:border-red-100 transition-colors flex-shrink-0">
                                         {index + 1}
                                     </div>
-                                    <div className="min-w-0 flex-1 py-1">
-                                        <p className="text-[11px] font-bold text-gray-900 transition-colors uppercase tracking-wide whitespace-normal leading-tight break-words">
+                                    <div className="min-w-0 flex-1">
+                                        <p className="text-sm font-black text-gray-900 transition-colors uppercase tracking-tight whitespace-normal leading-[1.1] mb-1">
                                             {getDealDisplayName(deal)}
                                         </p>
-                                        <p className="text-[10px] text-gray-500 mt-1 whitespace-normal break-words">{deal.companyName || deal.companyId?.name || "Unknown Company"}</p>
+                                        <p className="text-[11px] font-medium text-gray-500 whitespace-normal line-clamp-1">{deal.companyName || deal.companyId?.name || "Unknown Company"}</p>
                                     </div>
                                 </div>
-                                <div className="text-sm font-black text-gray-900 whitespace-nowrap pl-2 border-l border-gray-50 flex-shrink-0">
+                                <div className="text-lg font-black text-gray-900 whitespace-nowrap pl-4 border-l border-gray-100 flex-shrink-0 flex items-center h-12">
                                     ${(deal.value || 0).toLocaleString()}
                                 </div>
                             </div>
