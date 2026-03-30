@@ -11,6 +11,8 @@ import dealRoutes from "./routes/dealRoutes.js"
 import auditLogRoutes from "./routes/auditLogRoutes.js"
 import notificationRoutes from "./routes/notificationRoutes.js"
 import fileRoutes from "./routes/fileRoutes.js"
+import rankRoutes from "./routes/rankRoutes.js"
+import chatbotRoutes from "./routes/chatbotRoutes.js"
 // console.log("MONGO_URI:", process.env.MONGO_URI);
 
 import http from "http";
@@ -72,6 +74,8 @@ app.use("/api/deals", dealRoutes);
 app.use("/api/activity-history", auditLogRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/files", fileRoutes);
+app.use("/api/rank", rankRoutes);
+app.use("/api/chatbot", chatbotRoutes);
 
 // Catch-all route for debugging 404s
 app.use((req, res) => {
