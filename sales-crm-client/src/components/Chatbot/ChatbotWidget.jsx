@@ -86,20 +86,20 @@ export default function ChatbotWidget() {
             {!isOpen && (
                 <button
                     onClick={() => setIsOpen(true)}
-                    className="fixed bottom-6 right-6 z-50 w-16 h-16 bg-gradient-to-br from-red-500 to-red-700 text-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(220,38,38,0.5)] flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 group border border-white/20"
+                    className="fixed sm:bottom-6 sm:right-6 bottom-4 right-4 z-50 w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-red-500 to-red-700 text-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(220,38,38,0.5)] flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 group border border-white/20"
                     title="AI Sales Assistant"
                 >
                     <div className="relative">
-                        <Bot size={28} className="group-hover:rotate-12 transition-transform" />
-                        <Sparkles size={12} className="absolute -top-2 -right-2 text-red-100 animate-pulse" />
+                        <Bot size={24} className="sm:size-28 group-hover:rotate-12 transition-transform" />
+                        <Sparkles size={10} className="sm:size-12 absolute -top-2 -right-2 text-red-100 animate-pulse" />
                     </div>
-                    <span className="absolute top-2 right-2 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
+                    <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white" />
                 </button>
             )}
 
             {/* Chat Panel */}
             {isOpen && (
-                <div className={`fixed bottom-6 right-6 z-50 w-[400px] ${isMinimized ? 'h-16' : 'h-[600px] max-h-[calc(100vh-100px)]'} bg-white/95 backdrop-blur-xl rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] border border-white/20 flex flex-col overflow-hidden transition-all duration-500 ease-out animate-in fade-in zoom-in-95 slide-in-from-bottom-10`}>
+                <div className={`fixed sm:bottom-6 sm:right-6 bottom-4 right-4 z-50 sm:w-[400px] w-[calc(100vw-32px)] ${isMinimized ? 'h-16' : 'sm:h-[600px] h-[550px] max-h-[calc(100vh-100px)]'} bg-white/95 backdrop-blur-xl rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] border border-white/20 flex flex-col overflow-hidden transition-all duration-500 ease-out animate-in fade-in zoom-in-95 slide-in-from-bottom-10`}>
                     
                     {/* Header */}
                     <div 
