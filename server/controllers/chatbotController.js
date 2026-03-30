@@ -218,39 +218,7 @@ export const handleChat = async (req, res) => {
                 return res.json({ reply: summarizeCompany(co), type: "detail", total: 1 });
             }
 
-            // Search users/owners by name — show their deals summary
-            const matchedUsers = await User.find({
-                $or: [
-                    { firstName: { $regex: nameLower, $options: "i" } },
-                    { lastName: { $regex: nameLower, $options: "i" } }
-                ]
-            }).select("_id firstName lastName email role").lean();
-
-            if (matchedUsers.length > 0) {
-                const u = matchedUsers[0];
-                const userDeals = await Deal.find({ ownerId: u._id, isDeleted: false })
-                    .populate("companyId", "name").lean();
-                const userContacts = await Contact.find({ ownerId: u._id, isDeleted: false }).lean();
-                const userCompanies = await Company.find({ ownerId: u._id, isDeleted: false }).lean();
-
-                const totalValue = userDeals.reduce((sum, d) => sum + (d.value || 0), 0);
-                const wonDeals = userDeals.filter(d => d.stage === "Closed Won").length;
-                const lostDeals = userDeals.filter(d => d.stage === "Closed Lost").length;
-                const activeDeals = userDeals.filter(d => !["Closed Won", "Closed Lost"].includes(d.stage)).length;
-
-                const lines = [
-                    `👤 **${u.firstName} ${u.lastName}**`,
-                    `• **Email:** ${u.email}`,
-                    `• **Role:** ${u.role === "admin" ? "Admin" : u.role === "sales_manager" ? "Sales Manager" : "Sales Rep"}`,
-                    `• **Total Deals:** ${userDeals.length} (Active: ${activeDeals}, Won: ${wonDeals}, Lost: ${lostDeals})`,
-                    `• **Pipeline Value:** $${totalValue.toLocaleString()}`,
-                    `• **Contacts:** ${userContacts.length}`,
-                    `• **Companies:** ${userCompanies.length}`
-                ];
-                return res.json({ reply: lines.join("\n"), type: "detail", total: 1 });
-            }
-
-            return res.json({ reply: `No deals, contacts, companies, or users found matching **"${filter.name}"**.`, type: "error" });
+            return res.json({ reply: `I couldn't find any details for "${filter.name}". Please try a more specific name or check the spelling.`, type: "not_found" });
         }
 
         // ── DEALS ─────────────────────────────────────────────
@@ -279,10 +247,14 @@ export const handleChat = async (req, res) => {
 
             ranked.sort((a, b) => b.aiScore - a.aiScore);
 
-            // DETAIL action — summary of the top match
-            if (intent.action === "detail" && ranked.length > 0) {
+            // DETAIL action
+        if (intent.action === "detail") {
+            if (ranked.length > 0) {
                 return res.json({ reply: summarizeDeal(ranked[0]), type: "deal_detail", total: 1 });
+            } else {
+                return res.json({ reply: `I couldn't find any deal named "${filter.name}".`, type: "not_found" });
             }
+        }
 
             if (filter.limit) ranked = ranked.slice(0, filter.limit);
 
@@ -408,9 +380,13 @@ export const handleChat = async (req, res) => {
             ranked.sort((a, b) => b.aiScore - a.aiScore);
 
             // DETAIL action
-            if (intent.action === "detail" && ranked.length > 0) {
+        if (intent.action === "detail") {
+            if (ranked.length > 0) {
                 return res.json({ reply: summarizeContact(ranked[0]), type: "contact_detail", total: 1 });
+            } else {
+                return res.json({ reply: `I couldn't find any contact named "${filter.name}".`, type: "not_found" });
             }
+        }
 
             if (filter.limit) ranked = ranked.slice(0, filter.limit);
 

@@ -40,7 +40,7 @@ export const parseIntent = (message) => {
         action = "aggregate";
     }
     // Detail queries  
-    else if (/\b(detail|details|info|information|about)\b/i.test(input) || /\bgive\b.*\b(detail|info)\b/i.test(input)) {
+    else if (/\b(detail|details|info|information|about)\b/i.test(input) || /\bgive\b.*\b(detail|info)\b/i.test(input) || /^(detail|details|info|about)\s+/i.test(input)) {
         action = "detail";
     }
     // Top queries
@@ -82,8 +82,14 @@ export const parseIntent = (message) => {
 
     // Pattern 4: "detail/details/info of <name>" (without entity keyword)
     if (!name && action === "detail") {
-        const detailOfMatch = input.match(/\b(?:details?|info|about)\s+(?:of\s+)?(.+)/i);
+        const detailOfMatch = input.match(/\b(?:details?|info|about|information)\s+(?:of\s+)?(.+)/i);
         if (detailOfMatch) name = cleanName(detailOfMatch[1]);
+    }
+
+    // Pattern 5: Generic detail search (if line starts with detail/info)
+    if (!name && /^(detail|details|info|about)\s+(.+)$/i.test(input)) {
+        const match = input.match(/^(?:detail|details|info|about)\s+(.+)$/i);
+        if (match) name = cleanName(match[1]);
     }
 
     // Extract limit for "top N" queries

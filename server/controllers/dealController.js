@@ -305,8 +305,9 @@ export const updateDealInformation = async (req, res, next) => {
         }
 
         const oldStage = deal?.stage;
+        const oldOwnerId = deal.ownerId ? deal.ownerId.toString() : null;
 
-        if (req.body.ownerId !== undefined && req.body.ownerId !== deal.ownerId.toString()) {
+        if (req.body.ownerId !== undefined && req.body.ownerId !== oldOwnerId) {
             if (role === "sales_rep") {
                 return res.status(403).json({ message: "Sales representatives cannot reassign deals!" });
             }
@@ -387,10 +388,11 @@ export const updateDealInformation = async (req, res, next) => {
         });
 
         // Sync Company and Contact ownership for reassignment
-        if (req.body.ownerId && req.body.ownerId !== deal.ownerId.toString()) {
+        if (req.body.ownerId && req.body.ownerId !== oldOwnerId) {
             const syncOwnership = async () => {
-                if (deal.companyId) await Company.findByIdAndUpdate(deal.companyId, { ownerId: req.body.ownerId });
-                if (deal.contactId) await Contact.findByIdAndUpdate(deal.contactId, { ownerId: req.body.ownerId });
+                const newOwnerId = req.body.ownerId;
+                if (deal.companyId) await Company.findByIdAndUpdate(deal.companyId, { ownerId: newOwnerId });
+                if (deal.contactId) await Contact.findByIdAndUpdate(deal.contactId, { ownerId: newOwnerId });
             };
             syncOwnership().catch(err => console.error("Ownership sync error on reassignment:", err));
         }

@@ -18,9 +18,9 @@ const PriorityPipeline = ({ title = "Priority Pipeline", limit = 5, basePath = "
                 const res = await getRankedDeals({ limit: 20 });
                 const allDeals = res.data.data || [];
                 
-                // Show high-priority deals (Tier A and B)
+                // Show high-priority deals (Tier Hot and Warm)
                 const priority = allDeals
-                    .filter(d => d.aiTier === "A" || d.aiTier === "B")
+                    .filter(d => d.aiTier === "Hot" || d.aiTier === "Warm")
                     .slice(0, limit);
                 
                 setDeals(priority);
