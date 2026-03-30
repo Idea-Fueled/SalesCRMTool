@@ -86,14 +86,11 @@ export default function ChatbotWidget() {
             {!isOpen && (
                 <button
                     onClick={() => setIsOpen(true)}
-                    className="fixed sm:bottom-6 sm:right-6 bottom-4 right-4 z-50 w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-red-500 to-red-700 text-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(220,38,38,0.5)] flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 group border border-white/20"
+                    className="fixed sm:bottom-6 sm:right-6 bottom-4 right-4 z-50 w-14 h-14 bg-gradient-to-br from-red-500 to-red-700 text-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(220,38,38,0.5)] flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 group border border-white/20"
                     title="AI Sales Assistant"
                 >
-                    <div className="relative">
-                        <Bot size={24} className="sm:size-28 group-hover:rotate-12 transition-transform" />
-                        <Sparkles size={10} className="sm:size-12 absolute -top-2 -right-2 text-red-100 animate-pulse" />
-                    </div>
-                    <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white" />
+                    <Bot size={24} className="group-hover:rotate-12 transition-transform" />
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse" />
                 </button>
             )}
 
