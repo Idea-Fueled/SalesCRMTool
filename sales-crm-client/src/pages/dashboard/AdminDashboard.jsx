@@ -419,7 +419,7 @@ export default function AdminDashboard() {
                     <div className="flex-1 overflow-y-auto pr-2 space-y-4">
                         {topDeals.map((deal, index) => (
                             <div key={deal._id || index} className="flex items-start justify-between group cursor-pointer hover:bg-gray-50 p-3 -mx-2 rounded-xl transition-colors gap-3 overflow-hidden" onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: [deal] })}>
-                                <div className="flex items-center gap-3 min-w-0 flex-1">
+                                <div className="flex items-center gap-5 min-w-0 flex-1">
                                     <div className="w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center font-bold text-sm text-gray-400 shadow-sm border border-gray-100 group-hover:bg-red-50 group-hover:text-red-500 group-hover:border-red-100 transition-colors flex-shrink-0">
                                         {index + 1}
                                     </div>
@@ -430,7 +430,7 @@ export default function AdminDashboard() {
                                         <p className="text-[10px] font-medium text-gray-500 whitespace-normal line-clamp-1">{deal.companyName || deal.companyId?.name || "Unknown Company"}</p>
                                     </div>
                                 </div>
-                                <div className="text-sm font-semibold text-gray-900 whitespace-nowrap pl-3 border-l border-gray-100 flex-shrink-0 flex items-center h-9">
+                                <div className="text-sm font-semibold text-gray-900 whitespace-nowrap pl-6 border-l border-gray-100 flex-shrink-0 flex items-center h-9 ml-2">
                                     ${(deal.value || 0).toLocaleString()}
                                 </div>
                             </div>
