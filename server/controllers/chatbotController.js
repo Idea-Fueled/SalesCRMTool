@@ -1,7 +1,7 @@
 import { Deal } from "../models/dealSchema.js";
 import { Company } from "../models/companySchema.js";
 import { Contact } from "../models/contactSchema.js";
-import { User } from "../models/userSchema.js";
+import User from "../models/userSchema.js";
 import { scoreDeal, scoreCompany, scoreContact } from "../utils/rankingService.js";
 import { parseIntent, getHelpMessage } from "../utils/intentParser.js";
 
