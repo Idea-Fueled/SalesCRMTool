@@ -387,12 +387,42 @@ export const updateDealInformation = async (req, res, next) => {
             req
         });
 
-        // Sync Company and Contact ownership for reassignment
+        // Sync Company and Contact ownership for reassignment (including all associated companies for a contact)
         if (req.body.ownerId && req.body.ownerId !== oldOwnerId) {
             const syncOwnership = async () => {
                 const newOwnerId = req.body.ownerId;
-                if (deal.companyId) await Company.findByIdAndUpdate(deal.companyId, { ownerId: newOwnerId });
-                if (deal.contactId) await Contact.findByIdAndUpdate(deal.contactId, { ownerId: newOwnerId });
+                
+                // 1. Reassign the primary company linked directly to the deal
+                if (deal.companyId) {
+                    await Company.findByIdAndUpdate(deal.companyId, { ownerId: newOwnerId });
+                }
+                
+                // 2. Reassign the contact and ALL their associated companies (Multi-company support)
+                if (deal.contactId) {
+                    const contact = await Contact.findById(deal.contactId);
+                    if (contact) {
+                        // Update contact owner
+                        contact.ownerId = newOwnerId;
+                        await contact.save();
+                        
+                        // Collect all company IDs from the contact (primary + multi-company list)
+                        const companyIds = new Set();
+                        if (contact.companyId) companyIds.add(contact.companyId.toString());
+                        if (contact.companies && contact.companies.length > 0) {
+                            contact.companies.forEach(c => {
+                                if (c.companyId) companyIds.add(c.companyId.toString());
+                            });
+                        }
+                        
+                        // Update all these companies to the new owner
+                        if (companyIds.size > 0) {
+                            await Company.updateMany(
+                                { _id: { $in: Array.from(companyIds) } },
+                                { ownerId: newOwnerId }
+                            );
+                        }
+                    }
+                }
             };
             syncOwnership().catch(err => console.error("Ownership sync error on reassignment:", err));
         }
