@@ -407,9 +407,9 @@ export default function AdminDashboard() {
             </div>
 
             {/* Detailed Widgets Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-6">
                 {/* Top Deals Widget */}
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col min-h-[400px]">
+                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col min-h-[400px] xl:col-span-4">
                     <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center gap-2">
                             <div className="w-1 h-4 bg-red-500 rounded-full"></div>
@@ -440,7 +440,7 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Pipeline Statistics Widget */}
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col min-h-[400px] md:col-span-2 xl:col-span-2">
+                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col min-h-[400px] md:col-span-2 xl:col-span-5">
                     <div className="flex items-center justify-between mb-8">
                         <div className="flex items-center gap-2">
                             <div className="w-1 h-4 bg-orange-500 rounded-full"></div>
@@ -495,7 +495,7 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Deals Overview Widget */}
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col space-y-6">
+                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col space-y-6 xl:col-span-3">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <div className="w-1 h-4 bg-indigo-500 rounded-full"></div>
