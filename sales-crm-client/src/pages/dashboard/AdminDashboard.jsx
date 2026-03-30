@@ -418,17 +418,17 @@ export default function AdminDashboard() {
                     </div>
                     <div className="flex-1 overflow-y-auto pr-2 space-y-4">
                         {topDeals.map((deal, index) => (
-                            <div key={deal._id || index} className="flex items-start group cursor-pointer hover:bg-gray-50 p-3 -mx-2 rounded-xl transition-colors gap-3 overflow-hidden" onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: [deal] })}>
-                                <div className="w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center font-bold text-sm text-gray-400 shadow-sm border border-gray-100 group-hover:bg-red-50 group-hover:text-red-500 group-hover:border-red-100 transition-colors flex-shrink-0">
+                            <div key={deal._id || index} className="flex items-center group cursor-pointer hover:bg-gray-50 p-2.5 -mx-2 rounded-xl transition-colors gap-2.5 min-w-0" onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: [deal] })}>
+                                <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center font-bold text-xs text-gray-400 shadow-sm border border-gray-100 group-hover:bg-red-50 group-hover:text-red-500 group-hover:border-red-100 transition-colors flex-shrink-0">
                                     {index + 1}
                                 </div>
-                                <div className="flex-1 min-w-[100px] px-1">
-                                    <p className="text-xs font-semibold text-gray-900 transition-colors uppercase tracking-tight whitespace-normal leading-tight mb-0.5">
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-[11px] font-semibold text-gray-900 transition-colors uppercase tracking-tight whitespace-normal leading-tight mb-0.5">
                                         {getDealDisplayName(deal)}
                                     </p>
-                                    <p className="text-[10px] font-medium text-gray-500 whitespace-normal line-clamp-1">{deal.companyName || deal.companyId?.name || "Unknown Company"}</p>
+                                    <p className="text-[9px] font-medium text-gray-500 whitespace-nowrap overflow-hidden transition-all group-hover:whitespace-normal">{deal.companyName || deal.companyId?.name || "Unknown Company"}</p>
                                 </div>
-                                <div className="text-sm font-semibold text-gray-900 whitespace-nowrap pl-4 border-l border-gray-100 flex items-center h-9 justify-end flex-shrink-0">
+                                <div className="text-xs font-semibold text-gray-900 whitespace-nowrap pl-2.5 border-l border-gray-100 flex-shrink-0 text-right">
                                     ${(deal.value || 0).toLocaleString()}
                                 </div>
                             </div>
