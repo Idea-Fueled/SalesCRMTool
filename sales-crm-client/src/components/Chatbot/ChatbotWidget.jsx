@@ -103,7 +103,7 @@ export default function ChatbotWidget() {
                     
                     {/* Header */}
                     <div 
-                        className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 px-6 py-4 flex items-center justify-between flex-shrink-0 cursor-pointer shadow-lg shadow-red-900/10"
+                        className="bg-red-600 px-6 py-4 flex items-center justify-between flex-shrink-0 cursor-pointer shadow-lg shadow-red-900/10"
                         onClick={() => setIsMinimized(!isMinimized)}
                     >
                         <div className="flex items-center gap-3">
@@ -112,10 +112,6 @@ export default function ChatbotWidget() {
                             </div>
                             <div>
                                 <h3 className="text-white font-bold text-sm tracking-tight">AI Sales Assistant</h3>
-                                <div className="flex items-center gap-1.5">
-                                    <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.5)]"></span>
-                                    <p className="text-red-100 text-[10px] font-semibold uppercase tracking-wider opacity-80">Rank AI Engine Active</p>
-                                </div>
                             </div>
                         </div>
                         <div className="flex items-center gap-1">
