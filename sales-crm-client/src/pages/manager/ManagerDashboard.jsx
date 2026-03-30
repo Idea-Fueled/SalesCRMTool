@@ -11,7 +11,6 @@ import DashboardDetailModal from "../../components/modals/DashboardDetailModal";
 import { toast } from "react-hot-toast";
 import { Eye } from "lucide-react";
 import useDashboardRefresh from "../../hooks/useDashboardRefresh";
-import PriorityPipeline from "../../components/PriorityPipeline";
 
 const Select = ({ options, value, onChange }) => (
     <div className="relative">
@@ -150,9 +149,6 @@ export default function ManagerDashboard() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
-                <div className="lg:col-span-4">
-                    <PriorityPipeline basePath="/manager" />
-                </div>
                 <Card className="lg:col-span-8 flex flex-col">
                     <CardHeader title="TEAM SALES REPRESENTATIVE PERFORMANCE">
                         <Select options={periodOptions} value={period} onChange={setPeriod} />
