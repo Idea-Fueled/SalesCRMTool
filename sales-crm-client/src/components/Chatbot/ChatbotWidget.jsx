@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { MessageSquare, X, Send, Sparkles, Bot, Zap } from "lucide-react";
 import { sendChatMessage } from "../../API/services/chatbotService";
 import ChatMessage from "./ChatMessage";
+import { useAuth } from "../../context/AuthContext";
 
 const QUICK_ACTIONS = [
     { label: "🔥 Hot Deals", query: "show hot deals" },
@@ -11,6 +12,7 @@ const QUICK_ACTIONS = [
 ];
 
 export default function ChatbotWidget() {
+    const { user } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([
         {
@@ -74,6 +76,9 @@ export default function ChatbotWidget() {
             handleSend();
         }
     };
+
+    // Don't show on login/welcome screen
+    if (!user) return null;
 
     return (
         <>

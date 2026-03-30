@@ -19,19 +19,23 @@ export default function ChatMessage({ message }) {
         );
     }
 
+    // Check if this is a detail/summary response (bullet-point text)
+    const isDetail = type?.includes("detail");
+
     // Bot message
     return (
         <div className="flex justify-start mb-3">
             <div className="max-w-[90%] space-y-2">
                 {/* Text reply */}
                 {text && (
-                    <div className="bg-white border border-gray-100 px-4 py-2.5 rounded-2xl rounded-bl-md text-sm text-gray-700 shadow-sm leading-relaxed"
+                    <div
+                        className={`bg-white border border-gray-100 px-4 py-2.5 rounded-2xl rounded-bl-md shadow-sm leading-relaxed ${isDetail ? "text-xs" : "text-sm"} text-gray-700`}
                         dangerouslySetInnerHTML={{ __html: formatMarkdown(text) }}
                     />
                 )}
 
-                {/* Data cards */}
-                {data && data.length > 0 && (
+                {/* Data cards (only for list responses) */}
+                {data && data.length > 0 && !isDetail && (
                     <div className="space-y-1.5 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
                         {data.map((item, i) => (
                             <DataCard key={i} item={item} type={type} />
@@ -43,9 +47,12 @@ export default function ChatMessage({ message }) {
     );
 }
 
-/** Simple markdown → HTML (bold only) */
+/** Simple markdown → HTML (bold, newlines, bullet points) */
 function formatMarkdown(text) {
-    return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    return text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br/>')
+        .replace(/• /g, '<span class="inline-block w-1.5 h-1.5 bg-red-400 rounded-full mr-1.5 relative top-[-1px]"></span>');
 }
 
 /** Renders a compact card for a deal/company/contact */

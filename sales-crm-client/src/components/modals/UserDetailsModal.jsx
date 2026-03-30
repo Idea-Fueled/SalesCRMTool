@@ -20,7 +20,13 @@ export default function UserDetailsModal({ isOpen, onClose, user, title }) {
             try {
                 // Fetch all deals for this specific user
                 const res = await getDeals({ owner: user._id, limit: 1000 });
-                const deals = res.data.data || [];
+                const allDeals = res.data.data || [];
+                
+                // Filter to only this user's deals (backend may return team deals for managers/admins)
+                const deals = allDeals.filter(d => {
+                    const dealOwnerId = d.ownerId?._id || d.ownerId;
+                    return dealOwnerId === user._id || dealOwnerId?.toString() === user._id?.toString();
+                });
                 
                 const wonDeals = deals.filter(d => d.stage === "Closed Won");
                 const lostDeals = deals.filter(d => d.stage === "Closed Lost");
@@ -35,7 +41,7 @@ export default function UserDetailsModal({ isOpen, onClose, user, title }) {
                     pipeline: `$${pipelineValue >= 1000 ? (pipelineValue / 1000).toFixed(1) + 'K' : pipelineValue}`
                 });
                 
-                // Get the 3 most recent deals
+                // Get the 3 most recent deals for this user only
                 const sortedRecent = [...deals].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
                 setRecentDeals(sortedRecent);
                 

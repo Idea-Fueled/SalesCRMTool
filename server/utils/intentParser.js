@@ -35,12 +35,12 @@ export const parseIntent = (message) => {
     if (/\b(how many|count|total number)\b/i.test(input)) {
         action = "count";
     }
-    // Aggregate queries
-    else if (/\b(total value|total worth|sum|pipeline value)\b/i.test(input)) {
+    // Aggregate queries — allows "total deal value", "total value", "sum", etc.
+    else if (/\btotal\s+(\w+\s+)?value\b/i.test(input) || /\b(total worth|sum of|pipeline value)\b/i.test(input)) {
         action = "aggregate";
     }
     // Detail queries  
-    else if (/\b(detail|details|info|information|about)\b/i.test(input)) {
+    else if (/\b(detail|details|info|information|about)\b/i.test(input) || /\bgive\b.*\b(detail|info)\b/i.test(input)) {
         action = "detail";
     }
     // Top queries
@@ -48,31 +48,42 @@ export const parseIntent = (message) => {
         action = "list";
     }
 
-    // Extract name — look for patterns like:
-    // "deals of Anirudh", "contact Anirudh details", "show Anirudh deals"
+    // ── Extract name ────────────────────────────────────────
+    // Handles: "deals of Anirudh", "detail of Idea Fueled deal",
+    //          "contact Sandeep Kumar details", "deal Enterprise License info"
     let name = null;
-    
-    // Pattern: "of <name>", "for <name>", "by <name>"
-    const ofMatch = input.match(/\b(?:of|for|by|from)\s+([a-z]+(?:\s+[a-z]+)?)/i);
-    if (ofMatch) {
-        const candidate = ofMatch[1].trim();
-        // Don't treat common words as names
-        const stopWords = ["the", "all", "my", "hot", "warm", "cold", "deals", "contacts", "companies", "deal", "contact", "company"];
-        if (!stopWords.includes(candidate)) {
-            name = candidate;
-        }
+    const stopWords = ["the", "all", "my", "hot", "warm", "cold", "deals", "contacts", "companies",
+        "deal", "contact", "company", "show", "get", "list", "give", "me", "detail", "details",
+        "info", "information", "about", "top", "ranked", "of", "for", "by", "from", "sum",
+        "total", "value", "how", "many", "count"];
+
+    const cleanName = (raw) => {
+        if (!raw) return null;
+        // Remove stop words from the edges and entity keywords
+        const words = raw.trim().split(/\s+/).filter(w => !stopWords.includes(w.toLowerCase()));
+        return words.length > 0 ? words.join(" ") : null;
+    };
+
+    // Pattern 1: "of/for/by <name>" — greedy, captures multi-word names
+    const ofMatch = input.match(/\b(?:of|for|by|from)\s+(.+?)(?:\s+(?:deal|contact|company|details?|info)|\s*$)/i);
+    if (ofMatch) name = cleanName(ofMatch[1]);
+
+    // Pattern 2: "contact/deal/company <name> details/info"
+    if (!name) {
+        const entityNameMatch = input.match(/\b(?:contact|company|deal)\s+(.+?)(?:\s+(?:details?|info|information)|\s*$)/i);
+        if (entityNameMatch) name = cleanName(entityNameMatch[1]);
     }
 
-    // Pattern: "contact <name> details" or "<name> contact details"
+    // Pattern 3: "<name> contact/deal/company details"
     if (!name) {
-        const nameDetailMatch = input.match(/(?:contact|company|deal)\s+([a-z]+(?:\s+[a-z]+)?)\s+(?:details?|info)/i);
-        if (nameDetailMatch) {
-            const candidate = nameDetailMatch[1].trim();
-            const stopWords = ["the", "all", "my", "hot", "warm", "cold"];
-            if (!stopWords.includes(candidate)) {
-                name = candidate;
-            }
-        }
+        const nameEntityMatch = input.match(/^(?:show|get|give|list|me|the|\s)*(.+?)\s+(?:contact|company|deal)\s+(?:details?|info)/i);
+        if (nameEntityMatch) name = cleanName(nameEntityMatch[1]);
+    }
+
+    // Pattern 4: "detail/details/info of <name>" (without entity keyword)
+    if (!name && action === "detail") {
+        const detailOfMatch = input.match(/\b(?:details?|info|about)\s+(?:of\s+)?(.+)/i);
+        if (detailOfMatch) name = cleanName(detailOfMatch[1]);
     }
 
     // Extract limit for "top N" queries
@@ -93,11 +104,10 @@ export const parseIntent = (message) => {
     // If no entity detected, try to infer
     if (!entity) {
         if (name && action === "detail") {
-            entity = "contacts"; // "Anirudh details" → contacts
+            entity = "all"; // search across all entities for the name
         } else if (action === "aggregate") {
             entity = "deals"; // "total value" → deals
         } else {
-            // fallback
             return {
                 action: "unknown",
                 originalMessage: message
@@ -124,17 +134,22 @@ export const getHelpMessage = () => {
 • "show my deals" — List your deals ranked by AI score
 • "show hot deals" — Filter deals by Hot/Warm/Cold tier
 • "show deals of Anirudh" — Filter deals by owner name
+• "deal Enterprise License details" — Summary of a specific deal
 • "top 5 deals" — Show highest ranked deals
 • "how many hot deals?" — Count deals by tier
 • "total deal value" — Sum of all deal values
 
 **Contacts:**
 • "show contacts" — List all contacts ranked by score
-• "contact Sandeep details" — Show details for a specific contact
+• "contact Sandeep details" — Summary of a specific contact
 • "top contacts" — Top 5 ranked contacts
 
 **Companies:**
 • "show companies" — List all companies ranked by score
+• "company Idea Fueled details" — Summary of a specific company
 • "top companies" — Top 5 ranked companies
-• "hot companies" — Filter companies by tier`;
+• "hot companies" — Filter companies by tier
+
+**Quick Detail:**
+• "details of Anirudh" — Search across all entities by name`;
 };
