@@ -5,8 +5,8 @@
 
 // ── Tier mapping ──────────────────────────────────────────────
 const getTier = (score) => {
-    if (score >= 80) return "Hot";
-    if (score >= 50) return "Warm";
+    if (score >= 70) return "Hot";
+    if (score >= 40) return "Warm";
     return "Cold";
 };
 
