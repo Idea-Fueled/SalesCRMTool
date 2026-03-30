@@ -142,7 +142,6 @@ const router = createBrowserRouter([
 ]);
 
 import SessionTimeoutManager from "./components/SessionTimeoutManager";
-import ChatbotWidget from "./components/Chatbot/ChatbotWidget";
 
 const App = () => {
   return (
@@ -150,7 +149,6 @@ const App = () => {
       <NotificationProvider>
         <SessionTimeoutManager>
           <RouterProvider router={router} />
-          <ChatbotWidget />
         </SessionTimeoutManager>
       </NotificationProvider>
     </AuthProvider>

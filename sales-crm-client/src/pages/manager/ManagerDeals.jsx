@@ -8,10 +8,12 @@ import {
     LayoutList as LayoutListIcon, LayoutGrid as LayoutGridIcon, Kanban as KanbanIcon, Eye as EyeIcon, Search as SearchIcon
 } from "lucide-react";
 import DealCard from "../../components/cards/DealCard";
-import { getDeals, createDeal, updateDeal, deleteDeal, updateDealStage } from "../../API/services/dealService";
+import { getRankedDeals } from "../../API/services/rankService";
+import { createDeal, updateDeal, deleteDeal, updateDealStage } from "../../API/services/dealService";
 import { getCompanies } from "../../API/services/companyService";
 import { getContacts } from "../../API/services/contactService";
 import { getTeamUsers } from "../../API/services/userService";
+import RankBadge from "../../components/RankBadge";
 import { useAuth } from "../../context/AuthContext";
 import KanbanBoard from "../../components/KanbanBoard";
 import DealModal from "../../components/modals/DealModal";
@@ -85,7 +87,7 @@ export default function ManagerDeals() {
         if (!isSilent) setLoading(true);
         try {
             const [dealsRes, companiesRes, contactsRes, usersRes] = await Promise.all([
-                getDeals({
+                getRankedDeals({
                     stage: stageFilter === "All Stages" ? undefined : stageFilter,
                     limit: 100
                 }),
@@ -267,7 +269,7 @@ export default function ManagerDeals() {
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="border-b border-gray-100 bg-gray-50">
-                                    {["Deal Name", "Owned By", "Company", "Contact", "Stage", "Deal Value", "Expected Close", "Actions"].map(h => (
+                                    {["Rank", "Deal Name", "Owned By", "Company", "Contact", "Stage", "Deal Value", "Expected Close", "Actions"].map(h => (
                                         <th key={h} className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wide whitespace-nowrap">{h}</th>
                                     ))}
                                 </tr>
@@ -280,6 +282,9 @@ export default function ManagerDeals() {
                                 ) : (
                                     deals.map((d) => (
                                         <tr key={d._id} className="hover:bg-gray-50/50 transition-colors group">
+                                            <td className="px-4 py-3">
+                                                <RankBadge score={d.aiScore} tier={d.aiTier} compact />
+                                            </td>
                                             <td className="px-4 py-3 font-medium text-gray-800 whitespace-nowrap cursor-pointer hover:text-red-600 transition-colors"
                                                 onClick={() => navigate(`/manager/deals/${d._id}`)}>
                                                 {d.name}

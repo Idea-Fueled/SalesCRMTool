@@ -5,8 +5,10 @@ import {
     LayoutGrid, LayoutList, Mail, Phone, MapPin, Star, MoreVertical, ExternalLink
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { getRankedCompanies } from "../../API/services/rankService";
 import { getCompanies, createCompany, updateCompany, deleteCompany } from "../../API/services/companyService";
 import { getTeamUsers } from "../../API/services/userService";
+import RankBadge from "../../components/RankBadge";
 import { useAuth } from "../../context/AuthContext";
 import CompanyCard from "../../components/cards/CompanyCard";
 import CompanyModal from "../../components/modals/CompanyModal";
@@ -66,7 +68,7 @@ export default function CompaniesDashboard() {
         setLoading(true);
         try {
             const [companiesRes, allCompaniesRes, usersRes] = await Promise.all([
-                getCompanies({ name: search || undefined, limit: 100 }),
+                getRankedCompanies({ name: search || undefined, limit: 100 }),
                 getCompanies({ limit: 1000 }), // Fetch full list for stats
                 getTeamUsers()
             ]);
@@ -193,7 +195,7 @@ export default function CompaniesDashboard() {
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className="border-b border-gray-100 bg-gray-50">
-                                            {["Company", "Industry", "Email", "Owner", "Status", "Actions"].map(h => (
+                                            {["Rank", "Company", "Industry", "Email", "Owner", "Status", "Actions"].map(h => (
                                                 <th key={h} className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wide whitespace-nowrap">{h}</th>
                                             ))}
                                         </tr>
@@ -206,6 +208,9 @@ export default function CompaniesDashboard() {
                                         ) : (
                                             companies.map((c) => (
                                                 <tr key={c._id} className="hover:bg-gray-50/50 transition-colors group">
+                                                    <td className="px-4 py-3">
+                                                        <RankBadge score={c.aiScore} tier={c.aiTier} compact />
+                                                    </td>
                                                     <td className="px-4 py-3 font-medium text-gray-800 whitespace-nowrap cursor-pointer hover:text-red-600 transition-colors"
                                                         onClick={() => navigate(`/dashboard/companies/${c._id}`)}>
                                                         {c.name}

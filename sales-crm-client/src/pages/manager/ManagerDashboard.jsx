@@ -11,6 +11,7 @@ import DashboardDetailModal from "../../components/modals/DashboardDetailModal";
 import { toast } from "react-hot-toast";
 import { Eye } from "lucide-react";
 import useDashboardRefresh from "../../hooks/useDashboardRefresh";
+import PriorityPipeline from "../../components/PriorityPipeline";
 
 const Select = ({ options, value, onChange }) => (
     <div className="relative">
@@ -148,8 +149,11 @@ export default function ManagerDashboard() {
                 <StatCard label="Team Pipeline" value={loading ? "..." : formatCurrency(totalPipeline)} sub={`${activeDeals.length} active deals`} icon={DollarSign} onClick={() => setModalConfig({ isOpen: true, category: 'revenue', data: activeDeals })} />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-6">
-                <Card className="lg:col-span-3 flex flex-col">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+                <div className="lg:col-span-4">
+                    <PriorityPipeline basePath="/manager" />
+                </div>
+                <Card className="lg:col-span-8 flex flex-col">
                     <CardHeader title="TEAM SALES REPRESENTATIVE PERFORMANCE">
                         <Select options={periodOptions} value={period} onChange={setPeriod} />
                     </CardHeader>
@@ -200,7 +204,7 @@ export default function ManagerDashboard() {
                     </div>
                 </Card>
 
-                <Card className="lg:col-span-2">
+                <Card className="lg:col-span-4">
                     <CardHeader title="Team Deals by Stage" />
                     <div className="p-5 space-y-3">
                         {stageData.map(s => {

@@ -5,9 +5,11 @@ import {
     LayoutGrid, LayoutList
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { getContacts, createContact, updateContact, deleteContact } from "../../API/services/contactService";
+import { getRankedContacts } from "../../API/services/rankService";
+import { createContact, updateContact, deleteContact } from "../../API/services/contactService";
 import { getCompanies } from "../../API/services/companyService";
 import { getTeamUsers } from "../../API/services/userService";
+import RankBadge from "../../components/RankBadge";
 import { useAuth } from "../../context/AuthContext";
 import ContactModal from "../../components/modals/ContactModal";
 import ContactDetailsModal from "../../components/modals/ContactDetailsModal";
@@ -82,7 +84,7 @@ export default function ContactsDashboard() {
         setLoading(true);
         try {
             const [contactsRes, companiesRes, usersRes] = await Promise.all([
-                getContacts({ name: search || undefined, limit: 100 }),
+                getRankedContacts({ name: search || undefined, limit: 100 }),
                 getCompanies({ limit: 1000 }),
                 getTeamUsers()
             ]);
@@ -208,7 +210,7 @@ export default function ContactsDashboard() {
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className="border-b border-gray-100 bg-gray-50">
-                                            {["Contact", "Company", "Deals", "Owner", "LinkedIn", "Actions"].map(h => (
+                                            {["Rank", "Contact", "Company", "Deals", "Owner", "LinkedIn", "Actions"].map(h => (
                                                 <th key={h} className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wide whitespace-nowrap">{h}</th>
                                             ))}
                                         </tr>
@@ -221,6 +223,9 @@ export default function ContactsDashboard() {
                                         ) : (
                                             contacts.map((c) => (
                                                 <tr key={c._id} className="hover:bg-gray-50/50 transition-colors group">
+                                                    <td className="px-4 py-3">
+                                                        <RankBadge score={c.aiScore} tier={c.aiTier} compact />
+                                                    </td>
                                                     <td className="px-4 py-3 whitespace-nowrap">
                                                         <div className="flex items-center gap-3 cursor-pointer group/item"
                                                             onClick={() => navigate(`/dashboard/contacts/${c._id}`)}>

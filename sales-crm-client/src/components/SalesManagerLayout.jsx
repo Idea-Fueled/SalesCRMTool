@@ -10,6 +10,7 @@ import GlobalSearch from "./GlobalSearch";
 import LogoutConfirmModal from "./LogoutConfirmModal";
 import NotificationDropdown from "./NotificationDropdown";
 import MyProfileModal from "./modals/MyProfileModal";
+import ChatbotWidget from "./Chatbot/ChatbotWidget";
 
 const SidebarLink = ({ to, icon: IconComp, label, onClick }) => {
     const location = useLocation();
@@ -223,6 +224,7 @@ export default function SalesManagerLayout() {
                 isOpen={profileModalOpen} 
                 onClose={() => setProfileModalOpen(false)} 
             />
+            <ChatbotWidget />
         </div>
     );
 }

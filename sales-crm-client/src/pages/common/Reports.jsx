@@ -17,6 +17,7 @@ import { toPng } from "html-to-image";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import CollapsibleDealName from "../../components/CollapsibleDealName";
 import UserDetailsModal from "../../components/modals/UserDetailsModal";
+import RankBadge from "../../components/RankBadge";
 
 const TabButton = ({ active, label, icon: Icon, onClick }) => (
     <button
@@ -306,6 +307,7 @@ export default function Reports() {
                     { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString('en-IN'), w: 32 },
                     { header: 'Deal name',     key: d => d.name || '—',                              w: 50 },
                     { header: 'Deal Value',    key: d => d.value ? `${d.currency || '$'}${Number(d.value).toLocaleString()}` : '—', w: 28 },
+                    { header: 'AI Score',      key: d => d.aiScore || '—',                           w: 22 },
                     { header: 'Owner', key: d => {
                         const name = d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : (d.ownerName || '—');
                         const role = d.ownerId?.role;
@@ -319,6 +321,7 @@ export default function Reports() {
                     { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString('en-IN'), w: 32 },
                     { header: 'Company',       key: d => d.name || '—',                              w: 50 },
                     { header: 'Industry',      key: d => d.industry || '—',                          w: 38 },
+                    { header: 'AI Score',      key: d => d.aiScore || '—',                           w: 22 },
                     { header: 'Owner', key: d => {
                         const name = d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : '—';
                         const role = d.ownerId?.role;
@@ -332,6 +335,7 @@ export default function Reports() {
                     { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString(), w: 30 },
                     { header: 'Name',          key: d => `${d.firstName || ''} ${d.lastName || ''}`.trim() || '—', w: 50 },
                     { header: 'Title',         key: d => d.jobTitle || '—',                          w: 60 },
+                    { header: 'AI Score',      key: d => d.aiScore || '—',                           w: 20 },
                     { header: 'Owner',         key: d => {
                         const name = d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : '—';
                         const role = d.ownerId?.role;
@@ -645,6 +649,7 @@ export default function Reports() {
                             <tr className="bg-[#FFF9E5] border-b border-gray-100 text-[13px] font-bold text-gray-800 uppercase tracking-wider">
                                 <th className="px-4 py-3.5 font-bold whitespace-nowrap min-w-[120px]">Creation Date</th>
                                 <th className="px-4 py-3.5 font-bold min-w-[160px]">{activeTab === "contacts" ? "Name" : activeTab === "companies" ? "Company" : "Deal name"}</th>
+                                <th className="px-4 py-3.5 font-bold min-w-[100px]">AI Rank</th>
                                 <th className="px-4 py-3.5 font-bold min-w-[140px]">{activeTab === "deals" ? "Deal Value" : activeTab === "companies" ? "Industry" : "Title"}</th>
                                 <th className="px-4 py-3.5 font-bold min-w-[160px]">Owner</th>
                                 {activeTab !== "contacts" && <th className="px-4 py-3.5 text-left font-bold min-w-[90px]">Status</th>}
@@ -685,6 +690,9 @@ export default function Reports() {
                                             ) : (
                                                 activeTab === "contacts" ? `${item.firstName} ${item.lastName}` : item.name
                                             )}
+                                        </td>
+                                        <td className="px-4 py-4">
+                                            <RankBadge score={item.aiScore} tier={item.aiTier} compact />
                                         </td>
                                         <td className="px-4 py-4 text-gray-600 font-medium">
                                             {activeTab === "deals" ? `$${(item.value || 0).toLocaleString()}` : item.industry || item.jobTitle || "—"}

@@ -11,6 +11,7 @@ import DashboardDetailModal from "../../components/modals/DashboardDetailModal";
 import { toast } from "react-hot-toast";
 import { Eye } from "lucide-react";
 import useDashboardRefresh from "../../hooks/useDashboardRefresh";
+import PriorityPipeline from "../../components/PriorityPipeline";
 
 const Select = ({ options, value, onChange }) => (
     <div className="relative">
@@ -133,8 +134,11 @@ export default function RepDashboard() {
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-6">
-                <div className="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+                <div className="lg:col-span-4">
+                    <PriorityPipeline basePath="/rep" />
+                </div>
+                <div className="lg:col-span-5 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
                     <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <h2 className="font-bold text-gray-800">My Recent Deals</h2>
                         <Select options={periodOptions} value={period} onChange={setPeriod} />
@@ -180,7 +184,7 @@ export default function RepDashboard() {
                     </div>
                 </div>
 
-                <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                <div className="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-100 p-5">
                     <h3 className="font-bold text-gray-800 mb-4">My Pipeline Stages</h3>
                     <div className="space-y-4">
                         {deals.length === 0 && !loading ? (

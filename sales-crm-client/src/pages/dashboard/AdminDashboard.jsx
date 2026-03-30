@@ -14,6 +14,7 @@ import { toast } from "react-hot-toast";
 import DashboardDetailModal from "../../components/modals/DashboardDetailModal";
 import { truncateName } from "../../utils/stringUtils";
 import useDashboardRefresh from "../../hooks/useDashboardRefresh";
+import PriorityPipeline from "../../components/PriorityPipeline";
 
 const OverviewStat = ({ label, value, icon: IconComp, onClick }) => (
     <div
@@ -407,7 +408,8 @@ export default function AdminDashboard() {
             </div>
 
             {/* Detailed Widgets Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+                <PriorityPipeline basePath="/dashboard" />
                 {/* Top Deals Widget */}
                 <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col min-h-[400px]">
                     <div className="flex items-center justify-between mb-6">
@@ -442,7 +444,7 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Pipeline Statistics Widget */}
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col min-h-[400px] md:col-span-2 xl:col-span-1">
+                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col min-h-[400px] md:col-span-2 xl:col-span-2">
                     <div className="flex items-center justify-between mb-8">
                         <div className="flex items-center gap-2">
                             <div className="w-1 h-4 bg-orange-500 rounded-full"></div>

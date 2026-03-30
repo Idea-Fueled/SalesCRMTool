@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Users, Building2, Users2, ChevronDown, Plus, Edit2, Trash2, Search, Linkedin, ExternalLink, ChevronRight, LayoutGrid, LayoutList } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { getContacts, createContact, updateContact, deleteContact } from "../../API/services/contactService";
+import { getRankedContacts } from "../../API/services/rankService";
+import { createContact, updateContact, deleteContact } from "../../API/services/contactService";
 import { getCompanies } from "../../API/services/companyService";
+import RankBadge from "../../components/RankBadge";
 import ContactModal from "../../components/modals/ContactModal";
 import ContactDetailsModal from "../../components/modals/ContactDetailsModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
@@ -64,7 +66,7 @@ export default function ManagerContacts() {
         setLoading(true);
         try {
             const [contactsRes, companiesRes] = await Promise.all([
-                getContacts({ name: search || undefined, limit: 100 }),
+                getRankedContacts({ name: search || undefined, limit: 100 }),
                 getCompanies({ limit: 1000 })
             ]);
             setContacts(contactsRes.data.data);
@@ -185,7 +187,7 @@ export default function ManagerContacts() {
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="border-b border-gray-100 bg-gray-50">
-                                    {["Contact", "Job Title", "Company", "Deals", "Owner", "LinkedIn", "Actions"].map(h => (
+                                    {["Rank", "Contact", "Job Title", "Company", "Deals", "Owner", "LinkedIn", "Actions"].map(h => (
                                         <th key={h} className="text-left px-4 py-3 text-gray-500 font-semibold text-xs uppercase tracking-wide whitespace-nowrap">{h}</th>
                                     ))}
                                 </tr>
@@ -198,6 +200,9 @@ export default function ManagerContacts() {
                                 ) : (
                                     contacts.map((c) => (
                                         <tr key={c._id} className="hover:bg-gray-50/50 transition-colors group">
+                                            <td className="px-4 py-3">
+                                                <RankBadge score={c.aiScore} tier={c.aiTier} compact />
+                                            </td>
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center gap-3 cursor-pointer group/item"
                                                     onClick={() => navigate(`/manager/contacts/${c._id}`)}>
