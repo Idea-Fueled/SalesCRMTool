@@ -423,11 +423,11 @@ export default function AdminDashboard() {
                                     <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center font-bold text-gray-400 shadow-sm border border-gray-100 group-hover:bg-red-50 group-hover:text-red-500 group-hover:border-red-100 transition-colors flex-shrink-0">
                                         {index + 1}
                                     </div>
-                                    <div className="min-w-0 flex-1">
-                                        <p className="text-[11px] font-bold text-gray-900 transition-colors uppercase tracking-wide truncate">
+                                    <div className="min-w-0 flex-1 py-1">
+                                        <p className="text-[11px] font-bold text-gray-900 transition-colors uppercase tracking-wide whitespace-normal leading-tight break-words">
                                             {getDealDisplayName(deal)}
                                         </p>
-                                        <p className="text-[10px] text-gray-500 truncate mt-0.5">{deal.companyName || deal.companyId?.name || "Unknown Company"}</p>
+                                        <p className="text-[10px] text-gray-500 mt-1 whitespace-normal break-words">{deal.companyName || deal.companyId?.name || "Unknown Company"}</p>
                                     </div>
                                 </div>
                                 <div className="text-sm font-black text-gray-900 whitespace-nowrap pl-2 border-l border-gray-50 flex-shrink-0">
@@ -511,24 +511,24 @@ export default function AdminDashboard() {
                     </div>
 
                     <div className="space-y-4">
-                        <div className="flex items-center justify-between group cursor-pointer hover:bg-gray-50 p-2 -mx-2 rounded-xl transition-colors gap-3" onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: stats.dealList.filter(d => d.stage === 'Closed Won') })}>
+                        <div className="flex items-start justify-between group cursor-pointer hover:bg-gray-50 p-2 -mx-2 rounded-xl transition-colors gap-3" onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: stats.dealList.filter(d => d.stage === 'Closed Won') })}>
                             <div className="flex items-center gap-3 min-w-0 flex-1">
-                                <CheckCircle2 size={16} className="text-green-500 flex-shrink-0 group-hover:scale-110 transition-transform" />
-                                <span className="text-sm font-medium text-gray-600 truncate group-hover:text-gray-900">Successful Deals</span>
+                                <CheckCircle2 size={16} className="text-green-500 flex-shrink-0 group-hover:scale-110 transition-transform mt-0.5" />
+                                <span className="text-sm font-medium text-gray-600 whitespace-normal leading-tight group-hover:text-gray-900">Successful Deals</span>
                             </div>
                             <span className="text-sm font-bold text-gray-900 whitespace-nowrap pl-2 flex-shrink-0">{dealsOverview.successful} Deals</span>
                         </div>
-                        <div className="flex items-center justify-between group cursor-pointer hover:bg-gray-50 p-2 -mx-2 rounded-xl transition-colors gap-3" onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: stats.dealList.filter(d => !['Closed Won', 'Closed Lost'].includes(d.stage)) })}>
+                        <div className="flex items-start justify-between group cursor-pointer hover:bg-gray-50 p-2 -mx-2 rounded-xl transition-colors gap-3" onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: stats.dealList.filter(d => !['Closed Won', 'Closed Lost'].includes(d.stage)) })}>
                             <div className="flex items-center gap-3 min-w-0 flex-1">
-                                <CircleDashed size={16} className="text-yellow-500 flex-shrink-0 group-hover:scale-110 transition-transform" />
-                                <span className="text-sm font-medium text-gray-600 truncate group-hover:text-gray-900">Pending Deals</span>
+                                <CircleDashed size={16} className="text-yellow-500 flex-shrink-0 group-hover:scale-110 transition-transform mt-0.5" />
+                                <span className="text-sm font-medium text-gray-600 whitespace-normal leading-tight group-hover:text-gray-900">Pending Deals</span>
                             </div>
                             <span className="text-sm font-bold text-gray-900 whitespace-nowrap pl-2 flex-shrink-0">{dealsOverview.pending} Deals</span>
                         </div>
-                        <div className="flex items-center justify-between group cursor-pointer hover:bg-gray-50 p-2 -mx-2 rounded-xl transition-colors gap-3" onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: stats.dealList.filter(d => d.stage === 'Closed Lost') })}>
+                        <div className="flex items-start justify-between group cursor-pointer hover:bg-gray-50 p-2 -mx-2 rounded-xl transition-colors gap-3" onClick={() => setModalConfig({ isOpen: true, category: 'deals', data: stats.dealList.filter(d => d.stage === 'Closed Lost') })}>
                             <div className="flex items-center gap-3 min-w-0 flex-1">
-                                <XCircle size={16} className="text-red-500 flex-shrink-0 group-hover:scale-110 transition-transform" />
-                                <span className="text-sm font-medium text-gray-600 truncate group-hover:text-gray-900">Rejected Deals</span>
+                                <XCircle size={16} className="text-red-500 flex-shrink-0 group-hover:scale-110 transition-transform mt-0.5" />
+                                <span className="text-sm font-medium text-gray-600 whitespace-normal leading-tight group-hover:text-gray-900">Rejected Deals</span>
                             </div>
                             <span className="text-sm font-bold text-gray-900 whitespace-nowrap pl-2 flex-shrink-0">{dealsOverview.rejected} Deals</span>
                         </div>
