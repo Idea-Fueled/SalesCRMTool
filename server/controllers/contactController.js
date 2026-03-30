@@ -2,6 +2,7 @@ import { Company } from "../models/companySchema.js";
 import { Contact } from "../models/contactSchema.js";
 import { Deal } from "../models/dealSchema.js";
 import User from "../models/userSchema.js";
+import { scoreContact } from "../utils/rankingService.js";
 import { logAction } from "../utils/auditLogger.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../middlewares/uploadMiddleware.js";
 import { sendTieredNotification } from "../services/notificationService.js";
@@ -531,10 +532,15 @@ export const getContactById = async (req, res, next) => {
 
         const dealCount = await Deal.countDocuments(dealFilter);
 
+        // AI Rank calculation
+        const { score: aiScore, tier: aiTier } = scoreContact(contact, dealCount);
+
         res.status(200).json({ 
             data: {
                 ...contact.toObject(),
-                dealCount
+                dealCount,
+                aiScore,
+                aiTier
             } 
         });
     } catch (error) {

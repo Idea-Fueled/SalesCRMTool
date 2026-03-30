@@ -1,5 +1,7 @@
 import { Company } from "../models/companySchema.js";
+import { Contact } from "../models/contactSchema.js";
 import User from "../models/userSchema.js";
+import { scoreCompany } from "../utils/rankingService.js";
 
 import { logAction } from "../utils/auditLogger.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../middlewares/uploadMiddleware.js";
@@ -589,11 +591,19 @@ export const getCompanyById = async (req, res) => {
         const totalValue = deals.reduce((sum, d) => sum + (d.value || 0), 0);
         const dealCount = deals.length;
 
+        // AI Rank calculation
+        const contactCount = await Contact.countDocuments({ companyId: company._id, isDeleted: { $ne: true } });
+        const maxRevenueRes = await Company.aggregate([{ $match: { isDeleted: false } }, { $group: { _id: null, max: { $max: "$revenueRange" } } }]);
+        const maxRevenue = maxRevenueRes[0]?.max || 1;
+        const { score: aiScore, tier: aiTier } = scoreCompany(company, dealCount, contactCount, maxRevenue);
+
         res.status(200).json({ 
             data: {
                 ...company.toObject(),
                 dealCount,
-                totalValue
+                totalValue,
+                aiScore,
+                aiTier
             } 
         });
     } catch (error) {

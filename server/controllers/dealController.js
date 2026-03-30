@@ -2,6 +2,7 @@ import { Contact } from "../models/contactSchema.js";
 import { Deal } from "../models/dealSchema.js";
 import User from "../models/userSchema.js";
 import { Company } from "../models/companySchema.js";
+import { scoreDeal } from "../utils/rankingService.js";
 import { logAction } from "../utils/auditLogger.js";
 import { Notification } from "../models/notificationSchema.js";
 import { emitNotification } from "../utils/socket.js";
@@ -857,7 +858,18 @@ export const getDealById = async (req, res, next) => {
             return res.status(404).json({ message: "Deal not found!" });
         }
 
-        res.status(200).json({ data: deal });
+        // AI Rank calculation
+        const allDeals = await Deal.find({ isDeleted: false }).select("value");
+        const maxValue = Math.max(...allDeals.map(d => d.value || 0), 1);
+        const { score: aiScore, tier: aiTier } = scoreDeal(deal, maxValue);
+
+        res.status(200).json({ 
+            data: {
+                ...deal.toObject(),
+                aiScore,
+                aiTier
+            }
+        });
     } catch (error) {
         res.status(500).json({ message: error.message || "Server error!" });
     }

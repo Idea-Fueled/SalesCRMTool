@@ -279,7 +279,7 @@ export default function ContactDetails() {
                     <div className="min-w-0">
                         <div className="flex items-center gap-3 mb-1">
                             <h1 className="text-2xl font-black text-gray-900 leading-none">{contact.firstName} {contact.lastName}</h1>
-                            <RankBadge score={contact.aiScore} />
+                            <RankBadge score={contact.aiScore} tier={contact.aiTier} />
                         </div>
                         <div className="space-y-1.5">
                             <div className="flex items-center gap-3 mt-1">
