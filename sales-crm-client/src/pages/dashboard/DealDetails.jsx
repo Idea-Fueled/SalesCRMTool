@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { exportToPDF } from "../../utils/pdfExport";
+import RankBadge from "../../components/RankBadge";
 import { downloadFile, viewFile, validateFiles, ALLOWED_EXTENSIONS_STRING } from "../../utils/fileUtils";
 import { isDealOverdue } from "../../utils/dateUtils";
 
@@ -287,8 +288,9 @@ export default function DealDetails() {
                         {getInitials(deal.name)}
                     </div>
                     <div className="min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className="flex items-center gap-3 mb-1">
                             <h1 className="text-2xl font-black text-gray-900 leading-none">{deal.name}</h1>
+                            <RankBadge score={deal.aiScore} />
                             {isDealOverdue(deal) && (
                                 <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-black bg-red-600 text-white uppercase tracking-tighter animate-pulse shadow-sm shadow-red-100">
                                     <Clock size={10} /> Overdue for Closing

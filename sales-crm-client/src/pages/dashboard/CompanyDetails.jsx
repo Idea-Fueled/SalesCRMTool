@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { exportToPDF } from "../../utils/pdfExport";
+import RankBadge from "../../components/RankBadge";
 import { downloadFile, viewFile, validateFiles, ALLOWED_EXTENSIONS_STRING } from "../../utils/fileUtils";
 
 const companyStatusPipeline = [
@@ -277,8 +278,9 @@ export default function CompanyDetails() {
                         {getInitials(company.name)}
                     </div>
                     <div className="min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className="flex items-center gap-3 mb-1">
                             <h1 className="text-2xl font-black text-gray-900 leading-none">{company.name}</h1>
+                            <RankBadge score={company.aiScore} />
                         </div>
                         <div className="space-y-1.5">
                             <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
