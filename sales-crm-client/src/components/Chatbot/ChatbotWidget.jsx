@@ -99,7 +99,7 @@ export default function ChatbotWidget() {
 
             {/* Chat Panel */}
             {isOpen && (
-                <div className={`fixed bottom-6 right-6 z-50 w-[400px] ${isMinimized ? 'h-16' : 'h-[600px]'} bg-white/95 backdrop-blur-xl rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] border border-white/20 flex flex-col overflow-hidden transition-all duration-500 ease-out animate-in fade-in zoom-in-95 slide-in-from-bottom-10`}>
+                <div className={`fixed bottom-6 right-6 z-50 w-[400px] ${isMinimized ? 'h-16' : 'h-[600px] max-h-[calc(100vh-100px)]'} bg-white/95 backdrop-blur-xl rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] border border-white/20 flex flex-col overflow-hidden transition-all duration-500 ease-out animate-in fade-in zoom-in-95 slide-in-from-bottom-10`}>
                     
                     {/* Header */}
                     <div 
@@ -114,7 +114,7 @@ export default function ChatbotWidget() {
                                 <h3 className="text-white font-bold text-sm tracking-tight">AI Sales Assistant</h3>
                                 <div className="flex items-center gap-1.5">
                                     <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.5)]"></span>
-                                    <p className="text-red-100 text-[10px] font-semibold uppercase tracking-wider opacity-80 uppercase">Rank AI Engine Active</p>
+                                    <p className="text-red-100 text-[10px] font-semibold uppercase tracking-wider opacity-80">Rank AI Engine Active</p>
                                 </div>
                             </div>
                         </div>
