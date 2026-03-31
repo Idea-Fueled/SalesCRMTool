@@ -66,7 +66,7 @@ export const parseIntent = (message) => {
     const stopWords = ["the", "all", "my", "hot", "warm", "cold", "deals", "contacts", "companies",
         "deal", "contact", "company", "show", "get", "list", "give", "me", "detail", "details",
         "info", "information", "about", "top", "ranked", "of", "for", "by", "from", "sum",
-        "total", "value", "how", "many", "count"];
+        "total", "value", "how", "many", "count", "in", "stage", "above", "worth", "valued", "at"];
 
     const cleanName = (raw) => {
         if (!raw) return null;
@@ -81,7 +81,8 @@ export const parseIntent = (message) => {
 
     // Pattern 2: "contact/deal/company <name> details/info"
     if (!name) {
-        const entityNameMatch = input.match(/\b(?:contacts?|compan(?:y|ies)|deals?)\s+(.+?)(?:\s+(?:details?|info(rmation)?|about)|\s*$)/i);
+        // Exclude common filter triggers from being captured as names
+        const entityNameMatch = input.match(/\b(?:contacts?|compan(?:y|ies)|deals?)\s+(?!in\s+|above\s+|worth\s+|no\s+|with\s+)(.+?)(?:\s+(?:details?|info(rmation)?|about|stage)|\s*$)/i);
         if (entityNameMatch) name = cleanName(entityNameMatch[1]);
     }
 

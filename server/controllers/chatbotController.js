@@ -23,111 +23,154 @@ const buildOwnerFilter = async (user) => {
     return { ownerId: user._id };
 };
 
-// ── Format helpers (list cards) ───────────────────────────────
-const formatDeal = (d) => ({
-    id: d._id,
-    name: d.name,
-    value: `${d.currency || "$"}${(d.value || 0).toLocaleString()}`,
-    stage: d.stage,
-    owner: d.ownerId ? `${d.ownerId.firstName || ""} ${d.ownerId.lastName || ""}`.trim() : "Unassigned",
-    company: d.companyId?.name || d.companyName || "—",
-    score: d.aiScore,
-    tier: d.aiTier
-});
-
-const formatCompany = (c) => ({
-    id: c._id,
-    name: c.name,
-    industry: c.industry || "—",
-    status: c.status || "—",
-    owner: c.ownerId ? `${c.ownerId.firstName || ""} ${c.ownerId.lastName || ""}`.trim() : "Unassigned",
-    deals: c.dealCount || 0,
-    contacts: c.contactCount || 0,
-    score: c.aiScore,
-    tier: c.aiTier
-});
-
-const formatContact = (c) => ({
-    id: c._id,
-    name: `${c.firstName || ""} ${c.lastName || ""}`.trim(),
-    jobTitle: c.jobTitle || "—",
-    email: c.email || "—",
-    company: c.companyId?.name || c.companyName || "—",
-    linkedin: c.linkedin ? "Yes" : "No",
-    deals: c.dealCount || 0,
-    score: c.aiScore,
-    tier: c.aiTier
-});
-
-// ── Summary formatters (bullet-point detail) ──────────────────
-const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "N/A";
-
-const summarizeDeal = (d) => {
-    const owner = d.ownerId ? `${d.ownerId.firstName || ""} ${d.ownerId.lastName || ""}`.trim() : "Unassigned";
-    const company = d.companyId?.name || d.companyName || "—";
-    const contact = d.contactId ? `${d.contactId.firstName || ""} ${d.contactId.lastName || ""}`.trim() : "—";
-    const lines = [
-        `📌 **${d.name}**`,
-        `• **Value:** ${d.currency || "$"}${(d.value || 0).toLocaleString()}`,
-        `• **Stage:** ${d.stage || "—"}`,
-        `• **Probability:** ${d.probability ?? "—"}%`,
-        `• **Expected Close:** ${fmtDate(d.expectedCloseDate)}`,
-        `• **Company:** ${company}`,
-        `• **Contact:** ${contact}`,
-        `• **Owner:** ${owner}`,
-        `• **Source:** ${d.source || "—"}`,
-        `• **Remarks:** ${d.remarks?.length || 0} note(s)`,
-        `• **Attachments:** ${d.attachments?.length || 0} file(s)`,
-        `• **Created:** ${fmtDate(d.createdAt)}`,
-        `• **Updated:** ${fmtDate(d.updatedAt)}`,
-        `• **AI Score:** ${d.aiScore} (${d.aiTier})`
-    ];
-    if (d.notes) lines.push(`• **Notes:** ${d.notes.length > 100 ? d.notes.slice(0, 100) + "…" : d.notes}`);
-    return lines.join("\n");
+// ── Entity Configuration ─────────────────────────────────────
+const SCHEMA_CONFIG = {
+    deals: {
+        model: Deal,
+        populates: [
+            { path: "ownerId", select: "firstName lastName email role" },
+            { path: "companyId", select: "name" },
+            { path: "contactId", select: "firstName lastName" }
+        ],
+        scoreFn: (data, max) => scoreDeal(data, max),
+        formatFn: formatDeal,
+        summaryFn: summarizeDeal,
+        searchFields: ["name", "ownerId.firstName", "ownerId.lastName", "companyName", "companyId.name"],
+        type: "deal"
+    },
+    companies: {
+        model: Company,
+        populates: [{ path: "ownerId", select: "firstName lastName email role" }],
+        scoreFn: (data, max, counts) => scoreCompany(data, counts.deals, counts.contacts, max),
+        formatFn: formatCompany,
+        summaryFn: summarizeCompany,
+        searchFields: ["name", "industry"],
+        type: "company"
+    },
+    contacts: {
+        model: Contact,
+        populates: [
+            { path: "ownerId", select: "firstName lastName email role" },
+            { path: "companyId", select: "name" }
+        ],
+        scoreFn: (data, max, counts) => scoreContact(data, counts.deals),
+        formatFn: formatContact,
+        summaryFn: summarizeContact,
+        searchFields: ["firstName", "lastName", "jobTitle", "email", "companyName", "companyId.name"],
+        type: "contact"
+    }
 };
 
-const summarizeCompany = (c) => {
-    const owner = c.ownerId ? `${c.ownerId.firstName || ""} ${c.ownerId.lastName || ""}`.trim() : "Unassigned";
-    const lines = [
-        `🏢 **${c.name}**`,
-        `• **Industry:** ${c.industry || "—"}`,
-        `• **Status:** ${c.status || "—"}`,
-        `• **Size:** ${c.size || "—"}`,
-        `• **Revenue:** $${(c.revenueRange || 0).toLocaleString()}`,
-        `• **Website:** ${c.website || "—"}`,
-        `• **Phone:** ${c.phone || "—"}`,
-        `• **Address:** ${c.address || "—"}`,
-        `• **Owner:** ${owner}`,
-        `• **Active Deals:** ${c.dealCount || 0}`,
-        `• **Contacts:** ${c.contactCount || 0}`,
-        `• **Created:** ${fmtDate(c.createdAt)}`,
-        `• **Updated:** ${fmtDate(c.updatedAt)}`,
-        `• **AI Score:** ${c.aiScore} (${c.aiTier})`
-    ];
-    if (c.notes) lines.push(`• **Notes:** ${c.notes.length > 100 ? c.notes.slice(0, 100) + "…" : c.notes}`);
-    return lines.join("\n");
-};
+// ── Universal Query Handler ───────────────────────────────────
+const handleUniversalQuery = async (intent, user, res) => {
+    const { entity, action, filter } = intent;
+    const config = SCHEMA_CONFIG[entity];
+    if (!config) return res.json({ reply: "I'm not sure how to handle that entity yet.", type: "error" });
 
-const summarizeContact = (c) => {
-    const owner = c.ownerId ? `${c.ownerId.firstName || ""} ${c.ownerId.lastName || ""}`.trim() : "Unassigned";
-    const company = c.companyId?.name || c.companyName || "—";
-    const lines = [
-        `👤 **${c.firstName || ""} ${c.lastName || ""}**`,
-        `• **Job Title:** ${c.jobTitle || "—"}`,
-        `• **Email:** ${c.email || "—"}`,
-        `• **Phone:** ${c.phone || "—"}`,
-        `• **Mobile:** ${c.mobile || "—"}`,
-        `• **Company:** ${company}`,
-        `• **LinkedIn:** ${c.linkedin || "Not available"}`,
-        `• **Owner:** ${owner}`,
-        `• **Deals:** ${c.dealCount || 0} associated deal(s)`,
-        `• **Remarks:** ${c.remarks?.length || 0} note(s)`,
-        `• **Created:** ${fmtDate(c.createdAt)}`,
-        `• **Updated:** ${fmtDate(c.updatedAt)}`,
-        `• **AI Score:** ${c.aiScore} (${c.aiTier})`
-    ];
-    if (c.notes) lines.push(`• **Notes:** ${c.notes.length > 100 ? c.notes.slice(0, 100) + "…" : c.notes}`);
-    return lines.join("\n");
+    const ownerFilter = await buildOwnerFilter(user);
+    
+    // 1. Fetch base data
+    let query = config.model.find({ isDeleted: false, ...ownerFilter });
+    config.populates.forEach(p => query.populate(p));
+    let items = await query.lean();
+
+    // 2. Ranking & Counts (Relational)
+    let ranked = [];
+    if (entity === "deals") {
+        const maxValue = Math.max(...items.map(d => d.value || 0), 1);
+        ranked = items.map(d => ({ ...d, ...scoreDeal(d, maxValue), aiScore: scoreDeal(d, maxValue).score, aiTier: scoreDeal(d, maxValue).tier }));
+    } else if (entity === "companies") {
+        const companyIds = items.map(c => new mongoose.Types.ObjectId(c._id));
+        const [dealAgg, contactAgg] = await Promise.all([
+            Deal.aggregate([{ $match: { companyId: { $in: companyIds }, isDeleted: false } }, { $group: { _id: "$companyId", count: { $sum: 1 } } }]),
+            Contact.aggregate([{ $match: { companyId: { $in: companyIds }, isDeleted: false } }, { $group: { _id: "$companyId", count: { $sum: 1 } } }])
+        ]);
+        const dealCountMap = Object.fromEntries(dealAgg.map(d => [d._id?.toString(), d.count]));
+        const contactCountMap = Object.fromEntries(contactAgg.map(c => [c._id?.toString(), c.count]));
+        const maxRev = Math.max(...items.map(c => c.revenueRange || 0), 1);
+        ranked = items.map(c => {
+            const dc = dealCountMap[c._id.toString()] || 0;
+            const cc = contactCountMap[c._id.toString()] || 0;
+            const { score, tier } = scoreCompany(c, dc, cc, maxRev);
+            return { ...c, aiScore: score, aiTier: tier, dealCount: dc, contactCount: cc };
+        });
+    } else if (entity === "contacts") {
+        const contactIds = items.map(c => new mongoose.Types.ObjectId(c._id));
+        const dealAgg = await Deal.aggregate([{ $match: { contactId: { $in: contactIds }, isDeleted: false } }, { $group: { _id: "$contactId", count: { $sum: 1 } } }]);
+        const dealCountMap = Object.fromEntries(dealAgg.map(d => [d._id?.toString(), d.count]));
+        ranked = items.map(c => {
+            const dc = dealCountMap[c._id.toString()] || 0;
+            const { score, tier } = scoreContact(c, dc);
+            return { ...c, aiScore: score, aiTier: tier, dealCount: dc };
+        });
+    }
+
+    // 3. Filters
+    if (filter.tier) ranked = ranked.filter(i => i.aiTier === filter.tier);
+    if (filter.valueAbove) ranked = ranked.filter(i => (i.value || 0) >= filter.valueAbove);
+    if (filter.stageName) ranked = ranked.filter(i => (i.stage || "").toLowerCase() === filter.stageName.toLowerCase());
+    if (filter.noDeals) ranked = ranked.filter(i => (i.dealCount || 0) === 0);
+    if (filter.withDeals) ranked = ranked.filter(i => (i.dealCount || 0) > 0);
+
+    // 4. Intelligence Logic (Suggestions/Followups)
+    if (action === "suggestions" && entity === "deals") {
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        ranked = ranked.filter(d => d.aiScore >= 70 && (new Date(d.updatedAt) < sevenDaysAgo || (d.remarks?.length || 0) === 0));
+        if (ranked.length === 0) return res.json({ reply: "All your high-priority deals seem to be active! Keep it up. 🚀", type: "success" });
+    } else if (action === "followup" && entity === "deals") {
+        const fourteenDaysAgo = new Date();
+        fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+        ranked = ranked.filter(d => (d.remarks?.length || 0) === 0 || new Date(d.updatedAt) < fourteenDaysAgo);
+        if (ranked.length === 0) return res.json({ reply: "Great job! No deals currently need urgent follow-up action. ✅", type: "success" });
+    }
+
+    // 5. Name Search (Robust cross-field)
+    if (filter.name) {
+        const nl = filter.name.toLowerCase();
+        ranked = ranked.filter(i => {
+            return config.searchFields.some(field => {
+                const val = field.split('.').reduce((obj, key) => obj?.[key], i);
+                return (val?.toString() || "").toLowerCase().includes(nl);
+            });
+        });
+    }
+
+    // 6. Sorting
+    ranked.sort((a, b) => b.aiScore - a.aiScore);
+
+    // 7. Actions (Return standard JSONs)
+    if (action === "detail") {
+        if (ranked.length > 0) return res.json({ reply: config.summaryFn(ranked[0]), type: `${config.type}_detail`, total: 1 });
+        return res.json({ reply: `I couldn't find any ${config.type} named "${filter.name}".`, type: "not_found" });
+    }
+
+    if (action === "count") {
+        const label = filter.tier ? ` ${filter.tier}` : "";
+        return res.json({ reply: `You have **${ranked.length}${label} ${config.type}(s)**.`, type: "count", count: ranked.length });
+    }
+
+    if (action === "aggregate" && entity === "deals") {
+        const total = ranked.reduce((sum, d) => sum + (d.value || 0), 0);
+        return res.json({ reply: `Total pipeline value: **$${total.toLocaleString()}** across ${ranked.length} deal(s).`, type: "aggregate", value: total });
+    }
+
+    // Suggestions / Followup custom reply
+    let reply = `Here are your ${config.type}s ranked by AI score:`;
+    if (action === "suggestions") reply = `I've found **${ranked.length} high-priority ${config.type}(s)** that haven't had recent activity:`;
+    if (action === "followup") reply = `Here are **${ranked.length} ${config.type}(s)** that might need a follow-up (no recent activity or notes):`;
+    if (filter.tier) reply = `Here are your **${filter.tier} ${config.type}(s)**:`;
+    if (filter.noDeals) reply = `Here are your companies with **no associated deals**:`;
+    if (filter.withDeals) reply = `Here are your companies with **active deals**:`;
+
+    if (filter.limit) ranked = ranked.slice(0, filter.limit);
+
+    return res.json({
+        reply: ranked.length > 0 ? reply : `No ${config.type}s found matching your criteria.`,
+        data: ranked.map(config.formatFn),
+        type: `${config.type}_list`,
+        total: ranked.length
+    });
 };
 
 // ── Main chatbot handler ─────────────────────────────────────
@@ -159,324 +202,23 @@ export const handleChat = async (req, res) => {
             });
         }
 
-        const ownerFilter = await buildOwnerFilter(req.user);
         const { entity, filter } = intent;
 
         // ── CROSS-ENTITY SEARCH (entity === "all") ────────────
         if (entity === "all" && intent.action === "detail" && filter.name) {
-            const nameLower = filter.name.toLowerCase();
-
-            // Search deals by name
-            const deals = await Deal.find({ isDeleted: false, name: { $regex: nameLower, $options: "i" }, ...ownerFilter })
-                .populate("ownerId", "firstName lastName email role")
-                .populate("companyId", "name")
-                .populate("contactId", "firstName lastName")
-                .lean();
-
-            if (deals.length > 0) {
-                const maxValue = Math.max(...deals.map(d => d.value || 0), 1);
-                const { score, tier } = scoreDeal(deals[0], maxValue);
-                const d = { ...deals[0], aiScore: score, aiTier: tier };
-                return res.json({ reply: summarizeDeal(d), type: "detail", total: 1 });
+            for (const ent of ["deals", "contacts", "companies"]) {
+                const mockRes = {
+                    json: (data) => data,
+                    status: function() { return this; }
+                };
+                const result = await handleUniversalQuery({ ...intent, entity: ent }, req.user, mockRes);
+                if (result.type?.includes("detail")) return res.json(result);
             }
-
-            // Search contacts by name
-            const contacts = await Contact.find({
-                isDeleted: false, ...ownerFilter,
-                $or: [
-                    { firstName: { $regex: nameLower, $options: "i" } },
-                    { lastName: { $regex: nameLower, $options: "i" } }
-                ]
-            }).populate("ownerId", "firstName lastName email role").populate("companyId", "name").lean();
-
-            if (contacts.length > 0) {
-                const contactIds = contacts.map(c => c._id);
-                const dealAgg = await Deal.aggregate([
-                    { $match: { contactId: { $in: contactIds }, isDeleted: false } },
-                    { $group: { _id: "$contactId", count: { $sum: 1 } } }
-                ]);
-                const dealCount = dealAgg[0]?.count || 0;
-                const { score, tier } = scoreContact(contacts[0], dealCount);
-                const c = { ...contacts[0], aiScore: score, aiTier: tier, dealCount };
-                return res.json({ reply: summarizeContact(c), type: "detail", total: 1 });
-            }
-
-            // Search companies by name
-            const companies = await Company.find({ isDeleted: false, name: { $regex: nameLower, $options: "i" }, ...ownerFilter })
-                .populate("ownerId", "firstName lastName email role").lean();
-
-            if (companies.length > 0) {
-                const compId = companies[0]._id;
-                const [dAgg, cAgg] = await Promise.all([
-                    Deal.aggregate([{ $match: { companyId: compId, isDeleted: false, stage: { $nin: ["Closed Won", "Closed Lost"] } } }, { $group: { _id: null, count: { $sum: 1 } } }]),
-                    Contact.aggregate([{ $match: { companyId: compId, isDeleted: false } }, { $group: { _id: null, count: { $sum: 1 } } }])
-                ]);
-                const dealCount = dAgg[0]?.count || 0;
-                const contactCount = cAgg[0]?.count || 0;
-                const maxRev = companies[0].revenueRange || 1;
-                const { score, tier } = scoreCompany(companies[0], dealCount, contactCount, maxRev);
-                const co = { ...companies[0], aiScore: score, aiTier: tier, dealCount, contactCount };
-                return res.json({ reply: summarizeCompany(co), type: "detail", total: 1 });
-            }
-
-            return res.json({ reply: `I couldn't find any details for "${filter.name}". Please try a more specific name or check the spelling.`, type: "not_found" });
+            return res.json({ reply: `I couldn't find any details for "${filter.name}" across deals, contacts, or companies.`, type: "not_found" });
         }
 
-        // ── DEALS ─────────────────────────────────────────────
-        if (entity === "deals") {
-            const deals = await Deal.find({ isDeleted: false, ...ownerFilter })
-                .populate("ownerId", "firstName lastName email role")
-                .populate("companyId", "name")
-                .populate("contactId", "firstName lastName")
-                .lean();
 
-            const maxValue = Math.max(...deals.map(d => d.value || 0), 1);
-            let ranked = deals.map(deal => {
-                const { score, tier } = scoreDeal(deal, maxValue);
-                return { ...deal, aiScore: score, aiTier: tier };
-            });
-
-            // ── Apply Phase 1 Logic ───────────────────────────
-            
-            // 1. Value Above
-            if (filter.valueAbove) {
-                ranked = ranked.filter(d => (d.value || 0) >= filter.valueAbove);
-            }
-
-            // 2. Stage Name
-            if (filter.stageName) {
-                ranked = ranked.filter(d => (d.stage || "").toLowerCase() === filter.stageName.toLowerCase());
-            }
-
-            // 3. Suggestions (High Score + Low Activity)
-            if (intent.action === "suggestions") {
-                const sevenDaysAgo = new Date();
-                sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-                
-                ranked = ranked.filter(d => 
-                    d.aiScore >= 70 && 
-                    (new Date(d.updatedAt) < sevenDaysAgo || (d.remarks?.length || 0) === 0)
-                );
-                
-                if (ranked.length > 0) {
-                    return res.json({
-                        reply: `I've found **${ranked.length} high-priority deal(s)** that haven't had recent activity. High scores with low activity are great opportunities!`,
-                        data: ranked.slice(0, 5).map(formatDeal),
-                        type: "deal_list"
-                    });
-                } else {
-                    return res.json({ reply: "All your high-priority deals seem to be active! Keep it up. 🚀", type: "success" });
-                }
-            }
-
-            // 4. Follow-up Detection
-            if (intent.action === "followup") {
-                const fourteenDaysAgo = new Date();
-                fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
-                
-                ranked = ranked.filter(d => 
-                    (d.remarks?.length || 0) === 0 || 
-                    new Date(d.updatedAt) < fourteenDaysAgo
-                );
-                
-                if (ranked.length > 0) {
-                    return res.json({
-                        reply: `Here are **${ranked.length} deal(s)** that might need a follow-up (no recent activity or notes):`,
-                        data: ranked.slice(0, 5).map(formatDeal),
-                        type: "deal_list"
-                    });
-                } else {
-                    return res.json({ reply: "Great job! No deals currently need urgent follow-up action. ✅", type: "success" });
-                }
-            }
-
-            if (filter.tier) ranked = ranked.filter(d => d.aiTier === filter.tier);
-            if (filter.name) {
-                const nameLower = filter.name.toLowerCase();
-                ranked = ranked.filter(d => {
-                    const dealName = (d.name || "").toLowerCase();
-                    const ownerName = `${d.ownerId?.firstName || ""} ${d.ownerId?.lastName || ""}`.trim().toLowerCase();
-                    return dealName.includes(nameLower) || ownerName.includes(nameLower);
-                });
-            }
-
-            ranked.sort((a, b) => b.aiScore - a.aiScore);
-
-            // DETAIL action
-        if (intent.action === "detail") {
-            if (ranked.length > 0) {
-                return res.json({ reply: summarizeDeal(ranked[0]), type: "deal_detail", total: 1 });
-            } else {
-                return res.json({ reply: `I couldn't find any deal named "${filter.name}".`, type: "not_found" });
-            }
-        }
-
-            if (filter.limit) ranked = ranked.slice(0, filter.limit);
-
-            if (intent.action === "count") {
-                const tierLabel = filter.tier ? ` ${filter.tier}` : "";
-                return res.json({
-                    reply: `You have **${ranked.length}${tierLabel} deal(s)** in your pipeline.`,
-                    type: "count", count: ranked.length
-                });
-            }
-
-            if (intent.action === "aggregate") {
-                const total = ranked.reduce((sum, d) => sum + (d.value || 0), 0);
-                return res.json({
-                    reply: `Total pipeline value: **$${total.toLocaleString()}** across ${ranked.length} deal(s).`,
-                    type: "aggregate", value: total
-                });
-            }
-
-            const tierLabel = filter.tier ? ` ${filter.tier}` : "";
-            const ownerLabel = filter.name ? ` matching "${filter.name}"` : "";
-            return res.json({
-                reply: ranked.length > 0
-                    ? `Here are your${tierLabel} deals${ownerLabel} ranked by AI score:`
-                    : `No${tierLabel} deals found${ownerLabel}.`,
-                data: ranked.map(formatDeal),
-                type: "deal_list",
-                total: ranked.length
-            });
-        }
-
-        // ── COMPANIES ─────────────────────────────────────────
-        if (entity === "companies") {
-            const companies = await Company.find({ isDeleted: false, ...ownerFilter })
-                .populate("ownerId", "firstName lastName email role")
-                .lean();
-
-            const companyIds = companies.map(c => new mongoose.Types.ObjectId(c._id));
-            const [dealAgg, contactAgg] = await Promise.all([
-                Deal.aggregate([
-                    { $match: { companyId: { $in: companyIds }, isDeleted: false } },
-                    { $group: { _id: "$companyId", count: { $sum: 1 } } }
-                ]),
-                Contact.aggregate([
-                    { $match: { companyId: { $in: companyIds }, isDeleted: false } },
-                    { $group: { _id: "$companyId", count: { $sum: 1 } } }
-                ])
-            ]);
-
-            const dealCountMap = Object.fromEntries(dealAgg.map(d => [d._id?.toString(), d.count]));
-            const contactCountMap = Object.fromEntries(contactAgg.map(c => [c._id?.toString(), c.count]));
-            const maxRevenue = Math.max(...companies.map(c => c.revenueRange || 0), 1);
-
-            let ranked = companies.map(company => {
-                const dealCount = dealCountMap[company._id.toString()] || 0;
-                const contactCount = contactCountMap[company._id.toString()] || 0;
-                const { score, tier } = scoreCompany(company, dealCount, contactCount, maxRevenue);
-                return { ...company, aiScore: score, aiTier: tier, dealCount, contactCount };
-            });
-
-            if (filter.tier) ranked = ranked.filter(c => c.aiTier === filter.tier);
-            if (filter.name) {
-                const nameLower = filter.name.toLowerCase();
-                ranked = ranked.filter(c => (c.name || "").toLowerCase().includes(nameLower));
-            }
-
-            // Phase 1: Relational filtering (Deals)
-            if (filter.noDeals) {
-                ranked = ranked.filter(c => (c.dealCount || 0) === 0);
-                if (ranked.length === 0) {
-                    return res.json({ reply: "Excellent! All your companies currently have associated deals. 📈", type: "success" });
-                }
-            } else if (filter.withDeals) {
-                ranked = ranked.filter(c => (c.dealCount || 0) > 0);
-                if (ranked.length === 0) {
-                    return res.json({ reply: "It looks like none of your companies have any associated deals yet. 🏜️", type: "success" });
-                }
-            }
-
-            ranked.sort((a, b) => b.aiScore - a.aiScore);
-
-            // DETAIL action
-            if (intent.action === "detail" && ranked.length > 0) {
-                return res.json({ reply: summarizeCompany(ranked[0]), type: "company_detail", total: 1 });
-            }
-
-            if (filter.limit) ranked = ranked.slice(0, filter.limit);
-
-            if (intent.action === "count") {
-                return res.json({
-                    reply: `You have **${ranked.length} company/companies**.`,
-                    type: "count", count: ranked.length
-                });
-            }
-
-            const tierLabel = filter.tier ? ` ${filter.tier}` : "";
-            return res.json({
-                reply: ranked.length > 0
-                    ? `Here are your${tierLabel} companies ranked by AI score:`
-                    : `No${tierLabel} companies found.`,
-                data: ranked.map(formatCompany),
-                type: "company_list",
-                total: ranked.length
-            });
-        }
-
-        // ── CONTACTS ──────────────────────────────────────────
-        if (entity === "contacts") {
-            const contacts = await Contact.find({ isDeleted: false, ...ownerFilter })
-                .populate("ownerId", "firstName lastName email role")
-                .populate("companyId", "name")
-                .lean();
-
-            const contactIds = contacts.map(c => c._id);
-            const dealAgg = await Deal.aggregate([
-                { $match: { contactId: { $in: contactIds }, isDeleted: false } },
-                { $group: { _id: "$contactId", count: { $sum: 1 } } }
-            ]);
-            const dealCountMap = Object.fromEntries(dealAgg.map(d => [d._id.toString(), d.count]));
-
-            let ranked = contacts.map(contact => {
-                const dealCount = dealCountMap[contact._id.toString()] || 0;
-                const { score, tier } = scoreContact(contact, dealCount);
-                return { ...contact, aiScore: score, aiTier: tier, dealCount };
-            });
-
-            if (filter.tier) ranked = ranked.filter(c => c.aiTier === filter.tier);
-            if (filter.name) {
-                const nameLower = filter.name.toLowerCase();
-                ranked = ranked.filter(c => {
-                    const fullName = `${c.firstName || ""} ${c.lastName || ""}`.trim().toLowerCase();
-                    return fullName.includes(nameLower);
-                });
-            }
-
-            ranked.sort((a, b) => b.aiScore - a.aiScore);
-
-            // DETAIL action
-        if (intent.action === "detail") {
-            if (ranked.length > 0) {
-                return res.json({ reply: summarizeContact(ranked[0]), type: "contact_detail", total: 1 });
-            } else {
-                return res.json({ reply: `I couldn't find any contact named "${filter.name}".`, type: "not_found" });
-            }
-        }
-
-            if (filter.limit) ranked = ranked.slice(0, filter.limit);
-
-            if (intent.action === "count") {
-                return res.json({
-                    reply: `You have **${ranked.length} contact(s)**.`,
-                    type: "count", count: ranked.length
-                });
-            }
-
-            const tierLabel = filter.tier ? ` ${filter.tier}` : "";
-            return res.json({
-                reply: ranked.length > 0
-                    ? `Here are your${tierLabel} contacts ranked by AI score:`
-                    : `No${tierLabel} contacts found.`,
-                data: ranked.map(formatContact),
-                type: "contact_list",
-                total: ranked.length
-            });
-        }
-
-        res.json({ reply: "I couldn't process that request. Type **help** for examples!", type: "error" });
+        return await handleUniversalQuery(intent, req.user, res);
     } catch (error) {
         console.error("❌ Chatbot Error:", error);
         res.status(500).json({ reply: "Something went wrong. Please try again.", type: "error" });
