@@ -129,11 +129,17 @@ export const parseIntent = (message) => {
         }
     }
 
-    // 3. No Deals (Relational) — If "no deals" mentioned, force entity to companies if not already set
+    // 3. Relational Filters (Deals)
     if (/\b(no|zero|without)\s+deal(s)?\b/i.test(input)) {
         noDeals = true;
         if (!entity || entity === "deals") entity = "companies";
+    } else if (/\b(with|has|having|at least one)\s+deal(s)?\b/i.test(input)) {
+        // "companies with deals" -> inverse of noDeals
+        // We'll use a new filter property 'withDeals'
+        if (!entity || entity === "deals") entity = "companies";
     }
+
+    let withDeals = /\b(with|has|having|at least one)\s+deal(s)?\b/i.test(input);
 
     // Extract limit for "top N" queries
     let limit = null;
@@ -176,7 +182,8 @@ export const parseIntent = (message) => {
             own,
             valueAbove,
             stageName,
-            noDeals
+            noDeals,
+            withDeals
         }
     };
 };
@@ -209,7 +216,8 @@ export const getHelpMessage = () => {
 • "give me suggestions" — High-priority deals needing attention
 • "hot deals above 1 lakh" — Value-based filtering
 • "deals in negotiation stage" — Stage-based filtering
-• "companies with no deals" — Relational filtering
+• "companies with no deals" — Companies with zero deals
+• "companies with deals" — Companies with at least one deal
 
 **Quick Detail:**
 • "details of Anirudh" — Search across all entities by name`;

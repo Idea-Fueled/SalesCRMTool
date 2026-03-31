@@ -375,11 +375,16 @@ export const handleChat = async (req, res) => {
                 ranked = ranked.filter(c => (c.name || "").toLowerCase().includes(nameLower));
             }
 
-            // Phase 1: No Deals filtering
+            // Phase 1: Relational filtering (Deals)
             if (filter.noDeals) {
                 ranked = ranked.filter(c => (c.dealCount || 0) === 0);
                 if (ranked.length === 0) {
                     return res.json({ reply: "Excellent! All your companies currently have associated deals. 📈", type: "success" });
+                }
+            } else if (filter.withDeals) {
+                ranked = ranked.filter(c => (c.dealCount || 0) > 0);
+                if (ranked.length === 0) {
+                    return res.json({ reply: "It looks like none of your companies have any associated deals yet. 🏜️", type: "success" });
                 }
             }
 
