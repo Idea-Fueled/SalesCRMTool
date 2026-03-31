@@ -235,6 +235,60 @@ export const handleChat = async (req, res) => {
                 return { ...deal, aiScore: score, aiTier: tier };
             });
 
+            // ── Apply Phase 1 Logic ───────────────────────────
+            
+            // 1. Value Above
+            if (filter.valueAbove) {
+                ranked = ranked.filter(d => (d.value || 0) >= filter.valueAbove);
+            }
+
+            // 2. Stage Name
+            if (filter.stageName) {
+                ranked = ranked.filter(d => (d.stage || "").toLowerCase() === filter.stageName.toLowerCase());
+            }
+
+            // 3. Suggestions (High Score + Low Activity)
+            if (intent.action === "suggestions") {
+                const sevenDaysAgo = new Date();
+                sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                
+                ranked = ranked.filter(d => 
+                    d.aiScore >= 70 && 
+                    (new Date(d.updatedAt) < sevenDaysAgo || (d.remarks?.length || 0) === 0)
+                );
+                
+                if (ranked.length > 0) {
+                    return res.json({
+                        reply: `I've found **${ranked.length} high-priority deal(s)** that haven't had recent activity. High scores with low activity are great opportunities!`,
+                        data: ranked.slice(0, 5).map(formatDeal),
+                        type: "deal_list"
+                    });
+                } else {
+                    return res.json({ reply: "All your high-priority deals seem to be active! Keep it up. 🚀", type: "success" });
+                }
+            }
+
+            // 4. Follow-up Detection
+            if (intent.action === "followup") {
+                const fourteenDaysAgo = new Date();
+                fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+                
+                ranked = ranked.filter(d => 
+                    (d.remarks?.length || 0) === 0 || 
+                    new Date(d.updatedAt) < fourteenDaysAgo
+                );
+                
+                if (ranked.length > 0) {
+                    return res.json({
+                        reply: `Here are **${ranked.length} deal(s)** that might need a follow-up (no recent activity or notes):`,
+                        data: ranked.slice(0, 5).map(formatDeal),
+                        type: "deal_list"
+                    });
+                } else {
+                    return res.json({ reply: "Great job! No deals currently need urgent follow-up action. ✅", type: "success" });
+                }
+            }
+
             if (filter.tier) ranked = ranked.filter(d => d.aiTier === filter.tier);
             if (filter.name) {
                 const nameLower = filter.name.toLowerCase();
@@ -319,6 +373,14 @@ export const handleChat = async (req, res) => {
             if (filter.name) {
                 const nameLower = filter.name.toLowerCase();
                 ranked = ranked.filter(c => (c.name || "").toLowerCase().includes(nameLower));
+            }
+
+            // Phase 1: No Deals filtering
+            if (filter.noDeals) {
+                ranked = ranked.filter(c => (c.dealCount || 0) === 0);
+                if (ranked.length === 0) {
+                    return res.json({ reply: "Excellent! All your companies currently have associated deals. 📈", type: "success" });
+                }
             }
 
             ranked.sort((a, b) => b.aiScore - a.aiScore);

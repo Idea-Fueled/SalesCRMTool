@@ -27,10 +27,21 @@ export const parseIntent = (message) => {
     if (/\bhot\b/i.test(input)) tier = "Hot";
     else if (/\bwarm\b/i.test(input)) tier = "Warm";
     else if (/\bcold\b/i.test(input)) tier = "Cold";
+    else if (/\bhigh\s+priority\b/i.test(input)) tier = "Hot";
 
     // Determine action
     let action = "list"; // default
 
+    // Suggestions / Proactive items
+    if (/\b(suggestion|suggestions|proactive|priority|priority base|what should i do|highlight)\b/i.test(input)) {
+        action = "suggestions";
+        entity = entity || "deals"; // default suggestions to deals
+    }
+    // Follow-ups
+    else if (/\b(follow-up|followup|follow up|pending|no activity|need attention|waiting)\b/i.test(input)) {
+        action = "followup";
+        entity = entity || "deals";
+    }
     // Count queries
     if (/\b(how many|count|total number)\b/i.test(input)) {
         action = "count";
@@ -92,6 +103,37 @@ export const parseIntent = (message) => {
         if (match) name = cleanName(match[1]);
     }
 
+    // ── Advanced Filters ──────────────────────────────────────
+    let valueAbove = null;
+    let stageName = null;
+    let noDeals = false;
+
+    // 1. Value Above (Handles: "above 1 lakh", "greater than 50k", "more than 10000")
+    const valueMatch = input.match(/\b(?:above|greater than|more than|worth|valued at)\s+([\d,.]+)\s*(k|lakh|lakhs|m|million|cr|crore)?\b/i);
+    if (valueMatch) {
+        let val = parseFloat(valueMatch[1].replace(/,/g, ''));
+        const unit = (valueMatch[2] || "").toLowerCase();
+        if (unit.startsWith("k")) val *= 1000;
+        else if (unit.startsWith("lakh")) val *= 100000;
+        else if (unit.startsWith("m")) val *= 1000000;
+        else if (unit.startsWith("cr")) val *= 10000000;
+        valueAbove = val;
+    }
+
+    // 2. Stage Name (Handles: "negotiation stage", "lead stage", "in proposal")
+    const stageKeywords = ["lead", "qualified", "proposal", "negotiation", "closed won", "closed lost"];
+    for (const s of stageKeywords) {
+        if (new RegExp(`\\b${s}\\b.*stage`, "i").test(input) || new RegExp(`in\\s+${s}`, "i").test(input)) {
+            stageName = s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            break;
+        }
+    }
+
+    // 3. No Deals (Relational)
+    if (/\b(no|zero|without)\s+deals\b/i.test(input)) {
+        noDeals = true;
+    }
+
     // Extract limit for "top N" queries
     let limit = null;
     const topMatch = input.match(/\btop\s+(\d+)/i);
@@ -113,6 +155,8 @@ export const parseIntent = (message) => {
             entity = "all"; // search across all entities for the name
         } else if (action === "aggregate") {
             entity = "deals"; // "total value" → deals
+        } else if (action === "suggestions" || action === "followup") {
+            entity = "deals"; 
         } else {
             return {
                 action: "unknown",
@@ -128,7 +172,10 @@ export const parseIntent = (message) => {
             tier,
             name,
             limit,
-            own
+            own,
+            valueAbove,
+            stageName,
+            noDeals
         }
     };
 };
@@ -155,6 +202,13 @@ export const getHelpMessage = () => {
 • "company Idea Fueled details" — Summary of a specific company
 • "top companies" — Top 5 ranked companies
 • "hot companies" — Filter companies by tier
+
+**Intelligence (Phase 1):**
+• "pending follow-ups" — Deals with no recent activity
+• "give me suggestions" — High-priority deals needing attention
+• "hot deals above 1 lakh" — Value-based filtering
+• "deals in negotiation stage" — Stage-based filtering
+• "companies with no deals" — Relational filtering
 
 **Quick Detail:**
 • "details of Anirudh" — Search across all entities by name`;
