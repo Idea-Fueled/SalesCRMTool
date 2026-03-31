@@ -18,9 +18,9 @@ export const parseIntent = (message) => {
 
     // Determine entity
     let entity = null;
-    if (/deal/i.test(input)) entity = "deals";
-    else if (/compan/i.test(input)) entity = "companies";
-    else if (/contact/i.test(input)) entity = "contacts";
+    if (/\b(company|companies|compan)\b/i.test(input)) entity = "companies";
+    else if (/\b(contact|contacts)\b/i.test(input)) entity = "contacts";
+    else if (/\b(deal|deals)\b/i.test(input)) entity = "deals";
 
     // Determine tier filter
     let tier = null;
@@ -51,7 +51,7 @@ export const parseIntent = (message) => {
         action = "aggregate";
     }
     // Detail queries  
-    else if (/\b(detail|details|info|information|about)\b/i.test(input) || /\bgive\b.*\b(detail|info)\b/i.test(input) || /^(detail|details|info|about)\s+/i.test(input)) {
+    else if (/\b(details?|info(rmation)?|about)\b/i.test(input) || /\bgive\b.*\b(details?|info)\b/i.test(input) || /^(details?|info|about)\s+/i.test(input)) {
         action = "detail";
     }
     // Top queries
@@ -129,9 +129,10 @@ export const parseIntent = (message) => {
         }
     }
 
-    // 3. No Deals (Relational)
+    // 3. No Deals (Relational) — If "no deals" mentioned, force entity to companies if not already set
     if (/\b(no|zero|without)\s+deals\b/i.test(input)) {
         noDeals = true;
+        if (!entity || entity === "deals") entity = "companies";
     }
 
     // Extract limit for "top N" queries
