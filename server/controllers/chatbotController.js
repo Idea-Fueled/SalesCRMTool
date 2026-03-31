@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Deal } from "../models/dealSchema.js";
 import { Company } from "../models/companySchema.js";
 import { Contact } from "../models/contactSchema.js";
@@ -346,7 +347,7 @@ export const handleChat = async (req, res) => {
                 .populate("ownerId", "firstName lastName email role")
                 .lean();
 
-            const companyIds = companies.map(c => c._id);
+            const companyIds = companies.map(c => new mongoose.Types.ObjectId(c._id));
             const [dealAgg, contactAgg] = await Promise.all([
                 Deal.aggregate([
                     { $match: { companyId: { $in: companyIds }, isDeleted: false } },
@@ -358,8 +359,8 @@ export const handleChat = async (req, res) => {
                 ])
             ]);
 
-            const dealCountMap = Object.fromEntries(dealAgg.map(d => [d._id.toString(), d.count]));
-            const contactCountMap = Object.fromEntries(contactAgg.map(c => [c._id.toString(), c.count]));
+            const dealCountMap = Object.fromEntries(dealAgg.map(d => [d._id?.toString(), d.count]));
+            const contactCountMap = Object.fromEntries(contactAgg.map(c => [c._id?.toString(), c.count]));
             const maxRevenue = Math.max(...companies.map(c => c.revenueRange || 0), 1);
 
             let ranked = companies.map(company => {
