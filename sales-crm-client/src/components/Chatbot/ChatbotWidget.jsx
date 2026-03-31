@@ -58,9 +58,10 @@ export default function ChatbotWidget() {
                 type: type || "text"
             }]);
         } catch (error) {
-            const errMsg = error.response?.status === 401
+            const serverMsg = error.response?.data?.reply;
+            const errMsg = serverMsg || (error.response?.status === 401
                 ? "Your session expired. Please log in again."
-                : "Something went wrong. Please try again.";
+                : "Something went wrong. Please try again.");
             setMessages(prev => [...prev, {
                 role: "bot",
                 text: errMsg,

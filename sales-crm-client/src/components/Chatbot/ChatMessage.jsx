@@ -59,6 +59,7 @@ function formatMarkdown(text) {
 function DataCard({ item, type }) {
     const isDeal = type?.includes("deal");
     const isCompany = type?.includes("company");
+    const isUser = type?.includes("user");
 
     return (
         <div className="flex items-center justify-between gap-3 px-4 py-3 bg-white/60 border border-white rounded-2xl hover:bg-white hover:shadow-md hover:border-red-100 transition-all duration-300 group ring-1 ring-black/5">
@@ -71,14 +72,17 @@ function DataCard({ item, type }) {
                         {item.name}
                     </p>
                     <p className="text-[10px] text-gray-500 font-medium truncate mt-0.5 opacity-70">
-                        {isDeal ? `${item.value} · ${item.stage}` :
-                         isCompany ? `${item.industry} · ${item.status}` :
-                         `${item.jobTitle} · ${item.company}`}
+                        {isDeal ? `$${(item.value || 0).toLocaleString()} · ${item.stage || "Lead"}` :
+                         isCompany ? `${item.industry || "General"} · ${item.status || "Active"}` :
+                         isUser ? `${item.role || "User"} · ${item.email}` :
+                         `${item.jobTitle || "Contact"} · ${item.company || "Direct"}`}
                     </p>
                 </div>
             </div>
             <div className="flex-shrink-0 scale-90 group-hover:scale-100 transition-transform duration-300">
-                <RankBadge score={item.score} tier={item.tier} compact />
+                {!isUser && item.score !== undefined && (
+                    <RankBadge score={item.score} tier={item.tier} compact />
+                )}
             </div>
         </div>
     );

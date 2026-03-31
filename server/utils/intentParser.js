@@ -16,11 +16,18 @@ export const parseIntent = (message) => {
         return { action: "greet" };
     }
 
-    // Determine entity
+    let action = "list"; // default actions
     let entity = null;
-    if (/\b(company|companies|compan)\b/i.test(input)) entity = "companies";
+
+    // Determine entity (Priority to Reports)
+    if (/\b(report|reports|stat|stats|statistic|statistics|dashboard|summary)\b/i.test(input)) {
+        entity = "reports";
+        action = "aggregate";
+    }
+    else if (/\b(company|companies|compan)\b/i.test(input)) entity = "companies";
     else if (/\b(contact|contacts)\b/i.test(input)) entity = "contacts";
-    else if (/\b(deal|deals)\b/i.test(input)) entity = "deals";
+    else if (/\b(user|users|member|members|team|colleague|colleagues)\b/i.test(input)) entity = "users";
+    else if (/\b(deal|deals|negotiation|lead|pipeline)\b/i.test(input)) entity = "deals";
 
     // Determine tier filter
     let tier = null;
@@ -29,8 +36,7 @@ export const parseIntent = (message) => {
     else if (/\bcold\b/i.test(input)) tier = "Cold";
     else if (/\bhigh\s+priority\b/i.test(input)) tier = "Hot";
 
-    // Determine action
-    let action = "list"; // default
+    // Determine remaining action logic... (action already defined)
 
     // Suggestions / Proactive items
     if (/\b(suggestion|suggestions|proactive|priority|priority base|what should i do|highlight)\b/i.test(input)) {
@@ -66,7 +72,8 @@ export const parseIntent = (message) => {
     const stopWords = ["the", "all", "my", "hot", "warm", "cold", "deals", "contacts", "companies",
         "deal", "contact", "company", "show", "get", "list", "give", "me", "detail", "details",
         "info", "information", "about", "top", "ranked", "of", "for", "by", "from", "sum",
-        "total", "value", "how", "many", "count", "in", "stage", "above", "worth", "valued", "at"];
+        "total", "value", "how", "many", "count", "in", "stage", "above", "worth", "valued", "at",
+        "is", "are", "there", "what", "who", "which", "number", "has", "have"];
 
     const cleanName = (raw) => {
         if (!raw) return null;
@@ -176,6 +183,7 @@ export const parseIntent = (message) => {
     return {
         action,
         entity,
+        originalMessage: message,
         filter: {
             tier,
             name,
@@ -184,42 +192,30 @@ export const parseIntent = (message) => {
             valueAbove,
             stageName,
             noDeals,
-            withDeals
+            withDeals,
+            withDeals,
+            trash: /\b(trash|deleted|archived|archive)\b/i.test(input),
+            team: /\b(team|members|colleagues)\b/i.test(input),
+            active: /\bdeactivated|inactive\b/i.test(input) ? false : (/\bactive\b/i.test(input) ? true : null)
         }
     };
 };
 
 export const getHelpMessage = () => {
-    return `Here's what I can do:
+    return `Hi! I'm your AI Sales Assistant. 🤖
 
-**Deals:**
-• "show my deals" — List your deals ranked by AI score
-• "show hot deals" — Filter deals by Hot/Warm/Cold tier
-• "show deals of Anirudh" — Filter deals by owner name
-• "deal Enterprise License details" — Summary of a specific deal
-• "top 5 deals" — Show highest ranked deals
-• "how many hot deals?" — Count deals by tier
-• "total deal value" — Sum of all deal values
+I've been upgraded with AI, which means you don't need to memorize strict commands anymore. 
+Just ask me **naturally** about your CRM data!
 
-**Contacts:**
-• "show contacts" — List all contacts ranked by score
-• "contact Sandeep details" — Summary of a specific contact
-• "top contacts" — Top 5 ranked contacts
+**Here are some examples of what you can ask me:**
+• *"Show my high value inactive deals"*
+• *"How many hot contacts do I have?"*
+• *"Get me the details of Sandeep"*
+• *"Provide my top 5 deals in the negotiation stage"*
+• *"What is my total pipeline value?"*
+• *"Show me companies with no deals"*
+• *"Who needs a follow-up right now?"*
 
-**Companies:**
-• "show companies" — List all companies ranked by score
-• "company Idea Fueled details" — Summary of a specific company
-• "top companies" — Top 5 ranked companies
-• "hot companies" — Filter companies by tier
-
-**Intelligence (Phase 1):**
-• "pending follow-ups" — Deals with no recent activity
-• "give me suggestions" — High-priority deals needing attention
-• "hot deals above 1 lakh" — Value-based filtering
-• "deals in negotiation stage" — Stage-based filtering
-• "companies with no deals" — Companies with zero deals
-• "companies with deals" — Companies with at least one deal
-
-**Quick Detail:**
-• "details of Anirudh" — Search across all entities by name`;
+I can filter by tier (Hot/Warm/Cold), stage, value amounts, names, and even find things that are inactive or have missing deals.
+Try it out!`;
 };
