@@ -349,7 +349,7 @@ export const handleChat = async (req, res) => {
             const companyIds = companies.map(c => c._id);
             const [dealAgg, contactAgg] = await Promise.all([
                 Deal.aggregate([
-                    { $match: { companyId: { $in: companyIds }, isDeleted: false, stage: { $nin: ["Closed Won", "Closed Lost"] } } },
+                    { $match: { companyId: { $in: companyIds }, isDeleted: false } },
                     { $group: { _id: "$companyId", count: { $sum: 1 } } }
                 ]),
                 Contact.aggregate([

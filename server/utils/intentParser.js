@@ -81,13 +81,13 @@ export const parseIntent = (message) => {
 
     // Pattern 2: "contact/deal/company <name> details/info"
     if (!name) {
-        const entityNameMatch = input.match(/\b(?:contact|company|deal)\s+(.+?)(?:\s+(?:details?|info|information)|\s*$)/i);
+        const entityNameMatch = input.match(/\b(?:contacts?|compan(?:y|ies)|deals?)\s+(.+?)(?:\s+(?:details?|info(rmation)?|about)|\s*$)/i);
         if (entityNameMatch) name = cleanName(entityNameMatch[1]);
     }
 
     // Pattern 3: "<name> contact/deal/company details"
     if (!name) {
-        const nameEntityMatch = input.match(/^(?:show|get|give|list|me|the|\s)*(.+?)\s+(?:contact|company|deal)\s+(?:details?|info)/i);
+        const nameEntityMatch = input.match(/^(?:show|get|give|list|me|the|\s)*(.+?)\s+(?:contacts?|compan(?:y|ies)|deals?)\s+(?:details?|info(rmation)?|about)/i);
         if (nameEntityMatch) name = cleanName(nameEntityMatch[1]);
     }
 
@@ -130,7 +130,7 @@ export const parseIntent = (message) => {
     }
 
     // 3. No Deals (Relational) — If "no deals" mentioned, force entity to companies if not already set
-    if (/\b(no|zero|without)\s+deals\b/i.test(input)) {
+    if (/\b(no|zero|without)\s+deal(s)?\b/i.test(input)) {
         noDeals = true;
         if (!entity || entity === "deals") entity = "companies";
     }
