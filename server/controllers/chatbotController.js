@@ -23,6 +23,67 @@ const buildOwnerFilter = async (user) => {
     return { ownerId: user._id };
 };
 
+// ── Formatters & Summarizers ─────────────────────────────────
+const formatDeal = (d) => ({
+    id: d._id,
+    name: d.name,
+    value: d.value,
+    stage: d.stage,
+    owner: d.ownerId ? `${d.ownerId.firstName} ${d.ownerId.lastName}` : "Unassigned",
+    company: d.companyId?.name || "None",
+    aiScore: d.aiScore,
+    aiTier: d.aiTier
+});
+
+const summarizeDeal = (d) => `
+**Deal:** ${d.name}
+**Value:** $${(d.value || 0).toLocaleString()}
+**Stage:** ${d.stage}
+**Owner:** ${d.ownerId ? `${d.ownerId.firstName} ${d.ownerId.lastName}` : "Unassigned"}
+**Company:** ${d.companyId?.name || "None"}
+**AI Score:** ${d.aiScore} (${d.aiTier})
+`.trim();
+
+const formatCompany = (c) => ({
+    id: c._id,
+    name: c.name,
+    industry: c.industry,
+    owner: c.ownerId ? `${c.ownerId.firstName} ${c.ownerId.lastName}` : "Unassigned",
+    deals: c.dealCount,
+    contacts: c.contactCount,
+    aiScore: c.aiScore,
+    aiTier: c.aiTier
+});
+
+const summarizeCompany = (c) => `
+**Company:** ${c.name}
+**Industry:** ${c.industry || "N/A"}
+**Owner:** ${c.ownerId ? `${c.ownerId.firstName} ${c.ownerId.lastName}` : "Unassigned"}
+**Active Deals:** ${c.dealCount}
+**Total Contacts:** ${c.contactCount}
+**AI Score:** ${c.aiScore} (${c.aiTier})
+`.trim();
+
+const formatContact = (c) => ({
+    id: c._id,
+    name: `${c.firstName} ${c.lastName}`,
+    email: c.email,
+    company: c.companyId?.name || "None",
+    owner: c.ownerId ? `${c.ownerId.firstName} ${c.ownerId.lastName}` : "Unassigned",
+    deals: c.dealCount,
+    aiScore: c.aiScore,
+    aiTier: c.aiTier
+});
+
+const summarizeContact = (c) => `
+**Contact:** ${c.firstName} ${c.lastName}
+**Email:** ${c.email || "N/A"}
+**Company:** ${c.companyId?.name || "None"}
+**Owner:** ${c.ownerId ? `${c.ownerId.firstName} ${c.ownerId.lastName}` : "Unassigned"}
+**Active Deals:** ${c.dealCount}
+**AI Score:** ${c.aiScore} (${c.aiTier})
+`.trim();
+
 // ── Entity Configuration ─────────────────────────────────────
 const SCHEMA_CONFIG = {
     deals: {
