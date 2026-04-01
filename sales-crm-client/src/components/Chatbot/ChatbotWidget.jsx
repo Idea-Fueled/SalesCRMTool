@@ -32,12 +32,14 @@ export default function ChatbotWidget() {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
-    // Focus input when opened
+    // Focus input when opened or after loading finishes
     useEffect(() => {
-        if (isOpen) {
-            setTimeout(() => inputRef.current?.focus(), 200);
+        if (isOpen && !loading) {
+            // Use a small timeout to ensure visibility/render completion
+            const timer = setTimeout(() => inputRef.current?.focus(), 100);
+            return () => clearTimeout(timer);
         }
-    }, [isOpen]);
+    }, [isOpen, loading]);
 
     const handleSend = async (text) => {
         const query = text || input.trim();
