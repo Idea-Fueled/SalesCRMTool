@@ -307,21 +307,19 @@ export default function Reports() {
                     { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString('en-IN'), w: 32 },
                     { header: 'Deal name',     key: d => d.name || '—',                              w: 50 },
                     { header: 'Deal Value',    key: d => d.value ? `${d.currency || '$'}${Number(d.value).toLocaleString()}` : '—', w: 28 },
-                    { header: 'AI Score',      key: d => d.aiScore || '—',                           w: 22 },
                     { header: 'Owner', key: d => {
                         const name = d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : (d.ownerName || '—');
                         const role = d.ownerId?.role;
                         const roleTag = role === 'admin' ? '(Admin)' : role === 'sales_manager' ? '(Mgr)' : role === 'sales_rep' ? '(Rep)' : '';
                         return roleTag ? `${name} ${roleTag}` : name;
-                    }, w: 42 },
+                    }, w: 64 },
                     { header: 'Status',        key: d => d.stage || '—',                             w: 28 },
                 ];
             } else if (activeTab === 'companies') {
                 columns = [
                     { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString('en-IN'), w: 32 },
                     { header: 'Company',       key: d => d.name || '—',                              w: 50 },
-                    { header: 'Industry',      key: d => d.industry || '—',                          w: 38 },
-                    { header: 'AI Score',      key: d => d.aiScore || '—',                           w: 22 },
+                    { header: 'Industry',      key: d => d.industry || '—',                          w: 60 },
                     { header: 'Owner', key: d => {
                         const name = d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : '—';
                         const role = d.ownerId?.role;
@@ -334,8 +332,7 @@ export default function Reports() {
                 columns = [
                     { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString(), w: 30 },
                     { header: 'Name',          key: d => `${d.firstName || ''} ${d.lastName || ''}`.trim() || '—', w: 50 },
-                    { header: 'Title',         key: d => d.jobTitle || '—',                          w: 60 },
-                    { header: 'AI Score',      key: d => d.aiScore || '—',                           w: 20 },
+                    { header: 'Title',         key: d => d.jobTitle || '—',                          w: 80 },
                     { header: 'Owner',         key: d => {
                         const name = d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : '—';
                         const role = d.ownerId?.role;
