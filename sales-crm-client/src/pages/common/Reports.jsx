@@ -304,41 +304,41 @@ export default function Reports() {
             let columns = [];
             if (activeTab === 'deals') {
                 columns = [
-                    { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString('en-IN'), w: 32 },
-                    { header: 'Deal name',     key: d => d.name || '—',                              w: 50 },
-                    { header: 'Deal Value',    key: d => d.value ? `${d.currency || '$'}${Number(d.value).toLocaleString()}` : '—', w: 28 },
+                    { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString('en-IN'), w: 28 },
+                    { header: 'Deal name',     key: d => d.name || '—',                              w: 45 },
+                    { header: 'Deal Value',    key: d => d.value ? `${d.currency || '$'}${Number(d.value).toLocaleString()}` : '—', w: 25 },
                     { header: 'Owner', key: d => {
                         const name = d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : (d.ownerName || '—');
                         const role = d.ownerId?.role;
                         const roleTag = role === 'admin' ? '(Admin)' : role === 'sales_manager' ? '(Mgr)' : role === 'sales_rep' ? '(Rep)' : '';
                         return roleTag ? `${name} ${roleTag}` : name;
-                    }, w: 64 },
-                    { header: 'Status',        key: d => d.stage || '—',                             w: 28 },
+                    }, w: 57 },
+                    { header: 'Status',        key: d => d.stage || '—',                             w: 25 },
                 ];
             } else if (activeTab === 'companies') {
                 columns = [
-                    { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString('en-IN'), w: 32 },
-                    { header: 'Company',       key: d => d.name || '—',                              w: 50 },
-                    { header: 'Industry',      key: d => d.industry || '—',                          w: 60 },
+                    { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString('en-IN'), w: 28 },
+                    { header: 'Company',       key: d => d.name || '—',                              w: 45 },
+                    { header: 'Industry',      key: d => d.industry || '—',                          w: 54 },
                     { header: 'Owner', key: d => {
                         const name = d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : '—';
                         const role = d.ownerId?.role;
                         const roleTag = role === 'admin' ? '(Admin)' : role === 'sales_manager' ? '(Mgr)' : role === 'sales_rep' ? '(Rep)' : '';
                         return roleTag ? `${name} ${roleTag}` : name;
-                    }, w: 35 },
-                    { header: 'Status',        key: d => d.status || '—',                            w: 25 },
+                    }, w: 31 },
+                    { header: 'Status',        key: d => d.status || '—',                            w: 22 },
                 ];
             } else {
                 columns = [
-                    { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString(), w: 30 },
-                    { header: 'Name',          key: d => `${d.firstName || ''} ${d.lastName || ''}`.trim() || '—', w: 50 },
-                    { header: 'Title',         key: d => d.jobTitle || '—',                          w: 80 },
+                    { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString(), w: 28 },
+                    { header: 'Name',          key: d => `${d.firstName || ''} ${d.lastName || ''}`.trim() || '—', w: 45 },
+                    { header: 'Title',         key: d => d.jobTitle || '—',                          w: 70 },
                     { header: 'Owner',         key: d => {
                         const name = d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : '—';
                         const role = d.ownerId?.role;
                         const roleTag = role === 'admin' ? '(Admin)' : role === 'sales_manager' ? '(Mgr)' : role === 'sales_rep' ? '(Rep)' : '';
                         return roleTag ? `${name} ${roleTag}` : name;
-                    }, w: 40 },
+                    }, w: 37 },
                 ];
             }
 
