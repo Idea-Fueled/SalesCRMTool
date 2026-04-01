@@ -13,84 +13,33 @@ import fs from "fs";
 const getVisibilityFilter = async (user, entity, filter = {}) => {
     const { _id: id, role } = user;
     const isTrash = !!(filter.trash || filter.isDeleted);
+    
+    // Base filter for all roles
     let baseFilter = { isDeleted: isTrash };
 
+    // Admin has full visibility
     if (role === "admin") {
-        if (entity === "users" && !isTrash) return { isDeleted: false };
         return baseFilter;
     }
 
-    const teamUsers = await User.find({ $or: [{ _id: id }, { managerId: id }] }).select("_id");
-    const teamIds = teamUsers.map(u => u._id);
-    const ownershipRef = role === "sales_manager" ? { ownerId: { $in: teamIds } } : { ownerId: id };
+    // Identify team members for Managers, or just self for Reps
+    let teamIds = [id];
+    if (role === "sales_manager") {
+        const teamUsers = await User.find({ managerId: id }).select("_id");
+        teamIds = [id, ...teamUsers.map(u => u._id)];
+    }
 
+    // Role-based Ownership Reference
+    const ownershipRef = { ownerId: { $in: teamIds } };
+
+    // Special handling for the "users" entity
     if (entity === "users") {
-        const userBase = { isDeleted: isTrash };
-        if (role === "sales_manager") return { ...userBase, managerId: id };
-        return { ...userBase, _id: id };
+        if (role === "sales_manager") return { ...baseFilter, managerId: id };
+        return { ...baseFilter, _id: id };
     }
 
-    if (entity === "deals") {
-        const [myCompanies, myContacts] = await Promise.all([
-            Company.find(ownershipRef).select("_id"),
-            Contact.find(ownershipRef).select("_id")
-        ]);
-        const companyIds = myCompanies.map(c => c._id);
-        const contactIds = myContacts.map(c => c._id);
-
-        return {
-            ...baseFilter,
-            $or: [
-                ownershipRef,
-                { companyId: { $in: companyIds } },
-                { contactId: { $in: contactIds } }
-            ]
-        };
-    }
-
-    if (entity === "contacts") {
-        const [myDeals, myCompanies] = await Promise.all([
-            Deal.find(ownershipRef).select("contactId"),
-            Company.find(ownershipRef).select("_id")
-        ]);
-        const dealContactIds = myDeals.map(d => d.contactId).filter(Boolean);
-        const companyIds = myCompanies.map(c => c._id);
-
-        return {
-            ...baseFilter,
-            $or: [
-                ownershipRef,
-                { _id: { $in: dealContactIds } },
-                { companyId: { $in: companyIds } },
-                { "companies.companyId": { $in: companyIds } }
-            ]
-        };
-    }
-
-    if (entity === "companies") {
-        const [myDeals, myContacts] = await Promise.all([
-            Deal.find(ownershipRef).select("companyId"),
-            Contact.find(ownershipRef).select("companyId companies")
-        ]);
-
-        const dealCompanyIds = myDeals.map(d => d.companyId).filter(Boolean);
-        const contactCompanyIds = [];
-        myContacts.forEach(c => {
-            if (c.companyId) contactCompanyIds.push(c.companyId);
-            if (c.companies) c.companies.forEach(assoc => { if (assoc.companyId) contactCompanyIds.push(assoc.companyId); });
-        });
-
-        return {
-            ...baseFilter,
-            $or: [
-                ownershipRef,
-                { _id: { $in: dealCompanyIds } },
-                { _id: { $in: contactCompanyIds } }
-            ]
-        };
-    }
-
-    return baseFilter;
+    // For everything else (deals, contacts, companies), use strict ownership
+    return { ...baseFilter, ...ownershipRef };
 };
 
 // ── Formatters & Summarizers ─────────────────────────────────
@@ -402,10 +351,22 @@ const handleUniversalQuery = async (intent, user, res) => {
     // 5a. Explicit Owner Filter (Handles "me", "my", or specific names)
     if (filter.owner || filter.own) {
         const ownerLower = String(filter.owner || (filter.own ? "me" : "")).toLowerCase();
+        const userIdStr = user._id.toString();
+
         if (ownerLower === "me" || ownerLower === "my") {
-            // Strict personal ownership override
-            ranked = ranked.filter(i => (i.ownerId?._id?.toString() || i.ownerId?.toString()) === user._id.toString());
+            // For Sales Reps, "my" is always strict personal ownership.
+            // For Managers and Admins, "my" often refers to their authorized context (Team/All).
+            // We only apply strict personal filtering for non-admin/non-manager roles.
+            if (user.role === "sales_rep") {
+                ranked = ranked.filter(i => {
+                    const oid = i.ownerId?._id ? i.ownerId._id.toString() : (i.ownerId ? i.ownerId.toString() : null);
+                    return oid === userIdStr;
+                });
+            }
+            // Note: For Manager/Admin, we don't filter further because getVisibilityFilter 
+            // already restricted 'ranked' to their Team/All context respectively.
         } else {
+            // Specific name filter (e.g. "show Rahul's deals")
             ranked = ranked.filter(i => {
                 const ownerName = `${i.ownerId?.firstName || ""} ${i.ownerId?.lastName || ""}`.toLowerCase();
                 return ownerName.includes(ownerLower);
