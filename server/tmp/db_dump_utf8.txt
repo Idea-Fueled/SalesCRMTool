@@ -1,0 +1,9 @@
+﻿[dotenv@17.3.1] injecting env (10) from .env -- tip: ≡ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit
+--- USERS ---
+Anirudh Joshi [admin] ID: 69c2688c9ab6a4be83623a85
+Abhishek Mittal [sales_manager] ID: 69c269099ab6a4be83623aa1
+Rishabh Loomba [sales_rep] ID: 69c26eb857989f9bd3e3d86f
+
+--- DEALS ---
+Deal: Idea Fueled License, Owner: 69c269099ab6a4be83623aa1, Deleted: false
+Deal: Idea Fueled License 2, Owner: 69c26eb857989f9bd3e3d86f, Deleted: false

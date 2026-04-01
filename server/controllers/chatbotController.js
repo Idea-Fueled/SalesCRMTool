@@ -31,17 +31,25 @@ const getVisibilityFilter = async (user, entity, filter = {}) => {
     }
 
     if (filter.own || (filter.owner && ["me", "my"].includes(filter.owner.toLowerCase()))) {
-        filter.ownerId = id;
+        if (role === "sales_rep") {
+            filter.ownerId = id;
+        } else {
+            // For Admin/Manager, "my" refers to their sphere of influence (all or team)
+            // We set filter.ownerId for detail extraction downstream, but don't restrict query
+            filter.ownerId = id;
+        }
     }
 
-    // Identify team members for Managers, or just self for Reps
+    // Identify target owner if any
     let ownerIdObj = null;
     try {
-        if (filter.ownerId) {
+        // Only enforce strict ownerId filtering if it's NOT a generic "me/my" for privileged roles
+        const isGenericMy = (filter.own || (filter.owner && ["me", "my"].includes(filter.owner.toLowerCase())));
+        if (filter.ownerId && (role === "sales_rep" || !isGenericMy)) {
             ownerIdObj = typeof filter.ownerId === "string" ? new mongoose.Types.ObjectId(filter.ownerId) : filter.ownerId;
         }
     } catch (e) {
-        // Carry on if not a valid ObjectId
+        // Carry on
     }
 
     // Role-based constraints
