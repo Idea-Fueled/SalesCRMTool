@@ -305,40 +305,40 @@ export default function Reports() {
             if (activeTab === 'deals') {
                 columns = [
                     { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString('en-IN'), w: 28 },
-                    { header: 'Deal name',     key: d => d.name || '—',                              w: 45 },
+                    { header: 'Deal name',     key: d => d.name || '—',                              w: 40 },
                     { header: 'Deal Value',    key: d => d.value ? `${d.currency || '$'}${Number(d.value).toLocaleString()}` : '—', w: 25 },
                     { header: 'Owner', key: d => {
                         const name = d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : (d.ownerName || '—');
                         const role = d.ownerId?.role;
                         const roleTag = role === 'admin' ? '(Admin)' : role === 'sales_manager' ? '(Mgr)' : role === 'sales_rep' ? '(Rep)' : '';
                         return roleTag ? `${name} ${roleTag}` : name;
-                    }, w: 57 },
+                    }, w: 62 },
                     { header: 'Status',        key: d => d.stage || '—',                             w: 25 },
                 ];
             } else if (activeTab === 'companies') {
                 columns = [
                     { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString('en-IN'), w: 28 },
-                    { header: 'Company',       key: d => d.name || '—',                              w: 45 },
-                    { header: 'Industry',      key: d => d.industry || '—',                          w: 54 },
+                    { header: 'Company',       key: d => d.name || '—',                              w: 40 },
+                    { header: 'Industry',      key: d => d.industry || '—',                          w: 45 },
                     { header: 'Owner', key: d => {
                         const name = d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : '—';
                         const role = d.ownerId?.role;
                         const roleTag = role === 'admin' ? '(Admin)' : role === 'sales_manager' ? '(Mgr)' : role === 'sales_rep' ? '(Rep)' : '';
                         return roleTag ? `${name} ${roleTag}` : name;
-                    }, w: 31 },
-                    { header: 'Status',        key: d => d.status || '—',                            w: 22 },
+                    }, w: 42 },
+                    { header: 'Status',        key: d => d.status || '—',                            w: 25 },
                 ];
             } else {
                 columns = [
                     { header: 'Creation Date', key: d => new Date(d.createdAt).toLocaleDateString(), w: 28 },
                     { header: 'Name',          key: d => `${d.firstName || ''} ${d.lastName || ''}`.trim() || '—', w: 45 },
-                    { header: 'Title',         key: d => d.jobTitle || '—',                          w: 70 },
+                    { header: 'Title',         key: d => d.jobTitle || '—',                          w: 65 },
                     { header: 'Owner',         key: d => {
                         const name = d.ownerId ? `${d.ownerId.firstName || ''} ${d.ownerId.lastName || ''}`.trim() : '—';
                         const role = d.ownerId?.role;
                         const roleTag = role === 'admin' ? '(Admin)' : role === 'sales_manager' ? '(Mgr)' : role === 'sales_rep' ? '(Rep)' : '';
                         return roleTag ? `${name} ${roleTag}` : name;
-                    }, w: 37 },
+                    }, w: 42 },
                 ];
             }
 
@@ -380,8 +380,8 @@ export default function Reports() {
                 columns.forEach(col => {
                     const cellText = String(col.key(item) ?? '—');
                     pdf.setTextColor(55, 65, 81);
-                    // More generous truncation logic (approx 3 chars per 5mm)
-                    const maxChars = Math.floor(col.w / 1.6);
+                    // More generous truncation logic (approx 3 chars per 5.5mm)
+                    const maxChars = Math.floor(col.w / 1.85); 
                     const displayText = cellText.length > maxChars ? cellText.slice(0, maxChars - 1) + '…' : cellText;
                     pdf.text(displayText, x, y + 5.5);
                     x += col.w;
