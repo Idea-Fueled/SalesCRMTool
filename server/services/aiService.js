@@ -6,21 +6,21 @@ const SYSTEM_PROMPT = `
 You are an intelligent AI assistant for a Sales CRM system. Your job is to understand any user query written in natural language and convert it into structured JSON for backend processing.
 
 Extract:
-- action: "list", "detail", "count", "aggregate"
+- action: "list", "detail", "count", "aggregate", "greet"
 - entity: "deals", "contacts", "companies", "users", "reports"
 - filters: optional object (tier, value, stage, owner, name, activity, trash, team, etc.)
 - limit: number (if user says top N)
-- detail: true if user asks for details of multiple items (e.g. "show all user details")
 
 Rules:
+- action="greet": If the user says "hi", "hello", "hey", etc. without any specific query.
+- tier: Extract "Hot", "Warm", or "Cold" from the query into filters.tier for ANY entity.
 - "each", "every", "all" → means ALL items (NOT a name)
-- "owner": Map person names here when referring to whoever owns/has the deals (e.g. "Sandeep", "Rahul"). DO NOT put owner names in 'name'.
-- "name": ONLY use this for specific deal titles (e.g. "Enterprise License"), contact titles (if entity is contacts), or company titles (if entity is companies).
+- "owner": Map person names here when referring to whoever owns/has the deals.
+- "name": ONLY for specific deal titles, contact names, or company names.
 - If user asks for "deleted", "trash", or "archive" → set "trash": true in filters.
 - If user asks for "my team", "members", or "colleagues" → use entity="users" and filter "team": true.
 - If user asks for stats, totals, or dashboard info → use entity="reports" and action="aggregate".
-- Never assume random words as names
-- Understand flexible queries
+- Never assume random words as names.
 
 Return ONLY valid JSON. No explanation.
 
@@ -53,7 +53,7 @@ export const getAIIntent = async (message) => {
         const res = await axios.post(
             "https://openrouter.ai/api/v1/chat/completions",
             {
-                model: "mistralai/mistral-7b-instruct:free",
+                model: "google/gemini-2.0-flash-lite-001",
                 messages: [
                     { role: "system", content: SYSTEM_PROMPT },
                     { role: "user", content: message }
@@ -63,7 +63,9 @@ export const getAIIntent = async (message) => {
             {
                 headers: {
                     Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "http://localhost:5173",
+                    "X-Title": "SalesCRM Assistant"
                 },
                 timeout: 8000
             }

@@ -1,0 +1,40 @@
+
+[2026-04-01T06:18:24.423Z] USER: janirudh232@gmail.com (admin) | ENTITY: deals | ACTION: list
+[FILTER]: {
+  "isDeleted": {
+    "$ne": true
+  }
+}
+[ITEMS FOUND IN DB]: 2
+
+[2026-04-01T06:18:30.802Z] USER: janirudh232@gmail.com (admin) | ENTITY: deals | ACTION: count
+[FILTER]: {
+  "isDeleted": {
+    "$ne": true
+  }
+}
+[ITEMS FOUND IN DB]: 2
+
+[2026-04-01T06:18:54.926Z] USER: janirudh232@gmail.com (admin) | ENTITY: contacts | ACTION: count
+[FILTER]: {
+  "isDeleted": {
+    "$ne": true
+  }
+}
+[ITEMS FOUND IN DB]: 4
+
+[2026-04-01T06:27:05.831Z] USER: janirudh232@gmail.com (admin) | ENTITY: companies | ACTION: list
+[FILTER]: {
+  "isDeleted": {
+    "$ne": true
+  }
+}
+[ITEMS FOUND IN DB]: 4
+
+[2026-04-01T06:27:16.305Z] USER: janirudh232@gmail.com (admin) | ENTITY: deals | ACTION: list
+[FILTER]: {
+  "isDeleted": {
+    "$ne": true
+  }
+}
+[ITEMS FOUND IN DB]: 2

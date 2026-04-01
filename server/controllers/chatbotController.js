@@ -3,43 +3,92 @@ import { Deal } from "../models/dealSchema.js";
 import { Company } from "../models/companySchema.js";
 import { Contact } from "../models/contactSchema.js";
 import User from "../models/userSchema.js";
+import fs from "fs";
+import path from "path";
 import { scoreDeal, scoreCompany, scoreContact } from "../utils/rankingService.js";
 import { parseIntent, getHelpMessage } from "../utils/intentParser.js";
 import { getAIIntent } from "../services/aiService.js";
 import os from "os";
-import path from "path";
-import fs from "fs";
 
 const getVisibilityFilter = async (user, entity, filter = {}) => {
     const { _id: id, role } = user;
     const isTrash = !!(filter.trash || filter.isDeleted);
     
-    // Base filter for all roles
-    let baseFilter = { isDeleted: isTrash };
+    // Base filter for all roles ($ne: true matches both false and undefined)
+    let baseFilter = { isDeleted: isTrash ? true : { $ne: true } };
 
-    // Admin has full visibility
+    // Resolve owner if provided as a name
+    if (filter.owner && !["me", "my"].includes(filter.owner.toLowerCase())) {
+        const ownerUser = await User.findOne({
+            $or: [
+                { firstName: { $regex: filter.owner, $options: "i" } },
+                { lastName: { $regex: filter.owner, $options: "i" } }
+            ]
+        }).select("_id");
+        if (ownerUser) {
+            filter.ownerId = ownerUser._id;
+        }
+    }
+
+    if (filter.own || (filter.owner && ["me", "my"].includes(filter.owner.toLowerCase()))) {
+        filter.ownerId = id;
+    }
+
+    // Identify team members for Managers, or just self for Reps
+    let ownerIdObj = null;
+    try {
+        if (filter.ownerId) {
+            ownerIdObj = typeof filter.ownerId === "string" ? new mongoose.Types.ObjectId(filter.ownerId) : filter.ownerId;
+        }
+    } catch (e) {
+        // Carry on if not a valid ObjectId
+    }
+
+    // Role-based constraints
     if (role === "admin") {
+        if (ownerIdObj) {
+            baseFilter.ownerId = ownerIdObj;
+        }
         return baseFilter;
     }
 
     // Identify team members for Managers, or just self for Reps
     let teamIds = [id];
     if (role === "sales_manager") {
-        const teamUsers = await User.find({ managerId: id }).select("_id");
-        teamIds = [id, ...teamUsers.map(u => u._id)];
+        const teamUsers = await User.find({
+            $or: [{ _id: id }, { managerId: id }]
+        }).select("_id");
+
+        const teamIds = teamUsers.map(u => u._id);
+        const visibilityFilter = {
+            $and: [
+                baseFilter,
+                { ownerId: { $in: teamIds } }
+            ]
+        };
+
+        // If a specific owner was requested within the team
+        if (ownerIdObj) {
+            const requestedOwnerIdStr = ownerIdObj.toString();
+            const isTeamMember = teamIds.some(tid => tid.toString() === requestedOwnerIdStr);
+            if (isTeamMember) {
+                visibilityFilter.$and.push({ ownerId: ownerIdObj });
+            }
+        }
+
+        return visibilityFilter;
     }
 
-    // Role-based Ownership Reference
-    const ownershipRef = { ownerId: { $in: teamIds } };
-
-    // Special handling for the "users" entity
-    if (entity === "users") {
-        if (role === "sales_manager") return { ...baseFilter, managerId: id };
-        return { ...baseFilter, _id: id };
+    if (role === "sales_rep") {
+        return {
+            $and: [
+                baseFilter,
+                { ownerId: id }
+            ]
+        };
     }
 
-    // For everything else (deals, contacts, companies), use strict ownership
-    return { ...baseFilter, ...ownershipRef };
+    return baseFilter;
 };
 
 // ── Formatters & Summarizers ─────────────────────────────────
@@ -257,6 +306,14 @@ const handleReportingQuery = async (user, intent, res) => {
 // ── Universal Query Handler ───────────────────────────────────
 const handleUniversalQuery = async (intent, user, res) => {
     let { entity, action } = intent;
+
+    // ── GREETING HANDLER ──
+    if (action === "greet") {
+        return res.json({
+            reply: `Hello ${user.firstName}! 👋 I'm your AI Sales Assistant. I can help you find deals, contacts, companies, or even generate reports for you. What's on your mind today?`,
+            type: "greeting"
+        });
+    }
     const filter = intent.filter || intent.filters || {};
     
     // Normalize AI root-level properties
@@ -275,9 +332,11 @@ const handleUniversalQuery = async (intent, user, res) => {
     config.populates.forEach(p => query.populate(p));
     let items = await query.lean();
 
-    // 2. Ranking & Counts (Relational)
+    // 2. Ranking & Tiering Logic
     const isTrash = !!(filter.trash || filter.isDeleted);
+    const isTrashFilter = isTrash ? true : { $ne: true };
     let ranked = [];
+
     if (entity === "deals") {
         const maxValue = Math.max(...items.map(d => d.value || 0), 1);
         ranked = items.map(d => {
@@ -287,14 +346,14 @@ const handleUniversalQuery = async (intent, user, res) => {
     } else if (entity === "companies") {
         const companyIds = items.map(c => new mongoose.Types.ObjectId(c._id));
         const [dealAgg, contactAgg] = await Promise.all([
-            Deal.aggregate([{ $match: { companyId: { $in: companyIds }, isDeleted: isTrash } }, { $group: { _id: "$companyId", count: { $sum: 1 } } }]),
-            Contact.aggregate([{ $match: { companyId: { $in: companyIds }, isDeleted: isTrash } }, { $group: { _id: "$companyId", count: { $sum: 1 } } }])
+            Deal.aggregate([{ $match: { companyId: { $in: companyIds }, isDeleted: isTrashFilter } }, { $group: { _id: "$companyId", count: { $sum: 1 } } }]),
+            Contact.aggregate([{ $match: { companyId: { $in: companyIds }, isDeleted: isTrashFilter } }, { $group: { _id: "$companyId", count: { $sum: 1 } } }])
         ]);
         const dealCountMap = Object.fromEntries(dealAgg.map(d => [d._id?.toString(), d.count]));
         const contactCountMap = Object.fromEntries(contactAgg.map(c => [c._id?.toString(), c.count]));
 
         // Correct max Revenue for normalized scoring
-        const maxRevResult = await Company.aggregate([{ $match: { isDeleted: isTrash } }, { $group: { _id: null, max: { $max: "$revenueRange" } } }]);
+        const maxRevResult = await Company.aggregate([{ $match: { isDeleted: isTrashFilter } }, { $group: { _id: null, max: { $max: "$revenueRange" } } }]);
         const maxRev = maxRevResult[0]?.max || 1;
 
         ranked = items.map(c => {
@@ -305,7 +364,7 @@ const handleUniversalQuery = async (intent, user, res) => {
         });
     } else if (entity === "contacts") {
         const contactIds = items.map(c => new mongoose.Types.ObjectId(c._id));
-        const dealAgg = await Deal.aggregate([{ $match: { contactId: { $in: contactIds }, isDeleted: isTrash } }, { $group: { _id: "$contactId", count: { $sum: 1 } } }]);
+        const dealAgg = await Deal.aggregate([{ $match: { contactId: { $in: contactIds }, isDeleted: isTrashFilter } }, { $group: { _id: "$contactId", count: { $sum: 1 } } }]);
         const dealCountMap = Object.fromEntries(dealAgg.map(d => [d._id?.toString(), d.count]));
         ranked = items.map(c => {
             const dc = dealCountMap[c._id.toString()] || 0;
@@ -349,27 +408,16 @@ const handleUniversalQuery = async (intent, user, res) => {
     }
 
     // 5a. Explicit Owner Filter (Handles "me", "my", or specific names)
-    if (filter.owner || filter.own) {
+    // Note: Most logic moved to getVisibilityFilter for database-level optimization.
+    // We only keep this if name resolution failed or for additional safety.
+    if (!filter.ownerId && (filter.owner || filter.own)) {
         const ownerLower = String(filter.owner || (filter.own ? "me" : "")).toLowerCase();
         const userIdStr = user._id.toString();
 
         if (ownerLower === "me" || ownerLower === "my") {
-            // For Sales Reps, "my" is always strict personal ownership.
-            // For Managers and Admins, "my" often refers to their authorized context (Team/All).
-            // We only apply strict personal filtering for non-admin/non-manager roles.
-            if (user.role === "sales_rep") {
-                ranked = ranked.filter(i => {
-                    const oid = i.ownerId?._id ? i.ownerId._id.toString() : (i.ownerId ? i.ownerId.toString() : null);
-                    return oid === userIdStr;
-                });
-            }
-            // Note: For Manager/Admin, we don't filter further because getVisibilityFilter 
-            // already restricted 'ranked' to their Team/All context respectively.
-        } else {
-            // Specific name filter (e.g. "show Rahul's deals")
             ranked = ranked.filter(i => {
-                const ownerName = `${i.ownerId?.firstName || ""} ${i.ownerId?.lastName || ""}`.toLowerCase();
-                return ownerName.includes(ownerLower);
+                const oid = i.ownerId?._id ? i.ownerId._id.toString() : (i.ownerId ? i.ownerId.toString() : null);
+                return oid === userIdStr;
             });
         }
     }
@@ -410,30 +458,40 @@ const handleUniversalQuery = async (intent, user, res) => {
 
     // 7. Actions (Return standard JSONs)
     if (action === "detail") {
-        if (ranked.length > 0) return res.json({ reply: config.summaryFn(ranked[0]), type: `${config.type}_detail`, total: 1 });
-        return res.json({ reply: `I couldn't find any ${config.type} named "${filter.name}".`, type: "not_found" });
+        if (ranked.length > 0) return res.json({ reply: `Here's a detailed look at **${ranked[0].name || ranked[0].firstName + ' ' + ranked[0].lastName}**:`, detail: config.summaryFn(ranked[0]), type: `${config.type}_detail`, total: 1 });
+        return res.json({ reply: `I'm sorry, I couldn't find any ${config.type} matching that name. Would you like me to try a broader search?`, type: "not_found" });
     }
 
     if (action === "count") {
-        const label = filter.tier ? ` ${filter.tier}` : "";
-        return res.json({ reply: `You have **${ranked.length}${label} ${config.type}(s)**.`, type: "count", count: ranked.length });
+        const tierLabel = filter.tier ? ` **${filter.tier}**` : "";
+        const entityLabel = ranked.length === 1 ? config.type : (config.type === "company" ? "companies" : `${config.type}s`);
+        
+        let reply = `You currently have **${ranked.length}**${tierLabel} ${entityLabel} in your system.`;
+        if (ranked.length === 0) {
+            reply = `I couldn't find any${tierLabel} ${entityLabel} matching your request. Is there anything else I can check?`;
+        }
+        return res.json({ reply, type: "count", count: ranked.length });
     }
 
     if (action === "aggregate" && entity === "deals") {
         const total = ranked.reduce((sum, d) => sum + (d.value || 0), 0);
-        return res.json({ reply: `Total pipeline value: **$${total.toLocaleString()}** across ${ranked.length} deal(s).`, type: "aggregate", value: total });
+        return res.json({ 
+            reply: `The total value for these **${ranked.length} deals** is **$${total.toLocaleString()}**. Your pipeline is looking strong! 📈`, 
+            type: "aggregate", 
+            value: total 
+        });
     }
 
     // Suggestions / Followup custom reply
     const pluralType = config.type === "company" ? "companies" : `${config.type}s`;
-    let reply = `I've found some ${pluralType} for you! Here they are, ranked by potential:`;
+    let reply = `I've found some ${pluralType} for you! Here they are sorted by priority:`;
     
     if (action === "suggestions") {
-        reply = `I've highlighted **${ranked.length} high-priority ${config.type}(s)** that could use some attention:`;
+        reply = `I've highlighted **${ranked.length} high-priority ${config.type}(s)** that could use some immediate attention:`;
     } else if (action === "followup") {
-        reply = `Here are **${ranked.length} ${config.type}(s)** that might need a quick follow-up or check-in:`;
+        reply = `Here are **${ranked.length} ${config.type}(s)** that might need a quick follow-up or check-in today:`;
     } else if (filter.tier) {
-        reply = `Here are your **${filter.tier} ${pluralType}**:`;
+        reply = `I've retrieved your **${filter.tier} ${pluralType}** from the system:`;
     } else if (filter.team && entity === "users") {
         reply = `I've retrieved your **team members** for you:`;
     } else if (filter.noDeals) {
@@ -446,12 +504,11 @@ const handleUniversalQuery = async (intent, user, res) => {
 
     // Graceful Empty States
     if (ranked.length === 0) {
-        let emptyMsg = `I couldn't find any ${pluralType} matching those specific criteria right now.`;
-        if (filter.tier === "Hot") emptyMsg = `I searched, but there are no **Hot ${pluralType}** at the moment. You might want to check your "Warm" leads or update your filters!`;
+        let emptyMsg = `I'm sorry, I couldn't find any ${pluralType} matching those specific criteria right now.`;
+        if (filter.tier === "Hot") emptyMsg = `I searched, but there are no **Hot ${pluralType}** at the moment. You might want to check your "Warm" leads!`;
         else if (filter.trash) emptyMsg = `Your **trash for ${pluralType}** is currently empty — that's a clean slate!`;
-        else emptyMsg += ` You may want to try a broader search or check your overall ${pluralType} list.`;
-
-        return res.json({ reply: emptyMsg, type: "info" });
+        else emptyMsg += ` You may want to try a broader search or check your overall lists.`;
+        return res.json({ reply: emptyMsg, type: "empty" });
     }
 
     return res.json({
@@ -467,7 +524,7 @@ export const handleChat = async (req, res) => {
     try {
         const { message } = req.body;
         if (!message || !message.trim()) {
-            return res.status(400).json({ reply: "Please type a message!", type: "error" });
+            return res.status(400).json({ reply: "Hello there! 👋 Is there anything specific you'd like me to look up for you? You can ask about deals, contacts, or companies!", type: "info" });
         }
 
         // Try AI Parser first, fallback to rule-based
@@ -482,14 +539,6 @@ export const handleChat = async (req, res) => {
 
         if (intent.action === "help") {
             return res.json({ reply: getHelpMessage(), type: "help" });
-        }
-
-        if (intent.action === "greet") {
-            const name = req.user?.firstName || "there";
-            return res.json({
-                reply: `Hello ${name}! 👋 I'm your AI Sales Assistant. Type **"help"** to see what I can do, or ask me something like **"show my hot deals"**!`,
-                type: "greeting"
-            });
         }
 
         if (intent.action === "unknown") {
@@ -518,10 +567,9 @@ export const handleChat = async (req, res) => {
             });
         }
 
-
         return await handleUniversalQuery(intent, req.user, res);
     } catch (error) {
         console.error("❌ Chatbot Error:", error);
-        res.status(500).json({ reply: "Something went wrong. Please try again.", type: "error" });
+        res.status(500).json({ reply: "Oops! Something went wrong on my end. Please try again in a moment.", type: "error" });
     }
 };

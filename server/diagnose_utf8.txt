@@ -1,0 +1,11 @@
+﻿[dotenv@17.3.1] injecting env (10) from .env -- tip: ΓÜÖ∩╕Å  write to custom object with { processEnv: myObject }
+≡ƒöî Connecting to DB...
+Γ£à Connected.
+
+≡ƒôè DATABASE STATS:
+Deals: Total=2, Active=2, Deleted=0
+Companies: Total=4, Active=4
+Contacts: Total=4, Active=4
+
+≡ƒôä Sample Deal OwnerId TYPE: object
+≡ƒôä Sample Deal OwnerId VALUE: new ObjectId('69c269099ab6a4be83623aa1')

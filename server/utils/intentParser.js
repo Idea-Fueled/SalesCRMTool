@@ -11,9 +11,9 @@ export const parseIntent = (message) => {
         return { action: "help" };
     }
 
-    // Greeting
-    if (/^(hi|hello|hey|sup|yo)\b/.test(input)) {
-        return { action: "greet" };
+    // Greeting (Immediate return to avoid entity matching)
+    if (/^(hi|hello|hey|hola|sup|yo|greetings)\b/i.test(input) || input === "hi") {
+        return { action: "greet", originalMessage: message };
     }
 
     let action = "list"; // default actions
@@ -29,12 +29,13 @@ export const parseIntent = (message) => {
     else if (/\b(user|users|member|members|team|colleague|colleagues)\b/i.test(input)) entity = "users";
     else if (/\b(deal|deals|negotiation|lead|pipeline)\b/i.test(input)) entity = "deals";
 
-    // Determine tier filter
+    // Determine tier filter (Hot, Warm, Cold)
     let tier = null;
     if (/\bhot\b/i.test(input)) tier = "Hot";
     else if (/\bwarm\b/i.test(input)) tier = "Warm";
     else if (/\bcold\b/i.test(input)) tier = "Cold";
     else if (/\bhigh\s+priority\b/i.test(input)) tier = "Hot";
+    else if (/\blow\s+priority\b/i.test(input)) tier = "Cold";
 
     // Determine remaining action logic... (action already defined)
 
@@ -69,11 +70,8 @@ export const parseIntent = (message) => {
     // Handles: "deals of Anirudh", "detail of Idea Fueled deal",
     //          "contact Sandeep Kumar details", "deal Enterprise License info"
     let name = null;
-    const stopWords = ["the", "all", "my", "hot", "warm", "cold", "deals", "contacts", "companies",
-        "deal", "contact", "company", "show", "get", "list", "give", "me", "detail", "details",
-        "info", "information", "about", "top", "ranked", "of", "for", "by", "from", "sum",
-        "total", "value", "how", "many", "count", "in", "stage", "above", "worth", "valued", "at",
-        "is", "are", "there", "what", "who", "which", "number", "has", "have"];
+    const stopWords = ["the", "all", "my", "i", "do", "does", "did", "am", "is", "are", "there", "what", "who", "which", "number", "has", "have", "had", "was", "were", "be", "been", "being", "hot", "warm", "cold", "deals", "contacts", "companies",
+        "deal", "contact", "company", "show", "get", "list", "give", "me", "detail", "details", "info", "information", "about", "top", "ranked", "of", "for", "by", "from", "sum", "total", "value", "how", "many", "count", "in", "stage", "above", "worth", "valued", "at"];
 
     const cleanName = (raw) => {
         if (!raw) return null;
@@ -95,7 +93,7 @@ export const parseIntent = (message) => {
 
     // Pattern 3: "<name> contact/deal/company details"
     if (!name) {
-        const nameEntityMatch = input.match(/^(?:show|get|give|list|me|the|\s)*(.+?)\s+(?:contacts?|compan(?:y|ies)|deals?)\s+(?:details?|info(rmation)?|about)/i);
+        const nameEntityMatch = input.match(/^(?:show|get|give|list|me|the|\s)*(\w+(?:\s+\w+)?)\s+(?:contacts?|compan(?:y|ies)|deals?)\s+(?:details?|info(rmation)?|about)/i);
         if (nameEntityMatch) name = cleanName(nameEntityMatch[1]);
     }
 
@@ -158,7 +156,8 @@ export const parseIntent = (message) => {
         limit = 5; // default top 5
     }
 
-    // "my deals" → own filter
+    // "my deals" → own filter (Strict personal ownership)
+    // We don't include "i" here because "how many deals do i have" is often a general query for non-reps.
     let own = false;
     if (/\bmy\b/i.test(input)) {
         own = true;
@@ -191,8 +190,6 @@ export const parseIntent = (message) => {
             own,
             valueAbove,
             stageName,
-            noDeals,
-            withDeals,
             withDeals,
             trash: /\b(trash|deleted|archived|archive)\b/i.test(input),
             team: /\b(team|members|colleagues)\b/i.test(input),

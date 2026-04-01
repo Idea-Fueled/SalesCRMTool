@@ -1,0 +1,205 @@
+
+[2026-04-01T06:33:40.792Z] REQ: contacts | ACT: list | USER: 69c2688c9ab6a4be83623a85 (admin)
+[FILTER]: {
+  "isDeleted": {
+    "$ne": true
+  }
+}
+[ITEMS FOUND]: 4
+[SAMPLE 0]: ID=69c2715257989f9bd3e3d921, OwnerID={"_id":"69c2688c9ab6a4be83623a85","firstName":"Anirudh","lastName":"Joshi","email":"janirudh232@gmail.com","role":"admin"}
+
+[2026-04-01T06:33:47.975Z] REQ: deals | ACT: count | USER: 69c2688c9ab6a4be83623a85 (admin)
+[FILTER]: {
+  "isDeleted": {
+    "$ne": true
+  }
+}
+[ITEMS FOUND]: 2
+[SAMPLE 0]: ID=69c271ee57989f9bd3e3d97c, OwnerID={"_id":"69c269099ab6a4be83623aa1","firstName":"Abhishek","lastName":"Mittal","email":"anirudhj545@gmail.com","role":"sales_manager"}
+
+[2026-04-01T07:03:24.558Z] REQ: deals | ACT: list | USER: 69c2688c9ab6a4be83623a85 (admin)
+[INTENT FILTER]: {
+  "tier": null,
+  "name": null,
+  "limit": 5,
+  "own": false,
+  "valueAbove": null,
+  "stageName": null,
+  "noDeals": false,
+  "withDeals": false,
+  "trash": false,
+  "team": false,
+  "active": null
+}
+[VISIBILITY FILTER]: {
+  "isDeleted": {
+    "$ne": true
+  }
+}
+[ITEMS FOUND]: 2
+[SAMPLE 0]: ID=69c271ee57989f9bd3e3d97c, OwnerID={"_id":"69c269099ab6a4be83623aa1","firstName":"Abhishek","lastName":"Mittal","email":"anirudhj545@gmail.com","role":"sales_manager"}
+
+[2026-04-01T07:03:31.160Z] REQ: deals | ACT: list | USER: 69c2688c9ab6a4be83623a85 (admin)
+[INTENT FILTER]: {
+  "tier": "Hot",
+  "name": null,
+  "limit": null,
+  "own": false,
+  "valueAbove": null,
+  "stageName": null,
+  "noDeals": false,
+  "withDeals": false,
+  "trash": false,
+  "team": false,
+  "active": null
+}
+[VISIBILITY FILTER]: {
+  "isDeleted": {
+    "$ne": true
+  }
+}
+[ITEMS FOUND]: 2
+[SAMPLE 0]: ID=69c271ee57989f9bd3e3d97c, OwnerID={"_id":"69c269099ab6a4be83623aa1","firstName":"Abhishek","lastName":"Mittal","email":"anirudhj545@gmail.com","role":"sales_manager"}
+
+[2026-04-01T07:03:38.316Z] REQ: deals | ACT: count | USER: 69c2688c9ab6a4be83623a85 (admin)
+[INTENT FILTER]: {
+  "tier": null,
+  "name": null,
+  "limit": null,
+  "own": true,
+  "valueAbove": null,
+  "stageName": null,
+  "noDeals": false,
+  "withDeals": false,
+  "trash": false,
+  "team": false,
+  "active": null,
+  "ownerId": "69c2688c9ab6a4be83623a85"
+}
+[VISIBILITY FILTER]: {
+  "isDeleted": {
+    "$ne": true
+  },
+  "ownerId": "69c2688c9ab6a4be83623a85"
+}
+[ITEMS FOUND]: 0
+
+[2026-04-01T07:03:45.923Z] REQ: deals | ACT: count | USER: 69c2688c9ab6a4be83623a85 (admin)
+[INTENT FILTER]: {
+  "tier": "Hot",
+  "name": null,
+  "limit": null,
+  "own": true,
+  "valueAbove": null,
+  "stageName": null,
+  "noDeals": false,
+  "withDeals": false,
+  "trash": false,
+  "team": false,
+  "active": null,
+  "ownerId": "69c2688c9ab6a4be83623a85"
+}
+[VISIBILITY FILTER]: {
+  "isDeleted": {
+    "$ne": true
+  },
+  "ownerId": "69c2688c9ab6a4be83623a85"
+}
+[ITEMS FOUND]: 0
+
+[2026-04-01T07:04:24.854Z] REQ: deals | ACT: count | USER: 69c2688c9ab6a4be83623a85 (admin)
+[INTENT FILTER]: {
+  "tier": "Hot",
+  "name": null,
+  "limit": null,
+  "own": true,
+  "valueAbove": null,
+  "stageName": null,
+  "noDeals": false,
+  "withDeals": false,
+  "trash": false,
+  "team": false,
+  "active": null,
+  "ownerId": "69c2688c9ab6a4be83623a85"
+}
+[VISIBILITY FILTER]: {
+  "isDeleted": {
+    "$ne": true
+  },
+  "ownerId": "69c2688c9ab6a4be83623a85"
+}
+[ITEMS FOUND]: 0
+
+[2026-04-01T07:13:08.569Z] REQ: deals | ACT: list | USER: 69c2688c9ab6a4be83623a85 (admin)
+[INTENT FILTER]: {}
+[VISIBILITY FILTER]: {
+  "isDeleted": {
+    "$ne": true
+  }
+}
+[ITEMS FOUND]: 2
+[SAMPLE 0]: ID=69c271ee57989f9bd3e3d97c, OwnerID={"_id":"69c269099ab6a4be83623aa1","firstName":"Abhishek","lastName":"Mittal","email":"anirudhj545@gmail.com","role":"sales_manager"}
+
+[2026-04-01T07:13:24.653Z] REQ: contacts | ACT: detail | USER: 69c2688c9ab6a4be83623a85 (admin)
+[INTENT FILTER]: {}
+[VISIBILITY FILTER]: {
+  "isDeleted": {
+    "$ne": true
+  }
+}
+[ITEMS FOUND]: 4
+[SAMPLE 0]: ID=69c2715257989f9bd3e3d921, OwnerID={"_id":"69c2688c9ab6a4be83623a85","firstName":"Anirudh","lastName":"Joshi","email":"janirudh232@gmail.com","role":"admin"}
+
+[2026-04-01T07:13:40.201Z] REQ: deals | ACT: list | USER: 69c2688c9ab6a4be83623a85 (admin)
+[INTENT FILTER]: {}
+[VISIBILITY FILTER]: {
+  "isDeleted": {
+    "$ne": true
+  }
+}
+[ITEMS FOUND]: 2
+[SAMPLE 0]: ID=69c271ee57989f9bd3e3d97c, OwnerID={"_id":"69c269099ab6a4be83623aa1","firstName":"Abhishek","lastName":"Mittal","email":"anirudhj545@gmail.com","role":"sales_manager"}
+
+[2026-04-01T07:13:51.906Z] REQ: deals | ACT: count | USER: 69c2688c9ab6a4be83623a85 (admin)
+[INTENT FILTER]: {}
+[VISIBILITY FILTER]: {
+  "isDeleted": {
+    "$ne": true
+  }
+}
+[ITEMS FOUND]: 2
+[SAMPLE 0]: ID=69c271ee57989f9bd3e3d97c, OwnerID={"_id":"69c269099ab6a4be83623aa1","firstName":"Abhishek","lastName":"Mittal","email":"anirudhj545@gmail.com","role":"sales_manager"}
+
+[2026-04-01T07:14:04.905Z] REQ: deals | ACT: count | USER: 69c2688c9ab6a4be83623a85 (admin)
+[INTENT FILTER]: {
+  "stage": "hot"
+}
+[VISIBILITY FILTER]: {
+  "isDeleted": {
+    "$ne": true
+  }
+}
+[ITEMS FOUND]: 2
+[SAMPLE 0]: ID=69c271ee57989f9bd3e3d97c, OwnerID={"_id":"69c269099ab6a4be83623aa1","firstName":"Abhishek","lastName":"Mittal","email":"anirudhj545@gmail.com","role":"sales_manager"}
+
+[2026-04-01T07:14:10.816Z] REQ: deals | ACT: list | USER: 69c2688c9ab6a4be83623a85 (admin)
+[INTENT FILTER]: {}
+[VISIBILITY FILTER]: {
+  "isDeleted": {
+    "$ne": true
+  }
+}
+[ITEMS FOUND]: 2
+[SAMPLE 0]: ID=69c271ee57989f9bd3e3d97c, OwnerID={"_id":"69c269099ab6a4be83623aa1","firstName":"Abhishek","lastName":"Mittal","email":"anirudhj545@gmail.com","role":"sales_manager"}
+
+[2026-04-01T07:14:24.979Z] REQ: deals | ACT: list | USER: 69c2688c9ab6a4be83623a85 (admin)
+[INTENT FILTER]: {
+  "stage": "warm"
+}
+[VISIBILITY FILTER]: {
+  "isDeleted": {
+    "$ne": true
+  }
+}
+[ITEMS FOUND]: 2
+[SAMPLE 0]: ID=69c271ee57989f9bd3e3d97c, OwnerID={"_id":"69c269099ab6a4be83623aa1","firstName":"Abhishek","lastName":"Mittal","email":"anirudhj545@gmail.com","role":"sales_manager"}
