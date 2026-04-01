@@ -84,8 +84,10 @@ export default function UserDetailsModal({ isOpen, onClose, user, title }) {
             <div className="space-y-6">
                 {/* Header Profile Section */}
                 <div className="flex items-center gap-5 p-5 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100 shadow-sm">
-                    <div className={`w-16 h-16 rounded-2xl ${avatarColor} flex items-center justify-center text-white text-xl font-bold border-4 border-white shadow-md flex-shrink-0`}>
-                        {initials}
+                    <div className={`w-16 h-16 rounded-2xl ${avatarColor} flex items-center justify-center text-white text-xl font-bold border-4 border-white shadow-md flex-shrink-0 overflow-hidden`}>
+                        {user.profilePicture ? (
+                            <img src={user.profilePicture} alt={fullName} className="w-full h-full object-cover" />
+                        ) : initials}
                     </div>
                     <div className="min-w-0">
                         <h2 className="text-xl font-bold text-gray-900 truncate">{fullName}</h2>
@@ -165,11 +167,21 @@ export default function UserDetailsModal({ isOpen, onClose, user, title }) {
                         <section>
                             <h4 className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">
                                 <Mail size={12} className="text-red-400" />
-                                Contact Details
+                                Contact Information
                             </h4>
-                            <div className="flex flex-col p-4 bg-red-50/50 rounded-2xl border border-red-100/50">
-                                <span className="text-[10px] text-red-500 font-bold uppercase tracking-tighter mb-1">Business Email</span>
-                                <span className="text-sm font-bold text-red-700 break-all">{user.email}</span>
+                            <div className="space-y-3 p-4 bg-red-50/50 rounded-2xl border border-red-100/50">
+                                <div>
+                                    <span className="text-[10px] text-red-500 font-bold uppercase tracking-tighter block mb-0.5">Email Address</span>
+                                    <span className="text-sm font-bold text-red-700 break-all">{user.email}</span>
+                                </div>
+                                <div>
+                                    <span className="text-[10px] text-red-500 font-bold uppercase tracking-tighter block mb-0.5">Phone Number</span>
+                                    <span className="text-sm font-bold text-red-700">{user.phoneNumber || "Not provided"}</span>
+                                </div>
+                                <div>
+                                    <span className="text-[10px] text-red-500 font-bold uppercase tracking-tighter block mb-0.5">Residential Address</span>
+                                    <span className="text-sm font-bold text-red-700">{user.address || "Not provided"}</span>
+                                </div>
                                 <div className="flex items-center gap-2 mt-2 pt-2 border-t border-red-100/30">
                                     <Clock size={10} className="text-red-400" />
                                     <span className="text-[10px] text-red-500 font-medium tracking-tight">

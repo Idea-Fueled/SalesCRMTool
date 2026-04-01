@@ -105,14 +105,24 @@ const formatDeal = (d) => ({
     tier: d.aiTier
 });
 
-const summarizeDeal = (d) => `
+const summarizeDeal = (d) => {
+    const valueStr = (d.value || 0).toLocaleString();
+    let insight = "";
+    if (d.aiTier === "Hot") insight = "🔥 This item is high-priority and shows great potential!";
+    else if (d.stage === "Negotiation") insight = "🤝 You're in the final stretch! This deal is currently in the negotiation phase.";
+    else if (d.stage === "Closed Won") insight = "🎉 Brilliant work! This deal is successfully completed.";
+    
+    return `
 **Deal:** ${d.name}
-**Value:** $${(d.value || 0).toLocaleString()}
-**Stage:** ${d.stage}
-**Owner:** ${d.ownerId ? `${d.ownerId.firstName} ${d.ownerId.lastName}` : "Unassigned"}
-**Company:** ${d.companyId?.name || "None"}
-**AI Score:** ${d.aiScore} (${d.aiTier})
-`.trim();
+**Value:** $${valueStr}
+**Current Stage:** ${d.stage}
+**Ownership:** ${d.ownerId ? `${d.ownerId.firstName} ${d.ownerId.lastName}` : "Unassigned"}
+**Associated Company:** ${d.companyId?.name || "None"}
+**AI Priority:** ${d.aiTier}
+
+${insight ? `*Assistant's Insight:* ${insight}` : "This deal is progressing through the pipeline. Do you need any specific follow-up actions?"}
+    `.trim();
+};
 
 const formatCompany = (c) => ({
     id: c._id,
@@ -127,34 +137,46 @@ const formatCompany = (c) => ({
     tier: c.aiTier
 });
 
-const summarizeCompany = (c) => `
+const summarizeCompany = (c) => {
+    let insight = "";
+    if (c.dealCount > 0) insight = `This is an active partner with ${c.dealCount} ongoing deal(s).`;
+    else insight = "This company is in your network, but has no active deals yet. It might be a good time to reach out!";
+
+    return `
 **Company:** ${c.name}
-**Industry:** ${c.industry || "N/A"}
-**Owner:** ${c.ownerId ? `${c.ownerId.firstName} ${c.ownerId.lastName}` : "Unassigned"}
+**Industry:** ${c.industry || "General"}
+**Account Owner:** ${c.ownerId ? `${c.ownerId.firstName} ${c.ownerId.lastName}` : "Unassigned"}
 **Active Deals:** ${c.dealCount}
 **Total Contacts:** ${c.contactCount}
-**AI Score:** ${c.aiScore} (${c.aiTier})
-`.trim();
+
+*Assistant's Perspective:* ${insight}
+    `.trim();
+};
 
 const formatContact = (c) => ({
     id: c._id,
     name: `${c.firstName} ${c.lastName}`,
     email: c.email,
-    company: c.companyId?.name || "None",
-    owner: c.ownerId ? `${c.ownerId.firstName} ${c.ownerId.lastName}` : "Unassigned",
+    jobTitle: c.jobTitle,
+    company: c.companyId?.name || "Direct",
     deals: c.dealCount,
     score: c.aiScore,
     tier: c.aiTier
 });
 
-const summarizeContact = (c) => `
-**Contact:** ${c.firstName} ${c.lastName}
-**Email:** ${c.email || "N/A"}
-**Company:** ${c.companyId?.name || "None"}
-**Owner:** ${c.ownerId ? `${c.ownerId.firstName} ${c.ownerId.lastName}` : "Unassigned"}
-**Active Deals:** ${c.dealCount}
-**AI Score:** ${c.aiScore} (${c.aiTier})
-`.trim();
+const summarizeContact = (c) => {
+    const contactName = `${c.firstName} ${c.lastName}`;
+    return `
+**Contact:** ${contactName}
+**Position:** ${c.jobTitle || "Lead"}
+**Email Address:** ${c.email || "N/A"}
+**Company Attachment:** ${c.companyId?.name || "Direct Relationship"}
+**Active Deal Count:** ${c.dealCount}
+**Priority Level:** ${c.aiTier}
+
+*Note:* I've found ${contactName} to be a ${c.aiTier === 'Hot' ? 'key stakeholder' : 'valuable contact'} in your network. Let me know if you'd like to see their associated deals!
+    `.trim();
+};
 
 // ── Entity Configuration ─────────────────────────────────────
 const SCHEMA_CONFIG = {
@@ -443,19 +465,36 @@ const handleUniversalQuery = async (intent, user, res) => {
 
     // Suggestions / Followup custom reply
     const pluralType = config.type === "company" ? "companies" : `${config.type}s`;
-    let reply = `Here are your ${pluralType}:`;
-    if (entity !== "users") reply = `Here are your ${pluralType} ranked by AI score:`;
-    if (action === "suggestions") reply = `I've found **${ranked.length} high-priority ${config.type}(s)** that haven't had recent activity:`;
-    if (action === "followup") reply = `Here are **${ranked.length} ${config.type}(s)** that might need a follow-up (no recent activity or notes):`;
-    if (filter.tier) reply = `Here are your **${filter.tier} ${config.type}(s)**:`;
-    if (filter.team && entity === "users") reply = `Here are your **team members**:`;
-    if (filter.noDeals) reply = `Here are your companies with **no associated deals**:`;
-    if (filter.withDeals) reply = `Here are your companies with **active deals**:`;
+    let reply = `I've found some ${pluralType} for you! Here they are, ranked by potential:`;
+    
+    if (action === "suggestions") {
+        reply = `I've highlighted **${ranked.length} high-priority ${config.type}(s)** that could use some attention:`;
+    } else if (action === "followup") {
+        reply = `Here are **${ranked.length} ${config.type}(s)** that might need a quick follow-up or check-in:`;
+    } else if (filter.tier) {
+        reply = `Here are your **${filter.tier} ${pluralType}**:`;
+    } else if (filter.team && entity === "users") {
+        reply = `I've retrieved your **team members** for you:`;
+    } else if (filter.noDeals) {
+        reply = `I've identified these companies that currently have **no associated deals**:`;
+    } else if (filter.withDeals) {
+        reply = `Here are the companies in your network with **active deals**:`;
+    }
 
     if (filter.limit) ranked = ranked.slice(0, filter.limit);
 
+    // Graceful Empty States
+    if (ranked.length === 0) {
+        let emptyMsg = `I couldn't find any ${pluralType} matching those specific criteria right now.`;
+        if (filter.tier === "Hot") emptyMsg = `I searched, but there are no **Hot ${pluralType}** at the moment. You might want to check your "Warm" leads or update your filters!`;
+        else if (filter.trash) emptyMsg = `Your **trash for ${pluralType}** is currently empty — that's a clean slate!`;
+        else emptyMsg += ` You may want to try a broader search or check your overall ${pluralType} list.`;
+
+        return res.json({ reply: emptyMsg, type: "info" });
+    }
+
     return res.json({
-        reply: ranked.length > 0 ? reply : `No ${pluralType} found matching your criteria.`,
+        reply,
         data: ranked.map(config.formatFn),
         type: `${config.type}_list`,
         total: ranked.length
@@ -494,8 +533,8 @@ export const handleChat = async (req, res) => {
 
         if (intent.action === "unknown") {
             return res.json({
-                reply: `I'm not sure what you mean by "${message}". Try asking about **deals**, **contacts**, or **companies**. Type **"help"** for examples!`,
-                type: "error"
+                reply: `I'm sorry, I didn't quite catch that. Try asking something like **'show my hot deals'**, **'list top companies'**, or type **'help'** for more ideas!`,
+                type: "unknown"
             });
         }
 
@@ -512,7 +551,10 @@ export const handleChat = async (req, res) => {
                 const result = await handleUniversalQuery({ ...intent, entity: ent }, req.user, mockRes);
                 if (result && result.total > 0) return res.json(result);
             }
-            return res.json({ reply: `I couldn't find any details for "${filter.name}" across deals, contacts, or companies.`, type: "not_found" });
+            return res.json({ 
+                reply: `I searched through your deals, contacts, and companies, but I couldn't find anything matching **"${filter.name}"**. You might want to double-check the name or try a broader search phrase!`, 
+                type: "not_found" 
+            });
         }
 
 

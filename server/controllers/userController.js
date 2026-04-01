@@ -22,7 +22,12 @@ const formatRoleName = (role) => {
 
 export const registerUser = async (req, res, next) => {
     try {
-        const { firstName, lastName, email, password, role, managerId } = req.body;
+        const { firstName, lastName, email, password, role, managerId, phoneNumber, address } = req.body;
+        let profilePicture = null;
+        if (req.file) {
+            const uploadRes = await uploadToCloudinary(req.file, "user_profiles");
+            profilePicture = uploadRes.url;
+        }
 
         // Validation: password is NOT required if being created by an authorized user (invitation flow)
         let isInvitation = !!req.user;
@@ -74,7 +79,10 @@ export const registerUser = async (req, res, next) => {
                 managerId: role === "sales_rep" ? managerId : null,
                 isSetupComplete: false,
                 invitationToken,
-                invitationExpiry
+                invitationExpiry,
+                phoneNumber,
+                address,
+                profilePicture
             });
 
             // Construct invitation link
@@ -111,7 +119,10 @@ export const registerUser = async (req, res, next) => {
                 password: hashedPass,
                 role,
                 managerId: isInvitation && role === "sales_rep" ? managerId : null,
-                isSetupComplete: true
+                isSetupComplete: true,
+                phoneNumber,
+                address,
+                profilePicture
             })
 
             // If it's an invite with a password, we still want to notify them they have an account
@@ -493,7 +504,7 @@ export const updateUser = async (req, res, next) => {
     try {
 
         const { id } = req.params;
-        const { firstName, lastName, email, role, managerId } = req.body;
+        const { firstName, lastName, email, role, managerId, phoneNumber, address } = req.body;
         const { role: currentUserRole, id: currentUserId } = req.user;
 
         const user = await User.findById(id);
@@ -520,6 +531,13 @@ export const updateUser = async (req, res, next) => {
         user.firstName = firstName || user.firstName;
         user.lastName = lastName || user.lastName;
         user.email = email || user.email;
+        user.phoneNumber = phoneNumber !== undefined ? phoneNumber : user.phoneNumber;
+        user.address = address !== undefined ? address : user.address;
+
+        if (req.file) {
+            const uploadRes = await uploadToCloudinary(req.file, "user_profiles");
+            user.profilePicture = uploadRes.url;
+        }
 
         if (currentUserRole === "admin") {
             user.role = role || user.role;

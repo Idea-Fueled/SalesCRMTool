@@ -18,7 +18,7 @@ const optionalProtect = async (req, res, next) => {
     next();
 };
 
-router.post("/register", optionalProtect, registerUser)
+router.post("/register", optionalProtect, upload.single("profilePicture"), registerUser)
 router.post("/login", loginUser)
 router.post("/logout", protect, logoutUser)
 router.get("/profile", protect, getProfile)
@@ -32,7 +32,7 @@ router.get("/admin-test", protect, requireRole("admin"), adminTest)
 router.get("/team", protect, getTeamUsers)
 router.get("/trash", protect, requireRole("admin"), getDeletedUsers)
 router.get("/:id", protect, getUserById)
-router.put("/:id", protect, updateUser)
+router.put("/:id", protect, upload.single("profilePicture"), updateUser)
 router.patch("/:id/deactivate", protect, deactivateUser)
 router.patch("/:id/activate", protect, activateUser)
 router.patch("/:id/change-password", protect, changePassword)

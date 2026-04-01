@@ -202,20 +202,17 @@ export const parseIntent = (message) => {
 };
 
 export const getHelpMessage = () => {
-    return `Hi! I'm your AI Sales Assistant. 🤖
+    return `Hello! 👋 I'm your **AI Sales Assistant**, and I'm here to help you manage your pipeline more efficiently.
 
-I've been upgraded with AI, which means you don't need to memorize strict commands anymore. 
-Just ask me **naturally** about your CRM data!
+Think of me as a teammate who knows your CRM inside and out. You don't need to use specific commands — just talk to me naturally!
 
-**Here are some examples of what you can ask me:**
-• *"Show my high value inactive deals"*
-• *"How many hot contacts do I have?"*
-• *"Get me the details of Sandeep"*
-• *"Provide my top 5 deals in the negotiation stage"*
-• *"What is my total pipeline value?"*
-• *"Show me companies with no deals"*
-• *"Who needs a follow-up right now?"*
+**Here are some things you can ask me to do:**
+• *"Show me my **hot deals**"* — I'll find your highest-priority opportunities.
+* *"Who are my **active users**?"* — I'll list your current team members.
+* *"Give me the **details of Idea Fueled** company"* — I'll pull up a full profile for you.
+* *"How many **contacts** do I have in total?"* — I'll give you a quick count.
+* *"What is my **total pipeline value**?"* — I'll calculate your overall deal worth.
+* *"Which **companies** have no deals yet?"* — I'll identify potential outreach targets.
 
-I can filter by tier (Hot/Warm/Cold), stage, value amounts, names, and even find things that are inactive or have missing deals.
-Try it out!`;
+If I ever get stuck, I'll do my best to guide you back. What can I help you find today?`;
 };
