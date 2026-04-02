@@ -52,10 +52,14 @@ export default function ChatbotWidget() {
 
         try {
             const res = await sendChatMessage(query);
-            const { reply, data, type } = res.data;
+            const { reply, data, detail, type } = res.data;
+            
+            // For detail responses, concatenate the reply and the detailed markdown
+            const fullText = detail ? `${reply}\n\n${detail}` : reply;
+
             setMessages(prev => [...prev, {
                 role: "bot",
-                text: reply,
+                text: fullText,
                 data: data || null,
                 type: type || "text"
             }]);

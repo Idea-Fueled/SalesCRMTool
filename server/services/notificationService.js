@@ -1,6 +1,7 @@
 import { Notification } from "../models/notificationSchema.js";
 import User from "../models/userSchema.js";
 import { emitNotification } from "../utils/socket.js";
+import { sendNotificationEmail } from "./emailService.js";
 
 export const notifyReassignment = async ({
     oldOwnerId,
@@ -48,7 +49,7 @@ export const notifyReassignment = async ({
                     entityId: entityId || oldOwnerId,
                     entityType,
                     message: notificationMessage,
-                    type: "deal_reassigned", // Reusing this type or we can add "reassignment" if needed
+                    type: "deal_reassigned", 
                     teamId: (recipientId === oldOwner.managerId?.toString()) ? oldOwner.managerId : 
                             (recipientId === newOwner.managerId?.toString()) ? newOwner.managerId : null
                 });
@@ -69,10 +70,7 @@ export const notifyReassignment = async ({
 
 /**
  * Sends tiered notifications (Admin + Owner + Owner's Manager)
- * Rules:
- * - Admins are always notified (except the actor).
- * - The Owner of the record is notified (except the actor).
- * - The Owner's Manager is notified (if applicable and not the actor).
+ * Also sends email notifications to the same recipients.
  */
 export const sendTieredNotification = async ({
     actorId,
@@ -89,27 +87,38 @@ export const sendTieredNotification = async ({
         if (!actor) return;
 
         const actorName = `${actor.firstName} ${actor.lastName}`;
-        const recipients = new Set();
+        const recipientIds = new Set();
+        const recipientEmails = new Map(); // ID -> Email
 
         // 1. Add ALL active Admins
-        const admins = await User.find({ role: "admin", isActive: true }).select("_id");
-        admins.forEach(admin => recipients.add(admin._id.toString()));
+        const admins = await User.find({ role: "admin", isActive: true }).select("_id email");
+        admins.forEach(admin => {
+            recipientIds.add(admin._id.toString());
+            recipientEmails.set(admin._id.toString(), admin.email);
+        });
 
         // 2. Add Owner and Owner's Manager
         if (ownerId) {
-            const owner = await User.findById(ownerId);
+            const owner = await User.findById(ownerId).select("_id email managerId isActive");
             if (owner && owner.isActive) {
-                recipients.add(ownerId.toString());
+                recipientIds.add(ownerId.toString());
+                recipientEmails.set(ownerId.toString(), owner.email);
+                
                 if (owner.managerId) {
-                    recipients.add(owner.managerId.toString());
+                    const manager = await User.findById(owner.managerId).select("_id email isActive");
+                    if (manager && manager.isActive) {
+                        recipientIds.add(manager._id.toString());
+                        recipientEmails.set(manager._id.toString(), manager.email);
+                    }
                 }
             }
         }
 
         // 3. Remove Actor from recipients (prevent self-notification)
-        recipients.delete(actorId.toString());
+        recipientIds.delete(actorId.toString());
+        recipientEmails.delete(actorId.toString());
 
-        if (recipients.size === 0) return;
+        if (recipientIds.size === 0) return;
 
         // 4. Format Message
         const actionVerb = action === "CREATE" ? "created" : 
@@ -136,9 +145,12 @@ export const sendTieredNotification = async ({
 
         const notificationType = type || typeMap[entityType] || "system";
 
-        // 5. Create and Emit Notifications
-        const notifications = await Promise.all(
-            Array.from(recipients).map(async (recipientId) => {
+        // 5. Create, Emit, and Email
+        const emailSubject = `${entityType} ${actionVerb.charAt(0).toUpperCase() + actionVerb.slice(1)}`;
+
+        await Promise.all(
+            Array.from(recipientIds).map(async (recipientId) => {
+                // In-app Notification
                 const notification = await Notification.create({
                     recipientId,
                     senderId: actorId,
@@ -148,13 +160,19 @@ export const sendTieredNotification = async ({
                     message: notificationMessage,
                     type: notificationType
                 });
-                
                 emitNotification(notification);
+
+                // Email Notification
+                const email = recipientEmails.get(recipientId);
+                if (email) {
+                    sendNotificationEmail(email, emailSubject, notificationMessage);
+                }
+
                 return notification;
             })
         );
 
-        console.log(`[notificationService] Created ${notifications.length} tiered notifications for ${action} ${entityType}.`);
+        console.log(`[notificationService] Created ${recipientIds.size} tiered notifications and sent emails for ${action} ${entityType}.`);
 
     } catch (error) {
         console.error("❌ Notification Service Error (sendTieredNotification):", error);
