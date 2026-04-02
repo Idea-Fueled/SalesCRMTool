@@ -6,10 +6,10 @@ import { useAuth } from "../../context/AuthContext";
 import ChangePasswordModal from "./ChangePasswordModal";
 
 const ModalOverlay = ({ children, onClose }) => (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center px-4"
+    <div className="fixed inset-0 z-[100] flex items-center justify-center py-4 px-4"
         style={{ background: "rgba(15,15,25,0.5)", backdropFilter: "blur(4px)" }}
         onClick={onClose}>
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md" onClick={e => e.stopPropagation()}>
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[95vh] flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
             {children}
         </div>
     </div>
@@ -178,7 +178,7 @@ export default function UserModal({ isOpen, onClose, user, managers = [], onSave
         <>
             <ModalOverlay onClose={onClose}>
                 <ModalHeader title={getTitle()} onClose={onClose} />
-                <form onSubmit={handleSubmit} noValidate className="px-6 py-5 space-y-4">
+                <form onSubmit={handleSubmit} noValidate className="px-6 py-5 space-y-4 overflow-y-auto custom-scrollbar-premium">
                     {/* Profile Picture Upload */}
                     <div className="flex flex-col items-center pb-2">
                         <div className="relative group">
