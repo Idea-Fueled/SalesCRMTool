@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { X, Trash2 } from "lucide-react";
 import { createUser, updateUser, adminResetPassword } from "../../API/services/userService";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
@@ -47,6 +47,7 @@ export default function UserModal({ isOpen, onClose, user, managers = [], onSave
     const [errors, setErrors] = useState({});
     const [saving, setSaving] = useState(false);
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+    const [removeProfilePicture, setRemoveProfilePicture] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -75,6 +76,7 @@ export default function UserModal({ isOpen, onClose, user, managers = [], onSave
                 });
                 setPreviewUrl(null);
                 setProfilePicture(null);
+                setRemoveProfilePicture(false);
             }
             setErrors({});
             setAdminNewPassword("");
@@ -86,6 +88,7 @@ export default function UserModal({ isOpen, onClose, user, managers = [], onSave
         if (file) {
             setProfilePicture(file);
             setPreviewUrl(URL.createObjectURL(file));
+            setRemoveProfilePicture(false);
         }
     };
 
@@ -126,11 +129,16 @@ export default function UserModal({ isOpen, onClose, user, managers = [], onSave
             if (form.role === "sales_rep") {
                 formData.append("managerId", form.managerId || "");
             }
-            if (!isEdit && form.password) {
+            if (isEdit && !form.password) {
+                // Do nothing
+            } else if (!isEdit && form.password) {
                 formData.append("password", form.password);
             }
             if (profilePicture) {
                 formData.append("profilePicture", profilePicture);
+            }
+            if (removeProfilePicture) {
+                formData.append("removeProfilePicture", "true");
             }
 
             if (isEdit) {
@@ -182,9 +190,19 @@ export default function UserModal({ isOpen, onClose, user, managers = [], onSave
                     {/* Profile Picture Upload */}
                     <div className="flex flex-col items-center pb-2">
                         <div className="relative group">
-                            <div className="w-20 h-20 rounded-full border-2 border-gray-100 overflow-hidden bg-gray-50 flex items-center justify-center shadow-inner">
+                            <div className="w-20 h-20 rounded-full border-2 border-gray-100 overflow-hidden bg-gray-50 flex items-center justify-center shadow-inner relative">
                                 {previewUrl ? (
-                                    <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                                    <>
+                                        <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                                        <button 
+                                            type="button"
+                                            onClick={(e) => { e.preventDefault(); setPreviewUrl(null); setProfilePicture(null); setRemoveProfilePicture(true); }}
+                                            className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                            <Trash2 size={16} className="text-white mb-1" />
+                                            <span className="text-[9px] font-bold text-white uppercase">Remove</span>
+                                        </button>
+                                    </>
                                 ) : (
                                     <div className="text-gray-300">
                                         <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">

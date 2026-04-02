@@ -534,7 +534,9 @@ export const updateUser = async (req, res, next) => {
         user.phoneNumber = phoneNumber !== undefined ? phoneNumber : user.phoneNumber;
         user.address = address !== undefined ? address : user.address;
 
-        if (req.file) {
+        if (req.body.removeProfilePicture === "true" || req.body.removeProfilePicture === true) {
+            user.profilePicture = null;
+        } else if (req.file) {
             const uploadRes = await uploadToCloudinary(req.file, "user_profiles");
             user.profilePicture = uploadRes.url;
         }
@@ -1269,13 +1271,22 @@ export const uploadProfilePicture = async (req, res) => {
         const { id } = req.user;
         const file = req.file;
 
-        if (!file) {
-            return res.status(400).json({ message: "No image file provided." });
-        }
-
         const user = await User.findById(id);
         if (!user) {
             return res.status(404).json({ message: "User not found!" });
+        }
+
+        if (req.body.removeProfilePicture === "true" || req.body.removeProfilePicture === true) {
+            user.profilePicture = null; 
+            await user.save();
+            return res.status(200).json({
+                message: "Profile picture removed successfully!",
+                data: { profilePicture: null }
+            });
+        }
+
+        if (!file) {
+            return res.status(400).json({ message: "No image file provided." });
         }
 
         // Use our existing Cloudinary upload service since Multer is using memoryStorage

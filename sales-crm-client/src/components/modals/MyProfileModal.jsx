@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import Modal from "./Modal";
-import { Mail, Shield, User as UserIcon, Calendar, Clock, CheckCircle, XCircle, Camera, Loader2 } from "lucide-react";
+import { Mail, Shield, User as UserIcon, Calendar, Clock, CheckCircle, XCircle, Camera, Loader2, Trash2 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import API from "../../API/Interceptor";
 import { toast } from "react-hot-toast";
@@ -84,6 +84,27 @@ export default function MyProfileModal({ isOpen, onClose }) {
         }
     };
 
+    const handleRemovePicture = async (e) => {
+        e.stopPropagation();
+        setUploading(true);
+        try {
+            const formData = new FormData();
+            formData.append("removeProfilePicture", "true");
+
+            const response = await API.put("/auth/profile/picture", formData, {
+                headers: { "Content-Type": "multipart/form-data" }
+            });
+            
+            toast.success(response.data?.message || "Profile picture removed!");
+            await fetchProfile();
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to remove image.");
+            console.error("Remove Error:", error);
+        } finally {
+            setUploading(false);
+        }
+    };
+
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="My Profile">
             <div className="space-y-6">
@@ -116,6 +137,15 @@ export default function MyProfileModal({ isOpen, onClose }) {
                                 )}
                             </div>
                         </button>
+                        {user.profilePicture && !uploading && (
+                            <button
+                                onClick={handleRemovePicture}
+                                className="absolute -top-1 -right-1 bg-white hover:bg-gray-100 text-red-500 rounded-full p-1.5 border border-gray-200 shadow-sm transition-all z-10"
+                                title="Remove profile picture"
+                            >
+                                <Trash2 size={12} />
+                            </button>
+                        )}
                         <input 
                             type="file" 
                             ref={fileInputRef} 
