@@ -192,17 +192,7 @@ export default function UserModal({ isOpen, onClose, user, managers = [], onSave
                         <div className="relative group">
                             <div className="w-20 h-20 rounded-full border-2 border-gray-100 overflow-hidden bg-gray-50 flex items-center justify-center shadow-inner relative">
                                 {previewUrl ? (
-                                    <>
-                                        <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
-                                        <button 
-                                            type="button"
-                                            onClick={(e) => { e.preventDefault(); setPreviewUrl(null); setProfilePicture(null); setRemoveProfilePicture(true); }}
-                                            className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                                        >
-                                            <Trash2 size={16} className="text-white mb-1" />
-                                            <span className="text-[9px] font-bold text-white uppercase">Remove</span>
-                                        </button>
-                                    </>
+                                    <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
                                 ) : (
                                     <div className="text-gray-300">
                                         <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
@@ -211,7 +201,19 @@ export default function UserModal({ isOpen, onClose, user, managers = [], onSave
                                     </div>
                                 )}
                             </div>
-                            <label className="absolute bottom-0 right-0 p-1.5 bg-red-600 text-white rounded-full cursor-pointer shadow-lg hover:bg-red-700 transition transform group-hover:scale-110 active:scale-95">
+                            
+                            {previewUrl && (
+                                <button
+                                    type="button"
+                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setPreviewUrl(null); setProfilePicture(null); setRemoveProfilePicture(true); }}
+                                    className="absolute -top-1 -right-1 bg-white hover:bg-gray-100 text-red-500 rounded-full p-1.5 border border-gray-200 shadow-md transition-all z-10 hover:scale-110 active:scale-95"
+                                    title="Remove profile picture"
+                                >
+                                    <Trash2 size={12} />
+                                </button>
+                            )}
+
+                            <label className="absolute bottom-0 right-0 p-1.5 bg-red-600 text-white rounded-full cursor-pointer shadow-lg hover:bg-red-700 transition transform group-hover:scale-110 active:scale-95 z-10">
                                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4v16m8-8H4" />
                                 </svg>
