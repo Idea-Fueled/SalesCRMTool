@@ -220,7 +220,7 @@ export default function UserModal({ isOpen, onClose, user, managers = [], onSave
                     <div>
                         <label className="block text-xs font-semibold text-gray-600 mb-1">Email Address *</label>
                         <input type="email" name="email" value={form.email} onChange={handleChange}
-                            className={inputClass(errors.email)} placeholder="jane@company.com" />
+                            className={inputClass(errors.email)} placeholder="jane@company.com" autoComplete="off" />
                         {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                     </div>
 
@@ -240,7 +240,7 @@ export default function UserModal({ isOpen, onClose, user, managers = [], onSave
                         <div>
                             <label className="block text-xs font-semibold text-gray-600 mb-1">Password (Optional)</label>
                             <input type="password" name="password" value={form.password} onChange={handleChange}
-                                className={inputClass(errors.password)} placeholder="Min. 6 characters or leave blank" />
+                                className={inputClass(errors.password)} placeholder="Min. 6 characters or leave blank" autoComplete="new-password" />
                             {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
                             <p className="text-[10px] text-gray-400 mt-1 italic">
                                 If omitted, the user will receive a link via email to set their own password.
