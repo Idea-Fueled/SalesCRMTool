@@ -97,6 +97,23 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
                     ['Company Size', data.size ? `${data.size} Employees` : '—'],
                     ['Revenue Range', data.revenueRange ? `$${data.revenueRange.toLocaleString()}` : '—'],
                 ]);
+
+                if (data.notes) {
+                    if (y > pageHeight - 40) { pdf.addPage(); y = 20; }
+                    pdf.setFontSize(10);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setTextColor(31, 41, 55);
+                    pdf.text('OPERATIONAL NOTES', margin, y);
+                    y += 6;
+                    
+                    pdf.setFontSize(9);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setTextColor(55, 65, 81);
+                    const splitNotes = pdf.splitTextToSize(data.notes, pageWidth - margin * 2 - 10);
+                    pdf.text(splitNotes, margin + 2, y);
+                    y += (splitNotes.length * 5) + 6;
+                }
+
                 drawSection('OWNER', [
                     ['Owner', data.ownerId ? `${data.ownerId.firstName} ${data.ownerId.lastName || ''}`.trim() : '—'],
                     ['Designation', data.ownerId?.role === 'admin' ? 'Admin' : data.ownerId?.role === 'sales_manager' ? 'Sales Manager' : data.ownerId?.role === 'sales_rep' ? 'Sales Representative' : '—'],
