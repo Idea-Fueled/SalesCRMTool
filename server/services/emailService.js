@@ -22,6 +22,9 @@ export const sendNotificationEmail = async (to, subject, message) => {
         return;
     }
 
+    const frontendUrl = process.env.FRONTEND_URL || "https://sales-crm-tool.vercel.app";
+    const logoUrl = `${frontendUrl}/Logo.png`;
+
     const msg = {
         to,
         from: SENDER_EMAIL,
@@ -29,8 +32,11 @@ export const sendNotificationEmail = async (to, subject, message) => {
         text: message.replace(/<[^>]*>?/gm, ""), // Basic HTML to text fallback
         html: `
             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
-                    <h2 style="margin: 0; font-size: 20px;">SalesCRM Notification</h2>
+                <div style="text-align: center; padding: 25px 20px 15px 20px; background-color: #ffffff;">
+                    <img src="${logoUrl}" alt="mbdConsulting Logo" style="height: 45px; width: auto;" />
+                </div>
+                <div style="background-color: #dc2626; color: white; padding: 15px; text-align: center;">
+                    <h2 style="margin: 0; font-size: 18px; font-weight: 600;">System Notification</h2>
                 </div>
                 <div style="padding: 30px; line-height: 1.6; color: #374151;">
                     <p style="font-size: 16px; margin-bottom: 20px;">${message}</p>
