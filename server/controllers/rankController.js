@@ -28,7 +28,7 @@ const buildOwnerFilter = async (user) => {
 export const getRankedDeals = async (req, res) => {
     try {
         const ownerFilter = await buildOwnerFilter(req.user);
-        const { tier, limit, owner } = req.query;
+        const { tier, limit, owner, name } = req.query;
 
         const deals = await Deal.find({ isDeleted: false, ...ownerFilter })
             .populate("ownerId", "firstName lastName email role")
@@ -59,6 +59,18 @@ export const getRankedDeals = async (req, res) => {
             });
         }
 
+        // Global text search across names, companies, contacts, owner
+        if (name) {
+            const searchLower = name.toLowerCase();
+            ranked = ranked.filter(d => {
+                const dealName = (d.name || "").toLowerCase();
+                const compName = (d.companyId?.name || d.companyName || "").toLowerCase();
+                const contName = `${d.contactId?.firstName || ""} ${d.contactId?.lastName || ""}`.trim().toLowerCase();
+                const ownerName = `${d.ownerId?.firstName || ""} ${d.ownerId?.lastName || ""}`.trim().toLowerCase();
+                return dealName.includes(searchLower) || compName.includes(searchLower) || contName.includes(searchLower) || ownerName.includes(searchLower);
+            });
+        }
+
         // Sort by score desc
         ranked.sort((a, b) => b.aiScore - a.aiScore);
 
@@ -78,7 +90,7 @@ export const getRankedDeals = async (req, res) => {
 export const getRankedCompanies = async (req, res) => {
     try {
         const ownerFilter = await buildOwnerFilter(req.user);
-        const { tier, limit } = req.query;
+        const { tier, limit, name } = req.query;
 
         const companies = await Company.find({ isDeleted: false, ...ownerFilter })
             .populate("ownerId", "firstName lastName email role")
@@ -112,6 +124,16 @@ export const getRankedCompanies = async (req, res) => {
 
         if (tier) {
             ranked = ranked.filter(c => c.aiTier.toLowerCase() === tier.toLowerCase());
+        }
+
+        if (name) {
+            const searchLower = name.toLowerCase();
+            ranked = ranked.filter(c => {
+                const compName = (c.name || "").toLowerCase();
+                const industry = (c.industry || "").toLowerCase();
+                const ownerName = `${c.ownerId?.firstName || ""} ${c.ownerId?.lastName || ""}`.trim().toLowerCase();
+                return compName.includes(searchLower) || industry.includes(searchLower) || ownerName.includes(searchLower);
+            });
         }
 
         ranked.sort((a, b) => b.aiScore - a.aiScore);
