@@ -584,8 +584,22 @@ export default function Reports() {
                 {/* Chart Section */}
                 {!loading && data.length > 0 && (
                     <div className="p-6 bg-gray-50/30 border-b border-gray-100 flex flex-col items-center">
+                        <style>
+                            {`
+                                #report-chart-container *, 
+                                #report-chart-container svg, 
+                                #report-chart-container path {
+                                    outline: none !important;
+                                    box-shadow: none !important;
+                                    -webkit-tap-highlight-color: transparent;
+                                }
+                                #report-chart-container svg:focus {
+                                    outline: none !important;
+                                }
+                            `}
+                        </style>
                         <div id="report-chart-container" className="w-full flex flex-col md:flex-row items-center justify-around gap-16 py-6 px-4 bg-white rounded-xl" style={{ outline: 'none' }}>
-                            <div className="w-full h-[220px] max-w-[400px] focus:outline-none" style={{ outline: 'none' }} tabIndex="-1">
+                            <div className="w-full h-[220px] max-w-[400px]" style={{ outline: 'none' }} tabIndex="-1">
                                 <ResponsiveContainer width="100%" height="100%" style={{ outline: 'none' }}>
                                     <PieChart style={{ outline: 'none' }}>
                                         <Pie
