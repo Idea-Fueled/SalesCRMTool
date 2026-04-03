@@ -95,7 +95,6 @@ export default function UserDetailsModal({ isOpen, onClose, user, title }) {
                             <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider bg-red-50 text-red-600 border-red-100`}>
                                 {roleMap[user.role] || user.role}
                             </span>
-                            <span className="text-gray-300">•</span>
                             <div className={`flex items-center gap-1.5 text-xs font-semibold ${user.isActive ? "text-green-600" : "text-gray-400"}`}>
                                 <span className={`w-1.5 h-1.5 rounded-full ${user.isActive ? "bg-green-500" : "bg-gray-400"}`} />
                                 {user.isActive ? "Active" : "Inactive"}

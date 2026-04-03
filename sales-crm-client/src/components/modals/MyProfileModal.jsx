@@ -112,11 +112,11 @@ export default function MyProfileModal({ isOpen, onClose }) {
                 {/* Header Information with Upload */}
                 <div className="flex items-center gap-5 p-4 bg-gray-50 rounded-2xl border border-gray-100">
                     
-                    <div className="relative group flex-shrink-0">
+                    <div className="relative flex-shrink-0">
                         <button 
                             onClick={handleAvatarClick}
                             disabled={uploading}
-                            className={`w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-bold border-4 border-white shadow-sm overflow-hidden transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 ${uploading ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer hover:shadow-md'} ${!user.profilePicture ? avatarColor : 'bg-gray-100'}`}
+                            className={`group w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-bold border-4 border-white shadow-sm overflow-hidden transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 ${uploading ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer hover:shadow-md'} ${!user.profilePicture ? avatarColor : 'bg-gray-100'}`}
                             title="Click to change profile picture"
                         >
                             {user.profilePicture ? (
@@ -140,7 +140,7 @@ export default function MyProfileModal({ isOpen, onClose }) {
                         {user.profilePicture && !uploading && (
                             <button
                                 onClick={handleRemovePicture}
-                                className="absolute -top-1 -right-1 bg-white hover:bg-gray-100 text-red-500 rounded-full p-1.5 border border-gray-200 shadow-sm transition-all z-10"
+                                className="absolute -top-1 -right-1 bg-white hover:bg-gray-100 text-red-500 rounded-full p-1.5 border border-gray-200 shadow-sm transition-all z-10 hover:scale-110 active:scale-95"
                                 title="Remove profile picture"
                             >
                                 <Trash2 size={12} />
