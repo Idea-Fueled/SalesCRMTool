@@ -1,4 +1,0 @@
-Connected to MongoDB.
-Found 1 total users with role: 'admin'
-- Anirudh Joshi (janirudh232@gmail.com) | isActive: true
-Found 1 active admins for notifications.

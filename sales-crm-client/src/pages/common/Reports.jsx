@@ -597,13 +597,14 @@ export default function Reports() {
                                             paddingAngle={5}
                                             dataKey="value"
                                             isAnimationActive={false}
+                                            style={{ outline: 'none' }}
                                         >
                                             {getChartData().map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} style={{ outline: 'none' }} />
                                             ))}
                                         </Pie>
                                         <Tooltip 
-                                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', outline: 'none' }}
                                             itemStyle={{ fontSize: '12px', fontWeight: 'bold' }}
                                         />
                                         <Legend verticalAlign="middle" align="right" layout="vertical" iconType="circle" 
