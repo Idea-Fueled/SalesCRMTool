@@ -584,9 +584,9 @@ export default function Reports() {
                 {/* Chart Section */}
                 {!loading && data.length > 0 && (
                     <div className="p-6 bg-gray-50/30 border-b border-gray-100 flex flex-col items-center">
-                        <div id="report-chart-container" className="w-full flex flex-col md:flex-row items-center justify-around gap-16 py-6 px-4 bg-white rounded-xl">
-                            <div className="w-full h-[220px] max-w-[400px] focus:outline-none">
-                                <ResponsiveContainer width="100%" height="100%">
+                        <div id="report-chart-container" className="w-full flex flex-col md:flex-row items-center justify-around gap-16 py-6 px-4 bg-white rounded-xl" style={{ outline: 'none' }}>
+                            <div className="w-full h-[220px] max-w-[400px] focus:outline-none" style={{ outline: 'none' }} tabIndex="-1">
+                                <ResponsiveContainer width="100%" height="100%" style={{ outline: 'none' }}>
                                     <PieChart style={{ outline: 'none' }}>
                                         <Pie
                                             data={getChartData()}
