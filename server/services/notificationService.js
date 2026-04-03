@@ -155,6 +155,10 @@ export const sendTieredNotification = async ({
         else if (action === "DEACTIVATE") emailSubject = `${entityType} Deactivated`;
         else if (action === "ACTIVATE") emailSubject = `${entityType} Activated`;
 
+        if (entityName) {
+            emailSubject += `: ${entityName}`;
+        }
+
         await Promise.all(
             Array.from(recipientIds).map(async (recipientId) => {
                 // In-app Notification
