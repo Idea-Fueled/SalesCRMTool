@@ -22,14 +22,23 @@ const CardHeader = ({ title, children }) => (
     </div>
 );
 
-const Avatar = ({ name }) => {
+const Avatar = ({ name, profilePicture }) => {
     if (!name) return null;
     const parts = name.trim().split(/\s+/);
     const firstName = parts[0] || "";
     const lastName = parts.length > 1 ? parts[parts.length - 1] : "";
     const initials = `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
+
+    if (profilePicture) {
+        return (
+            <div className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-white">
+                <img src={profilePicture} alt={name} className="w-full h-full object-cover" />
+            </div>
+        );
+    }
+
     return (
-        <div className="w-9 h-9 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+        <div className="w-9 h-9 rounded-full bg-red-600 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
             {initials}
         </div>
     );
@@ -229,7 +238,7 @@ export default function ManagerTeam() {
                                         >
                                             <td className="px-4 py-3 whitespace-nowrap">
                                                 <div className="flex items-center gap-3">
-                                                    <Avatar name={`${m.firstName} ${m.lastName}`} />
+                                                    <Avatar name={`${m.firstName} ${m.lastName}`} profilePicture={m.profilePicture} />
                                                     <div>
                                                         <p className="font-bold text-gray-800 leading-none group-hover:text-red-600 transition-colors uppercase">{m.firstName} {m.lastName}</p>
                                                         <p className="text-xs text-gray-400 mt-0.5">{m.email}</p>
