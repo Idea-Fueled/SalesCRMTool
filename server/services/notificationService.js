@@ -146,7 +146,14 @@ export const sendTieredNotification = async ({
         const notificationType = type || typeMap[entityType] || "system";
 
         // 5. Create, Emit, and Email
-        const emailSubject = `${entityType} ${actionVerb.charAt(0).toUpperCase() + actionVerb.slice(1)}`;
+        let emailSubject = `${entityType} Updated`;
+        if (action === "CREATE") emailSubject = `New ${entityType} Created`;
+        else if (action === "DELETE") emailSubject = `${entityType} Deleted`;
+        else if (action === "ASSIGN") emailSubject = `${entityType} Reassigned`;
+        else if (action === "STAGE_CHANGE") emailSubject = `${entityType} Stage Updated`;
+        else if (action === "REMARK") emailSubject = `New Remark on ${entityType}`;
+        else if (action === "DEACTIVATE") emailSubject = `${entityType} Deactivated`;
+        else if (action === "ACTIVATE") emailSubject = `${entityType} Activated`;
 
         await Promise.all(
             Array.from(recipientIds).map(async (recipientId) => {
