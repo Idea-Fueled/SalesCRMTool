@@ -465,8 +465,12 @@ export default function ContactDetails() {
                         </div>
                         <div className="p-5">
                             <div className="flex flex-col items-center gap-3">
-                                <div className="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-sm ring-1 ring-red-50">
-                                    {contact.ownerId?.firstName?.[0]}{contact.ownerId?.lastName?.[0]}
+                                <div className="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-sm ring-1 ring-red-50 overflow-hidden">
+                                    {contact.ownerId?.profilePicture ? (
+                                        <img src={contact.ownerId.profilePicture} alt="Owner" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <>{contact.ownerId?.firstName?.[0]}{contact.ownerId?.lastName?.[0]}</>
+                                    )}
                                 </div>
                                 <div className="text-center">
                                     <p className="text-sm font-bold text-gray-900 leading-none">{contact.ownerId?.firstName} {contact.ownerId?.lastName || ""}</p>

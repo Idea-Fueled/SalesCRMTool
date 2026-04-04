@@ -99,26 +99,35 @@ export default function ContactCard({ contact, onEdit, onDelete, onView, onDeals
                             <Linkedin size={10} /> LinkedIn
                         </a>
                     )}
-                    <span className="text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-widest bg-gray-50 text-gray-400 border border-gray-100">
-                        {contact.ownerId?.firstName || "System"}
-                    </span>
                 </div>
             </div>
 
             <div className="px-5 py-3 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-2">
+                        <div className="w-5 h-5 rounded-full bg-red-600 flex items-center justify-center text-[8px] font-bold text-white uppercase overflow-hidden">
+                            {contact.ownerId?.profilePicture ? (
+                                <img src={contact.ownerId.profilePicture} alt="Owner" className="w-full h-full object-cover" />
+                            ) : (
+                                <>{contact.ownerId?.firstName?.[0] || "S"}</>
+                            )}
+                        </div>
+                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tight">
+                            {contact.ownerId?.firstName} {contact.ownerId?.lastName || ""}
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 ml-1 border-l border-gray-200 pl-3">
                         <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]"></div>
                         <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Active</span>
                     </div>
-                    <button 
-                        onClick={(e) => { e.stopPropagation(); onDealsClick?.(contact); }}
-                        className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white border border-gray-100 hover:border-red-200 hover:text-red-600 transition-all shadow-sm"
-                    >
-                        <Briefcase size={10} className="text-gray-400 group-hover:text-red-400" />
-                        <span className="text-[9px] font-black uppercase tracking-tighter">Deals: {contact.dealCount || 0}</span>
-                    </button>
                 </div>
+                <button 
+                    onClick={(e) => { e.stopPropagation(); onDealsClick?.(contact); }}
+                    className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white border border-gray-100 hover:border-red-200 hover:text-red-600 transition-all shadow-sm"
+                >
+                    <Briefcase size={10} className="text-gray-400 group-hover:text-red-400" />
+                    <span className="text-[10px] font-black uppercase tracking-tighter">Deals: {contact.dealCount || 0}</span>
+                </button>
             </div>
         </div>
     );

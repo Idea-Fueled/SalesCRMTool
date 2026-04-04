@@ -130,19 +130,28 @@ function SortableDealCard({ deal, onEdit, onDelete, isOverlay = false }) {
                             <Clock size={12} />
                             <span>{closeDate || "No date"}</span>
                         </div>
-                        <div className="flex items-center gap-1">
-                            <button
-                                onClick={(e) => { e.stopPropagation(); onEdit(deal); }}
-                                className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
-                            >
-                                <Edit2 size={12} />
-                            </button>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); onDelete(deal); }}
-                                className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
-                            >
-                                <Trash2 size={12} />
-                            </button>
+                        <div className="flex items-center gap-2">
+                            <div className="w-5 h-5 rounded-full bg-red-600 flex items-center justify-center text-[8px] font-bold text-white uppercase overflow-hidden border border-red-100">
+                                {deal.ownerId?.profilePicture ? (
+                                    <img src={deal.ownerId.profilePicture} alt="Owner" className="w-full h-full object-cover" />
+                                ) : (
+                                    <>{deal.ownerId?.firstName?.[0] || "U"}</>
+                                )}
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); onEdit(deal); }}
+                                    className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                                >
+                                    <Edit2 size={12} />
+                                </button>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); onDelete(deal); }}
+                                    className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                                >
+                                    <Trash2 size={12} />
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

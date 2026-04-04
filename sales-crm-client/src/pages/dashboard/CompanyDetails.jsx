@@ -443,8 +443,12 @@ export default function CompanyDetails() {
                         </div>
                         <div className="p-5">
                             <div className="flex flex-col items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
-                                <div className="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-sm ring-1 ring-red-100">
-                                    {company.ownerId?.firstName?.[0]}{company.ownerId?.lastName?.[0]}
+                                <div className="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-sm ring-1 ring-red-100 overflow-hidden">
+                                    {company.ownerId?.profilePicture ? (
+                                        <img src={company.ownerId.profilePicture} alt="Owner" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <>{company.ownerId?.firstName?.[0]}{company.ownerId?.lastName?.[0]}</>
+                                    )}
                                 </div>
                                 <div className="text-center">
                                     <p className="text-sm font-black text-gray-900 leading-none">{company.ownerId?.firstName} {company.ownerId?.lastName || ""}</p>

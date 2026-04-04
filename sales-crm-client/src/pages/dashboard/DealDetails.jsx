@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { getDealById, updateDeal, addRemark as addDealRemark, deleteDeal, getArchivedDeals, restoreDeal, deleteRemarkFile, deleteAttachment, deleteRemark } from "../../API/services/dealService";
+import { getDealById, updateDeal, addRemark as addDealRemark, deleteDeal, getArchivedDeals, restoreDeal, deleteRemarkFile, deleteAttachment, deleteRemark, generateDealSummary } from "../../API/services/dealService";
 import { getCompanies } from "../../API/services/companyService";
 import { getContacts } from "../../API/services/contactService";
 import { getTeamUsers } from "../../API/services/userService";
@@ -15,7 +15,7 @@ import {
     RotateCw, Maximize2, Lock, ThumbsUp, Shield,
     MoreHorizontal, Download, ChevronRight, Layers,
     MapPin, Mail, Phone, FileText, Paperclip, List, History, MessageSquare,
-    Edit2, Trash2, X
+    Edit2, Trash2, X, Sparkles
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { exportToPDF } from "../../utils/pdfExport";
@@ -65,6 +65,7 @@ export default function DealDetails() {
     const [newRemark, setNewRemark] = useState("");
     const [remarkFiles, setRemarkFiles] = useState([]);
     const [savingRemark, setSavingRemark] = useState(false);
+    const [generatingSummary, setGeneratingSummary] = useState(false);
 
     const fetchDealData = async (silent = false, showToast = false) => {
         if (!silent) setLoading(true);
@@ -239,6 +240,19 @@ export default function DealDetails() {
         }
     };
 
+    const handleGenerateSummary = async () => {
+        setGeneratingSummary(true);
+        try {
+            const res = await generateDealSummary(deal._id);
+            setDeal(prev => ({ ...prev, aiSummary: res.data.aiSummary }));
+            toast.success("AI Summary refreshed!");
+        } catch (err) {
+            toast.error(err.response?.data?.message || "Failed to generate summary");
+        } finally {
+            setGeneratingSummary(false);
+        }
+    };
+
     const handleDeleteDeal = async () => {
         try {
             await deleteDeal(deal._id);
@@ -363,6 +377,52 @@ export default function DealDetails() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 {/* Left Column - Information */}
                 <div className="lg:col-span-4 space-y-6">
+                    {/* AI Deal Summary */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white">
+                            <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                                <Sparkles size={16} className="text-red-500" /> AI Deal Summary
+                            </h3>
+                            <button
+                                onClick={handleGenerateSummary}
+                                disabled={generatingSummary}
+                                className="text-[10px] font-bold text-red-600 hover:text-red-700 disabled:opacity-50 flex items-center gap-1 uppercase tracking-tighter"
+                            >
+                                {generatingSummary ? <Loader2 size={10} className="animate-spin" /> : <RotateCw size={10} />}
+                                {deal.aiSummary ? "Refresh" : "Generate"}
+                            </button>
+                        </div>
+                        <div className="p-6">
+                            {generatingSummary ? (
+                                <div className="space-y-3 animate-pulse">
+                                    <div className="h-3 bg-gray-100 rounded-full w-3/4"></div>
+                                    <div className="h-3 bg-gray-100 rounded-full w-full"></div>
+                                    <div className="h-3 bg-gray-100 rounded-full w-5/6"></div>
+                                </div>
+                            ) : deal.aiSummary?.text ? (
+                                <div className="prose prose-sm max-w-none text-[13px] text-gray-700 leading-relaxed font-medium">
+                                    {deal.aiSummary.text.split('\n').filter(line => line.trim()).map((line, i) => (
+                                        <p key={i} className="mb-2 last:mb-0 flex gap-2">
+                                            {line.trim().startsWith('-') || line.trim().startsWith('*') || /^\d+\./.test(line.trim()) ? (
+                                                <span className="text-red-500 mt-1.5 flex-shrink-0">•</span>
+                                            ) : null}
+                                            <span>{line.replace(/^[-*]\s*/, '').replace(/^\d+\.\s*/, '')}</span>
+                                        </p>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-4">
+                                    <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-3">No AI summary generated yet</p>
+                                    <button
+                                        onClick={handleGenerateSummary}
+                                        className="px-5 py-2 bg-red-600 text-white rounded-xl text-[12px] font-bold hover:bg-red-700 transition-all shadow-sm flex items-center gap-2 mx-auto active:scale-95"
+                                    >
+                                        <Sparkles size={14} /> Generate Summary
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                     {/* Deals Information */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <div className="px-6 py-4 border-b border-gray-50 bg-gray-50/30">

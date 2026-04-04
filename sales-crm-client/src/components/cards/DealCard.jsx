@@ -92,8 +92,12 @@ const DealCard = ({ deal, onEdit, onDelete, onView }) => {
 
             <div className="px-5 py-3 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center text-[10px] font-bold text-white uppercase">
-                        {deal.ownerId?.firstName?.[0] || "U"}
+                    <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center text-[10px] font-bold text-white uppercase overflow-hidden">
+                        {deal.ownerId?.profilePicture ? (
+                            <img src={deal.ownerId.profilePicture} alt="Owner" className="w-full h-full object-cover" />
+                        ) : (
+                            <>{deal.ownerId?.firstName?.[0] || "U"}</>
+                        )}
                     </div>
                     <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tight">
                         {deal.ownerId?.firstName} {deal.ownerId?.lastName || ""}

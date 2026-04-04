@@ -289,7 +289,18 @@ export default function ManagerDeals() {
                                                 onClick={() => navigate(`/manager/deals/${d._id}`)}>
                                                 {d.name}
                                             </td>
-                                            <td className="px-4 py-3 text-red-600 font-bold whitespace-nowrap">{d.ownerId ? `${d.ownerId.firstName} ${d.ownerId.lastName || ""}`.trim() : "Unknown"}</td>
+                                            <td className="px-4 py-3 text-red-600 font-bold whitespace-nowrap">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-5 h-5 rounded-full bg-red-600 flex items-center justify-center text-[8px] font-bold text-white uppercase overflow-hidden border border-red-200">
+                                                        {d.ownerId?.profilePicture ? (
+                                                            <img src={d.ownerId.profilePicture} alt="Owner" className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <>{d.ownerId?.firstName?.[0] || "U"}</>
+                                                        )}
+                                                    </div>
+                                                    <span>{d.ownerId ? `${d.ownerId.firstName} ${d.ownerId.lastName || ""}`.trim() : "Unknown"}</span>
+                                                </div>
+                                            </td>
                                             <td className="px-4 py-3 text-gray-500 whitespace-nowrap cursor-pointer hover:text-red-600 transition-colors"
                                                 onClick={() => {
                                                     if (d.companyId?._id || d.companyId) {

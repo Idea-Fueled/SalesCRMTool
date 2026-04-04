@@ -144,9 +144,9 @@ const dealSchema = new mongoose.Schema(
             type: Boolean,
             default: false
         },
-        deletedAt: {
-            type: Date,
-            default: null
+        aiSummary: {
+            text: { type: String },
+            generatedAt: { type: Date }
         }
     },
     { timestamps: true }

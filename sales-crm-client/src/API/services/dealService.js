@@ -52,3 +52,7 @@ export const deleteAttachment = async (id, fileId) => {
 export const deleteRemark = async (id, remarkId) => {
     return API.delete(`/deals/${id}/remarks/${remarkId}`);
 };
+
+export const generateDealSummary = async (id) => {
+    return API.post(`/deals/${id}/ai-summary`);
+};

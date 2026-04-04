@@ -82,7 +82,7 @@ export const getAIIntent = async (message) => {
 
         const parsed = JSON.parse(cleaned);
 
-        // ✅ FINAL NORMALIZED OUTPUT
+        // FINAL NORMALIZED OUTPUT
         const normalized = {
             action: parsed.action || "list",
             entity: parsed.entity || "deals",
@@ -138,5 +138,68 @@ export const getAIIntent = async (message) => {
     } catch (error) {
         console.error("AI Intent Error:", error.message);
         throw error; // Let the caller (chatbotController) fall back to rule-based parser
+    }
+};
+
+/**
+ * Generates a concise TL;DR summary for a specific deal based on its metadata and remarks.
+ */
+export const generateSpecificDealSummary = async (deal) => {
+    const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+    if (!OPENROUTER_API_KEY) {
+        throw new Error("OPENROUTER_API_KEY is missing");
+    }
+
+    const remarksText = deal.remarks?.map(r => `[${new Date(r.createdAt).toLocaleDateString()}] ${r.authorName}: ${r.text}`).join('\n') || "No remarks yet.";
+
+    const prompt = `
+    You are a Sales Strategy Expert. Summarize the following Deal for a Sales Manager.
+    
+    DEAL DETAILS:
+    - Name: ${deal.name}
+    - Stage: ${deal.stage}
+    - Value: ${deal.currency} ${deal.value}
+    - Probability: ${deal.probability}%
+    - Expected Close: ${new Date(deal.expectedCloseDate).toLocaleDateString()}
+    
+    TIMELINE / REMARKS:
+    ${remarksText}
+    
+    TASK:
+    Provide a concise summary in 3-4 bullet points. 
+    Focus on:
+    1. Current Health (Is it on track?)
+    2. Key Roadblocks (What's slowing it down?)
+    3. Next Recommended Actions.
+    
+    Keep the tone professional and the bullets short.
+    `;
+
+    try {
+        const res = await axios.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            {
+                model: "google/gemini-2.0-flash-lite-001",
+                messages: [
+                    { role: "system", content: "You are a professional sales assistant. Provide only the summary bullets." },
+                    { role: "user", content: prompt }
+                ],
+                temperature: 0.3
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "http://localhost:5173",
+                    "X-Title": "SalesCRM Assistant"
+                },
+                timeout: 10000
+            }
+        );
+
+        return res.data?.choices?.[0]?.message?.content || "Could not generate summary.";
+    } catch (error) {
+        console.error("Deal Summary AI Error:", error.message);
+        throw error;
     }
 };

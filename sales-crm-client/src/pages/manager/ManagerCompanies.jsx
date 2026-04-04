@@ -194,7 +194,18 @@ export default function ManagerCompanies() {
                                             <td className="px-4 py-3">
                                                 <span className={`text-[11px] px-2.5 py-1 rounded-full font-bold ${statusBg[c.status] || "bg-gray-100 text-gray-600"}`}>{c.status}</span>
                                             </td>
-                                            <td className="px-4 py-3 text-red-600 font-bold">{c.ownerId?.firstName || "Unknown"}</td>
+                                            <td className="px-4 py-3 text-red-600 font-bold whitespace-nowrap">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-5 h-5 rounded-full bg-red-600 flex items-center justify-center text-[8px] font-bold text-white uppercase overflow-hidden border border-red-200">
+                                                        {c.ownerId?.profilePicture ? (
+                                                            <img src={c.ownerId.profilePicture} alt="Owner" className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <>{c.ownerId?.firstName?.[0] || "U"}</>
+                                                        )}
+                                                    </div>
+                                                    <span>{c.ownerId?.firstName || "Unknown"}</span>
+                                                </div>
+                                            </td>
                                             <td className="px-4 py-3 text-gray-600">{c.revenueRange || "—"}</td>
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center gap-2">

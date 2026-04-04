@@ -8,6 +8,7 @@ import { Notification } from "../models/notificationSchema.js";
 import { emitNotification } from "../utils/socket.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../middlewares/uploadMiddleware.js";
 import { sendTieredNotification } from "../services/notificationService.js";
+import { generateSpecificDealSummary } from "../services/aiService.js";
 
 const getProbabilityForStage = (stage) => {
     const mapping = {
@@ -1055,5 +1056,35 @@ export const deleteRemark = async (req, res) => {
         res.status(200).json({ message: "Remark deleted successfully!" });
     } catch (error) {
         res.status(500).json({ message: error.message || "Server error!" });
+    }
+};
+/**
+ * Triggers AI generation for a specific deal summary and saves it to the database.
+ */
+export const generateDealSummary = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deal = await Deal.findById(id).populate("ownerId", "firstName lastName");
+        
+        if (!deal) {
+            return res.status(404).json({ message: "Deal not found!" });
+        }
+
+        const summaryText = await generateSpecificDealSummary(deal);
+        
+        deal.aiSummary = {
+            text: summaryText,
+            generatedAt: new Date()
+        };
+        
+        await deal.save();
+        
+        res.status(200).json({ 
+            message: "AI Summary generated successfully",
+            aiSummary: deal.aiSummary 
+        });
+    } catch (error) {
+        console.error("Controller AI Summary Error:", error.message);
+        res.status(500).json({ message: "Failed to generate AI summary", error: error.message });
     }
 };

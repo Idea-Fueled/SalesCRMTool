@@ -59,7 +59,13 @@ export default function DashboardDetailModal({ isOpen, onClose, category, data, 
                                 <div className="grid grid-cols-2 gap-y-2 text-xs text-gray-500">
                                     <div className="flex flex-col gap-1 min-w-0">
                                         <div className="flex items-center gap-1.5 min-w-0">
-                                            <Users size={12} className="shrink-0" />
+                                            <div className="w-4 h-4 rounded-full bg-red-600 flex items-center justify-center text-[7px] font-bold text-white uppercase overflow-hidden border border-red-200 shrink-0">
+                                                {deal.ownerId?.profilePicture ? (
+                                                    <img src={deal.ownerId.profilePicture} alt="Owner" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <>{deal.ownerId?.firstName?.[0] || "U"}</>
+                                                )}
+                                            </div>
                                             <span className="truncate">
                                                 {(deal.ownerId?.firstName || deal.ownerId?.lastName)
                                                     ? getDealOwnerFullName(deal)
@@ -101,8 +107,12 @@ export default function DashboardDetailModal({ isOpen, onClose, category, data, 
                     <div className="space-y-3">
                         {data.map((user) => (
                             <div key={user._id} className="p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors flex items-center gap-4">
-                                <div className="w-10 h-10 shrink-0 rounded-full bg-red-600 flex items-center justify-center font-bold text-white uppercase text-xs">
-                                    {user.firstName?.[0] || ""}{user.lastName?.[0] || ""}
+                                <div className="w-10 h-10 shrink-0 rounded-full bg-red-600 flex items-center justify-center font-bold text-white uppercase text-xs overflow-hidden border border-red-200">
+                                    {user.profilePicture ? (
+                                        <img src={user.profilePicture} alt="User" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <>{user.firstName?.[0] || ""}{user.lastName?.[0] || ""}</>
+                                    )}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <h4 className="font-bold text-gray-900 truncate">{user.firstName} {user.lastName}</h4>
