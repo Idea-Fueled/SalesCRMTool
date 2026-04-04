@@ -96,11 +96,11 @@ export const createCompany = async (req, res) => {
             action: "CREATE",
             performedBy: req.user.id,
             targetUserId: company.ownerId?.toString() !== req.user.id.toString() ? company.ownerId : null,
-            details: { 
+            details: {
                 newValues: company,
                 entityName: company.name,
-                message: company.ownerId?.toString() !== req.user.id.toString() 
-                    ? `Company "${company.name}" created and assigned to ownership` 
+                message: company.ownerId?.toString() !== req.user.id.toString()
+                    ? `Company "${company.name}" created and assigned to ownership`
                     : `Company "${company.name}" created`
             },
             req
@@ -166,7 +166,7 @@ export const getCompanies = async (req, res) => {
             }).select("_id");
 
             teamIds = teamUsers.map(u => u._id);
-            
+
             const { Deal } = await import("../models/dealSchema.js");
             const { Contact } = await import("../models/contactSchema.js");
 
@@ -287,8 +287,8 @@ export const updateCompany = async (req, res) => {
             }
 
             const { Deal } = await import("../models/dealSchema.js");
-            const hasExistingDeal = await Deal.exists({ 
-                companyId: id, 
+            const hasExistingDeal = await Deal.exists({
+                companyId: id,
                 ownerId: role === "sales_manager" ? { $in: teamIds } : userId,
                 isDeleted: { $ne: true }
             });
@@ -332,6 +332,7 @@ export const updateCompany = async (req, res) => {
             }
         }
 
+        const oldOwnerId = company.ownerId ? company.ownerId.toString() : null;
         const fields = [
             "name", "industry", "size", "website", "primaryContact",
             "status", "address", "phone", "revenueRange", "notes", "remarks", "ownerId", "email"
@@ -377,17 +378,20 @@ export const updateCompany = async (req, res) => {
             data: company
         });
 
+        const newOwnerId = company.ownerId ? company.ownerId.toString() : null;
+        const ownerChanged = req.body.ownerId !== undefined && newOwnerId !== oldOwnerId;
+
         // Log company update
         await logAction({
             entityType: "Company",
             entityId: id,
-            action: req.body.ownerId && req.body.ownerId.toString() !== (company.ownerId?.toString() || "") ? "REASSIGN" : "UPDATE",
+            action: ownerChanged ? "REASSIGN" : "UPDATE",
             performedBy: userId,
-            targetUserId: req.body.ownerId && req.body.ownerId.toString() !== userId.toString() ? req.body.ownerId : null,
-            details: { 
+            targetUserId: ownerChanged && newOwnerId !== userId.toString() ? newOwnerId : null,
+            details: {
                 newValues: req.body,
                 entityName: company.name,
-                message: req.body.ownerId ? `Company "${company.name}" updated and reassigned` : `Company "${company.name}" updated`
+                message: ownerChanged ? `Company "${company.name}" updated and reassigned` : `Company "${company.name}" updated`
             },
             req
         });
@@ -399,7 +403,7 @@ export const updateCompany = async (req, res) => {
             entityId: id,
             entityType: "Company",
             entityName: company.name,
-            action: req.body.ownerId && req.body.ownerId.toString() !== (company.ownerId?.toString() || "") ? "ASSIGN" : "UPDATE"
+            action: ownerChanged ? "ASSIGN" : "UPDATE"
         });
 
         return;
@@ -597,14 +601,14 @@ export const getCompanyById = async (req, res) => {
         const maxRevenue = maxRevenueRes[0]?.max || 1;
         const { score: aiScore, tier: aiTier } = scoreCompany(company, dealCount, contactCount, maxRevenue);
 
-        res.status(200).json({ 
+        res.status(200).json({
             data: {
                 ...company.toObject(),
                 dealCount,
                 totalValue,
                 aiScore,
                 aiTier
-            } 
+            }
         });
     } catch (error) {
         res.status(500).json({ message: error.message || "Server error!" });

@@ -115,8 +115,8 @@ export const sendTieredNotification = async ({
         }
 
         // 3. Remove Actor from recipients (prevent self-notification)
-        // recipientIds.delete(actorId.toString());
-        // recipientEmails.delete(actorId.toString());
+        recipientIds.delete(actorId.toString());
+        recipientEmails.delete(actorId.toString());
 
         if (recipientIds.size === 0) return;
 

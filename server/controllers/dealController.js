@@ -363,8 +363,10 @@ export const updateDealInformation = async (req, res, next) => {
         await deal.save();
 
         let reassignedToName = null;
-        if (req.body.ownerId) {
-            const owner = await User.findById(req.body.ownerId);
+        const newOwnerId = deal.ownerId ? deal.ownerId.toString() : null;
+        const ownerChanged = req.body.ownerId !== undefined && newOwnerId !== oldOwnerId;
+        if (ownerChanged) {
+            const owner = await User.findById(newOwnerId);
             if (owner) reassignedToName = `${owner.firstName} ${owner.lastName}`;
         }
 
@@ -377,9 +379,9 @@ export const updateDealInformation = async (req, res, next) => {
         await logAction({
             entityType: "Deal",
             entityId: id,
-            action: req.body.ownerId && req.body.ownerId.toString() !== deal.ownerId.toString() ? "REASSIGN" : "UPDATE",
+            action: ownerChanged ? "REASSIGN" : "UPDATE",
             performedBy: userId,
-            targetUserId: req.body.ownerId && req.body.ownerId.toString() !== userId.toString() ? req.body.ownerId : null,
+            targetUserId: ownerChanged && newOwnerId !== userId.toString() ? newOwnerId : null,
             details: {
                 newValues: req.body,
                 entityName: deal.name,
@@ -442,7 +444,7 @@ export const updateDealInformation = async (req, res, next) => {
             entityId: id,
             entityType: "Deal",
             entityName: deal.name,
-            action: req.body.ownerId && req.body.ownerId.toString() !== deal.ownerId.toString() ? "ASSIGN" : "UPDATE",
+            action: ownerChanged ? "ASSIGN" : "UPDATE",
             customMessage: hierarchyMsg || (reassignedToName ? `Deal "${deal.name}" reassigned to ${reassignedToName}` : null)
         });
 

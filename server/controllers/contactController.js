@@ -342,6 +342,7 @@ export const updateContact = async (req, res, next) => {
             } catch (e) { /* ignore parse errors */ }
         }
 
+        const oldOwnerId = contact.ownerId ? contact.ownerId.toString() : null;
         const fields = [
             "firstName", "lastName", "email", "jobTitle", "companyId",
             "ownerId", "phone", "mobile", "linkedin", "notes", "remarks"
@@ -383,8 +384,11 @@ export const updateContact = async (req, res, next) => {
         await contact.save();
 
         let reassignedToName = null;
-        if (req.body.ownerId) {
-            const owner = await User.findById(req.body.ownerId);
+        const newOwnerId = contact.ownerId ? contact.ownerId.toString() : null;
+        const ownerChanged = req.body.ownerId !== undefined && newOwnerId !== oldOwnerId;
+
+        if (ownerChanged) {
+            const owner = await User.findById(newOwnerId);
             if (owner) reassignedToName = `${owner.firstName} ${owner.lastName}`;
         }
 
@@ -397,9 +401,9 @@ export const updateContact = async (req, res, next) => {
         await logAction({
             entityType: "Contact",
             entityId: id,
-            action: req.body.ownerId && req.body.ownerId.toString() !== (contact.ownerId?.toString() || "") ? "REASSIGN" : "UPDATE",
+            action: ownerChanged ? "REASSIGN" : "UPDATE",
             performedBy: userId,
-            targetUserId: req.body.ownerId && req.body.ownerId.toString() !== userId.toString() ? req.body.ownerId : null,
+            targetUserId: ownerChanged && newOwnerId !== userId.toString() ? newOwnerId : null,
             details: {
                 newValues: req.body,
                 entityName: `${contact.firstName} ${contact.lastName}`,
@@ -416,7 +420,7 @@ export const updateContact = async (req, res, next) => {
             entityId: id,
             entityType: "Contact",
             entityName: `${contact.firstName} ${contact.lastName}`,
-            action: req.body.ownerId && req.body.ownerId.toString() !== (contact.ownerId?.toString() || "") ? "ASSIGN" : "UPDATE",
+            action: ownerChanged ? "ASSIGN" : "UPDATE",
             customMessage: reassignedToName ? `Contact "${contact.firstName} ${contact.lastName}" reassigned to ${reassignedToName} by ${req.user.firstName}.` : null
         });
 
