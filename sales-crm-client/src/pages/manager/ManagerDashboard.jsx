@@ -45,15 +45,19 @@ const StatCard = ({ label, value, sub, icon: IconComp, onClick }) => (
     </div>
 );
 
-const Avatar = ({ name }) => {
+const Avatar = ({ name, url }) => {
     if (!name) return null;
     const parts = name.trim().split(/\s+/);
     const firstName = parts[0] || "";
     const lastName = parts.length > 1 ? parts[parts.length - 1] : "";
     const initials = `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
     return (
-        <div className="w-9 h-9 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-            {initials}
+        <div className="w-9 h-9 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 overflow-hidden border border-red-200 shadow-sm">
+            {url ? (
+                <img src={url} alt={name} className="w-full h-full object-cover" />
+            ) : (
+                initials
+            )}
         </div>
     );
 };
@@ -129,7 +133,8 @@ export default function ManagerDashboard() {
             pipelineRaw: pipeline,
             lastLogin: rep.lastLogin ? new Date(rep.lastLogin).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "Never",
             status: rep.isActive ? "Active" : "Inactive",
-            color: repColors[i % repColors.length]
+            color: repColors[i % repColors.length],
+            profilePicture: rep.profilePicture
         };
     });
 
@@ -175,7 +180,7 @@ export default function ManagerDashboard() {
                                         >
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center gap-3">
-                                                    <Avatar name={rep.name} color={rep.color} />
+                                                    <Avatar name={rep.name} url={rep.profilePicture} />
                                                     <div>
                                                         <p className="font-medium text-gray-800 leading-none">{rep.name}</p>
                                                         <p className="text-xs text-gray-400 mt-0.5">{rep.lastLogin}</p>
@@ -235,7 +240,7 @@ export default function ManagerDashboard() {
                     ) : (
                         repStats.map((rep) => (
                             <div key={rep._id} className="flex flex-col items-center gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100">
-                                <Avatar name={rep.name} color={rep.color} />
+                                <Avatar name={rep.name} url={rep.profilePicture} />
                                 <p className="text-sm font-semibold text-gray-800 text-center leading-tight">{rep.name}</p>
                                 <div className="w-full space-y-1.5">
                                     <div>

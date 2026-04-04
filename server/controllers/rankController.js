@@ -31,7 +31,7 @@ export const getRankedDeals = async (req, res) => {
         const { tier, limit, owner, name } = req.query;
 
         const deals = await Deal.find({ isDeleted: false, ...ownerFilter })
-            .populate("ownerId", "firstName lastName email role")
+            .populate("ownerId", "firstName lastName email profilePicture role")
             .populate("companyId", "name")
             .populate("contactId", "firstName lastName")
             .lean();
@@ -93,7 +93,7 @@ export const getRankedCompanies = async (req, res) => {
         const { tier, limit, name } = req.query;
 
         const companies = await Company.find({ isDeleted: false, ...ownerFilter })
-            .populate("ownerId", "firstName lastName email role")
+            .populate("ownerId", "firstName lastName email profilePicture role")
             .lean();
 
         // Aggregate deal counts and contact counts per company
@@ -156,7 +156,7 @@ export const getRankedContacts = async (req, res) => {
         const { tier, limit, name } = req.query;
 
         const contacts = await Contact.find({ isDeleted: false, ...ownerFilter })
-            .populate("ownerId", "firstName lastName email role")
+            .populate("ownerId", "firstName lastName email profilePicture role")
             .populate("companyId", "name")
             .lean();
 

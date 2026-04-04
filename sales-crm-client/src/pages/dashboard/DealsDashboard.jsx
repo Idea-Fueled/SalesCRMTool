@@ -348,7 +348,18 @@ export default function DealsDashboard() {
                                                             onNavigate={() => navigate(`/dashboard/deals/${d._id}`)} 
                                                         />
                                                     </td>
-                                                    <td className="px-4 py-3 text-red-700 font-semibold whitespace-nowrap">{d.ownerId?.firstName || "System"}</td>
+                                                    <td className="px-4 py-3 text-red-700 font-semibold whitespace-nowrap">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-5 h-5 rounded-full bg-red-600 flex items-center justify-center text-[8px] font-bold text-white uppercase overflow-hidden border border-red-200">
+                                                                {d.ownerId?.profilePicture ? (
+                                                                    <img src={d.ownerId.profilePicture} alt="Owner" className="w-full h-full object-cover" />
+                                                                ) : (
+                                                                    <>{d.ownerId?.firstName?.[0] || "U"}</>
+                                                                )}
+                                                            </div>
+                                                            <span>{d.ownerId?.firstName || "System"}</span>
+                                                        </div>
+                                                    </td>
                                                     <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
                                                         {d.companyId?._id ? (
                                                             <button onClick={() => navigate(`/dashboard/companies/${d.companyId._id}`)} className="hover:text-red-600 hover:underline">
