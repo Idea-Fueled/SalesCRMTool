@@ -166,13 +166,10 @@ export const generateSpecificDealSummary = async (deal) => {
     ${remarksText}
     
     TASK:
-    Provide a concise summary as a single, well-structured paragraph (4-5 sentences). 
-    Focus on:
-    1. Current Health (Is it on track?)
-    2. Key Roadblocks (What's slowing it down?)
-    3. Next Recommended Actions.
+    Provide a concise, cohesive summary as a single, well-structured paragraph (4-5 sentences). 
+    The summary should naturally flow and cover the current health of the deal, any key roadblocks, and next recommended actions without using any bold section headers, bullet points, asterisks, or numbered lists.
     
-    Keep the tone professional and avoid bullet points.
+    Keep the tone professional and ensure it reads as a continuous narrative.
     `;
 
     try {
