@@ -166,13 +166,13 @@ export const generateSpecificDealSummary = async (deal) => {
     ${remarksText}
     
     TASK:
-    Provide a concise summary in 3-4 bullet points. 
+    Provide a concise summary as a single, well-structured paragraph (4-5 sentences). 
     Focus on:
     1. Current Health (Is it on track?)
     2. Key Roadblocks (What's slowing it down?)
     3. Next Recommended Actions.
     
-    Keep the tone professional and the bullets short.
+    Keep the tone professional and avoid bullet points.
     `;
 
     try {

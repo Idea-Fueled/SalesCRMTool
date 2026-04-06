@@ -383,14 +383,16 @@ export default function DealDetails() {
                             <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
                                 <Sparkles size={16} className="text-red-500" /> AI Deal Summary
                             </h3>
-                            <button
-                                onClick={handleGenerateSummary}
-                                disabled={generatingSummary}
-                                className="text-[10px] font-bold text-red-600 hover:text-red-700 disabled:opacity-50 flex items-center gap-1 uppercase tracking-tighter"
-                            >
-                                {generatingSummary ? <Loader2 size={10} className="animate-spin" /> : <RotateCw size={10} />}
-                                {deal.aiSummary ? "Refresh" : "Generate"}
-                            </button>
+                            {deal.aiSummary && (
+                                <button
+                                    onClick={handleGenerateSummary}
+                                    disabled={generatingSummary}
+                                    className="text-[10px] font-bold text-red-600 hover:text-red-700 disabled:opacity-50 flex items-center gap-1 uppercase tracking-tighter"
+                                >
+                                    {generatingSummary ? <Loader2 size={10} className="animate-spin" /> : <RotateCw size={10} />}
+                                    Refresh
+                                </button>
+                            )}
                         </div>
                         <div className="p-6">
                             {generatingSummary ? (
@@ -401,14 +403,7 @@ export default function DealDetails() {
                                 </div>
                             ) : deal.aiSummary?.text ? (
                                 <div className="prose prose-sm max-w-none text-[13px] text-gray-700 leading-relaxed font-medium">
-                                    {deal.aiSummary.text.split('\n').filter(line => line.trim()).map((line, i) => (
-                                        <p key={i} className="mb-2 last:mb-0 flex gap-2">
-                                            {line.trim().startsWith('-') || line.trim().startsWith('*') || /^\d+\./.test(line.trim()) ? (
-                                                <span className="text-red-500 mt-1.5 flex-shrink-0">•</span>
-                                            ) : null}
-                                            <span>{line.replace(/^[-*]\s*/, '').replace(/^\d+\.\s*/, '')}</span>
-                                        </p>
-                                    ))}
+                                    <p>{deal.aiSummary.text}</p>
                                 </div>
                             ) : (
                                 <div className="text-center py-4">
