@@ -167,7 +167,8 @@ export const generateSpecificDealSummary = async (deal) => {
     
     TASK:
     Provide a concise, cohesive summary as a single, well-structured paragraph (4-5 sentences). 
-    The summary should naturally flow and cover the current health of the deal, any key roadblocks, and next recommended actions without using any bold section headers, bullet points, asterisks, or numbered lists.
+    Start with a bold introductory sentence like: **Here's a summary of the ${deal.name} deal:**
+    The rest of the summary should naturally flow and cover the current health of the deal, any key roadblocks, and next recommended actions without using any bold section headers, bullet points, asterisks, or numbered lists.
     
     Keep the tone professional and ensure it reads as a continuous narrative.
     `;

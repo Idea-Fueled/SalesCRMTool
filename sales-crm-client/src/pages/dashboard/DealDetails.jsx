@@ -403,7 +403,18 @@ export default function DealDetails() {
                                 </div>
                             ) : deal.aiSummary?.text ? (
                                 <div className="prose prose-sm max-w-none text-[13px] text-gray-700 leading-relaxed font-medium">
-                                    <p>{deal.aiSummary.text}</p>
+                                    {(() => {
+                                        const lines = deal.aiSummary.text.split('\n').filter(l => l.trim());
+                                        if (lines.length > 1) {
+                                            return (
+                                                <>
+                                                    <p className="font-bold mb-2">{lines[0].replace(/\*\*/g, '')}</p>
+                                                    <p>{lines.slice(1).join(' ')}</p>
+                                                </>
+                                            );
+                                        }
+                                        return <p>{deal.aiSummary.text}</p>;
+                                    })()}
                                 </div>
                             ) : (
                                 <div className="text-center py-4">
