@@ -1,6 +1,6 @@
 import express from "express"
 import { protect } from "../middlewares/authMiddleware.js";
-import { changeOwnership, createCompany, deleteCompany, getCompanies, getCompanyById, updateCompany, getArchivedCompanies, restoreCompany, addRemark, deleteRemarkFile, deleteAttachment, deleteRemark } from "../controllers/companyController.js";
+import { changeOwnership, createCompany, deleteCompany, getCompanies, getCompanyById, updateCompany, getArchivedCompanies, restoreCompany, addRemark, deleteRemarkFile, deleteAttachment, deleteRemark, generateCompanySummary } from "../controllers/companyController.js";
 import { upload } from "../middlewares/uploadMiddleware.js";
 
 const router = express.Router();
@@ -16,6 +16,7 @@ router.delete("/:id", protect, deleteCompany);
 router.delete("/:id/remarks/:remarkId/files/:fileId", protect, deleteRemarkFile)
 router.delete("/:id/remarks/:remarkId", protect, deleteRemark)
 router.delete("/:id/attachments/:fileId", protect, deleteAttachment)
+router.post("/:id/generate-summary", protect, generateCompanySummary);
 router.patch("/:id/change-owner", protect, changeOwnership);
 
 export default router;

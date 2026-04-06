@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { getCompanyById, updateCompany, deleteCompany, addRemark as addCompanyRemark, deleteRemarkFile, deleteAttachment, deleteRemark } from "../../API/services/companyService";
+import { getCompanyById, updateCompany, deleteCompany, addRemark as addCompanyRemark, deleteRemarkFile, deleteAttachment, deleteRemark, generateCompanySummary } from "../../API/services/companyService";
 import { getTeamUsers } from "../../API/services/userService";
 import { useAuth } from "../../context/AuthContext";
 import CompanyModal from "../../components/modals/CompanyModal";
@@ -12,7 +12,7 @@ import {
     ChevronRight, Download, RotateCw, Maximize2,
     Layers, Users, Target, Info, DollarSign,
     MoreHorizontal, List, FileText, Paperclip, X,
-    Loader2, ExternalLink, MessageSquare, Edit2, Trash2
+    Loader2, ExternalLink, MessageSquare, Edit2, Trash2, Sparkles
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { exportToPDF } from "../../utils/pdfExport";
@@ -114,6 +114,8 @@ export default function CompanyDetails() {
     const [remarkFiles, setRemarkFiles] = useState([]);
     const [savingRemark, setSavingRemark] = useState(false);
     const [users, setUsers] = useState([]);
+    const [generatingSummary, setGeneratingSummary] = useState(false);
+    const [showSummaryLog, setShowSummaryLog] = useState(false);
 
     const fetchCompany = async (silent = false) => {
         if (!silent) setLoading(true);
@@ -152,7 +154,8 @@ export default function CompanyDetails() {
             
             setCompany(prev => ({
                 ...prev,
-                remarks: [...(Array.isArray(prev.remarks) ? prev.remarks : []), res.data.data]
+                remarks: [...(Array.isArray(prev.remarks) ? prev.remarks : []), res.data.data],
+                aiSummary: res.data.aiSummary || prev.aiSummary
             }));
             
             setNewRemark("");
@@ -162,6 +165,19 @@ export default function CompanyDetails() {
             toast.error(err?.response?.data?.message || "Failed to add remark");
         } finally {
             setSavingRemark(false);
+        }
+    };
+
+    const handleGenerateSummary = async () => {
+        setGeneratingSummary(true);
+        try {
+            const res = await generateCompanySummary(company._id);
+            setCompany(prev => ({ ...prev, aiSummary: res.data.aiSummary }));
+            toast.success("AI Summary refreshed!");
+        } catch (err) {
+            toast.error(err.response?.data?.message || "Failed to generate summary");
+        } finally {
+            setGeneratingSummary(false);
         }
     };
 
@@ -328,6 +344,149 @@ export default function CompanyDetails() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 {/* Left Column - Information */}
                 <div className="lg:col-span-4 space-y-6">
+                    {/* AI Company Summary */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
+                        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white overflow-visible">
+                            <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                                <Sparkles size={16} className="text-red-500" /> AI Summary
+                                {company.aiSummary && (
+                                    <div className="relative">
+                                        <button 
+                                            onClick={() => setShowSummaryLog(!showSummaryLog)}
+                                            className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+                                            title="View Generation Details"
+                                        >
+                                            <List size={14} />
+                                        </button>
+                                        {showSummaryLog && (
+                                            <div className="absolute left-0 top-full mt-2 w-72 bg-white border border-gray-200 shadow-2xl rounded-2xl p-5 z-50 animate-in fade-in zoom-in duration-200">
+                                                <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-50">
+                                                    <div className="flex items-center gap-2">
+                                                        <Clock size={16} className="text-gray-400" />
+                                                        <span className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Generation Log</span>
+                                                    </div>
+                                                    <button 
+                                                        onClick={() => setShowSummaryLog(false)}
+                                                        className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                                                        title="Close"
+                                                    >
+                                                        <X size={16} />
+                                                    </button>
+                                                </div>
+
+                                                <div className="space-y-0 max-h-[320px] overflow-y-auto pr-1 custom-scrollbar">
+                                                    {(() => {
+                                                        const current = { 
+                                                            generatedAt: company.aiSummary.generatedAt, 
+                                                            generatedByName: company.aiSummary.generatedByName 
+                                                        };
+                                                        const history = company.aiSummary.history || [];
+                                                        const allLogs = [current, ...history].filter(l => l.generatedAt);
+                                                        
+                                                        return allLogs.map((log, idx) => (
+                                                            <div key={idx} className="relative pl-6 pb-6 last:pb-2">
+                                                                {/* Timeline Line */}
+                                                                {idx !== allLogs.length - 1 && (
+                                                                    <div className="absolute left-[5px] top-4 bottom-0 w-[1.5px] bg-gray-100"></div>
+                                                                )}
+                                                                {/* Dot */}
+                                                                <div className={`absolute left-0 top-1.5 w-[12px] h-[12px] rounded-full border-2 bg-white z-10 ${idx === 0 ? 'border-red-500' : 'border-gray-300'}`}></div>
+                                                                
+                                                                <div className="flex justify-between items-start gap-4">
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <h4 className={`text-[11px] font-bold uppercase tracking-tight ${idx === 0 ? 'text-gray-900' : 'text-gray-500'}`}>
+                                                                            SUMMARY {idx === allLogs.length - 1 ? 'GENERATED' : 'REFRESHED'}
+                                                                        </h4>
+                                                                        <p className="text-[11px] text-gray-500 mt-1 truncate">
+                                                                            By <span className="font-medium text-gray-700">{log.generatedByName || 'System'}</span>
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="text-right flex-shrink-0">
+                                                                        <span className="text-[10px] font-medium text-gray-400 whitespace-nowrap">
+                                                                            {new Date(log.generatedAt).toLocaleDateString([], { day: 'numeric', month: 'short' })}
+                                                                        </span>
+                                                                        <p className="text-[9px] text-gray-300 font-medium leading-none mt-1">
+                                                                            {new Date(log.generatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ));
+                                                    })()}
+                                                </div>
+
+                                                <button 
+                                                    onClick={() => setShowSummaryLog(false)}
+                                                    className="mt-4 w-full py-2.5 text-[11px] font-bold text-white bg-red-500 hover:bg-red-600 rounded-xl transition-all active:scale-95 shadow-sm"
+                                                >
+                                                    Close
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </h3>
+                            {company.aiSummary?.text && (
+                                <button
+                                    onClick={handleGenerateSummary}
+                                    disabled={generatingSummary}
+                                    className="text-[10px] font-bold text-red-600 hover:text-red-700 disabled:opacity-50 flex items-center gap-1 uppercase tracking-tighter"
+                                >
+                                    {generatingSummary ? <Loader2 size={10} className="animate-spin" /> : <RotateCw size={10} />}
+                                    Refresh
+                                </button>
+                            )}
+                        </div>
+                        <div className="p-6">
+                            {generatingSummary ? (
+                                <div className="space-y-3 animate-pulse">
+                                    <div className="h-3 bg-gray-100 rounded-full w-3/4"></div>
+                                    <div className="h-3 bg-gray-100 rounded-full w-full"></div>
+                                    <div className="h-3 bg-gray-100 rounded-full w-5/6"></div>
+                                </div>
+                            ) : company.aiSummary?.text ? (
+                                <div className="prose prose-sm max-w-none text-[13px] text-gray-700 leading-relaxed font-medium">
+                                {(() => {
+                                    const text = company.aiSummary.text.trim();
+                                    // Try to match leading bold pattern: **heading** rest of text
+                                    const boldMatch = text.match(/^\*\*(.*?)\*\*\s*(.*)/s);
+                                    
+                                    if (boldMatch) {
+                                        return (
+                                            <>
+                                                <p className="font-bold mb-2">{boldMatch[1].replace(/\*\*/g, '')}</p>
+                                                <p>{boldMatch[2].replace(/\*\*/g, '')}</p>
+                                            </>
+                                        );
+                                    }
+
+                                    // Fallback to splitting by newline if no bold markers at start
+                                    const lines = text.split('\n').filter(l => l.trim());
+                                    if (lines.length > 1) {
+                                        return (
+                                            <>
+                                                <p className="font-bold mb-2">{lines[0].replace(/\*\*/g, '')}</p>
+                                                <p>{lines.slice(1).join(' ').replace(/\*\*/g, '')}</p>
+                                            </>
+                                        );
+                                    }
+                                    
+                                    return <p>{text.replace(/\*\*/g, '')}</p>;
+                                })()}
+                                </div>
+                            ) : (
+                                <div className="text-center py-4">
+                                    <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-3">No AI summary generated yet</p>
+                                    <button
+                                        onClick={handleGenerateSummary}
+                                        className="px-5 py-2 bg-red-600 text-white rounded-xl text-[12px] font-bold hover:bg-red-700 transition-all shadow-sm flex items-center gap-2 mx-auto active:scale-95"
+                                    >
+                                        <Sparkles size={14} /> Generate Summary
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                     {/* Company Information */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <div className="px-6 py-4 border-b border-gray-50 bg-gray-50/30">
@@ -409,8 +568,14 @@ export default function CompanyDetails() {
                                                     <div className="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
                                                         <FileText size={14} />
                                                     </div>
-                                                    <div className="min-w-0 flex-1 text-left">
-                                                        <p className="text-[11px] font-bold text-gray-900 truncate">{file.fileName}</p>
+                                                    <div className="min-w-0 flex-1 text-left py-0.5">
+                                                        <p className="text-[11px] font-bold text-gray-900 truncate leading-tight">{file.fileName}</p>
+                                                        <p className="text-[9px] font-medium text-gray-400 mt-1 truncate">
+                                                            Uploaded by {file.uploadedByName || 'Unknown'}
+                                                        </p>
+                                                        <p className="text-[9px] font-medium text-gray-400 leading-none">
+                                                            {formatDate(file.uploadedAt || new Date(), true)}
+                                                        </p>
                                                     </div>
                                                 </button>
                                                 <button
@@ -485,16 +650,6 @@ export default function CompanyDetails() {
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <div className="px-6 h-14 border-b border-gray-50 flex items-center justify-between">
                             <h3 className="text-sm font-bold text-gray-900 tracking-tight">Remarks</h3>
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={() => fetchCompany(true)}
-                                    disabled={isRefreshing}
-                                    className={`text-gray-300 hover:text-red-500 transition-all ${isRefreshing ? "animate-spin text-red-500" : ""}`}
-                                    title="Refresh Details"
-                                >
-                                    <RotateCw size={12} />
-                                </button>
-                            </div>
                         </div>
 
                         <div className="p-6 space-y-6">

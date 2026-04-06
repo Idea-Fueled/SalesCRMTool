@@ -94,6 +94,7 @@ const contactSchema = new mongoose.Schema({
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "User"
             },
+            uploadedByName: String,
             uploadedAt: {
                 type: Date,
                 default: Date.now
@@ -107,6 +108,19 @@ const contactSchema = new mongoose.Schema({
     deletedAt: {
         type: Date,
         default: null
+    },
+    aiSummary: {
+        text: String,
+        generatedAt: Date,
+        generatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        generatedByName: String,
+        history: [
+            {
+                generatedAt: Date,
+                generatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+                generatedByName: String
+            }
+        ]
     }
 }, { timestamps: true })
 

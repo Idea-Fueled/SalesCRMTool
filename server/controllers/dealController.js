@@ -204,11 +204,15 @@ export const addRemark = async (req, res) => {
             files: remarkFiles,
             author: userId,
             authorName,
-            createdAt: new Date()
+            createdAt: new Date(),
+            stage: req.body.stage || deal.stage // Always capture a stage
         };
 
         deal.remarks.push(newRemark);
         await deal.save();
+
+        // Auto-update AI summary
+        const aiSummary = await updateAiSummaryInternal(deal, req.user);
 
         const savedRemark = deal.remarks[deal.remarks.length - 1];
         await deal.populate({
@@ -216,7 +220,11 @@ export const addRemark = async (req, res) => {
             select: 'firstName lastName email profilePicture'
         });
 
-        res.status(200).json({ message: "Remark added successfully!", data: savedRemark });
+        res.status(200).json({ 
+            message: "Remark added successfully!", 
+            data: savedRemark,
+            aiSummary 
+        });
 
         // Log action
         await logAction({
@@ -343,24 +351,53 @@ export const updateDealInformation = async (req, res, next) => {
              const authorName = `${req.user.firstName} ${req.user.lastName || ""}`.trim();
              deal.remarks.push({
                  text: req.body.remarks,
-                 author: userId,
-                 authorName,
-                 createdAt: new Date()
-             });
+                  author: userId,
+                  authorName,
+                  createdAt: new Date(),
+                  stage: deal.stage
+              });
         }
 
-        // Handle File Uploads for Attachments if updating
-        if (req.files && req.files.length > 0) {
+        // Handle Stage Change Remarks
+        const restrictedStages = ["Proposal", "Negotiation", "Closed Won", "Closed Lost"];
+        if (req.body.stage && req.body.stage !== oldStage && restrictedStages.includes(req.body.stage)) {
+            if (req.body.remarkText || (req.files && req.files.length > 0)) {
+                console.log(`Creating stage-linked remark for stage: ${req.body.stage}`);
+                let remarkFiles = [];
+                if (req.files && req.files.length > 0) {
+                    // Filter files that are meant for the remark (if your frontend distinguishes them, 
+                    // otherwise we might just take all files uploaded during this update as remark files)
+                    const uploadPromises = req.files.map(file => uploadToCloudinary(file, "deals/remarks"));
+                    remarkFiles = await Promise.all(uploadPromises);
+                }
+
+                const authorName = `${req.user.firstName} ${req.user.lastName || ""}`.trim();
+                deal.remarks.push({
+                    text: req.body.remarkText || "",
+                    files: remarkFiles,
+                    author: userId,
+                    authorName,
+                    createdAt: new Date(),
+                    stage: req.body.stage
+                });
+            }
+        } else if (req.files && req.files.length > 0) {
+            // Standard attachments if no stage change remark was created
             const uploadPromises = req.files.map(file => uploadToCloudinary(file, "deals/attachments"));
             const uploadedFiles = await Promise.all(uploadPromises);
             const newAttachments = uploadedFiles.map(file => ({
                 ...file,
-                uploadedBy: userId
+                uploadedBy: userId,
+                uploadedByName: `${req.user.firstName} ${req.user.lastName || ""}`.trim(),
+                uploadedAt: new Date()
             }));
             deal.attachments.push(...newAttachments);
         }
 
         await deal.save();
+
+        // Auto-update AI summary
+        const aiSummary = await updateAiSummaryInternal(deal, req.user);
 
         let reassignedToName = null;
         const newOwnerId = deal.ownerId ? deal.ownerId.toString() : null;
@@ -372,7 +409,7 @@ export const updateDealInformation = async (req, res, next) => {
 
         res.status(200).json({
             message: "Deal updated successfuly!",
-            data: deal
+            data: { ...deal.toObject(), aiSummary }
         })
 
         // Log deal update
@@ -525,9 +562,12 @@ export const moveDealStage = async (req, res, next) => {
 
         await deal.save();
 
+        // Auto-update AI summary
+        const aiSummary = await updateAiSummaryInternal(deal, req.user);
+
         res.status(200).json({
             message: "Deal stage updated successfully!",
-            data: deal
+            data: { ...deal.toObject(), aiSummary }
         })
 
         // Log stage move
@@ -627,9 +667,12 @@ export const markDealResult = async (req, res, next) => {
 
         await deal.save();
 
+        // Auto-update AI summary
+        const aiSummary = await updateAiSummaryInternal(deal, req.user);
+
         res.status(200).json({
             message: `Deal marked as ${result}`,
-            data: deal
+            data: { ...deal.toObject(), aiSummary }
         })
 
         // Log result
@@ -1061,6 +1104,36 @@ export const deleteRemark = async (req, res) => {
     }
 };
 /**
+ * Internal helper to update AI summary and its history.
+ */
+const updateAiSummaryInternal = async (deal, user) => {
+    try {
+        const summaryText = await generateSpecificDealSummary(deal);
+        
+        // Prepare current metadata for history before updating
+        const historyEntry = {
+            generatedAt: deal.aiSummary?.generatedAt || new Date(),
+            generatedBy: deal.aiSummary?.generatedBy || deal.ownerId,
+            generatedByName: deal.aiSummary?.generatedByName || "System Process"
+        };
+
+        deal.aiSummary = {
+            text: summaryText,
+            generatedAt: new Date(),
+            generatedBy: user.id,
+            generatedByName: `${user.firstName} ${user.lastName || ""}`.trim(),
+            history: [historyEntry, ...(deal.aiSummary?.history || [])].slice(0, 20) // Keep last 20
+        };
+        
+        await deal.save();
+        return deal.aiSummary;
+    } catch (error) {
+        console.error("Auto Summary Generation Error:", error.message);
+        return deal.aiSummary; // Return existing summary on failure
+    }
+};
+
+/**
  * Triggers AI generation for a specific deal summary and saves it to the database.
  */
 export const generateDealSummary = async (req, res) => {
@@ -1072,18 +1145,11 @@ export const generateDealSummary = async (req, res) => {
             return res.status(404).json({ message: "Deal not found!" });
         }
 
-        const summaryText = await generateSpecificDealSummary(deal);
-        
-        deal.aiSummary = {
-            text: summaryText,
-            generatedAt: new Date()
-        };
-        
-        await deal.save();
+        const aiSummary = await updateAiSummaryInternal(deal, req.user);
         
         res.status(200).json({ 
             message: "AI Summary generated successfully",
-            aiSummary: deal.aiSummary 
+            aiSummary
         });
     } catch (error) {
         console.error("Controller AI Summary Error:", error.message);

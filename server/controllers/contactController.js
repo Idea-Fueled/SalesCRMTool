@@ -6,6 +6,7 @@ import { scoreContact } from "../utils/rankingService.js";
 import { logAction } from "../utils/auditLogger.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../middlewares/uploadMiddleware.js";
 import { sendTieredNotification } from "../services/notificationService.js";
+import { generateSpecificContactSummary } from "../services/aiService.js";
 
 export const createContact = async (req, res, next) => {
     try {
@@ -107,13 +108,14 @@ export const createContact = async (req, res, next) => {
             attachments: []
         };
 
-        // Handle File Uploads
         if (req.files && req.files.length > 0) {
             const uploadPromises = req.files.map(file => uploadToCloudinary(file, "contacts/attachments"));
             const uploadedFiles = await Promise.all(uploadPromises);
             contactData.attachments = uploadedFiles.map(file => ({
                 ...file,
-                uploadedBy: id
+                uploadedBy: id,
+                uploadedByName: `${req.user.firstName} ${req.user.lastName || ""}`.trim(),
+                uploadedAt: new Date()
             }));
         }
 
@@ -370,13 +372,14 @@ export const updateContact = async (req, res, next) => {
             });
         }
 
-        // Handle File Uploads for Attachments
         if (req.files && req.files.length > 0) {
             const uploadPromises = req.files.map(file => uploadToCloudinary(file, "contacts/attachments"));
             const uploadedFiles = await Promise.all(uploadPromises);
             const newAttachments = uploadedFiles.map(file => ({
                 ...file,
-                uploadedBy: userId
+                uploadedBy: userId,
+                uploadedByName: `${req.user.firstName} ${req.user.lastName || ""}`.trim(),
+                uploadedAt: new Date()
             }));
             contact.attachments.push(...newAttachments);
         }
@@ -392,9 +395,12 @@ export const updateContact = async (req, res, next) => {
             if (owner) reassignedToName = `${owner.firstName} ${owner.lastName}`;
         }
 
+        const aiSummary = await updateContactAiSummaryInternal(id, req.user);
+
         res.status(200).json({
             message: "Contact updated successfully!",
-            data: contact
+            data: contact,
+            aiSummary: aiSummary || contact.aiSummary
         })
 
         // Log contact update
@@ -736,7 +742,9 @@ export const deleteRemark = async (req, res) => {
         contact.remarks.pull(remarkId);
         await contact.save();
 
-        res.status(200).json({ message: "Remark deleted successfully!" });
+        const aiSummary = await updateContactAiSummaryInternal(id, req.user);
+
+        res.status(200).json({ message: "Remark deleted successfully!", aiSummary: aiSummary || contact.aiSummary });
     } catch (error) {
         res.status(500).json({ message: error.message || "Server error!" });
     }
@@ -781,7 +789,13 @@ export const addRemark = async (req, res) => {
             select: 'firstName lastName email profilePicture'
         });
 
-        res.status(200).json({ message: "Remark added successfully!", data: savedRemark });
+        const aiSummary = await updateContactAiSummaryInternal(id, req.user);
+
+        res.status(200).json({ 
+            message: "Remark added successfully!", 
+            data: savedRemark,
+            aiSummary: aiSummary || contact.aiSummary
+        });
 
         // Log action
         await logAction({
@@ -806,5 +820,73 @@ export const addRemark = async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ message: error.message || "Server error!" });
+    }
+};
+
+/**
+ * Internal helper to update Contact AI Summary and manage history.
+ */
+export const updateContactAiSummaryInternal = async (contactId, user) => {
+    try {
+        const contact = await Contact.findById(contactId)
+            .populate("ownerId", "firstName lastName")
+            .populate("companyId", "name industry");
+
+        if (!contact) return null;
+
+        const summaryText = await generateSpecificContactSummary(contact);
+
+        // Archive current summary to history if it exists
+        if (contact.aiSummary && contact.aiSummary.text) {
+            const historyEntry = {
+                generatedAt: contact.aiSummary.generatedAt || new Date(),
+                generatedBy: contact.aiSummary.generatedBy,
+                generatedByName: contact.aiSummary.generatedByName || "System"
+            };
+
+            contact.aiSummary.history = contact.aiSummary.history || [];
+            contact.aiSummary.history.unshift(historyEntry);
+
+            // Cap history at 20 entries
+            if (contact.aiSummary.history.length > 20) {
+                contact.aiSummary.history = contact.aiSummary.history.slice(0, 20);
+            }
+        }
+
+        // Update current summary
+        contact.aiSummary = {
+            text: summaryText,
+            generatedAt: new Date(),
+            generatedBy: user._id || user.id,
+            generatedByName: `${user.firstName} ${user.lastName || ""}`.trim(),
+            history: contact.aiSummary?.history || []
+        };
+
+        await contact.save();
+        return contact.aiSummary;
+    } catch (error) {
+        console.error("Error in updateContactAiSummaryInternal:", error);
+        return null;
+    }
+};
+
+/**
+ * Endpoint to explicitly trigger a contact summary refresh.
+ */
+export const generateContactSummary = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const aiSummary = await updateContactAiSummaryInternal(id, req.user);
+
+        if (!aiSummary) {
+            return res.status(500).json({ message: "Failed to generate AI summary" });
+        }
+
+        res.status(200).json({
+            message: "AI Summary generated successfully",
+            aiSummary
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message || "Server error" });
     }
 };

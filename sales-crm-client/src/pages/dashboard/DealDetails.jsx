@@ -66,6 +66,8 @@ export default function DealDetails() {
     const [remarkFiles, setRemarkFiles] = useState([]);
     const [savingRemark, setSavingRemark] = useState(false);
     const [generatingSummary, setGeneratingSummary] = useState(false);
+    const [showSummaryLog, setShowSummaryLog] = useState(false);
+    const [selectedRemarkStage, setSelectedRemarkStage] = useState("All");
 
     const fetchDealData = async (silent = false, showToast = false) => {
         if (!silent) setLoading(true);
@@ -228,7 +230,8 @@ export default function DealDetails() {
             const updatedRemarks = Array.isArray(deal.remarks) ? [...deal.remarks, res.data.data] : [res.data.data];
             setDeal(prev => ({ 
                 ...prev, 
-                remarks: updatedRemarks 
+                remarks: updatedRemarks,
+                aiSummary: res.data.aiSummary || prev.aiSummary
             }));
             setNewRemark("");
             setRemarkFiles([]);
@@ -378,12 +381,88 @@ export default function DealDetails() {
                 {/* Left Column - Information */}
                 <div className="lg:col-span-4 space-y-6">
                     {/* AI Deal Summary */}
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white">
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
+                        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white overflow-visible">
                             <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                                <Sparkles size={16} className="text-red-500" /> AI Deal Summary
+                                <Sparkles size={16} className="text-red-500" /> AI Summary
+                                {deal.aiSummary && (
+                                    <div className="relative">
+                                        <button 
+                                            onClick={() => setShowSummaryLog(!showSummaryLog)}
+                                            className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+                                            title="View Generation Details"
+                                        >
+                                            <List size={14} />
+                                        </button>
+                                        {showSummaryLog && (
+                                            <div className="absolute left-0 top-full mt-2 w-72 bg-white border border-gray-200 shadow-2xl rounded-2xl p-5 z-50 animate-in fade-in zoom-in duration-200">
+                                                <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-50">
+                                                    <div className="flex items-center gap-2">
+                                                        <Clock size={16} className="text-gray-400" />
+                                                        <span className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Generation Log</span>
+                                                    </div>
+                                                    <button 
+                                                        onClick={() => setShowSummaryLog(false)}
+                                                        className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                                                        title="Close"
+                                                    >
+                                                        <X size={16} />
+                                                    </button>
+                                                </div>
+
+                                                <div className="space-y-0 max-h-[320px] overflow-y-auto pr-1 custom-scrollbar">
+                                                    {(() => {
+                                                        const current = { 
+                                                            generatedAt: deal.aiSummary.generatedAt, 
+                                                            generatedByName: deal.aiSummary.generatedByName 
+                                                        };
+                                                        const history = deal.aiSummary.history || [];
+                                                        const allLogs = [current, ...history].filter(l => l.generatedAt);
+                                                        
+                                                        return allLogs.map((log, idx) => (
+                                                            <div key={idx} className="relative pl-6 pb-6 last:pb-2">
+                                                                {/* Timeline Line */}
+                                                                {idx !== allLogs.length - 1 && (
+                                                                    <div className="absolute left-[5px] top-4 bottom-0 w-[1.5px] bg-gray-100"></div>
+                                                                )}
+                                                                {/* Dot */}
+                                                                <div className={`absolute left-0 top-1.5 w-[12px] h-[12px] rounded-full border-2 bg-white z-10 ${idx === 0 ? 'border-red-500' : 'border-gray-300'}`}></div>
+                                                                
+                                                                <div className="flex justify-between items-start gap-4">
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <h4 className={`text-[11px] font-bold uppercase tracking-tight ${idx === 0 ? 'text-gray-900' : 'text-gray-500'}`}>
+                                                                            SUMMARY {idx === allLogs.length - 1 ? 'GENERATED' : 'REFRESHED'}
+                                                                        </h4>
+                                                                        <p className="text-[11px] text-gray-500 mt-1 truncate">
+                                                                            By <span className="font-medium text-gray-700">{log.generatedByName || 'System'}</span>
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="text-right flex-shrink-0">
+                                                                        <span className="text-[10px] font-medium text-gray-400 whitespace-nowrap">
+                                                                            {new Date(log.generatedAt).toLocaleDateString([], { day: 'numeric', month: 'short' })}
+                                                                        </span>
+                                                                        <p className="text-[9px] text-gray-300 font-medium leading-none mt-1">
+                                                                            {new Date(log.generatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ));
+                                                    })()}
+                                                </div>
+
+                                                <button 
+                                                    onClick={() => setShowSummaryLog(false)}
+                                                    className="mt-4 w-full py-2.5 text-[11px] font-bold text-white bg-red-500 hover:bg-red-600 rounded-xl transition-all active:scale-95 shadow-sm"
+                                                >
+                                                    Close
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </h3>
-                            {deal.aiSummary && (
+                            {deal.aiSummary?.text && (
                                 <button
                                     onClick={handleGenerateSummary}
                                     disabled={generatingSummary}
@@ -514,8 +593,14 @@ export default function DealDetails() {
                                                     <div className="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
                                                         <FileText size={14} />
                                                     </div>
-                                                    <div className="min-w-0 flex-1 text-left">
-                                                        <p className="text-[11px] font-bold text-gray-900 truncate">{file.fileName}</p>
+                                                    <div className="min-w-0 flex-1 text-left py-0.5">
+                                                        <p className="text-[11px] font-bold text-gray-900 truncate leading-tight">{file.fileName}</p>
+                                                        <p className="text-[9px] font-medium text-gray-400 mt-1 truncate">
+                                                            Uploaded by {file.uploadedByName || 'Unknown'}
+                                                        </p>
+                                                        <p className="text-[9px] font-medium text-gray-400 leading-none">
+                                                            {formatDate(file.uploadedAt || new Date(), true)}
+                                                        </p>
                                                     </div>
                                                 </button>
                                                  <button
@@ -670,16 +755,44 @@ export default function DealDetails() {
                     </div>
 
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                        <div className="px-6 h-14 border-b border-gray-50 flex items-center justify-between">
-                            <h3 className="text-sm font-bold text-gray-900 tracking-tight">Remarks</h3>
+                        <div className="px-6 h-14 border-b border-gray-100 flex items-center justify-between bg-white">
+                            <h3 className="text-sm font-bold text-gray-900 tracking-tight">Timeline & Remarks</h3>
+                            <div className="flex items-center gap-2">
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Filter:</span>
+                                <select 
+                                    className="text-[10px] b font-bold uppercase tracking-wider bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 focus:ring-1 focus:ring-red-400 focus:outline-none transition-all cursor-pointer text-gray-600"
+                                    value={selectedRemarkStage}
+                                    onChange={(e) => setSelectedRemarkStage(e.target.value)}
+                                >
+                                    <option value="All">All Stages</option>
+                                    {pipelineStages.map(s => (
+                                        <option key={s.id} value={s.id}>{s.label}</option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
 
                         <div className="p-6 space-y-6">
                             {/* Narratives/Notes */}
                             <div className="space-y-4">
-                                <div className="space-y-4 max-h-[350px] overflow-y-auto px-1">
-                                    {deal.remarks && Array.isArray(deal.remarks) && deal.remarks.length > 0 ? (
-                                        deal.remarks.map((remark, i) => (
+                                <div className="space-y-4 max-h-[350px] overflow-y-auto px-1 custom-scrollbar">
+                                    {(() => {
+                                        const filteredRemarks = deal.remarks && Array.isArray(deal.remarks) 
+                                            ? deal.remarks.filter(r => selectedRemarkStage === "All" || r.stage === selectedRemarkStage)
+                                            : [];
+                                        
+                                        if (filteredRemarks.length === 0) {
+                                            return (
+                                                <div className="text-center py-10 bg-gray-50/20 rounded-xl border border-dashed border-gray-100">
+                                                    <MessageSquare size={18} className="mx-auto text-gray-300 mb-1.5 opacity-20" />
+                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em] italic">
+                                                        {selectedRemarkStage === "All" ? "No remarks yet" : `No remarks for ${selectedRemarkStage}`}
+                                                    </p>
+                                                </div>
+                                            );
+                                        }
+
+                                        return filteredRemarks.map((remark, i) => (
                                             <div key={i} className="group p-4 bg-gray-50/30 rounded-xl border border-gray-100 transition-all hover:bg-white hover:shadow-sm">
                                                 <div className="flex items-start justify-between mb-2">
                                                     <div className="flex items-center gap-2">
@@ -693,6 +806,18 @@ export default function DealDetails() {
                                                         <span className="text-[11px] font-semibold text-gray-500">
                                                             {remark.authorName || "Unknown"} <span className="text-gray-300 mx-1">•</span> {formatDate(remark.createdAt || new Date(), true)}
                                                         </span>
+                                                        {remark.stage && (
+                                                            <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-tighter text-white shadow-sm ml-2 ${
+                                                                remark.stage === "Lead" ? "bg-blue-600" :
+                                                                remark.stage === "Qualified" ? "bg-amber-400" :
+                                                                remark.stage === "Proposal" ? "bg-orange-600" :
+                                                                remark.stage === "Negotiation" ? "bg-pink-600" :
+                                                                remark.stage === "Closed Won" ? "bg-green-600" :
+                                                                remark.stage === "Closed Lost" ? "bg-red-600" : "bg-gray-400"
+                                                            }`}>
+                                                                {remark.stage}
+                                                            </span>
+                                                        )}
                                                     </div>
                                                     {(currentUser?.role === 'admin' || String(currentUser?._id || currentUser?.id) === String(remark.author?._id || remark.author?.id || remark.author)) && (
                                                         <button
@@ -740,12 +865,7 @@ export default function DealDetails() {
                                                 )}
                                             </div>
                                         ))
-                                    ) : (
-                                        <div className="text-center py-6 bg-gray-50/20 rounded-xl border border-dashed border-gray-100">
-                                            <MessageSquare size={18} className="mx-auto text-gray-300 mb-1.5 opacity-20" />
-                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em] italic">No remarks yet</p>
-                                        </div>
-                                    )}
+                                    })()}
                                 </div>
                                 
                                 {/* Add Remark Input */}

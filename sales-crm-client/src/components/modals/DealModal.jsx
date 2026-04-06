@@ -32,6 +32,13 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
     const [showCompanySuggest, setShowCompanySuggest] = useState(false);
     const [showContactSuggest, setShowContactSuggest] = useState(false);
     const [showStageDropdown, setShowStageDropdown] = useState(false);
+    
+    // Stage-linked remark state
+    const originalStage = React.useMemo(() => deal?.stage || "Lead", [deal?._id, isOpen]);
+    const [remarkText, setRemarkText] = useState("");
+    const [remarkFiles, setRemarkFiles] = useState([]);
+    const RESTRICTED_STAGES = ["Proposal", "Negotiation", "Closed Won", "Closed Lost"];
+    const isStageChangedToRestricted = deal && formData.stage !== originalStage && RESTRICTED_STAGES.includes(formData.stage);
 
     // Derived: Filtered contacts based on selected company
     const filteredContacts = React.useMemo(() => {
@@ -83,6 +90,8 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
             setFormData(emptyForm);
         }
         setErrors({});
+        setRemarkText("");
+        setRemarkFiles([]);
     }, [deal, isOpen]);
 
     const set = (field, value) => {
@@ -179,6 +188,13 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
                     dataToSave.append(key, formData[key]);
                 }
             });
+
+            // Append stage-linked remark if applicable
+            if (isStageChangedToRestricted) {
+                if (remarkText) dataToSave.append('remarkText', remarkText);
+                remarkFiles.forEach(file => dataToSave.append('files', file)); // Backend will handle as remark files if stage changed
+            }
+
             await onSave(dataToSave);
             onClose();
         } catch (error) {
@@ -336,6 +352,45 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
                         {errors.expectedCloseDate && <p className="text-red-500 text-xs">{errors.expectedCloseDate}</p>}
                     </div>
                 </div>
+
+                {/* Stage-linked Remark Section */}
+                {isStageChangedToRestricted && (
+                    <div className="space-y-3 p-4 bg-red-50/30 rounded-xl border border-red-100 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <div className="flex items-center justify-between">
+                            <label className="text-[10px] font-black text-red-600 uppercase tracking-widest">Add Remark for {formData.stage} Stage</label>
+                            <div className="flex items-center gap-2">
+                                {remarkFiles.map((file, idx) => (
+                                    <div key={idx} className="flex items-center gap-1 bg-white px-2 py-0.5 rounded border border-red-100 text-[9px] font-bold text-red-500">
+                                        <span className="max-w-[80px] truncate">{file.name}</span>
+                                        <button type="button" onClick={() => setRemarkFiles(prev => prev.filter((_, i) => i !== idx))}>
+                                            <X size={10} />
+                                        </button>
+                                    </div>
+                                ))}
+                                <label className="flex items-center gap-1 px-2 py-1 bg-white border border-red-200 rounded text-[9px] font-bold text-red-500 hover:bg-red-50 cursor-pointer shadow-sm">
+                                    <Paperclip size={10} /> +
+                                    <input 
+                                        type="file" 
+                                        multiple 
+                                        className="hidden" 
+                                        onChange={e => {
+                                            const files = Array.from(e.target.files);
+                                            const valid = validateFiles(files);
+                                            setRemarkFiles(prev => [...prev, ...valid]);
+                                            e.target.value = null;
+                                        }}
+                                    />
+                                </label>
+                            </div>
+                        </div>
+                        <textarea
+                            className="w-full px-3 py-2 text-sm border border-red-200 rounded-lg focus:ring-2 focus:ring-red-400 h-20 bg-white placeholder:text-gray-300 transition-all font-medium"
+                            value={remarkText}
+                            onChange={e => setRemarkText(e.target.value)}
+                            placeholder={`Why did this move to ${formData.stage}?`}
+                        />
+                    </div>
+                )}
 
                 {/* Source + Notes (Full Width) */}
                 <div className="grid grid-cols-1 gap-4">

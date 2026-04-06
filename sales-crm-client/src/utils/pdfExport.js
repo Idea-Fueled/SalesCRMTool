@@ -114,6 +114,41 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
                     ['Company', data.companyId?.name || data.companyName || '—'],
                     ['Primary Contact', data.contactId ? `${data.contactId.firstName} ${data.contactId.lastName || ''}`.trim() : (data.contactName || '—')],
                 ]);
+
+                // AI Deal Summary Section
+                if (data.aiSummary?.text) {
+                    if (y > pageHeight - 40) { pdf.addPage(); y = 20; }
+                    
+                    pdf.setFillColor(254, 242, 242); // Red 50
+                    pdf.rect(margin, y - 5, pageWidth - margin * 2, 8, 'F');
+                    pdf.setFillColor(220, 38, 38); // Red 600
+                    pdf.rect(margin, y - 5, 2, 8, 'F');
+                    
+                    pdf.setFontSize(10);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setTextColor(153, 27, 27); // Dark Red
+                    pdf.text('AI SUMMARY', margin + 5, y + 0.5);
+                    y += 7;
+                    
+                    pdf.setFontSize(9);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setTextColor(55, 65, 81);
+                    
+                    const summaryText = data.aiSummary.text.replace(/\*\*/g, ''); // Remove markdown bolds
+                    const splitSummary = pdf.splitTextToSize(summaryText, pageWidth - margin * 2 - 10);
+                    
+                    // Box background
+                    pdf.setFillColor(255, 255, 255);
+                    pdf.rect(margin + 2, y - 3, pageWidth - margin * 2 - 4, (splitSummary.length * 5) + 4, 'F');
+                    
+                    // Box border
+                    pdf.setDrawColor(254, 202, 202); // Red 200 border
+                    pdf.setLineWidth(0.2);
+                    pdf.rect(margin + 2, y - 3, pageWidth - margin * 2 - 4, (splitSummary.length * 5) + 4, 'S');
+
+                    pdf.text(splitSummary, margin + 5, y + 2);
+                    y += (splitSummary.length * 5) + 8;
+                }
             } else if (type === 'company') {
                 drawSection('Operational Identity', [
                     ['Company Name', data.name],
@@ -160,6 +195,41 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
                     ['Designation', data.ownerId?.role === 'admin' ? 'Admin' : data.ownerId?.role === 'sales_manager' ? 'Sales Manager' : data.ownerId?.role === 'sales_rep' ? 'Sales Representative' : '—'],
                     ['Account Status', data.status || 'Prospect'],
                 ]);
+
+                // AI Company Summary Section
+                if (data.aiSummary?.text) {
+                    if (y > pageHeight - 40) { pdf.addPage(); y = 20; }
+                    
+                    pdf.setFillColor(254, 242, 242); // Red 50
+                    pdf.rect(margin, y - 5, pageWidth - margin * 2, 8, 'F');
+                    pdf.setFillColor(220, 38, 38); // Red 600
+                    pdf.rect(margin, y - 5, 2, 8, 'F');
+                    
+                    pdf.setFontSize(10);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setTextColor(153, 27, 27); // Dark Red
+                    pdf.text('AI SUMMARY', margin + 5, y + 0.5);
+                    y += 7;
+                    
+                    pdf.setFontSize(9);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setTextColor(55, 65, 81);
+                    
+                    const summaryText = data.aiSummary.text.replace(/\*\*/g, ''); // Remove markdown bolds
+                    const splitSummary = pdf.splitTextToSize(summaryText, pageWidth - margin * 2 - 10);
+                    
+                    // Box background
+                    pdf.setFillColor(255, 255, 255);
+                    pdf.rect(margin + 2, y - 3, pageWidth - margin * 2 - 4, (splitSummary.length * 5) + 4, 'F');
+                    
+                    // Box border
+                    pdf.setDrawColor(254, 202, 202); // Red 200 border
+                    pdf.setLineWidth(0.2);
+                    pdf.rect(margin + 2, y - 3, pageWidth - margin * 2 - 4, (splitSummary.length * 5) + 4, 'S');
+
+                    pdf.text(splitSummary, margin + 5, y + 2);
+                    y += (splitSummary.length * 5) + 8;
+                }
             } else if (type === 'contact') {
                 drawSection('Contact Channels', [
                     ['Full Name', `${data.firstName} ${data.lastName || ''}`.trim()],
@@ -173,6 +243,75 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
                     ['Designation', data.ownerId?.role === 'admin' ? 'Admin' : data.ownerId?.role === 'sales_manager' ? 'Sales Manager' : data.ownerId?.role === 'sales_rep' ? 'Sales Representative' : '—'],
                     ['Associated Companies', data.companies?.map(c => c.companyId?.name || c.companyName).filter(Boolean).join(', ') || data.companyName || '—'],
                 ]);
+
+                // AI Contact Summary Section
+                if (data.aiSummary?.text) {
+                    if (y > pageHeight - 40) { pdf.addPage(); y = 20; }
+                    
+                    pdf.setFillColor(254, 242, 242); // Red 50
+                    pdf.rect(margin, y - 5, pageWidth - margin * 2, 8, 'F');
+                    pdf.setFillColor(220, 38, 38); // Red 600
+                    pdf.rect(margin, y - 5, 2, 8, 'F');
+                    
+                    pdf.setFontSize(10);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setTextColor(153, 27, 27); // Dark Red
+                    pdf.text('AI SUMMARY', margin + 5, y + 0.5);
+                    y += 7;
+                    
+                    pdf.setFontSize(9);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setTextColor(55, 65, 81);
+                    
+                    const summaryText = data.aiSummary.text.replace(/\*\*/g, ''); // Remove markdown bolds
+                    const splitSummary = pdf.splitTextToSize(summaryText, pageWidth - margin * 2 - 10);
+                    
+                    // Box background
+                    pdf.setFillColor(255, 255, 255);
+                    pdf.rect(margin + 2, y - 3, pageWidth - margin * 2 - 4, (splitSummary.length * 5) + 4, 'F');
+                    
+                    // Box border
+                    pdf.setDrawColor(254, 202, 202); // Red 200 border
+                    pdf.setLineWidth(0.2);
+                    pdf.rect(margin + 2, y - 3, pageWidth - margin * 2 - 4, (splitSummary.length * 5) + 4, 'S');
+
+                    pdf.text(splitSummary, margin + 5, y + 2);
+                    y += (splitSummary.length * 5) + 8;
+                }
+            }
+            
+            // Main Digital Assets Section (Main Attachments)
+            if (data.attachments && Array.isArray(data.attachments) && data.attachments.length > 0) {
+                if (y > pageHeight - 40) { pdf.addPage(); y = 20; }
+                
+                pdf.setFillColor(248, 250, 252);
+                pdf.rect(margin, y - 5, pageWidth - margin * 2, 8, 'F');
+                pdf.setFillColor(220, 38, 38);
+                pdf.rect(margin, y - 5, 2, 8, 'F');
+
+                pdf.setFontSize(10);
+                pdf.setFont('helvetica', 'bold');
+                pdf.setTextColor(31, 41, 55);
+                pdf.text('DIGITAL ASSETS', margin + 5, y + 0.5);
+                y += 9;
+
+                data.attachments.forEach((file) => {
+                    if (y > pageHeight - 20) { pdf.addPage(); y = 20; }
+                    
+                    pdf.setFontSize(9);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setTextColor(55, 65, 81);
+                    pdf.text(file.fileName, margin + 5, y);
+                    
+                    pdf.setFontSize(7.5);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setTextColor(156, 163, 175);
+                    const metaText = `Uploaded by ${file.uploadedByName || 'Unknown'}  •  ${new Date(file.uploadedAt || new Date()).toLocaleString('en-IN')}`;
+                    pdf.text(metaText, margin + 5, y + 4);
+                    
+                    y += 9;
+                });
+                y += 4;
             }
 
             // Remarks Section
@@ -218,7 +357,12 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
                     pdf.setFontSize(8);
                     pdf.setFont('helvetica', 'bold');
                     pdf.setTextColor(156, 163, 175);
-                    pdf.text(`${authorName.toUpperCase()}  •  ${new Date(remark.createdAt).toLocaleString('en-IN')}`, margin + 8, y);
+                    const headerText = [
+                        authorName.toUpperCase(),
+                        remark.stage ? remark.stage.toUpperCase() : null,
+                        new Date(remark.createdAt).toLocaleString('en-IN')
+                    ].filter(Boolean).join('  •  ');
+                    pdf.text(headerText, margin + 8, y);
                     y += 6;
 
                     // Text
@@ -233,13 +377,12 @@ export const exportToPDF = async (TypeOrElementId, DataOrFilename, OptionalFilen
                     // Attachments
                     if (remark.files && remark.files.length > 0) {
                         pdf.setFontSize(8);
-                        pdf.setFont('helvetica', 'italic');
-                        pdf.setTextColor(99, 102, 241); // Indigo color for attachments
-                        remark.files.forEach(file => {
-                            pdf.text(`🔗 ${file.fileName}`, margin + 8, y);
-                            y += 4;
-                        });
-                        y += 2;
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setTextColor(79, 70, 229); // Indigo 600
+                        const attachmentList = remark.files.map(f => f.fileName).join(', ');
+                        const splitAttachments = pdf.splitTextToSize(`[Attachments]: ${attachmentList}`, pageWidth - margin * 2 - 14);
+                        pdf.text(splitAttachments, margin + 8, y);
+                        y += (splitAttachments.length * 4) + 2;
                     }
                     
                     y += 4; // Space to next remark

@@ -35,3 +35,5 @@ export const deleteAttachment = async (id, fileId) => {
 export const deleteRemark = async (id, remarkId) => {
     return API.delete(`/contacts/${id}/remarks/${remarkId}`);
 };
+
+export const generateContactSummary = (id) => API.post(`/contacts/${id}/generate-summary`);

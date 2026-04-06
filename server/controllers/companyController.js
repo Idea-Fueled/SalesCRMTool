@@ -6,6 +6,7 @@ import { scoreCompany } from "../utils/rankingService.js";
 import { logAction } from "../utils/auditLogger.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../middlewares/uploadMiddleware.js";
 import { sendTieredNotification } from "../services/notificationService.js";
+import { generateSpecificCompanySummary } from "../services/aiService.js";
 
 export const createCompany = async (req, res) => {
     try {
@@ -72,13 +73,14 @@ export const createCompany = async (req, res) => {
             attachments: []
         };
 
-        // Handle File Uploads
         if (req.files && req.files.length > 0) {
             const uploadPromises = req.files.map(file => uploadToCloudinary(file, "companies/attachments"));
             const uploadedFiles = await Promise.all(uploadPromises);
             companyData.attachments = uploadedFiles.map(file => ({
                 ...file,
-                uploadedBy: req.user.id
+                uploadedBy: req.user.id,
+                uploadedByName: `${req.user.firstName} ${req.user.lastName || ""}`.trim(),
+                uploadedAt: new Date()
             }));
         }
 
@@ -360,22 +362,26 @@ export const updateCompany = async (req, res) => {
             });
         }
 
-        // Handle File Uploads for Attachments
         if (req.files && req.files.length > 0) {
             const uploadPromises = req.files.map(file => uploadToCloudinary(file, "companies/attachments"));
             const uploadedFiles = await Promise.all(uploadPromises);
             const newAttachments = uploadedFiles.map(file => ({
                 ...file,
-                uploadedBy: userId
+                uploadedBy: userId,
+                uploadedByName: `${req.user.firstName} ${req.user.lastName || ""}`.trim(),
+                uploadedAt: new Date()
             }));
             company.attachments.push(...newAttachments);
         }
 
         await company.save();
 
+        const aiSummary = await updateCompanyAiSummaryInternal(id, req.user);
+
         res.json({
             message: "Company updated successfully!",
-            data: company
+            data: company,
+            aiSummary: aiSummary || company.aiSummary
         });
 
         const newOwnerId = company.ownerId ? company.ownerId.toString() : null;
@@ -843,7 +849,13 @@ export const addRemark = async (req, res) => {
             select: 'firstName lastName email profilePicture'
         });
 
-        res.status(200).json({ message: "Remark added successfully!", data: savedRemark });
+        const aiSummary = await updateCompanyAiSummaryInternal(id, req.user);
+
+        res.status(200).json({ 
+            message: "Remark added successfully!", 
+            data: savedRemark,
+            aiSummary: aiSummary || company.aiSummary
+        });
 
         // Log action
         await logAction({
@@ -868,5 +880,78 @@ export const addRemark = async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ message: error.message || "Server error!" });
+    }
+};
+
+/**
+ * Internal helper to update Company AI Summary and manage history.
+ */
+export const updateCompanyAiSummaryInternal = async (companyId, user) => {
+    try {
+        const company = await Company.findById(companyId).populate("ownerId", "firstName lastName");
+        if (!company) return null;
+
+        // Fetch active deals for this company to provide context to the summary
+        const { Deal } = await import("../models/dealSchema.js");
+        const activeDeals = await Deal.find({ 
+            companyId, 
+            isDeleted: { $ne: true },
+            stage: { $nin: ["Closed Won", "Closed Lost"] } 
+        });
+
+        const summaryText = await generateSpecificCompanySummary(company, activeDeals);
+
+        // Archive current summary to history if it exists
+        if (company.aiSummary && company.aiSummary.text) {
+            const historyEntry = {
+                generatedAt: company.aiSummary.generatedAt || new Date(),
+                generatedBy: company.aiSummary.generatedBy,
+                generatedByName: company.aiSummary.generatedByName || "System"
+            };
+
+            company.aiSummary.history = company.aiSummary.history || [];
+            company.aiSummary.history.unshift(historyEntry);
+
+            // Cap history at 20 entries
+            if (company.aiSummary.history.length > 20) {
+                company.aiSummary.history = company.aiSummary.history.slice(0, 20);
+            }
+        }
+
+        // Update current summary
+        company.aiSummary = {
+            text: summaryText,
+            generatedAt: new Date(),
+            generatedBy: user._id || user.id,
+            generatedByName: `${user.firstName} ${user.lastName || ""}`.trim(),
+            history: company.aiSummary?.history || []
+        };
+
+        await company.save();
+        return company.aiSummary;
+    } catch (error) {
+        console.error("Error in updateCompanyAiSummaryInternal:", error);
+        return null;
+    }
+};
+
+/**
+ * Endpoint to explicitly trigger a company summary refresh.
+ */
+export const generateCompanySummary = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const aiSummary = await updateCompanyAiSummaryInternal(id, req.user);
+
+        if (!aiSummary) {
+            return res.status(500).json({ message: "Failed to generate AI summary" });
+        }
+
+        res.status(200).json({
+            message: "AI Summary generated successfully",
+            aiSummary
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message || "Server error" });
     }
 };

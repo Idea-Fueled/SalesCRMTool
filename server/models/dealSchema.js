@@ -110,7 +110,8 @@ const dealSchema = new mongoose.Schema(
                 createdAt: {
                     type: Date,
                     default: Date.now
-                }
+                },
+                stage: { type: String }
             }],
             default: []
         },
@@ -124,6 +125,7 @@ const dealSchema = new mongoose.Schema(
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "User"
             },
+            uploadedByName: String,
             uploadedAt: {
                 type: Date,
                 default: Date.now
@@ -146,7 +148,15 @@ const dealSchema = new mongoose.Schema(
         },
         aiSummary: {
             text: { type: String },
-            generatedAt: { type: Date }
+            generatedAt: { type: Date },
+            generatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+            generatedByName: { type: String },
+            history: [{
+                generatedAt: { type: Date },
+                generatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+                generatedByName: { type: String },
+                _id: false
+            }]
         }
     },
     { timestamps: true }

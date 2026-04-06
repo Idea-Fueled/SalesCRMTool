@@ -39,3 +39,5 @@ export const deleteAttachment = async (id, fileId) => {
 export const deleteRemark = async (id, remarkId) => {
     return API.delete(`/companies/${id}/remarks/${remarkId}`);
 };
+
+export const generateCompanySummary = (id) => API.post(`/companies/${id}/generate-summary`);

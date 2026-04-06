@@ -202,3 +202,114 @@ export const generateSpecificDealSummary = async (deal) => {
         throw error;
     }
 };
+
+/**
+ * Generates a concise summary for a specific contact based on their profile and remarks.
+ */
+export const generateSpecificContactSummary = async (contact) => {
+    const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+    if (!OPENROUTER_API_KEY) throw new Error("OPENROUTER_API_KEY is missing");
+
+    const remarksText = contact.remarks?.map(r => `[${new Date(r.createdAt).toLocaleDateString()}] ${r.authorName}: ${r.text}`).join('\n') || "No interaction remarks yet.";
+
+    const prompt = `
+    You are a Relationship Management Expert. Summarize the following Contact for a Sales Representative.
+    
+    CONTACT DETAILS:
+    - Name: ${contact.firstName} ${contact.lastName}
+    - Job Title: ${contact.jobTitle}
+    - Company: ${contact.companyName || (contact.companyId?.name) || 'Not specified'}
+    - Contact Info: ${contact.email}, ${contact.phone || contact.mobile || 'No phone'}
+    - LinkedIn: ${contact.linkedin || 'Not provided'}
+    
+    INTERACTION HISTORY:
+    ${remarksText}
+    
+    TASK:
+    Provide a concise, cohesive summary as a single paragraph (4-5 sentences). 
+    Start with a bold introductory sentence like: **Summary for ${contact.firstName} ${contact.lastName}:**
+    FOLLOW THE INTRODUCTORY LINE WITH TWO NEWLINES.
+    The rest of the summary should focus on the contact's role, the history of engagement, and any personal/professional details that help in building a relationship. Avoid bold section headers, bullet points, or lists.
+    `;
+
+    try {
+        const res = await axios.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            {
+                model: "google/gemini-2.0-flash-lite-001",
+                messages: [
+                    { role: "system", content: "You are a professional relationship assistant." },
+                    { role: "user", content: prompt }
+                ],
+                temperature: 0.3
+            },
+            {
+                headers: { Authorization: `Bearer ${OPENROUTER_API_KEY}`, "Content-Type": "application/json" },
+                timeout: 10000
+            }
+        );
+        return res.data?.choices?.[0]?.message?.content || "Could not generate contact summary.";
+    } catch (error) {
+        console.error("Contact Summary AI Error:", error.message);
+        throw error;
+    }
+};
+
+/**
+ * Generates a concise firmographic and strategic summary for a company.
+ */
+export const generateSpecificCompanySummary = async (company, activeDeals = []) => {
+    const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+    if (!OPENROUTER_API_KEY) throw new Error("OPENROUTER_API_KEY is missing");
+
+    const dealsText = activeDeals.length > 0 
+        ? activeDeals.map(d => `- ${d.name}: ${d.currency} ${d.value} (${d.stage})`).join('\n')
+        : "No active deals found.";
+
+    const remarksText = company.remarks?.map(r => `[${new Date(r.createdAt).toLocaleDateString()}] ${r.authorName}: ${r.text}`).join('\n') || "No high-level remarks.";
+
+    const prompt = `
+    You are a Strategic Account Manager. Summarize the following Company profile.
+    
+    COMPANY PROFILE:
+    - Name: ${company.name}
+    - Industry: ${company.industry || 'Not specified'}
+    - Size: ${company.size || 'Not specified'}
+    - Revenue: $${company.revenueRange?.toLocaleString() || '0'}
+    - Website: ${company.website || 'Not provided'}
+    
+    ACTIVE DEALS:
+    ${dealsText}
+    
+    TIMELINE / REMARKS:
+    ${remarksText}
+    
+    TASK:
+    Provide a concise, cohesive summary as a single paragraph (4-5 sentences). 
+    Start with a bold introductory sentence like: **Strategic overview for ${company.name}:**
+    FOLLOW THE INTRODUCTORY LINE WITH TWO NEWLINES.
+    The summary should synthesize the company's market position, their current pipeline activity, and the overall trajectory of the partnership. Use a professional, executive tone. No bold headers, bullet points, or lists.
+    `;
+
+    try {
+        const res = await axios.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            {
+                model: "google/gemini-2.0-flash-lite-001",
+                messages: [
+                    { role: "system", content: "You are a professional business strategist." },
+                    { role: "user", content: prompt }
+                ],
+                temperature: 0.3
+            },
+            {
+                headers: { Authorization: `Bearer ${OPENROUTER_API_KEY}`, "Content-Type": "application/json" },
+                timeout: 10000
+            }
+        );
+        return res.data?.choices?.[0]?.message?.content || "Could not generate company summary.";
+    } catch (error) {
+        console.error("Company Summary AI Error:", error.message);
+        throw error;
+    }
+};
