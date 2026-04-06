@@ -403,18 +403,33 @@ export default function DealDetails() {
                                 </div>
                             ) : deal.aiSummary?.text ? (
                                 <div className="prose prose-sm max-w-none text-[13px] text-gray-700 leading-relaxed font-medium">
-                                    {(() => {
-                                        const lines = deal.aiSummary.text.split('\n').filter(l => l.trim());
-                                        if (lines.length > 1) {
-                                            return (
-                                                <>
-                                                    <p className="font-bold mb-2">{lines[0].replace(/\*\*/g, '')}</p>
-                                                    <p>{lines.slice(1).join(' ')}</p>
-                                                </>
-                                            );
-                                        }
-                                        return <p>{deal.aiSummary.text}</p>;
-                                    })()}
+                                {(() => {
+                                    const text = deal.aiSummary.text.trim();
+                                    // Try to match leading bold pattern: **heading** rest of text
+                                    const boldMatch = text.match(/^\*\*(.*?)\*\*\s*(.*)/s);
+                                    
+                                    if (boldMatch) {
+                                        return (
+                                            <>
+                                                <p className="font-bold mb-2">{boldMatch[1].replace(/\*\*/g, '')}</p>
+                                                <p>{boldMatch[2].replace(/\*\*/g, '')}</p>
+                                            </>
+                                        );
+                                    }
+
+                                    // Fallback to splitting by newline if no bold markers at start
+                                    const lines = text.split('\n').filter(l => l.trim());
+                                    if (lines.length > 1) {
+                                        return (
+                                            <>
+                                                <p className="font-bold mb-2">{lines[0].replace(/\*\*/g, '')}</p>
+                                                <p>{lines.slice(1).join(' ').replace(/\*\*/g, '')}</p>
+                                            </>
+                                        );
+                                    }
+                                    
+                                    return <p>{text.replace(/\*\*/g, '')}</p>;
+                                })()}
                                 </div>
                             ) : (
                                 <div className="text-center py-4">
