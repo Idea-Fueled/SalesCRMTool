@@ -6,7 +6,7 @@ import User from "../models/userSchema.js";
 import fs from "fs";
 import path from "path";
 import { scoreDeal, scoreCompany, scoreContact } from "../utils/rankingService.js";
-import { parseIntent, getHelpMessage } from "../utils/intentParser.js";
+import { parseIntent, getHelpMessage, cleanName } from "../utils/intentParser.js";
 import { getAIIntent } from "../services/aiService.js";
 import os from "os";
 
@@ -323,6 +323,11 @@ const handleUniversalQuery = async (intent, user, res) => {
         });
     }
     const filter = intent.filter || intent.filters || {};
+
+    // Normalize name to avoid entity keyword overlap
+    if (filter.name) {
+        filter.name = cleanName(filter.name);
+    }
     
     // Normalize AI root-level properties
     if (intent.limit) filter.limit = intent.limit;

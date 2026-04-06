@@ -3,6 +3,16 @@
  * Parses user messages into structured intents.
  */
 
+export const cleanName = (raw) => {
+    if (!raw) return null;
+    const stopWords = ["the", "all", "my", "i", "do", "does", "did", "am", "is", "are", "there", "what", "who", "which", "number", "has", "have", "had", "was", "were", "be", "been", "being", "hot", "warm", "cold", "deals", "contacts", "companies",
+        "deal", "contact", "company", "show", "get", "list", "give", "me", "detail", "details", "info", "information", "about", "top", "ranked", "of", "for", "by", "from", "sum", "total", "value", "how", "many", "count", "in", "stage", "above", "worth", "valued", "at"];
+    
+    // Remove stop words from the edges and entity keywords
+    const words = raw.trim().split(/\s+/).filter(w => !stopWords.includes(w.toLowerCase()));
+    return words.length > 0 ? words.join(" ") : null;
+};
+
 export const parseIntent = (message) => {
     const input = message.trim().toLowerCase();
 
@@ -70,15 +80,6 @@ export const parseIntent = (message) => {
     // Handles: "deals of Anirudh", "detail of Idea Fueled deal",
     //          "contact Sandeep Kumar details", "deal Enterprise License info"
     let name = null;
-    const stopWords = ["the", "all", "my", "i", "do", "does", "did", "am", "is", "are", "there", "what", "who", "which", "number", "has", "have", "had", "was", "were", "be", "been", "being", "hot", "warm", "cold", "deals", "contacts", "companies",
-        "deal", "contact", "company", "show", "get", "list", "give", "me", "detail", "details", "info", "information", "about", "top", "ranked", "of", "for", "by", "from", "sum", "total", "value", "how", "many", "count", "in", "stage", "above", "worth", "valued", "at"];
-
-    const cleanName = (raw) => {
-        if (!raw) return null;
-        // Remove stop words from the edges and entity keywords
-        const words = raw.trim().split(/\s+/).filter(w => !stopWords.includes(w.toLowerCase()));
-        return words.length > 0 ? words.join(" ") : null;
-    };
 
     // Pattern 1: "of/for/by <name>" — greedy, captures multi-word names
     const ofMatch = input.match(/\b(?:of|for|by|from)\s+(.+?)(?:\s+(?:deal|contact|company|details?|info)|\s*$)/i);
@@ -86,7 +87,6 @@ export const parseIntent = (message) => {
 
     // Pattern 2: "contact/deal/company <name> details/info"
     if (!name) {
-        // Exclude common filter triggers from being captured as names
         const entityNameMatch = input.match(/\b(?:contacts?|compan(?:y|ies)|deals?)\s+(?!in\s+|above\s+|worth\s+|no\s+|with\s+)(.+?)(?:\s+(?:details?|info(rmation)?|about|stage)|\s*$)/i);
         if (entityNameMatch) name = cleanName(entityNameMatch[1]);
     }
@@ -97,16 +97,16 @@ export const parseIntent = (message) => {
         if (nameEntityMatch) name = cleanName(nameEntityMatch[1]);
     }
 
+    // Pattern 3.5 (New): Explicit "details of <name>"
+    if (!name && action === "detail") {
+        const explicitMatch = input.match(/\b(?:details?|info|about)\s+of\s+(.+?)(?:\s+company|\s+deal|\s+contact|\s*$)/i);
+        if (explicitMatch) name = cleanName(explicitMatch[1]);
+    }
+
     // Pattern 4: "detail/details/info of <name>" (without entity keyword)
     if (!name && action === "detail") {
         const detailOfMatch = input.match(/\b(?:details?|info|about|information)\s+(?:of\s+)?(.+)/i);
         if (detailOfMatch) name = cleanName(detailOfMatch[1]);
-    }
-
-    // Pattern 5: Generic detail search (if line starts with detail/info)
-    if (!name && /^(detail|details|info|about)\s+(.+)$/i.test(input)) {
-        const match = input.match(/^(?:detail|details|info|about)\s+(.+)$/i);
-        if (match) name = cleanName(match[1]);
     }
 
     // ── Advanced Filters ──────────────────────────────────────
