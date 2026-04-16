@@ -89,11 +89,6 @@ export const getRankedDeals = async (req, res) => {
 // ── GET /api/rank/companies ───────────────────────────────────
 export const getRankedCompanies = async (req, res) => {
     try {
-        const { Company } = await import("../models/companySchema.js");
-        const { Deal } = await import("../models/dealSchema.js");
-        const { Contact } = await import("../models/contactSchema.js");
-        const { User } = await import("../models/userSchema.js");
-
         const user = req.user;
         const userId = user._id.toString();
         const { tier, limit, name } = req.query;
