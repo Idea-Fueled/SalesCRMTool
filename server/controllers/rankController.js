@@ -89,36 +89,41 @@ export const getRankedDeals = async (req, res) => {
 // ── GET /api/rank/companies ───────────────────────────────────
 export const getRankedCompanies = async (req, res) => {
     try {
+        const { Company } = await import("../models/companySchema.js");
+        const { Deal } = await import("../models/dealSchema.js");
+        const { Contact } = await import("../models/contactSchema.js");
+        const { User } = await import("../models/userSchema.js");
+
         const user = req.user;
+        const userId = user._id.toString();
         const { tier, limit, name } = req.query;
 
         // Build visibility filter — mirrors getCompanies logic exactly
-        let ownerFilter = {};
-        const id = user._id; // Normalized name to 'id' to match companyController
+        let visibilityFilter = {};
 
         if (user.role === "sales_manager") {
             const teamUsers = await User.find({
-                $or: [{ _id: id }, { managerId: id }]
+                $or: [{ _id: userId }, { managerId: userId }]
             }).select("_id");
             const teamIds = teamUsers.map(u => u._id);
 
             // Get companies linked to team's deals
             const teamDeals = await Deal.find({ ownerId: { $in: teamIds }, isDeleted: { $ne: true } }).select("companyId");
-            const dealCompanyIds = teamDeals.map(d => d.companyId).filter(compId => compId);
+            const dealCompanyIds = teamDeals.map(d => d.companyId?.toString()).filter(Boolean);
 
             // Get companies linked to team's contacts
             const teamContacts = await Contact.find({ ownerId: { $in: teamIds }, isDeleted: { $ne: true } }).select("companyId companies");
             const contactCompanyIds = [];
             teamContacts.forEach(c => {
-                if (c.companyId) contactCompanyIds.push(c.companyId);
+                if (c.companyId) contactCompanyIds.push(c.companyId.toString());
                 if (c.companies && Array.isArray(c.companies)) {
                     c.companies.forEach(assoc => {
-                        if (assoc.companyId) contactCompanyIds.push(assoc.companyId);
+                        if (assoc.companyId) contactCompanyIds.push(assoc.companyId.toString());
                     });
                 }
             });
 
-            ownerFilter = {
+            visibilityFilter = {
                 $or: [
                     { ownerId: { $in: teamIds } },
                     { _id: { $in: dealCompanyIds } },
@@ -127,23 +132,23 @@ export const getRankedCompanies = async (req, res) => {
             };
         } else if (user.role === "sales_rep") {
             // sales_rep: sees own companies OR companies linked to their deals/contacts
-            const repDeals = await Deal.find({ ownerId: id, isDeleted: { $ne: true } }).select("companyId");
-            const dealCompanyIds = repDeals.map(d => d.companyId).filter(compId => compId);
+            const repDeals = await Deal.find({ ownerId: userId, isDeleted: { $ne: true } }).select("companyId");
+            const dealCompanyIds = repDeals.map(d => d.companyId?.toString()).filter(Boolean);
 
-            const repContacts = await Contact.find({ ownerId: id, isDeleted: { $ne: true } }).select("companyId companies");
+            const repContacts = await Contact.find({ ownerId: userId, isDeleted: { $ne: true } }).select("companyId companies");
             const contactCompanyIds = [];
             repContacts.forEach(c => {
-                if (c.companyId) contactCompanyIds.push(c.companyId);
+                if (c.companyId) contactCompanyIds.push(c.companyId.toString());
                 if (c.companies && Array.isArray(c.companies)) {
                     c.companies.forEach(assoc => {
-                        if (assoc.companyId) contactCompanyIds.push(assoc.companyId);
+                        if (assoc.companyId) contactCompanyIds.push(assoc.companyId.toString());
                     });
                 }
             });
 
-            ownerFilter = {
+            visibilityFilter = {
                 $or: [
-                    { ownerId: id },
+                    { ownerId: userId },
                     { _id: { $in: dealCompanyIds } },
                     { _id: { $in: contactCompanyIds } }
                 ]
@@ -151,7 +156,7 @@ export const getRankedCompanies = async (req, res) => {
         }
 
 
-        const companies = await Company.find({ isDeleted: { $ne: true }, ...ownerFilter })
+        const companies = await Company.find({ isDeleted: { $ne: true }, ...visibilityFilter })
             .populate("ownerId", "firstName lastName email profilePicture role")
             .lean();
 
