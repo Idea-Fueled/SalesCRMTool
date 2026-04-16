@@ -358,20 +358,21 @@ export default function MyProfileModal({ isOpen, onClose }) {
                             >
                                 Edit Profile
                             </button>
-                            {user.role === "admin" && (
+                            {user.role === "admin" ? (
                                 <button 
                                     onClick={() => setIsPasswordModalOpen(true)}
-                                    className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl font-bold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-gray-300"
+                                    className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm transition-all shadow-md shadow-red-100 focus:outline-none focus:ring-2 focus:ring-red-400"
                                 >
                                     Change Password
                                 </button>
+                            ) : (
+                                <button 
+                                    onClick={onClose} 
+                                    className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm transition-all shadow-md shadow-red-100 focus:outline-none focus:ring-2 focus:ring-red-400"
+                                >
+                                    Close
+                                </button>
                             )}
-                            <button 
-                                onClick={onClose} 
-                                className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm transition-all shadow-md shadow-red-100 focus:outline-none focus:ring-2 focus:ring-red-400"
-                            >
-                                Close
-                            </button>
                         </>
                     )}
                 </div>

@@ -272,7 +272,9 @@ export const loginUser = async (req, res, next) => {
                 isActive: updatedUser.isActive,
                 lastLogin: updatedUser.lastLogin,
                 createdAt: updatedUser.createdAt,
-                profilePicture: updatedUser.profilePicture
+                profilePicture: updatedUser.profilePicture,
+                phoneNumber: updatedUser.phoneNumber,
+                address: updatedUser.address
             }
         })
 
