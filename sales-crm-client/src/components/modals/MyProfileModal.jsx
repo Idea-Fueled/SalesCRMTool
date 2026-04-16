@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import Modal from "./Modal";
-import { Mail, Shield, User as UserIcon, Calendar, Clock, CheckCircle, XCircle, Camera, Loader2, Trash2 } from "lucide-react";
+import { Mail, Shield, User as UserIcon, Calendar, Clock, CheckCircle, XCircle, Camera, Loader2, Trash2, MapPin } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import API from "../../API/Interceptor";
 import { toast } from "react-hot-toast";
@@ -10,7 +10,16 @@ export default function MyProfileModal({ isOpen, onClose }) {
     const { user, fetchProfile } = useAuth();
     const [uploading, setUploading] = useState(false);
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [saving, setSaving] = useState(false);
     const fileInputRef = useRef(null);
+
+    const [formData, setFormData] = useState({
+        firstName: user?.firstName || "",
+        lastName: user?.lastName || "",
+        phoneNumber: user?.phoneNumber || "",
+        address: user?.address || ""
+    });
 
     if (!user) return null;
 
@@ -105,6 +114,37 @@ export default function MyProfileModal({ isOpen, onClose }) {
         }
     };
 
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setSaving(true);
+        try {
+            const response = await API.put("/auth/profile", formData);
+            toast.success(response.data?.message || "Profile updated successfully!");
+            await fetchProfile();
+            setIsEditing(false);
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to update profile.");
+            console.error("Update Profile Error:", error);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const cancelEdit = () => {
+        setFormData({
+            firstName: user.firstName || "",
+            lastName: user.lastName || "",
+            phoneNumber: user.phoneNumber || "",
+            address: user.address || ""
+        });
+        setIsEditing(false);
+    };
+
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="My Profile">
             <div className="space-y-6">
@@ -155,11 +195,38 @@ export default function MyProfileModal({ isOpen, onClose }) {
                         />
                     </div>
 
-                    <div className="min-w-0">
-                        <h2 className="text-2xl font-bold text-gray-900 truncate">{`${user.firstName || ""} ${user.lastName || ""}`.trim()}</h2>
-                        <div className={`inline-flex items-center mt-1 px-3 py-1 rounded-full text-xs font-bold border ${roleBadge[user.role] || "bg-gray-100 text-gray-600 border-gray-200"}`}>
-                            {formatRole(user.role)}
-                        </div>
+                    <div className="min-w-0 flex-1">
+                        {isEditing ? (
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">First Name</label>
+                                    <input 
+                                        type="text" 
+                                        name="firstName"
+                                        value={formData.firstName}
+                                        onChange={handleInputChange}
+                                        className="w-full px-3 py-1.5 text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-400 focus:outline-none transition-all"
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Last Name</label>
+                                    <input 
+                                        type="text" 
+                                        name="lastName"
+                                        value={formData.lastName}
+                                        onChange={handleInputChange}
+                                        className="w-full px-3 py-1.5 text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-400 focus:outline-none transition-all"
+                                    />
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                <h2 className="text-2xl font-bold text-gray-900 truncate">{`${user.firstName || ""} ${user.lastName || ""}`.trim()}</h2>
+                                <div className={`inline-flex items-center mt-1 px-3 py-1 rounded-full text-xs font-bold border ${roleBadge[user.role] || "bg-gray-100 text-gray-600 border-gray-200"}`}>
+                                    {formatRole(user.role)}
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
 
@@ -171,9 +238,26 @@ export default function MyProfileModal({ isOpen, onClose }) {
                                 <Mail size={12} className="text-gray-400" />
                                 Contact Details
                             </h4>
-                            <div className="flex flex-col min-w-0">
-                                <span className="text-sm font-semibold text-gray-700 break-all">{user.email}</span>
-                                <span className="text-[11px] text-gray-400 italic">Primary Business Email</span>
+                            <div className="flex flex-col min-w-0 space-y-3">
+                                <div className="flex flex-col">
+                                    <span className="text-sm font-semibold text-gray-700 break-all">{user.email}</span>
+                                    <span className="text-[11px] text-gray-400 italic">Primary Business Email</span>
+                                </div>
+                                <div className="flex flex-col space-y-1">
+                                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Phone Number</label>
+                                    {isEditing ? (
+                                        <input 
+                                            type="text"
+                                            name="phoneNumber"
+                                            value={formData.phoneNumber}
+                                            onChange={handleInputChange}
+                                            placeholder="Add phone number"
+                                            className="w-full px-3 py-1.5 text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-400 focus:outline-none transition-all"
+                                        />
+                                    ) : (
+                                        <span className="text-sm font-semibold text-gray-700">{user.phoneNumber || "Not provided"}</span>
+                                    )}
+                                </div>
                             </div>
                         </section>
 
@@ -210,6 +294,28 @@ export default function MyProfileModal({ isOpen, onClose }) {
 
                         <section>
                             <h4 className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                                <MapPin size={12} className="text-gray-400" />
+                                Location / Address
+                            </h4>
+                            {isEditing ? (
+                                <textarea 
+                                    name="address"
+                                    value={formData.address}
+                                    onChange={handleInputChange}
+                                    placeholder="Add address info"
+                                    rows={2}
+                                    className="w-full px-3 py-1.5 text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-400 focus:outline-none transition-all resize-none"
+                                />
+                            ) : (
+                                <div className="flex flex-col">
+                                    <span className="text-sm font-semibold text-gray-700">{user.address || "Not provided"}</span>
+                                    <span className="text-[11px] text-gray-400 italic">Office or Remote Location</span>
+                                </div>
+                            )}
+                        </section>
+
+                        <section>
+                            <h4 className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
                                 <Clock size={12} className="text-gray-400" />
                                 Last Activity
                             </h4>
@@ -230,20 +336,48 @@ export default function MyProfileModal({ isOpen, onClose }) {
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                    {user.role === "admin" && (
-                        <button 
-                            onClick={() => setIsPasswordModalOpen(true)}
-                            className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm transition-all shadow-md shadow-red-100 focus:outline-none focus:ring-2 focus:ring-red-400 active:scale-[0.98]"
-                        >
-                            Change Password
-                        </button>
+                    {isEditing ? (
+                        <>
+                            <button 
+                                onClick={handleSubmit}
+                                disabled={saving}
+                                className="flex-1 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold text-sm transition-all shadow-md shadow-green-100 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+                            >
+                                {saving ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />}
+                                <span>Save Changes</span>
+                            </button>
+                            <button 
+                                onClick={cancelEdit}
+                                disabled={saving}
+                                className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl font-bold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-gray-300"
+                            >
+                                Cancel
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <button 
+                                onClick={() => setIsEditing(true)}
+                                className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm transition-all shadow-md shadow-red-100 focus:outline-none focus:ring-2 focus:ring-red-400"
+                            >
+                                Edit Profile
+                            </button>
+                            {user.role === "admin" && (
+                                <button 
+                                    onClick={() => setIsPasswordModalOpen(true)}
+                                    className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl font-bold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-gray-300"
+                                >
+                                    Change Password
+                                </button>
+                            )}
+                            <button 
+                                onClick={onClose} 
+                                className="sm:w-24 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-400 rounded-xl font-bold text-sm transition-all"
+                            >
+                                Close
+                            </button>
+                        </>
                     )}
-                    <button 
-                        onClick={onClose} 
-                        className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm transition-all shadow-md shadow-red-100 focus:outline-none focus:ring-2 focus:ring-red-400 active:scale-[0.98]"
-                    >
-                        Close
-                    </button>
                 </div>
             </div>
 

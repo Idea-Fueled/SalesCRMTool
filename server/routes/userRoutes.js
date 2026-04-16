@@ -1,5 +1,5 @@
 import express from "express"
-import { adminTest, activateUser, adminResetPassword, bulkReassignRecords, changePassword, deactivateUser, forgotPassword, getProfile, getUserById, getTeamUsers, loginUser, logoutUser, registerUser, resetPassword, updateUser, softDeleteUser, getDeletedUsers, restoreUser, setupPassword, resendInvitation, resendVerificationByEmail, uploadProfilePicture } from "../controllers/userController.js"
+import { adminTest, activateUser, adminResetPassword, bulkReassignRecords, changePassword, deactivateUser, forgotPassword, getProfile, getUserById, getTeamUsers, loginUser, logoutUser, registerUser, resetPassword, updateProfile, updateUser, softDeleteUser, getDeletedUsers, restoreUser, setupPassword, resendInvitation, resendVerificationByEmail, uploadProfilePicture } from "../controllers/userController.js"
 import { protect } from "../middlewares/authMiddleware.js"
 import { requireRole } from "../middlewares/roleMiddleware.js"
 import { upload } from "../middlewares/uploadMiddleware.js"
@@ -22,6 +22,7 @@ router.post("/register", optionalProtect, upload.single("profilePicture"), regis
 router.post("/login", loginUser)
 router.post("/logout", protect, logoutUser)
 router.get("/profile", protect, getProfile)
+router.put("/profile", protect, updateProfile)
 router.put("/profile/picture", protect, upload.single("profilePicture"), uploadProfilePicture)
 router.post("/forgot-password", forgotPassword)
 router.post("/reset-password", resetPassword)

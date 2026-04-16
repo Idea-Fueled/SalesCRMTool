@@ -1250,6 +1250,45 @@ export const resendVerificationByEmail = async (req, res) => {
     }
 };
 
+export const updateProfile = async (req, res) => {
+    try {
+        const { id } = req.user;
+        const { firstName, lastName, phoneNumber, address } = req.body;
+
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found!" });
+        }
+
+        // Update only basic profile details
+        user.firstName = firstName || user.firstName;
+        user.lastName = lastName || user.lastName;
+        user.phoneNumber = phoneNumber !== undefined ? phoneNumber : user.phoneNumber;
+        user.address = address !== undefined ? address : user.address;
+
+        await user.save();
+
+        res.status(200).json({
+            message: "Profile updated successfully!",
+            data: user
+        });
+
+        // Log the action
+        await logAction({
+            userId: id,
+            action: "UPDATE",
+            entityType: "User",
+            entityId: id,
+            entityName: `${user.firstName} ${user.lastName}`,
+            details: "User updated their own basic profile details."
+        });
+
+    } catch (error) {
+        console.error("❌ Error updating profile:", error);
+        res.status(500).json({ message: error.message || "Server error updating profile." });
+    }
+};
+
 export const uploadProfilePicture = async (req, res) => {
     try {
         const { id } = req.user;
