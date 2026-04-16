@@ -93,6 +93,7 @@ const Login = () => {
             }
 
             login(user);
+            sessionStorage.setItem("loginTimestamp", Date.now().toString());
             toast.success("Login successful!");
             if (user.role === "admin") navigate("/dashboard");
             else if (user.role === "sales_manager") navigate("/manager");

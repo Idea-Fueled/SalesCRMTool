@@ -2,66 +2,68 @@ import { useEffect, useState, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import SessionExpiredModal from "./modals/SessionExpiredModal";
 
+// How long after login to ignore session_expired events (ms).
+// Prevents false triggers from API calls that race with the auth cookie.
+const LOGIN_GRACE_PERIOD = 10_000; // 10 seconds
+
 const SessionTimeoutManager = ({ children }) => {
-    const { user, logout, fetchProfile } = useAuth();
+    const { user, fetchProfile } = useAuth();
     const [isExpired, setIsExpired] = useState(false);
     const lastActivityRef = useRef(Date.now());
 
-    // 15 minutes = 900,000 ms (for production)
+    // 15 minutes inactivity limit
     const INACTIVITY_LIMIT = 15 * 60 * 1000;
-    // Refresh backend cookie every 30 seconds if active (for testing)
+    // Refresh backend cookie every 30 seconds while active
     const REFRESH_INTERVAL = 30 * 1000;
 
-    const handleLoggedOutMode = async () => {
-        setIsExpired(true);
-    };
+    // Reset expired flag whenever a new user session starts
+    useEffect(() => {
+        if (user) {
+            setIsExpired(false);
+            lastActivityRef.current = Date.now();
+        }
+    }, [user?._id, user?.id]);
 
-    // Main Inactivity Logic
+    // Main inactivity + server-expiry logic
     useEffect(() => {
         if (!user || isExpired) return;
 
-        console.log("DEBUG: Inactivity monitor STARTED (1 minute limit)");
         lastActivityRef.current = Date.now();
 
         const checkInterval = setInterval(() => {
-            const now = Date.now();
-            const idleTime = now - lastActivityRef.current;
-            const idleSeconds = Math.floor(idleTime / 1000);
-
-            if (idleSeconds > 0 && idleSeconds % 10 === 0) {
-                console.log(`DEBUG: Still idle... ${idleSeconds}s / 60s`);
-            }
-
+            const idleTime = Date.now() - lastActivityRef.current;
             if (idleTime >= INACTIVITY_LIMIT) {
-                console.warn("DEBUG: INACTIVITY LIMIT REACHED!");
-                handleLoggedOutMode();
+                console.warn("SESSION: Inactivity limit reached.");
+                setIsExpired(true);
             }
         }, 1000);
 
-        const resetTimer = () => {
-            lastActivityRef.current = Date.now();
-        };
-
+        const resetTimer = () => { lastActivityRef.current = Date.now(); };
         const events = ["mousedown", "mousemove", "keydown", "scroll", "touchstart"];
-        events.forEach(event => document.addEventListener(event, resetTimer));
+        events.forEach(e => document.addEventListener(e, resetTimer));
 
-        // Listen for server-side expiration (401s)
+        // server-side 401 handler — respects login grace period
         const handleServerExpired = () => {
-            console.warn("DEBUG: SESSION_EXPIRED EVENT RECEIVED FROM SERVER!");
+            const loginTs = parseInt(sessionStorage.getItem("loginTimestamp") || "0", 10);
+            const elapsed = Date.now() - loginTs;
+            if (elapsed < LOGIN_GRACE_PERIOD) {
+                console.warn(`SESSION: session_expired suppressed — only ${Math.round(elapsed / 1000)}s since login.`);
+                return;
+            }
+            console.warn("SESSION: session_expired received from server.");
             setIsExpired(true);
         };
         window.addEventListener("session_expired", handleServerExpired);
 
-        // Periodically refresh profile to keep backend session alive if active
+        // Periodically refresh profile to keep backend session alive
         const refreshTimer = setInterval(() => {
-            console.log("DEBUG: Periodic session refresh (fetchProfile)");
             fetchProfile();
         }, REFRESH_INTERVAL);
 
         return () => {
             clearInterval(checkInterval);
             clearInterval(refreshTimer);
-            events.forEach(event => document.removeEventListener(event, resetTimer));
+            events.forEach(e => document.removeEventListener(e, resetTimer));
             window.removeEventListener("session_expired", handleServerExpired);
         };
     }, [user?._id, user?.id, isExpired]);
@@ -75,3 +77,4 @@ const SessionTimeoutManager = ({ children }) => {
 };
 
 export default SessionTimeoutManager;
+

@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import User from "../models/userSchema.js";
 import bcrypt from "bcrypt";
 import { generateToken } from "../utils/authToken.js";
+import { getCookieOptions } from "../utils/cookieOptions.js";
 import { comparePassword as verifyPassword, hashedPassword as generateHash } from "../utils/hashPassword.js";
 import { Company } from "../models/companySchema.js";
 import { Contact } from "../models/contactSchema.js";
@@ -154,13 +155,7 @@ export const registerUser = async (req, res, next) => {
 
             if (!isInvitation) {
                 const token = await generateToken(user._id, user.role);
-                res.cookie("token", token, {
-                    httpOnly: true,
-                    secure: true,
-                    sameSite: "none",
-                    partitioned: true,
-                    maxAge: 15 * 60 * 1000
-                })
+                res.cookie("token", token, getCookieOptions())
             }
         }
 
@@ -259,13 +254,7 @@ export const loginUser = async (req, res, next) => {
 
         const token = await generateToken(user._id, user.role)
 
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "none",
-            partitioned: true,
-            maxAge: 15 * 60 * 1000
-        })
+        res.cookie("token", token, getCookieOptions())
 
         const lastLogin = new Date();
         const updatedUser = await User.findByIdAndUpdate(user._id, { lastLogin, isSetupComplete: true }, { new: true })
@@ -954,12 +943,7 @@ export const bulkReassignRecords = async (req, res, next) => {
     }
 }
 export const logoutUser = (req, res) => {
-    res.clearCookie("token", {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-        partitioned: true
-    });
+    res.clearCookie("token", getCookieOptions(0));
     return res.status(200).json({ message: "Logged out successfully!" });
 }
 

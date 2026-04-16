@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken"
 import User from "../models/userSchema.js"
 import { generateToken } from "../utils/authToken.js"
+import { getCookieOptions } from "../utils/cookieOptions.js"
 
 export const protect = async (req, res, next) => {
     try {
@@ -29,13 +30,7 @@ export const protect = async (req, res, next) => {
 
         // Sliding Session: Re-issue token to extend the session by another 15 minutes on every active request
         const newToken = await generateToken(user._id, user.role);
-        res.cookie("token", newToken, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "none",
-            partitioned: true,
-            maxAge: 15 * 60 * 1000
-        });
+        res.cookie("token", newToken, getCookieOptions());
 
         req.user = user
         next()

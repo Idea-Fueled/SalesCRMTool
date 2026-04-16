@@ -70,9 +70,13 @@ API.interceptors.response.use(
                 // Swallow all — prevents page-level catch blocks from showing "Failed to load data"
                 return new Promise(() => { });
             } else if (error.response.status === 401) {
-                // If a 401 actually occurs (token expired or missing), trigger the session expired modal immediately.
+                // If a 401 occurs (token expired / missing), trigger the session expired modal.
+                // We also swallow the error so component catch blocks don't show extra toasts
+                // (the modal itself handles the UX for the user).
                 if (!error.config?.url?.includes("/auth/login") && !error.config?.url?.includes("/auth/profile")) {
                     window.dispatchEvent(new CustomEvent("session_expired"));
+                    // Swallow — same pattern as ACCOUNT_DEACTIVATED
+                    return new Promise(() => { });
                 }
             } else if (error.response.status === 500) {
                 console.log("Internal server error");

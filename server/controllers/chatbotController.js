@@ -13,7 +13,7 @@ import os from "os";
 const getVisibilityFilter = async (user, entity, filter = {}) => {
     const { _id: id, role } = user;
     const isTrash = !!(filter.trash || filter.isDeleted);
-    
+
     // Base filter for all roles ($ne: true matches both false and undefined)
     let baseFilter = { isDeleted: isTrash ? true : { $ne: true } };
 
@@ -117,7 +117,7 @@ const summarizeDeal = (d) => {
     if (d.aiTier === "Hot") insight = "🔥 This item is high-priority and shows great potential!";
     else if (d.stage === "Negotiation") insight = "🤝 You're in the final stretch! This deal is currently in the negotiation phase.";
     else if (d.stage === "Closed Won") insight = "🎉 Brilliant work! This deal is successfully completed.";
-    
+
     return `
 **Deal:** ${d.name}
 **Value:** $${valueStr}
@@ -283,7 +283,7 @@ const handleReportingQuery = async (user, intent, res) => {
         ]);
 
         let reply = `### 📊 ${isTrash ? 'Trash/Archive' : 'CRM Overview'} Report\n\n`;
-        
+
         if (showDeals) {
             const totalDeals = dealStats.reduce((acc, s) => acc + s.count, 0);
             const totalValue = dealStats.reduce((acc, s) => acc + s.totalValue, 0);
@@ -300,10 +300,10 @@ const handleReportingQuery = async (user, intent, res) => {
             if (teamSize > 0) reply += `\n**Team:** You are managing ${teamSize} active members.`;
         }
 
-        return res.json({ 
-            reply, 
-            type: "report", 
-            stats: { deals: showDeals, contacts: showContacts, companies: showCompanies } 
+        return res.json({
+            reply,
+            type: "report",
+            stats: { deals: showDeals, contacts: showContacts, companies: showCompanies }
         });
     } catch (error) {
         console.error("Reporting Error:", error);
@@ -328,7 +328,7 @@ const handleUniversalQuery = async (intent, user, res) => {
     if (filter.name) {
         filter.name = cleanName(filter.name);
     }
-    
+
     // Normalize AI root-level properties
     if (intent.limit) filter.limit = intent.limit;
     if (intent.detail && action === "list") action = "detail";
@@ -339,7 +339,7 @@ const handleUniversalQuery = async (intent, user, res) => {
     if (!config) return res.json({ reply: "I'm not sure how to handle that entity yet.", type: "error" });
 
     const visibilityFilter = await getVisibilityFilter(user, entity, filter);
-    
+
     // 1. Fetch base data
     let query = config.model.find(visibilityFilter);
     config.populates.forEach(p => query.populate(p));
@@ -478,7 +478,7 @@ const handleUniversalQuery = async (intent, user, res) => {
     if (action === "count") {
         const tierLabel = filter.tier ? ` **${filter.tier}**` : "";
         const entityLabel = ranked.length === 1 ? config.type : (config.type === "company" ? "companies" : `${config.type}s`);
-        
+
         let reply = `You currently have **${ranked.length}**${tierLabel} ${entityLabel} in your system.`;
         if (ranked.length === 0) {
             reply = `I couldn't find any${tierLabel} ${entityLabel} matching your request. Is there anything else I can check?`;
@@ -488,17 +488,17 @@ const handleUniversalQuery = async (intent, user, res) => {
 
     if (action === "aggregate" && entity === "deals") {
         const total = ranked.reduce((sum, d) => sum + (d.value || 0), 0);
-        return res.json({ 
-            reply: `The total value for these **${ranked.length} deals** is **$${total.toLocaleString()}**. Your pipeline is looking strong! 📈`, 
-            type: "aggregate", 
-            value: total 
+        return res.json({
+            reply: `The total value for these **${ranked.length} deals** is **$${total.toLocaleString()}**. Your pipeline is looking strong! 📈`,
+            type: "aggregate",
+            value: total
         });
     }
 
     // Suggestions / Followup custom reply
     const pluralType = config.type === "company" ? "companies" : `${config.type}s`;
     let reply = `I've found some ${pluralType} for you! Here they are sorted by priority:`;
-    
+
     if (action === "suggestions") {
         reply = `I've highlighted **${ranked.length} high-priority ${config.type}(s)** that could use some immediate attention:`;
     } else if (action === "followup") {
@@ -532,7 +532,7 @@ const handleUniversalQuery = async (intent, user, res) => {
     });
 };
 
-// ── Main chatbot handler ─────────────────────────────────────
+// ── Main chatbot handler ────────────────────────────────
 export const handleChat = async (req, res) => {
     try {
         const { message } = req.body;
@@ -569,14 +569,14 @@ export const handleChat = async (req, res) => {
             for (const ent of ["deals", "contacts", "companies"]) {
                 const mockRes = {
                     json: (data) => data,
-                    status: function() { return this; }
+                    status: function () { return this; }
                 };
                 const result = await handleUniversalQuery({ ...intent, entity: ent }, req.user, mockRes);
                 if (result && result.total > 0) return res.json(result);
             }
-            return res.json({ 
-                reply: `I searched through your deals, contacts, and companies, but I couldn't find anything matching **"${filter.name}"**. You might want to double-check the name or try a broader search phrase!`, 
-                type: "not_found" 
+            return res.json({
+                reply: `I searched through your deals, contacts, and companies, but I couldn't find anything matching **"${filter.name}"**. You might want to double-check the name or try a broader search phrase!`,
+                type: "not_found"
             });
         }
 

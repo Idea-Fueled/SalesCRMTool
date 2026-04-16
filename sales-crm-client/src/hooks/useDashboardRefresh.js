@@ -1,9 +1,12 @@
 import { useEffect, useRef } from "react";
 
+// Must match the LOGIN_GRACE_PERIOD in SessionTimeoutManager
+const LOGIN_GRACE_PERIOD = 10_000; // 10 seconds
+
 /**
  * Custom hook to handle automatic dashboard data refreshing.
  * @param {Function} fetchData - The function to call to refresh data.
- * @param {number} intervalMs - The polling interval in milliseconds (default 1 minute).
+ * @param {number} intervalMs - The polling interval in milliseconds (default 30s).
  */
 const useDashboardRefresh = (fetchData, intervalMs = 30000) => {
     const fetchRef = useRef(fetchData);
@@ -13,10 +16,10 @@ const useDashboardRefresh = (fetchData, intervalMs = 30000) => {
     }, [fetchData]);
 
     useEffect(() => {
-        // Initial fetch is usually handled by the component's own useEffect,
-        // but this hook ensures periodic updates.
-        
         const intervalId = setInterval(() => {
+            // Don't poll within the login grace period to avoid 401 race conditions
+            const loginTs = parseInt(sessionStorage.getItem("loginTimestamp") || "0", 10);
+            if (Date.now() - loginTs < LOGIN_GRACE_PERIOD) return;
             console.log("Dashboard auto-refresh: polling for updates...");
             fetchRef.current();
         }, intervalMs);
@@ -24,6 +27,14 @@ const useDashboardRefresh = (fetchData, intervalMs = 30000) => {
         // Visibility and Focus Refreshes
         const handleVisibilityAndFocus = () => {
             if (document.visibilityState === "visible") {
+                // Skip refresh within LOGIN_GRACE_PERIOD of login.
+                // Prevents 401-induced session_expired modal when switching
+                // tabs or DevTools immediately after logging in.
+                const loginTs = parseInt(sessionStorage.getItem("loginTimestamp") || "0", 10);
+                if (Date.now() - loginTs < LOGIN_GRACE_PERIOD) {
+                    console.log("Dashboard auto-refresh: skipped — within login grace period.");
+                    return;
+                }
                 console.log("Dashboard auto-refresh: window focused/visible, refreshing data...");
                 fetchRef.current();
             }
@@ -41,3 +52,4 @@ const useDashboardRefresh = (fetchData, intervalMs = 30000) => {
 };
 
 export default useDashboardRefresh;
+

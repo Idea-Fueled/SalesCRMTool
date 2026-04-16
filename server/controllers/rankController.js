@@ -152,8 +152,35 @@ export const getRankedCompanies = async (req, res) => {
 // ── GET /api/rank/contacts ────────────────────────────────────
 export const getRankedContacts = async (req, res) => {
     try {
-        const ownerFilter = await buildOwnerFilter(req.user);
+        const user = req.user;
         const { tier, limit, name } = req.query;
+
+        // Build visibility filter — mirrors getContacts logic exactly
+        let ownerFilter = {};
+        if (user.role === "admin") {
+            ownerFilter = {};
+        } else if (user.role === "sales_manager") {
+            const teamIds = await getTeamIds(user._id);
+            // Manager sees: owned by team OR linked to team's deals
+            const teamDeals = await Deal.find({ ownerId: { $in: teamIds }, isDeleted: false }).select("contactId").lean();
+            const dealContactIds = teamDeals.map(d => d.contactId).filter(Boolean);
+            ownerFilter = {
+                $or: [
+                    { ownerId: { $in: teamIds } },
+                    { _id: { $in: dealContactIds } }
+                ]
+            };
+        } else {
+            // sales_rep: sees own contacts OR contacts linked to their deals
+            const myDeals = await Deal.find({ ownerId: user._id, isDeleted: false }).select("contactId").lean();
+            const dealContactIds = myDeals.map(d => d.contactId).filter(Boolean);
+            ownerFilter = {
+                $or: [
+                    { ownerId: user._id },
+                    { _id: { $in: dealContactIds } }
+                ]
+            };
+        }
 
         const contacts = await Contact.find({ isDeleted: false, ...ownerFilter })
             .populate("ownerId", "firstName lastName email profilePicture role")
