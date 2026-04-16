@@ -304,7 +304,9 @@ export const getProfile = async (req, res, next) => {
                 isActive: user.isActive,
                 lastLogin: user.lastLogin,
                 createdAt: user.createdAt,
-                profilePicture: user.profilePicture
+                profilePicture: user.profilePicture,
+                phoneNumber: user.phoneNumber,
+                address: user.address
             }
         })
     } catch (error) {

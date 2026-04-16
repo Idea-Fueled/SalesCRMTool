@@ -258,6 +258,24 @@ export default function MyProfileModal({ isOpen, onClose }) {
                                         <span className="text-sm font-semibold text-gray-700">{user.phoneNumber || "Not provided"}</span>
                                     )}
                                 </div>
+                                <div className="flex flex-col space-y-1">
+                                    <label className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                        <MapPin size={10} />
+                                        Location / Address
+                                    </label>
+                                    {isEditing ? (
+                                        <textarea 
+                                            name="address"
+                                            value={formData.address}
+                                            onChange={handleInputChange}
+                                            placeholder="Add address info"
+                                            rows={2}
+                                            className="w-full px-3 py-1.5 text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-400 focus:outline-none transition-all resize-none"
+                                        />
+                                    ) : (
+                                        <span className="text-sm font-semibold text-gray-700">{user.address || "Not provided"}</span>
+                                    )}
+                                </div>
                             </div>
                         </section>
 
@@ -290,28 +308,6 @@ export default function MyProfileModal({ isOpen, onClose }) {
                                 )}
                                 <span className="text-[10px] text-gray-400 italic mt-0.5">Assigned Supervisor</span>
                             </div>
-                        </section>
-
-                        <section>
-                            <h4 className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                                <MapPin size={12} className="text-gray-400" />
-                                Location / Address
-                            </h4>
-                            {isEditing ? (
-                                <textarea 
-                                    name="address"
-                                    value={formData.address}
-                                    onChange={handleInputChange}
-                                    placeholder="Add address info"
-                                    rows={2}
-                                    className="w-full px-3 py-1.5 text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-400 focus:outline-none transition-all resize-none"
-                                />
-                            ) : (
-                                <div className="flex flex-col">
-                                    <span className="text-sm font-semibold text-gray-700">{user.address || "Not provided"}</span>
-                                    <span className="text-[11px] text-gray-400 italic">Office or Remote Location</span>
-                                </div>
-                            )}
                         </section>
 
                         <section>
