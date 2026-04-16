@@ -73,7 +73,11 @@ API.interceptors.response.use(
                 // If a 401 occurs (token expired / missing), trigger the session expired modal.
                 // We also swallow the error so component catch blocks don't show extra toasts
                 // (the modal itself handles the UX for the user).
-                if (!error.config?.url?.includes("/auth/login") && !error.config?.url?.includes("/auth/profile")) {
+                if (
+                    !error.config?.url?.includes("/auth/login") && 
+                    !error.config?.url?.includes("/auth/profile") &&
+                    !error.config?.url?.includes("/auth/logout")
+                ) {
                     window.dispatchEvent(new CustomEvent("session_expired"));
                     // Swallow — same pattern as ACCOUNT_DEACTIVATED
                     return new Promise(() => { });

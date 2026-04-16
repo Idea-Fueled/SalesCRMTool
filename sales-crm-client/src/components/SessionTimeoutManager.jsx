@@ -11,8 +11,8 @@ const SessionTimeoutManager = ({ children }) => {
     const [isExpired, setIsExpired] = useState(false);
     const lastActivityRef = useRef(Date.now());
 
-    // 15 minutes inactivity limit
-    const INACTIVITY_LIMIT = 15 * 60 * 1000;
+    // 1 minute inactivity limit (temporarily for testing)
+    const INACTIVITY_LIMIT = 1 * 60 * 1000;
     // Refresh backend cookie every 30 seconds while active
     const REFRESH_INTERVAL = 30 * 1000;
 
