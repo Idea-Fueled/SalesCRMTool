@@ -24,7 +24,7 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
         files: []
     };
 
-    const options = potentialOwners.filter(u => u._id !== currentUserId);
+    const options = potentialOwners;
 
     const [formData, setFormData] = useState(emptyForm);
     const [errors, setErrors] = useState({});
@@ -421,7 +421,7 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
                             value={formData.ownerId}
                             onChange={e => set("ownerId", e.target.value)}
                         >
-                            <option value="">Default (Myself)</option>
+                            <option value="">— Select Owner —</option>
                             {options.map(u => (
                                 <option key={u._id} value={u._id}>{u.firstName} {u.lastName} ({u.role === "admin" ? "Admin" : u.role === "sales_manager" ? "Sales Manager" : u.role === "sales_rep" ? "Sales Representative" : u.role.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())})</option>
                             ))}
