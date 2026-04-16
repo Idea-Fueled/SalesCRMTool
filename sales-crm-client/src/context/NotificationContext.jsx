@@ -61,7 +61,12 @@ export const NotificationProvider = ({ children }) => {
                 // Safety check: only process if intended for this user
                 if (!user || notification.recipientId.toString() !== user.id.toString()) return;
 
-                setNotifications(prev => [notification, ...prev]);
+                setNotifications(prev => {
+                    const exists = prev.some(n => n._id === notification._id);
+                    if (exists) return prev;
+                    return [notification, ...prev];
+                });
+
                 if (!notification.isRead) {
                     setUnreadCount(prev => prev + 1);
                     // Suppression logic:

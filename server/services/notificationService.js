@@ -145,6 +145,9 @@ export const sendTieredNotification = async ({
 
         const notificationType = type || typeMap[entityType] || "system";
 
+        // De-duplication check: Skip if an identical notification was sent to these recipients in the last 10 seconds
+        const tenSecondsAgo = new Date(Date.now() - 10000);
+
         // 5. Create, Emit, and Email
         let emailSubject = `${entityType} Updated`;
         if (action === "CREATE") emailSubject = `New ${entityType} Created`;
@@ -161,6 +164,19 @@ export const sendTieredNotification = async ({
 
         await Promise.all(
             Array.from(recipientIds).map(async (recipientId) => {
+                // De-duplication: check if already exists for this recipient in the short window
+                const existing = await Notification.findOne({
+                    recipientId,
+                    message: notificationMessage,
+                    entityId,
+                    createdAt: { $gte: tenSecondsAgo }
+                });
+
+                if (existing) {
+                    console.log(`[notificationService] Skipping duplicate notification for recipient ${recipientId}`);
+                    return null;
+                }
+
                 // In-app Notification
                 const notification = await Notification.create({
                     recipientId,
@@ -176,7 +192,6 @@ export const sendTieredNotification = async ({
                 // Email Notification
                 const email = recipientEmails.get(recipientId);
                 if (email) {
-                    console.log(`[notificationService] Triggering email to ${email} for subject: ${emailSubject}`);
                     sendNotificationEmail(email, emailSubject, notificationMessage);
                 }
 

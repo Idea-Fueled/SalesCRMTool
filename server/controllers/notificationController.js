@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Notification } from "../models/notificationSchema.js";
 import User from "../models/userSchema.js";
 
@@ -6,7 +7,7 @@ export const getNotifications = async (req, res) => {
         const { id: userId } = req.user;
         
         // Notifications are personal (created per recipient by the service)
-        const query = { recipientId: userId };
+        const query = { recipientId: new mongoose.Types.ObjectId(userId) };
 
         const notifications = await Notification.find(query)
             .populate("senderId", "firstName lastName")
@@ -32,11 +33,17 @@ export const markAsRead = async (req, res) => {
 export const markAllAsRead = async (req, res) => {
     try {
         const { id: userId } = req.user;
-        const query = { recipientId: userId, isRead: false };
+        const query = { recipientId: new mongoose.Types.ObjectId(userId), isRead: false };
 
-        await Notification.updateMany(query, { isRead: true });
-        res.status(200).json({ message: "All notifications marked as read" });
+        const result = await Notification.updateMany(query, { isRead: true });
+        console.log(`[NotificationController] MarkAllAsRead: updated ${result.modifiedCount} notifications for user ${userId}`);
+        
+        res.status(200).json({ 
+            message: "All notifications marked as read",
+            modifiedCount: result.modifiedCount
+        });
     } catch (error) {
+        console.error("Error in markAllAsRead:", error);
         res.status(500).json({ message: error.message || "Server error!" });
     }
 };
