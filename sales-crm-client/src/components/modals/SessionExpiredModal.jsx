@@ -26,7 +26,7 @@ const SessionExpiredModal = ({ isOpen, onClose }) => {
                     </div>
                     <h2 className="text-xl font-bold text-gray-900 mb-2">Session Expired</h2>
                     <p className="text-gray-500 text-sm mb-8">
-                        Your session has expired due to 1 minute of inactivity. Please log in again to continue.
+                        Your session has expired due to 15 minutes of inactivity. Please log in again to continue.
                     </p>
                     <button
                         onClick={handleLoginAgain}
