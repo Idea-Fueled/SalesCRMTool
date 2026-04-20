@@ -30,7 +30,7 @@ export const createContact = async (req, res, next) => {
         const primaryCompanyId = primaryCompany?.companyId || companyId || null;
         const primaryCompanyName = primaryCompany?.companyName || companyName || "";
 
-        if (!firstName || !lastName || !email || !jobTitle || (parsedCompanies.length === 0 && !companyId && !companyName)) {
+        if (!firstName || !lastName || !email || !jobTitle) {
             return res.status(400).json({
                 message: "All required fields must be filled!"
             })
