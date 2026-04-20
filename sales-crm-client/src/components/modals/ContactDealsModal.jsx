@@ -61,7 +61,7 @@ export default function ContactDealsModal({ isOpen, onClose, contact }) {
                     </div>
                 ) : deals.length === 0 ? (
                     <div className="text-center py-12 border-2 border-dashed border-gray-100 rounded-2xl">
-                        <p className="text-gray-400 text-sm font-bold uppercase tracking-widest text-[10px] opacity-60">No active deals found for this contact</p>
+                        <p className="text-gray-400 text-sm font-bold  tracking-widest text-[10px] opacity-60">No active deals found for this contact</p>
                     </div>
                 ) : (
                     <div className="grid gap-3">
@@ -132,5 +132,11 @@ export default function ContactDealsModal({ isOpen, onClose, contact }) {
         </Modal>
     );
 }
+
+
+
+
+
+
 
 

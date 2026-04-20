@@ -300,3 +300,9 @@ export default function GlobalSearch({ isOpen, onClose }) {
 }
 
 
+
+
+
+
+
+

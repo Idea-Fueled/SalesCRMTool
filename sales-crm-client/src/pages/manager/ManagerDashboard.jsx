@@ -236,7 +236,7 @@ export default function ManagerDashboard() {
                     {loading ? (
                         <p className="text-center text-gray-400 text-sm col-span-4 py-6">Loading rep data...</p>
                     ) : repStats.length === 0 ? (
-                        <p className="text-center text-gray-400 text-sm col-span-4 py-6">NO SALES REPRESENTATIVES FOUND IN YOUR TEAM.</p>
+                        <p className="text-center text-gray-400 text-sm col-span-4 py-6">NO SALES REPRESENTATIVES found IN YOUR TEAM.</p>
                     ) : (
                         repStats.map((rep) => (
                             <div key={rep._id} className="flex flex-col items-center gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100">
@@ -284,5 +284,11 @@ export default function ManagerDashboard() {
         </div>
     );
 }
+
+
+
+
+
+
 
 

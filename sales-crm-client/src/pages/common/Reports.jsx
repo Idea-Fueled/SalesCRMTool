@@ -679,7 +679,7 @@ export default function Reports() {
                             ) : data.length === 0 ? (
                                 <tr>
                                     <td colSpan={5} className="py-20 text-center text-gray-400 text-xs font-semibold ">
-                                        {searchQuery ? "Not found" : "NO records FOUND for this period."}
+                                        {searchQuery ? "Not found" : " 'No ' + $args[0].Groups[1].Value.ToLower() + ' found'  for this period."}
                                     </td>
                                 </tr>
                             ) : (
@@ -760,5 +760,11 @@ export default function Reports() {
         </div>
     );
 }
+
+
+
+
+
+
 
 

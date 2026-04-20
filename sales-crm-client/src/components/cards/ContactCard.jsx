@@ -134,3 +134,9 @@ export default function ContactCard({ contact, onEdit, onDelete, onView, onDeals
 }
 
 
+
+
+
+
+
+
