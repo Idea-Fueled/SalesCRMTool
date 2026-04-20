@@ -294,6 +294,7 @@ export default function MyProfileModal({ isOpen, onClose }) {
                     </div>
 
                     <div className="space-y-4 min-w-0">
+                        {user.role !== "admin" && (
                         <section>
                             <h4 className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
                                 <UserIcon size={12} className="text-gray-400" />
@@ -309,6 +310,7 @@ export default function MyProfileModal({ isOpen, onClose }) {
                                 <span className="text-[10px] text-gray-400 italic mt-0.5">Assigned Supervisor</span>
                             </div>
                         </section>
+                        )}
 
                         <section>
                             <h4 className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
