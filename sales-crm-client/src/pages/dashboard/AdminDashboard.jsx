@@ -313,7 +313,7 @@ export default function AdminDashboard() {
                     onClick={() => setModalConfig({ isOpen: true, category: 'companies', data: stats.companyList })}
                 />
                 <OverviewStat
-                    label="System Users"
+                    label="Users"
                     value={stats.users}
                     icon={Users}
                     onClick={() => setModalConfig({ isOpen: true, category: 'users', data: stats.userList })}

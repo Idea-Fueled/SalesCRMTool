@@ -20,7 +20,7 @@ export default function DashboardDetailModal({ isOpen, onClose, category, data, 
         revenue: "Total Revenue Details",
         deals: "Active Deals",
         companies: "Total Companies",
-        users: "System Users"
+        users: "Users"
     };
 
     const icons = {
