@@ -44,9 +44,3 @@ const SessionExpiredModal = ({ isOpen, onClose }) => {
 export default SessionExpiredModal;
 
 
-
-
-
-
-
-

@@ -40,9 +40,3 @@ export default function DeleteConfirmModal({ isOpen, onClose, onConfirm, title, 
 }
 
 
-
-
-
-
-
-

@@ -117,9 +117,3 @@ const DealCard = ({ deal, onEdit, onDelete, onView }) => {
 export default DealCard;
 
 
-
-
-
-
-
-

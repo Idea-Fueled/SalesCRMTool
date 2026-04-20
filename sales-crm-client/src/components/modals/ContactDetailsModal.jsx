@@ -150,9 +150,3 @@ export default function ContactDetailsModal({ isOpen, onClose, contact }) {
 }
 
 
-
-
-
-
-
-

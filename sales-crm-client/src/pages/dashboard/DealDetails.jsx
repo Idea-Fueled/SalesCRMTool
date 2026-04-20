@@ -972,9 +972,3 @@ export default function DealDetails() {
 }
 
 
-
-
-
-
-
-

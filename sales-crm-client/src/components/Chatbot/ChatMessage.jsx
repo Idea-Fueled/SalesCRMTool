@@ -89,9 +89,3 @@ function DataCard({ item, type }) {
 }
 
 
-
-
-
-
-
-

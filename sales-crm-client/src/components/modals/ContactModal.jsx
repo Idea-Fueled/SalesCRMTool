@@ -337,7 +337,7 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
                                 </div>
                                 <div className="overflow-y-auto flex-1">
                                     {filteredCompanies.length === 0 ? (
-                                        <p className="text-center text-gray-400 text-xs py-4"> 'No ' + $args[0].Groups[1].Value.ToLower() + ' found' </p>
+                                        <p className="text-center text-gray-400 text-xs py-4">NO companies FOUND</p>
                                     ) : filteredCompanies.map(comp => {
                                         const cid = comp._id || comp.id;
                                         const isSelected = formData.selectedCompanies.some(c => c.companyId === cid);
@@ -482,11 +482,5 @@ export default function ContactModal({ isOpen, onClose, contact, onSave, compani
         </Modal>
     );
 }
-
-
-
-
-
-
 
 

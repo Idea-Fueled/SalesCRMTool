@@ -181,7 +181,7 @@ export default function RepCompanies() {
                                     {loading && companies.length === 0 ? (
                                         <tr><td colSpan={6} className="text-center py-10 text-gray-400">Loading companies...</td></tr>
                                     ) : companies.length === 0 ? (
-                                        <tr><td colSpan={6} className="text-center py-20 text-gray-400 font-bold  tracking-widest text-[10px] opacity-60 "> 'No ' + $args[0].Groups[1].Value.ToLower() + ' found' </td></tr>
+                                        <tr><td colSpan={6} className="text-center py-20 text-gray-400 font-bold uppercase tracking-widest text-[10px] opacity-60 ">NO companies FOUND</td></tr>
                                     ) : (
                                         companies.map((c) => (
                                             <tr key={c._id} className="hover:bg-gray-50/50 transition-colors group">
@@ -232,7 +232,7 @@ export default function RepCompanies() {
                             {loading && companies.length === 0 ? (
                                 <div className="col-span-full text-center py-10 text-gray-400">Loading companies...</div>
                             ) : companies.length === 0 ? (
-                                <div className="col-span-full text-center py-20 text-gray-400 font-medium  uppercase tracking-widest text-xs"> 'No ' + $args[0].Groups[1].Value.ToLower() + ' found' </div>
+                                <div className="col-span-full text-center py-20 text-gray-400 font-medium  uppercase tracking-widest text-xs">NO companies FOUND</div>
                             ) : (
                                 companies.map((c) => (
                                     <CompanyCard
@@ -274,11 +274,5 @@ export default function RepCompanies() {
         </div>
     );
 }
-
-
-
-
-
-
 
 

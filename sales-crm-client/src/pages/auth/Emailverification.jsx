@@ -112,9 +112,3 @@ const Emailverification = () => {
 export default Emailverification;
 
 
-
-
-
-
-
-

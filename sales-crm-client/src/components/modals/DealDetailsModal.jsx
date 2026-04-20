@@ -182,9 +182,3 @@ export default function DealDetailsModal({ isOpen, onClose, deal }) {
 }
 
 
-
-
-
-
-
-

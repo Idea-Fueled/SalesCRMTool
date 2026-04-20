@@ -48,9 +48,3 @@ export default function RankBadge({ score, tier, compact = false }) {
 }
 
 
-
-
-
-
-
-

@@ -482,9 +482,3 @@ export default function DealModal({ isOpen, onClose, deal, onSave, companies, co
 }
 
 
-
-
-
-
-
-

@@ -102,9 +102,3 @@ const CompanyCard = ({ company, onEdit, onDelete, onView }) => {
 export default CompanyCard;
 
 
-
-
-
-
-
-

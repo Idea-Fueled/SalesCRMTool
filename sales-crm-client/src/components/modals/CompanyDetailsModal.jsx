@@ -168,9 +168,3 @@ export default function CompanyDetailsModal({ isOpen, onClose, company }) {
 }
 
 
-
-
-
-
-
-

@@ -829,9 +829,3 @@ export default function CompanyDetails() {
 }
 
 
-
-
-
-
-
-

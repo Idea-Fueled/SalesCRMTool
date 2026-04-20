@@ -35,9 +35,3 @@ export default function FileDeleteModal({ isOpen, onClose, onConfirm, message, t
 }
 
 
-
-
-
-
-
-
