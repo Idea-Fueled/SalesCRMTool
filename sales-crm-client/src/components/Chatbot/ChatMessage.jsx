@@ -87,3 +87,5 @@ function DataCard({ item, type }) {
         </div>
     );
 }
+
+

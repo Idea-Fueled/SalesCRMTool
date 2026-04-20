@@ -241,7 +241,7 @@ export default function MyProfileModal({ isOpen, onClose }) {
                             <div className="flex flex-col min-w-0 space-y-3">
                                 <div className="flex flex-col">
                                     <span className="text-sm font-semibold text-gray-700 break-all">{user.email}</span>
-                                    <span className="text-[11px] text-gray-400 italic">Primary Business Email</span>
+                                    <span className="text-[11px] text-gray-400 ">Primary Business Email</span>
                                 </div>
                                 <div className="flex flex-col space-y-1">
                                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Phone Number</label>
@@ -307,7 +307,7 @@ export default function MyProfileModal({ isOpen, onClose }) {
                                 {user.managerId && user.managerId.email && (
                                     <span className="text-[11px] font-medium text-gray-500 truncate mt-0.5">{user.managerId.email}</span>
                                 )}
-                                <span className="text-[10px] text-gray-400 italic mt-0.5">Assigned Supervisor</span>
+                                <span className="text-[10px] text-gray-400  mt-0.5">Assigned Supervisor</span>
                             </div>
                         </section>
                         )}
@@ -319,7 +319,7 @@ export default function MyProfileModal({ isOpen, onClose }) {
                             </h4>
                             <div className="flex flex-col">
                                 <span className="text-sm font-semibold text-gray-700">{formatDate(user.lastLogin)}</span>
-                                <span className="text-[11px] text-gray-400 italic">Your last successful session</span>
+                                <span className="text-[11px] text-gray-400 ">Your last successful session</span>
                             </div>
                         </section>
                     </div>
@@ -389,3 +389,5 @@ export default function MyProfileModal({ isOpen, onClose }) {
         </Modal>
     );
 }
+
+

@@ -59,3 +59,5 @@ const CollapsibleDealName = ({ name, onNavigate }) => {
 };
 
 export default CollapsibleDealName;
+
+

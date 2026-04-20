@@ -262,7 +262,7 @@ export default function UserModal({ isOpen, onClose, user, managers = [], onSave
                             <input type="password" name="password" value={form.password} onChange={handleChange}
                                 className={inputClass(errors.password)} placeholder="Min. 6 characters or leave blank" autoComplete="new-password" />
                             {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
-                            <p className="text-[10px] text-gray-400 mt-1 italic">
+                            <p className="text-[10px] text-gray-400 mt-1 ">
                                 If omitted, the user will receive a link via email to set their own password.
                             </p>
                         </div>
@@ -300,7 +300,7 @@ export default function UserModal({ isOpen, onClose, user, managers = [], onSave
                             <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-between">
                                 <div className="flex flex-col">
                                     <label className="text-xs font-bold text-gray-700 uppercase">Password Management</label>
-                                    <p className="text-[10px] text-gray-400 mt-0.5 italic">Requires current password</p>
+                                    <p className="text-[10px] text-gray-400 mt-0.5 ">Requires current password</p>
                                 </div>
                                 <button
                                     type="button"
@@ -333,7 +333,7 @@ export default function UserModal({ isOpen, onClose, user, managers = [], onSave
                                         Reset
                                     </button>
                                 </div>
-                                <p className="text-[10px] text-gray-400 italic">User will not be notified; please share it with them.</p>
+                                <p className="text-[10px] text-gray-400 ">User will not be notified; please share it with them.</p>
                             </div>
                         )
                     )}
@@ -357,3 +357,5 @@ export default function UserModal({ isOpen, onClose, user, managers = [], onSave
         </>
     );
 }
+
+

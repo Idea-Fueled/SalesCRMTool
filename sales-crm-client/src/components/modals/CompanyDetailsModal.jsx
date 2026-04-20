@@ -75,7 +75,7 @@ export default function CompanyDetailsModal({ isOpen, onClose, company }) {
                                     >
                                         {company.website || "No website listed"}
                                     </a>
-                                    <span className="text-[10px] text-gray-400 italic">Official Website</span>
+                                    <span className="text-[10px] text-gray-400 ">Official Website</span>
                                 </div>
                             </div>
                         </section>
@@ -88,11 +88,11 @@ export default function CompanyDetailsModal({ isOpen, onClose, company }) {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="flex flex-col">
                                     <span className="text-sm font-semibold text-gray-700">{company.size || "Unknown"}</span>
-                                    <span className="text-[10px] text-gray-400 italic">Company Size</span>
+                                    <span className="text-[10px] text-gray-400 ">Company Size</span>
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-sm font-semibold text-gray-700">{formatCurrency(company.revenueRange)}</span>
-                                    <span className="text-[10px] text-gray-400 italic">Annual Revenue</span>
+                                    <span className="text-[10px] text-gray-400 ">Annual Revenue</span>
                                 </div>
                             </div>
                         </section>
@@ -125,7 +125,7 @@ export default function CompanyDetailsModal({ isOpen, onClose, company }) {
                                 <span className="text-sm font-bold text-red-700">
                                     {company.ownerId ? `${company.ownerId.firstName || ""} ${company.ownerId.lastName || ""}`.trim() : "Not Assigned"}
                                 </span>
-                                <span className="text-[10px] text-red-400/80 italic mt-0.5">{company.ownerId?.email || "No contact info"}</span>
+                                <span className="text-[10px] text-red-400/80  mt-0.5">{company.ownerId?.email || "No contact info"}</span>
                             </div>
                         </section>
 
@@ -134,7 +134,7 @@ export default function CompanyDetailsModal({ isOpen, onClose, company }) {
                                 <FileText size={12} className="text-red-400" />
                                 Additional Notes
                             </h4>
-                            <div className="p-3 bg-gray-50 rounded-xl border border-gray-100 text-xs text-gray-600 leading-relaxed italic max-h-24 overflow-y-auto custom-scrollbar">
+                            <div className="p-3 bg-gray-50 rounded-xl border border-gray-100 text-xs text-gray-600 leading-relaxed  max-h-24 overflow-y-auto custom-scrollbar">
                                 {company.notes || "No internal notes available for this organization."}
                             </div>
                         </section>
@@ -166,3 +166,5 @@ export default function CompanyDetailsModal({ isOpen, onClose, company }) {
         </Modal>
     );
 }
+
+

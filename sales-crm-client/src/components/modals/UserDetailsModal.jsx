@@ -155,7 +155,7 @@ export default function UserDetailsModal({ isOpen, onClose, user, title }) {
                                         </div>
                                     ))
                                 ) : (
-                                    <p className="text-xs text-gray-400 italic py-2">No recent deal activity recorded.</p>
+                                    <p className="text-xs text-gray-400  py-2">No recent deal activity recorded.</p>
                                 )}
                             </div>
                         </section>
@@ -226,3 +226,5 @@ export default function UserDetailsModal({ isOpen, onClose, user, title }) {
         </Modal>
     );
 }
+
+

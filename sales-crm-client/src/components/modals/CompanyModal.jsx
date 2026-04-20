@@ -220,3 +220,5 @@ export default function CompanyModal({ isOpen, onClose, company, onSave, userRol
         </Modal>
     );
 }
+
+

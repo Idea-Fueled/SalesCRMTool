@@ -250,7 +250,7 @@ export default function UsersDashboard() {
                                     {loading && users.length === 0 ? (
                                         <tr><td colSpan={6} className="text-center py-10 text-gray-400">Loading users...</td></tr>
                                     ) : filtered.length === 0 ? (
-                                        <tr><td colSpan={6} className="text-center py-10 text-gray-400">No users found.</td></tr>
+                                        <tr><td colSpan={6} className="text-center py-10 text-gray-400">NO users FOUND.</td></tr>
                                     ) : (
                                         filtered.map((u) => (
                                             <tr
@@ -365,7 +365,7 @@ export default function UsersDashboard() {
                             {loading && users.length === 0 ? (
                                 <div className="col-span-full py-20 text-center text-gray-400">Loading users...</div>
                             ) : filtered.length === 0 ? (
-                                <div className="col-span-full py-20 text-center text-gray-400 font-medium">No users found.</div>
+                                <div className="col-span-full py-20 text-center text-gray-400 font-bold uppercase tracking-widest text-[10px] opacity-60">NO users FOUND.</div>
                             ) : (
                                 filtered.map(u => (
                                     <UserCard
@@ -457,3 +457,5 @@ export default function UsersDashboard() {
         </div >
     );
 }
+
+

@@ -434,7 +434,7 @@ export default function AdminDashboard() {
                             </div>
                         ))}
                         {topDeals.length === 0 && (
-                            <div className="h-full flex items-center justify-center text-sm text-gray-400 font-medium">No deals found for this period</div>
+                            <div className="h-full flex items-center justify-center text-sm text-gray-400 font-bold uppercase tracking-widest text-[10px] opacity-60">NO deals FOUND for this period</div>
                         )}
                     </div>
                 </div>
@@ -543,3 +543,5 @@ export default function AdminDashboard() {
         </div>
     );
 }
+
+

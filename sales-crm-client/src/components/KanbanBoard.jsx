@@ -350,3 +350,5 @@ export default function KanbanBoard({ deals, onEdit, onDelete, onMove }) {
         </DndContext>
     );
 }
+
+

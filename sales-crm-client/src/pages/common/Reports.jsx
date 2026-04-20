@@ -678,8 +678,8 @@ export default function Reports() {
                                 </tr>
                             ) : data.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="py-20 text-center text-gray-400 text-xs font-semibold italic">
-                                        {searchQuery ? "Not found" : "No records found for this period."}
+                                    <td colSpan={5} className="py-20 text-center text-gray-400 text-xs font-semibold ">
+                                        {searchQuery ? "Not found" : "NO records FOUND for this period."}
                                     </td>
                                 </tr>
                             ) : (
@@ -760,3 +760,5 @@ export default function Reports() {
         </div>
     );
 }
+
+

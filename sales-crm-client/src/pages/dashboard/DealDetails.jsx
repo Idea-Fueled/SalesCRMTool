@@ -573,7 +573,7 @@ export default function DealDetails() {
                                     <FileText size={10} className="text-gray-400" /> Interaction Notes
                                 </label>
                                 <div className="p-4 bg-gray-50/50 rounded-xl border border-gray-100 text-[13px] text-gray-800 leading-relaxed whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto">
-                                    {deal.notes ? deal.notes : <span className="text-gray-400 italic">No notes yet. Add a remark from the right panel.</span>}
+                                    {deal.notes ? deal.notes : <span className="text-gray-400 ">No notes yet. Add a remark from the right panel.</span>}
                                 </div>
                             </div>
 
@@ -668,7 +668,7 @@ export default function DealDetails() {
                         <div className="max-h-[300px] overflow-y-auto custom-scrollbar py-6 pl-6">
                             <div className="pr-6 space-y-4">
                                 {(!deal.stageHistory || deal.stageHistory.length === 0) ? (
-                                    <p className="text-xs text-gray-400 italic text-center py-4 pr-6">No historical transitions recorded.</p>
+                                    <p className="text-xs text-gray-400  text-center py-4 pr-6">No historical transitions recorded.</p>
                                 ) : (
                                     deal.stageHistory.map((history, idx) => (
                                         <div key={idx} className="relative pl-6 pb-4 last:pb-0 border-l border-gray-100 last:border-0">
@@ -785,7 +785,7 @@ export default function DealDetails() {
                                             return (
                                                 <div className="text-center py-10 bg-gray-50/20 rounded-xl border border-dashed border-gray-100">
                                                     <MessageSquare size={18} className="mx-auto text-gray-300 mb-1.5 opacity-20" />
-                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em] italic">
+                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em] ">
                                                         {selectedRemarkStage === "All" ? "No remarks yet" : `No remarks for ${selectedRemarkStage}`}
                                                     </p>
                                                 </div>
@@ -970,3 +970,5 @@ export default function DealDetails() {
         </div>
     );
 }
+
+

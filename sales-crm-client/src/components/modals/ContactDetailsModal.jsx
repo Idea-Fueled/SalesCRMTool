@@ -58,7 +58,7 @@ export default function ContactDetailsModal({ isOpen, onClose, contact }) {
                             <div className="space-y-3">
                                 <div className="flex flex-col">
                                     <span className="text-sm font-semibold text-gray-700">{contact.email}</span>
-                                    <span className="text-[10px] text-gray-400 italic font-medium">Primary Business Email</span>
+                                    <span className="text-[10px] text-gray-400  font-medium">Primary Business Email</span>
                                 </div>
                                 {contact.linkedin && (
                                     <div className="flex flex-col">
@@ -71,7 +71,7 @@ export default function ContactDetailsModal({ isOpen, onClose, contact }) {
                                             View LinkedIn Profile
                                             <ExternalLink size={10} />
                                         </a>
-                                        <span className="text-[10px] text-gray-400 italic font-medium uppercase tracking-tighter">Professional Social</span>
+                                        <span className="text-[10px] text-gray-400  font-medium uppercase tracking-tighter">Professional Social</span>
                                     </div>
                                 )}
                             </div>
@@ -85,11 +85,11 @@ export default function ContactDetailsModal({ isOpen, onClose, contact }) {
                             <div className="grid grid-cols-1 gap-4">
                                 <div className="flex flex-col">
                                     <span className="text-sm font-semibold text-gray-700">{contact.phone || "—"}</span>
-                                    <span className="text-[10px] text-gray-400 italic">Office extension</span>
+                                    <span className="text-[10px] text-gray-400 ">Office extension</span>
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-sm font-semibold text-gray-700">{contact.mobile || "—"}</span>
-                                    <span className="text-[10px] text-gray-400 italic">Direct mobile line</span>
+                                    <span className="text-[10px] text-gray-400 ">Direct mobile line</span>
                                 </div>
                             </div>
                         </section>
@@ -107,7 +107,7 @@ export default function ContactDetailsModal({ isOpen, onClose, contact }) {
                                 <span className="text-sm font-bold text-red-700">
                                     {`${contact.ownerId?.firstName || ""} ${contact.ownerId?.lastName || ""}`.trim() || "Not Assigned"}
                                 </span>
-                                <span className="text-[10px] text-red-400/80 italic mt-0.5">{contact.ownerId?.email}</span>
+                                <span className="text-[10px] text-red-400/80  mt-0.5">{contact.ownerId?.email}</span>
                             </div>
                         </section>
 
@@ -116,7 +116,7 @@ export default function ContactDetailsModal({ isOpen, onClose, contact }) {
                                 <FileText size={12} className="text-red-400" />
                                 Strategic Notes
                             </h4>
-                            <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 text-xs text-gray-600 leading-relaxed italic max-h-32 overflow-y-auto custom-scrollbar">
+                            <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 text-xs text-gray-600 leading-relaxed  max-h-32 overflow-y-auto custom-scrollbar">
                                 {contact.notes || "No interaction notes recorded for this contact."}
                             </div>
                         </section>
@@ -148,3 +148,5 @@ export default function ContactDetailsModal({ isOpen, onClose, contact }) {
         </Modal>
     );
 }
+
+

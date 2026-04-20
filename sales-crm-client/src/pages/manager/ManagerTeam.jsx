@@ -228,7 +228,7 @@ export default function ManagerTeam() {
                                 {loading ? (
                                     <tr><td colSpan={6} className="text-center py-10 text-gray-400">Loading team...</td></tr>
                                 ) : filtered.length === 0 ? (
-                                    <tr><td colSpan={6} className="text-center py-10 text-gray-400">No members found.</td></tr>
+                                    <tr><td colSpan={6} className="text-center py-10 text-gray-400">NO members FOUND.</td></tr>
                                 ) : (
                                     filtered.map((m) => (
                                         <tr
@@ -306,7 +306,7 @@ export default function ManagerTeam() {
                         {loading ? (
                             <div className="col-span-full text-center py-10 text-gray-400">Loading team cards...</div>
                         ) : filtered.length === 0 ? (
-                            <div className="col-span-full text-center py-10 text-gray-400">No members found.</div>
+                            <div className="col-span-full text-center py-10 text-gray-400">NO members FOUND.</div>
                         ) : (
                                     filtered.map(m => (
                                         <UserCard
@@ -365,3 +365,5 @@ export default function ManagerTeam() {
         </div>
     );
 }
+
+

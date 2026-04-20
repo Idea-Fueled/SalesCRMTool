@@ -238,7 +238,7 @@ export default function ManagerDeals() {
                         {loading && deals.length === 0 ? (
                             <div className="col-span-full text-center py-10 text-gray-400">Loading deals...</div>
                         ) : deals.length === 0 ? (
-                            <div className="col-span-full text-center py-20 text-gray-400 font-medium italic">no deals found</div>
+                            <div className="col-span-full text-center py-20 text-gray-400 font-bold uppercase tracking-widest text-[10px] opacity-60 ">NO deals FOUND</div>
                         ) : (
                             deals.map((d) => (
                                 <DealCard
@@ -278,7 +278,7 @@ export default function ManagerDeals() {
                                 {loading && deals.length === 0 ? (
                                     <tr><td colSpan={8} className="text-center py-10 text-gray-400">Loading team deals...</td></tr>
                                 ) : deals.length === 0 ? (
-                                    <tr><td colSpan={8} className="text-center py-20 text-gray-400 font-medium italic">no deals found</td></tr>
+                                    <tr><td colSpan={8} className="text-center py-20 text-gray-400 font-bold uppercase tracking-widest text-[10px] opacity-60 ">NO deals FOUND</td></tr>
                                 ) : (
                                     deals.map((d) => (
                                         <tr key={d._id} className="hover:bg-gray-50/50 transition-colors group">
@@ -392,3 +392,5 @@ export default function ManagerDeals() {
         </div>
     );
 }
+
+

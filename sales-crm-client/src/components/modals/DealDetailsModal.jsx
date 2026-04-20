@@ -139,7 +139,7 @@ export default function DealDetailsModal({ isOpen, onClose, deal }) {
                                 <span className="text-sm font-bold text-red-700">
                                     {`${deal.ownerId?.firstName || ""} ${deal.ownerId?.lastName || ""}`.trim() || "Not Assigned"}
                                 </span>
-                                <span className="text-[10px] text-red-400/80 italic mt-0.5">Strategic Account Unit</span>
+                                <span className="text-[10px] text-red-400/80  mt-0.5">Strategic Account Unit</span>
                             </div>
                         </section>
 
@@ -148,7 +148,7 @@ export default function DealDetailsModal({ isOpen, onClose, deal }) {
                                 <Info size={12} className="text-red-400" />
                                 Strategic Overview
                             </h4>
-                            <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 text-xs text-gray-600 leading-relaxed italic h-32 overflow-y-auto custom-scrollbar shadow-inner">
+                            <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 text-xs text-gray-600 leading-relaxed  h-32 overflow-y-auto custom-scrollbar shadow-inner">
                                 {deal.notes || "No strategic overview provided for this mandate."}
                             </div>
                         </section>
@@ -180,3 +180,5 @@ export default function DealDetailsModal({ isOpen, onClose, deal }) {
         </Modal>
     );
 }
+
+

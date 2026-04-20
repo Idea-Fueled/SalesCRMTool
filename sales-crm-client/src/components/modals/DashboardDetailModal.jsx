@@ -34,7 +34,7 @@ export default function DashboardDetailModal({ isOpen, onClose, category, data, 
         if (!data || data.length === 0) {
             return (
                 <div className="text-center py-12">
-                    <p className="text-gray-500 font-medium">No records found for this category.</p>
+                    <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px] opacity-60">NO records FOUND for this category.</p>
                 </div>
             );
         }
@@ -149,3 +149,5 @@ export default function DashboardDetailModal({ isOpen, onClose, category, data, 
         </Modal>
     );
 }
+
+

@@ -560,7 +560,7 @@ export default function ContactDetails() {
                                         View Profile <ExternalLink size={10} />
                                     </a>
                                 ) : (
-                                    <p className="text-sm font-bold text-gray-300 italic">Not available</p>
+                                    <p className="text-sm font-bold text-gray-300 ">Not available</p>
                                 )}
                             </div>
                             
@@ -570,7 +570,7 @@ export default function ContactDetails() {
                                     <FileText size={10} className="text-gray-400" /> Interaction Notes
                                 </label>
                                 <div className="p-4 bg-gray-50/50 rounded-xl border border-gray-100 text-[13px] text-gray-800 leading-relaxed whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto">
-                                    {contact.notes ? contact.notes : <span className="text-gray-400 italic">No notes yet. Add a remark from the right panel.</span>}
+                                    {contact.notes ? contact.notes : <span className="text-gray-400 ">No notes yet. Add a remark from the right panel.</span>}
                                 </div>
                             </div>
 
@@ -724,7 +724,7 @@ export default function ContactDetails() {
                                 ) : (
                                     <div className="text-center py-6 bg-gray-50/20 rounded-xl border border-dashed border-gray-100">
                                         <MessageSquare size={18} className="mx-auto text-gray-300 mb-1.5 opacity-20" />
-                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em] italic">No remarks yet</p>
+                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em] ">No remarks yet</p>
                                     </div>
                                 )}
                             </div>
@@ -832,3 +832,5 @@ export default function ContactDetails() {
         </div>
     );
 }
+
+
