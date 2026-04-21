@@ -54,6 +54,7 @@ const formatRole = (r) => ({ admin: "Admin", sales_manager: "Sales Manager", sal
 export default function UsersDashboard() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [resendingIds, setResendingIds] = useState(new Set());
     const [search, setSearch] = useState("");
     const [viewMode, setViewMode] = useState("list");
 
@@ -146,11 +147,20 @@ export default function UsersDashboard() {
     };
 
     const handleResendInvite = async (user) => {
+        if (resendingIds.has(user._id)) return;
+        
+        setResendingIds(prev => new Set(prev).add(user._id));
         try {
             await apiResendInvitation(user._id);
             toast.success(`Invitation link resent to ${user.email}`);
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to resend invitation");
+        } finally {
+            setResendingIds(prev => {
+                const next = new Set(prev);
+                next.delete(user._id);
+                return next;
+            });
         }
     };
 
@@ -291,10 +301,18 @@ export default function UsersDashboard() {
                                                         {u.isActive && (!u.isSetupComplete || !u.lastLogin) && (
                                                             <button
                                                                 onClick={(e) => { e.stopPropagation(); handleResendInvite(u); }}
-                                                                className="p-1 px-2 text-[10px] font-bold text-amber-600 hover:bg-amber-50 rounded-lg border border-amber-200 transition"
+                                                                disabled={resendingIds.has(u._id)}
+                                                                className={`p-1 px-2 text-[10px] font-bold rounded-lg border transition flex items-center justify-center gap-1.5 min-w-[60px] ${
+                                                                    resendingIds.has(u._id) 
+                                                                    ? "bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed" 
+                                                                    : "text-amber-600 hover:bg-amber-50 border-amber-200"
+                                                                }`}
                                                                 title="Resend invitation link or credential reminder"
                                                             >
-                                                                RESEND
+                                                                {resendingIds.has(u._id) ? (
+                                                                    <div className="w-2.5 h-2.5 border-2 border-gray-300 border-t-gray-500 rounded-full animate-spin" />
+                                                                ) : null}
+                                                                {resendingIds.has(u._id) ? "SENDING..." : "RESEND"}
                                                             </button>
                                                         )}
                                                     </div>
@@ -378,6 +396,7 @@ export default function UsersDashboard() {
                                         onReassign={(user) => { setSelectedUser(user); setIsReassignModalOpen(true); }}
                                         onView={(user) => { setSelectedUser(user); setIsDetailsModalOpen(true); }}
                                         onResendInvite={handleResendInvite}
+                                        isResending={resendingIds.has(u._id)}
                                     />
                                 ))
                             )}

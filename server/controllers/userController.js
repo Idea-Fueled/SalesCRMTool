@@ -1150,9 +1150,12 @@ export const resendInvitation = async (req, res) => {
             `;
         }
 
+        console.log(`[resendInvitation] ATTEMPTING to resend to: ${user.email} (Type: ${user.isSetupComplete ? 'Reminder' : 'SetupLink'})`);
         await sendEmail(user.email, subject, message);
+        console.log(`[resendInvitation] SUCCESS: Email sent to: ${user.email}`);
         res.status(200).json({ message: "Reminder email sent successfully!" });
     } catch (error) {
+        console.error("❌ [resendInvitation] FAILURE:", error.message);
         res.status(500).json({ message: error.message || "Server error resending invitation." });
     }
 };

@@ -37,7 +37,7 @@ const Avatar = ({ name, profilePicture }) => {
     );
 };
 
-const UserCard = ({ user, onEdit, onDeactivate, onActivate, onReassign, onDelete, onView, onResendInvite }) => {
+const UserCard = ({ user, onEdit, onDeactivate, onActivate, onReassign, onDelete, onView, onResendInvite, isResending }) => {
     const RoleIcon = roleIcon[user.role] || UserCheck;
 
     return (
@@ -93,10 +93,14 @@ const UserCard = ({ user, onEdit, onDeactivate, onActivate, onReassign, onDelete
                     {user.isActive && (!user.isSetupComplete || !user.lastLogin) && (
                         <button
                             onClick={(e) => { e.stopPropagation(); onResendInvite(user); }}
-                            className="text-[10px] font-bold text-amber-600 hover:underline uppercase"
+                            disabled={isResending}
+                            className={`text-[10px] font-bold uppercase transition flex items-center gap-1.5 ${isResending ? "text-gray-400" : "text-amber-600 hover:underline"}`}
                             title="Resend invitation link or credential reminder"
                         >
-                            Resend
+                            {isResending ? (
+                                <div className="w-2 h-2 border border-gray-300 border-t-gray-500 rounded-full animate-spin" />
+                            ) : null}
+                            {isResending ? "Sending..." : "Resend"}
                         </button>
                     )}
                 </div>
