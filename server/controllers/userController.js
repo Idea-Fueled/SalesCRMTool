@@ -45,7 +45,11 @@ export const registerUser = async (req, res, next) => {
             } catch (e) { /* ignore */ }
         }
 
-        if (!firstName?.trim() || !lastName?.trim() || !email?.trim() || !role) {
+        const trimmedEmail = email?.trim().toLowerCase();
+        const trimmedFirstName = firstName?.trim();
+        const trimmedLastName = lastName?.trim();
+
+        if (!trimmedFirstName || !trimmedLastName || !trimmedEmail || !role) {
             return res.status(400).json({
                 message: "All required fields (First Name, Last Name, Email, Role) must be filled!"
             })
@@ -57,7 +61,7 @@ export const registerUser = async (req, res, next) => {
             })
         }
 
-        const existingUser = await User.findOne({ email })
+        const existingUser = await User.findOne({ email: trimmedEmail })
         if (existingUser) {
             return res.status(400).json({
                 message: "User already exists!"
@@ -73,9 +77,9 @@ export const registerUser = async (req, res, next) => {
             const invitationExpiry = Date.now() + 3600000; // 1 hour
 
             user = await User.create({
-                firstName,
-                lastName,
-                email,
+                firstName: trimmedFirstName,
+                lastName: trimmedLastName,
+                email: trimmedEmail,
                 role,
                 managerId: role === "sales_rep" ? (managerId || null) : null,
                 isSetupComplete: false,
@@ -114,9 +118,9 @@ export const registerUser = async (req, res, next) => {
             // Self-Registration flow OR Admin-created with direct password
             const hashedPass = await generateHash(password)
             user = await User.create({
-                firstName,
-                lastName,
-                email,
+                firstName: trimmedFirstName,
+                lastName: trimmedLastName,
+                email: trimmedEmail,
                 password: hashedPass,
                 role,
                 managerId: isInvitation && role === "sales_rep" ? (managerId || null) : null,
@@ -171,12 +175,12 @@ export const registerUser = async (req, res, next) => {
 
         if (isInvitation) {
             try {
-                console.log(`[registerUser] Sending ${user.isSetupComplete ? 'Welcome' : 'Invitation'} email to: ${email}`);
-                await sendEmail(email, user.isSetupComplete ? "Welcome to mbdConsulting" : "Account Setup Invitation", message);
-                console.log(`[registerUser] Email SENT successfully to: ${email}`);
+                console.log(`[registerUser] ATTEMPTING email send to: ${user.email} (Flow: ${user.isSetupComplete ? 'Welcome' : 'Invitation'})`);
+                const subject = user.isSetupComplete ? "Welcome to mbdConsulting" : "Account Setup Invitation";
+                await sendEmail(user.email, subject, message);
+                console.log(`[registerUser] SUCCESS: Email sent to: ${user.email}`);
             } catch (err) {
-                console.error("❌ Email Delivery Error (Registration):", err);
-                // We still returned 201 above, but logging the error helps debug
+                console.error("❌ [registerUser] FAILURE: Email Delivery failed but user was created:", err.message);
             }
         }
 
