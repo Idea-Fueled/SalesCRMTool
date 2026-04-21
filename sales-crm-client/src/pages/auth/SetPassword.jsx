@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { setupPassword } from "../../API/services/userService";
 import { toast } from "react-hot-toast";
-import { Lock, CheckCircle, ArrowRight, ShieldCheck, Mail } from "lucide-react";
+import { Lock, CheckCircle, ArrowRight, ShieldCheck, Mail, Eye, EyeOff } from "lucide-react";
+import logoImg from "../../assets/Logo.png";
 
 export default function SetPassword() {
     const [searchParams] = useSearchParams();
@@ -11,6 +12,7 @@ export default function SetPassword() {
 
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
 
@@ -68,6 +70,10 @@ export default function SetPassword() {
         <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
             <div className="max-w-md w-full">
                 <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+                    <div className="bg-white p-8 pb-4 flex justify-center">
+                        <img src={logoImg} alt="mbdConsulting Logo" className="h-10 w-auto" />
+                    </div>
+
                     <div className="bg-red-600 p-8 text-center">
                         <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm border border-white/30">
                             <ShieldCheck size={32} className="text-white" />
@@ -84,30 +90,46 @@ export default function SetPassword() {
                             </div>
                         ) : (
                             <>
-                                <div className="space-y-4">
-                                    <div className="relative">
-                                        <Lock className="absolute left-4 top-4 text-gray-400" size={18} />
-                                        <input
-                                            type="password"
-                                            placeholder="Min. 6 characters"
-                                            className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 pl-12 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 transition"
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            required
-                                        />
+                                <div className="space-y-5">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">New Password</label>
+                                        <div className="relative">
+                                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                                            <input
+                                                type={showPassword ? "text" : "password"}
+                                                placeholder="Min. 6 characters"
+                                                className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 pl-12 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 transition"
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                required
+                                            />
+                                            <button 
+                                                type="button"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                                            >
+                                                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div className="relative">
-                                        <Lock className="absolute left-4 top-4 text-gray-400" size={18} />
-                                        <input
-                                            type="password"
-                                            placeholder="Min. 6 characters"
-                                            className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 pl-12 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 transition"
-                                            value={confirmPassword}
-                                            onChange={(e) => setConfirmPassword(e.target.value)}
-                                            required
-                                        />
+
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Confirm Password</label>
+                                        <div className="relative">
+                                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                                            <input
+                                                type={showPassword ? "text" : "password"}
+                                                placeholder="Min. 6 characters"
+                                                className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 pl-12 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 transition"
+                                                value={confirmPassword}
+                                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                                required
+                                            />
+                                        </div>
                                     </div>
-                                    <p className="text-[10px] text-gray-400 font-medium px-2">
+                                    
+                                    <p className="text-[10px] text-gray-400 font-bold px-2 flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
                                         * Password must be at least 6 characters long.
                                     </p>
                                 </div>
@@ -115,7 +137,7 @@ export default function SetPassword() {
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="w-full bg-red-600 text-white font-bold rounded-xl p-4 hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-100 disabled:opacity-70 disabled:scale-100 active:scale-95"
+                                    className="w-full bg-red-600 text-white font-bold rounded-xl p-4 hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-100 disabled:opacity-70 disabled:scale-100 active:scale-95 mt-2"
                                 >
                                     {loading ? "Activating account..." : "Complete Account Setup"}
                                 </button>

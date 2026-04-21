@@ -74,7 +74,7 @@ export const registerUser = async (req, res, next) => {
         if (isInvitation && !password) {
             // Invitation Flow: No password provided by the creator
             const invitationToken = crypto.randomBytes(32).toString("hex");
-            const invitationExpiry = Date.now() + 3600000; // 1 hour
+            const invitationExpiry = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
 
             user = await User.create({
                 firstName: trimmedFirstName,
@@ -106,7 +106,7 @@ export const registerUser = async (req, res, next) => {
                     <div style="text-align: center; margin: 30px 0;">
                         <a href="${setupUrl}" style="background-color: #e11d48; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Set Up Account</a>
                     </div>
-                    <p>This link is valid for 1 hour. If it expires, contact your administrator to resend the invite.</p>
+                    <p>This link is valid for 24 hours. If you did not request this, please ignore this email.</p>
                     <p>Or copy and paste this link:</p>
                     <p style="word-break: break-all; color: #64748b; font-size: 14px;">${setupUrl}</p>
                     <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
@@ -975,7 +975,7 @@ export const forgotPassword = async (req, res, next) => {
         const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
 
         user.resetPasswordToken = hashedToken;
-        user.resetPasswordExpiry = Date.now() + 3600000; // 1 hour
+        user.resetPasswordExpiry = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
 
         await user.save();
 
@@ -995,8 +995,7 @@ export const forgotPassword = async (req, res, next) => {
                 <div style="text-align: center; margin: 30px 0;">
                     <a href="${resetUrl}" style="background-color: #e11d48; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Reset Password</a>
                 </div>
-                <p>Or copy and paste this link into your browser:</p>
-                <p style="word-break: break-all; color: #64748b; font-size: 14px;">${resetUrl}</p>
+                <p>This link is valid for 24 hours. If you didn't make this request, you can safely ignore this email.</p>
                 <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
                 <p style="font-size: 12px; color: #94a3b8; text-align: center;">&copy; ${new Date().getFullYear()} mbdConsulting. All rights reserved.</p>
             </div>
@@ -1105,7 +1104,7 @@ export const resendInvitation = async (req, res) => {
 
         if (!user.isSetupComplete) {
             const invitationToken = crypto.randomBytes(32).toString("hex");
-            const invitationExpiry = Date.now() + 3600000; // 1 hour
+            const invitationExpiry = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
 
             user.invitationToken = invitationToken;
             user.invitationExpiry = invitationExpiry;
@@ -1124,7 +1123,7 @@ export const resendInvitation = async (req, res) => {
                     <div style="text-align: center; margin: 30px 0;">
                         <a href="${setupUrl}" style="background-color: #e11d48; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Set Up Account</a>
                     </div>
-                    <p>This link is valid for 1 hour.</p>
+                    <p>This link is valid for 24 hours.</p>
                     <p style="word-break: break-all; color: #64748b; font-size: 14px;">${setupUrl}</p>
                     <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
                     <p style="font-size: 12px; color: #94a3b8; text-align: center;">&copy; ${new Date().getFullYear()} mbdConsulting. All rights reserved.</p>
@@ -1181,7 +1180,7 @@ export const resendVerificationByEmail = async (req, res) => {
             console.log(`[resendVerificationByEmail] Path: Invitation Flow for ${email}`);
             // Flow A: Resend Account Setup Invitation
             const invitationToken = crypto.randomBytes(32).toString("hex");
-            const invitationExpiry = Date.now() + 3600000; // 1 hour
+            const invitationExpiry = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
 
             user.invitationToken = invitationToken;
             user.invitationExpiry = invitationExpiry;
@@ -1200,7 +1199,7 @@ export const resendVerificationByEmail = async (req, res) => {
                     <div style="text-align: center; margin: 30px 0;">
                         <a href="${setupUrl}" style="background-color: #e11d48; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Set Up Account</a>
                     </div>
-                    <p>This link is valid for 1 hour.</p>
+                    <p>This link is valid for 24 hours.</p>
                     <p style="word-break: break-all; color: #64748b; font-size: 14px;">${setupUrl}</p>
                     <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
                     <p style="font-size: 12px; color: #94a3b8; text-align: center;">&copy; ${new Date().getFullYear()} mbdConsulting. All rights reserved.</p>
@@ -1213,7 +1212,7 @@ export const resendVerificationByEmail = async (req, res) => {
             const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
 
             user.resetPasswordToken = hashedToken;
-            user.resetPasswordExpiry = Date.now() + 3600000; // 1 hour
+            user.resetPasswordExpiry = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
             await user.save();
 
             const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
@@ -1229,7 +1228,7 @@ export const resendVerificationByEmail = async (req, res) => {
                     <div style="text-align: center; margin: 30px 0;">
                         <a href="${resetUrl}" style="background-color: #e11d48; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Reset Password</a>
                     </div>
-                    <p>This link is valid for 1 hour.</p>
+                    <p>This link is valid for 24 hours.</p>
                     <p style="word-break: break-all; color: #64748b; font-size: 14px;">${resetUrl}</p>
                     <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
                     <p style="font-size: 12px; color: #94a3b8; text-align: center;">&copy; ${new Date().getFullYear()} mbdConsulting. All rights reserved.</p>
